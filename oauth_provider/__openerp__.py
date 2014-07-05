@@ -34,7 +34,7 @@ From client database redirects user to url1 at master database:
 
     url1 = '/oauth2/auth?%s' % urllib.urlencode({
 
-    'state': {"p": 1, "r": "%2Fweb%2Flogin%3F", "d": "some-test-3"},
+    'state': {"p": 1, "r": "%2Fweb%2Flogin%3F", "d": "client_database"},
 
     'redirect_uri': 'http://odoo.example.com/auth_oauth/signin',
 

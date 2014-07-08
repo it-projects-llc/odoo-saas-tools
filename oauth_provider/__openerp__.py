@@ -2,7 +2,7 @@
     'name' : 'OAuth2 server',
     'version' : '1.0.0',
     'author' : 'Ivan Yelizariev',
-    'category' : 'Base',
+    'category' : 'SaaS',
     'website' : 'https://it-projects.info',
 
     'depends' : ['web'],

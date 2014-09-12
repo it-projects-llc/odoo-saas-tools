@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<openerp>
+    <data noupdate="1">
+        <record id="saas_oauth_provider" model="auth.oauth.provider">
+            <field name="name">SaaS</field>
+            <field name="auth_endpoint">https://odoo.example.com/oauth2/auth</field>
+            <field name="scope">userinfo</field>
+            <field name="validation_endpoint">https://odoo.example.com/oauth2/tokeninfo</field>
+            <field name="data_endpoint"></field>
+            <field name="css_class">zocial openerp</field>
+            <field name="body">Log in via SaaS provider</field>
+            <field name="enabled" eval="True"/>
+        </record>
+	</data>
+</openerp>

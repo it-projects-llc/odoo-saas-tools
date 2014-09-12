@@ -1,5 +1,5 @@
 {
-    'name' : 'OAuth2 server',
+    'name' : 'OAuth2 provider',
     'version' : '1.0.0',
     'author' : 'Ivan Yelizariev',
     'category' : 'SaaS',
@@ -12,7 +12,31 @@
     'description': '''
 Addon allows to users to login in openerp databases via master database
 
-Depends on https://github.com/idan/oauthlib
+INSTALLATION
+============
+
+Dependencies
+------------
+
+* https://github.com/idan/oauthlib
+
+Server wide
+-----------
+
+You have to mark this module as server wide, e.g.
+
+in command line:
+
+    ./openerp-server --load=web,web_kanban,oauth_provider ...
+
+or in config file:
+
+    server_wide_modules=web,web_kanban,oauth_provider
+
+Database name
+-------------
+
+* Name of database must be equal to domain (FIXME)
 
 Basic flow
 ==========

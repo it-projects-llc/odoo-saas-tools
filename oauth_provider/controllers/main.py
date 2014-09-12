@@ -117,6 +117,13 @@ class OAuth2(http.Controller):
 
     @http.route('/oauth2/tokeninfo', type='http', auth='none')
     def tokeninfo(self, **kw):
+
+        domain = request.httprequest.host.split(':')[0]
+
+        domain = '8.0-saas-portal' # TMP
+
+        request.session.authenticate(domain)
+
         uri, http_method, body, headers = self._extract_params(request, kw)
 
         is_valid, req = self._server.verify_request(uri, http_method, body, headers)

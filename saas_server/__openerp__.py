@@ -17,6 +17,15 @@ Module for central database on odoo databases cluster. Cluster is a odoo install
 Functions:
 
 * create new databases
+* copy oauth provider data to new database
 * collect information about databases
+
+USING
+=====
+
+* You have to use --db-filter option  so that database with this module be determine unambiguously by host of request
+* install this module
+* Configure oauth provider data
+
     ''',
 }

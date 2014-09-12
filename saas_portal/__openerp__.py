@@ -8,6 +8,7 @@
     'depends' : ['oauth_provider', 'website'],
     'data':[
         'views/website.xml',
+        'views/res_config.xml',
         ],
     'installable': True,
 

@@ -49,3 +49,13 @@ class saas_portal(http.Controller):
         }
 
         return request.redirect('/oauth2/auth?%s' % werkzeug.url_encode(params))
+
+    @http.route(['/page/website.start', '/page/start'], type='http', auth="public", website=True)
+    def start(self, **post):
+
+        base_saas_domain = request.registry['ir.config_parameter'].get_param(request.cr, SUPERUSER_ID, "saas_portal.base_saas_domain")
+
+        values = {
+            'base_saas_domain': base_saas_domain,
+        }
+        return request.website.render("website.start", values)

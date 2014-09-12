@@ -2,13 +2,30 @@
 <openerp>
     <data>
 
+
+		<template id="theme" inherit_id="website.theme" name="saas portal assets">
+			<xpath expr="//link[@href='/website/static/src/css/website.css']" position="before">
+				<link rel='stylesheet' href='/saas_portal/static/src/css/odoo.css' t-ignore="true"/>
+			</xpath>
+		</template>
+
 		<template id="assets_frontend" inherit_id="website.assets_frontend" name="saas portal assets">
 			<xpath expr="." position="inside">
-				<link rel='stylesheet' href='/saas_portal/static/src/css/odoo.css'/>
 				<script type='text/javascript' src='/saas_portal/static/src/js/main.js'/>
 			</xpath>
 		</template>
 
+
+		<template id="layout" inherit_id="website.layout" name="inherited main layout">
+			<xpath expr="//main" position="after">
+				<style type="text/css">
+					#wrapwrap>footer{
+					background-color: #34495e;
+					}
+				</style>
+			</xpath>
+			
+		</template>
 
 		<template id="website.start" name="Free ERP: Start now" page="True" priority="29">
 			<t t-call="website.layout">
@@ -30,7 +47,7 @@
 												
 												<div class="input-group">
 													<input data-placement="bottom" name="odoo_db_name" data-trigger="manual" type="text" placeholder="your-company-name" class="form-control odoo_db_name" data-original-title="" title=""/>
-														<span class="input-group-addon">.odoo.com</span>
+														<span class="input-group-addon">.<t t-raw="base_saas_domain"/></span>
 
 													</div>                
 												</form>

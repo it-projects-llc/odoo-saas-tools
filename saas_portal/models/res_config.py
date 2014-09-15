@@ -6,6 +6,10 @@ class saas_portal_config_wizard(osv.osv_memory):
     _columns = {
         'base_saas_domain': fields.char('Base saas domain',
                                         help="e.g. odoo.com"),
+        'dbtemplate': fields.char('Template database',
+                                        help="Default template database (must exists on saas_server)"),
+        'saas_server_list': fields.char('Saas server list',
+                                        help="comma-separated list of saas_server"),
     }
 
     def get_default_base_saas_domain(self, cr, uid, ids, context=None):
@@ -22,3 +26,21 @@ class saas_portal_config_wizard(osv.osv_memory):
         config_parameters = self.pool.get("ir.config_parameter")
         for record in self.browse(cr, uid, ids, context=context):
             config_parameters.set_param(cr, uid, "saas_portal.base_saas_domain", record.base_saas_domain or '', context=context)
+
+    def get_default_dbtemplate(self, cr, uid, ids, context=None):
+        dbtemplate = self.pool.get("ir.config_parameter").get_param(cr, uid, "saas_portal.dbtemplate", default=None, context=context)
+        return {'dbtemplate': dbtemplate or False}
+
+    def set_dbtemplate(self, cr, uid, ids, context=None):
+        config_parameters = self.pool.get("ir.config_parameter")
+        for record in self.browse(cr, uid, ids, context=context):
+            config_parameters.set_param(cr, uid, "saas_portal.dbtemplate", record.dbtemplate or '', context=context)
+
+    def get_default_saas_server_list(self, cr, uid, ids, context=None):
+        saas_server_list = self.pool.get("ir.config_parameter").get_param(cr, uid, "saas_portal.saas_server_list", default=None, context=context)
+        return {'saas_server_list': saas_server_list or False}
+
+    def set_saas_server_list(self, cr, uid, ids, context=None):
+        config_parameters = self.pool.get("ir.config_parameter")
+        for record in self.browse(cr, uid, ids, context=context):
+            config_parameters.set_param(cr, uid, "saas_portal.saas_server_list", record.saas_server_list or '', context=context)

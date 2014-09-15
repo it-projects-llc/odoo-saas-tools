@@ -13,30 +13,21 @@ import simplejson
 
 from openerp.tools.translate import _
 
+import logging
+_logger = logging.getLogger(__name__)
+
 class saas_server(http.Controller):
     @http.route(['/saas_server/new_database'], type='http', auth='public')
     @fragment_to_query_string
     def new_database(self, **post):
-        # **post:
-        # lang
-        # module
-        # dbname
-        # tz
-        # client_id
-        # access_token
+        _logger.info('new_database post: %s', post)
 
+        state = simplejson.loads(post.get('state'))
+        new_db = state.get('d')
+        template_db = state.get('db_template')
 
-        # TODO install specific modules
-
-        template_db = '8.0-saas-client-template' # TODO
-        new_db = post.get('dbname')
-        new_db = '8.0-saas-client' # TMP
-        openerp.service.db.exp_drop(new_db) # TMP
-
-        dbuser = 'ivann'
         demo = False
-        lang = 'ru_RU'
-        action = 'base.action_run_ir_action_todo'
+        action = 'base.action_run_ir_action_todo' # TODO
 
         access_token = post['access_token']
 
@@ -47,14 +38,20 @@ class saas_server(http.Controller):
         if admin_data.get("error"):
             raise Exception(admin_data['error'])
 
+        client_id = admin_data.get('client_id')
+
+        openerp.service.db.exp_drop(new_db) # for debug
         #openerp.service.db.exp_create_database(new_db, demo, lang)
         openerp.service.db.exp_duplicate_database(template_db, new_db)
 
         registry = openerp.modules.registry.RegistryManager.get(new_db)
 
         with registry.cursor() as cr:
-            # create copy of oauth_provider
-            oauth_provider_data = {}
+            # update database.uuid
+            registry['ir.config_parameter'].set_param(cr, SUPERUSER_ID, 'database.uuid', client_id)
+
+            # save auth data
+            oauth_provider_data = {'enabled':True, 'client_id':client_id}
             for attr in ['name','auth_endpoint', 'scope', 'validation_endpoint', 'data_endpoint', 'css_class', 'body']:
                 oauth_provider_data[attr] = getattr(saas_oauth_provider, attr)
             oauth_provider_id = registry['auth.oauth.provider'].create(cr, SUPERUSER_ID, oauth_provider_data)
@@ -64,9 +61,9 @@ class saas_server(http.Controller):
                          'oauth_uid':admin_data['user_id'],
                          'oauth_access_token':access_token})
 
+            # get action_id
             action_id = registry['ir.model.data'].xmlid_to_res_id(cr, SUPERUSER_ID, action)
         new_db_domain = new_db
-        new_db_domain = 'localhost:8069' # TMP
 
         params = {
             'access_token':post['access_token'],
@@ -77,5 +74,5 @@ class saas_server(http.Controller):
                 }),
             'action':action
             }
-
-        return werkzeug.utils.redirect('http://%s/saas_client/new_database?%s' % (new_db_domain, werkzeug.url_encode(params)))
+        scheme = request.httprequest.scheme
+        return werkzeug.utils.redirect('{scheme}://{domain}/saas_client/new_database?{params}'.format(scheme=scheme, domain=new_db_domain, params=werkzeug.url_encode(params)))

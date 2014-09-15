@@ -75,7 +75,7 @@ class OAuth2Validator(RequestValidator):
         else:
             return True
 
-    def _load_application(self, client_id, req):
+    def _load_application(self, client_id, req, create=True):
         """
         If req.client was not set, load application instance for given client_id and store it
         in req.client
@@ -85,11 +85,10 @@ class OAuth2Validator(RequestValidator):
             app_id = app_obj.search(request.cr, SUPERUSER_ID, [('client_id','=',client_id)])
             if app_id:
                 app_id = app_id[0]
+            elif create:
+                app_id = app_obj.create(request.cr, SUPERUSER_ID, {'client_id':client_id})
+            if app_id:
                 req.client = app_obj.browse(request.cr, SUPERUSER_ID, app_id)
-            else:
-                req.client = 'TODO (create clien record)'
-                #log.debug("Failed body authentication: Application %s does not exist" % client_id)
-                #return None
         return req.client
 
     def validate_client_id(self, client_id, req, *args, **kwargs):
@@ -168,7 +167,7 @@ class OAuth2Validator(RequestValidator):
             'scope': token['scope'],
             'expires': expires.strftime(DEFAULT_SERVER_DATETIME_FORMAT),
             'token': token['access_token'],
-            #'application_id': req.client
+            'application_id': req.client.id
         })
 
         #if 'refresh_token' in token:

@@ -120,9 +120,7 @@ class OAuth2(http.Controller):
 
         domain = request.httprequest.host.split(':')[0]
 
-        domain = '8.0-saas-portal' # TMP
-
-        request.session.authenticate(domain)
+        request.session.authenticate(domain) # domain == dbname (see __openerp__.py)
 
         uri, http_method, body, headers = self._extract_params(request, kw)
 
@@ -131,6 +129,7 @@ class OAuth2(http.Controller):
 
         headers = None
         body = simplejson.dumps({'user_id':partner.id,
+                                 'client_id': req.client.client_id,
                                  'email':partner.email,
                                  'name':partner.name})
         status = 200

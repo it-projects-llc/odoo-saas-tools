@@ -36,7 +36,7 @@ or in config file:
 Database name
 -------------
 
-* Name of database must be equal to domain (FIXME)
+* Name of database must be equal to domain
 
 Basic flow
 ==========

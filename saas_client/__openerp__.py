@@ -4,12 +4,12 @@
     'author' : 'Ivan Yelizariev',
     'category' : 'SaaS',
     'website' : 'https://it-projects.info',
-    'depends' : ['auth_oauth'],
+    'depends' : ['auth_oauth', 'auth_oauth_check_client_id'],
     'data':[],
     'installable': True,
 
     'description': '''
-Module for client database.
+Module for client database. You have to install this module on template database (see saas_portal module)
 
 INSTALLATION
 ============

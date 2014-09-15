@@ -15,6 +15,8 @@
                     <div>
                         <group string="Domain">
 							<field name="base_saas_domain" placeholder="odoo.com" />
+							<field name="dbtemplate" placeholder="template.odoo.com" />
+							<field name="saas_server_list" placeholder="eu1.odoo.com,eu2.odoo.com" />
 						</group>
 					</div>
                 </form>

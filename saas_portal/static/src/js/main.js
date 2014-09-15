@@ -54,7 +54,7 @@ $(document).ready(function () {
             };
             var request = $.ajax(payload).done(
                 function(response, textStatus, jqXhr) {
-                    if (!response.error) {
+                    if (!response.result.error) {
                         var app = $input.attr('data-app') || url_params['app'] || '';
                         var cta_from = $input.attr('data-cta_from') || url_params['cta_from'] || false;
 

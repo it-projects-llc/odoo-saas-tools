@@ -39,10 +39,11 @@ class saas_portal(http.Controller):
         saas_server = saas_server_list[random.randint(0, len(saas_server_list)-1)]
         client_id = str(uuid.uuid1())
         scheme = request.httprequest.scheme
-
         full_dbname = self.get_full_dbname(post.get('dbname'))
-
         dbtemplate = request.registry['ir.config_parameter'].get_param(request.cr, SUPERUSER_ID, 'saas_portal.dbtemplate')
+
+        request.registry['oauth.application'].create(request.cr, SUPERUSER_ID, {'client_id': client_id, 'name':full_dbname})
+
         params = {
             'scope':'userinfo force_login trial skiptheuse',
             'state':simplejson.dumps({

@@ -93,15 +93,18 @@ class OAuth2(http.Controller):
 
 
         if  user.login == 'public':
-
+            scope = kw.get('scope')
             params = {'mode':'login',
-                      'scope':kw.get('scope'),
+                      'scope':scope,
                       #'debug':1,
                       #'login':?,
                       #'redirect_hostname':TODO,
                       'redirect': '/oauth2/auth?%s' % werkzeug.url_encode(kw)
             }
-            return self._response({'Location':'/web/login?%s' % werkzeug.url_encode(params)}, None, 302)
+            url = '/web/login'
+            if 'trial' in scope.split(' '):
+                url = '/web/signup'
+            return self._response({'Location':'{url}?{params}'.format(url=url, params=werkzeug.url_encode(params))}, None, 302)
         else:
             credentials.update({'user':user})
         

@@ -27,7 +27,7 @@ class saas_server(http.Controller):
         template_db = state.get('db_template')
 
         demo = False
-        action = 'base.action_run_ir_action_todo' # TODO
+        action = 'base.open_module_tree' # TODO
 
         access_token = post['access_token']
 
@@ -55,6 +55,13 @@ class saas_server(http.Controller):
             for attr in ['name','auth_endpoint', 'scope', 'validation_endpoint', 'data_endpoint', 'css_class', 'body']:
                 oauth_provider_data[attr] = getattr(saas_oauth_provider, attr)
             oauth_provider_id = registry['auth.oauth.provider'].create(cr, SUPERUSER_ID, oauth_provider_data)
+            registry['ir.model.data'].create(cr, SUPERUSER_ID, {
+                'name':'saas_oauth_provider',
+                'module':'saas_server',
+                'noupdate':True,
+                'model':'auth.oauth.provider',
+                'res_id':oauth_provider_id,
+            })
 
             admin = registry['res.users'].browse(cr, SUPERUSER_ID, SUPERUSER_ID)
             admin.write({'oauth_provider_id':oauth_provider_id,

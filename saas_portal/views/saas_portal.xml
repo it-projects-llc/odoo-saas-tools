@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <menuitem name="SaaS"
+            id="menu_base_saas"
+			sequence="30"
+            />
+		<menuitem id="menu_saas" parent="menu_base_saas" name="SaaS" sequence="1" />
+
+
+        <record id="view_clients_tree" model="ir.ui.view">
+            <field name="name">saas_portal.clients.tree</field>
+            <field name="model">oauth.application</field>
+            <field name="priority">4</field>
+            <field name="arch" type="xml">
+                <tree string="Clients">
+					<field name="name"/>
+                </tree>
+            </field>
+        </record>
+
+
+        <record id="view_clients_form" model="ir.ui.view">
+            <field name="name">saas_portal.clients.form</field>
+            <field name="model">oauth.application</field>
+            <field name="arch" type="xml">
+				<form string="Clients">
+					<group>
+						<group>
+							<field name="client_id"/>
+							<field name="name"/>
+						</group>
+					</group>
+					<field name="user_ids"/>
+				</form>
+            </field>
+        </record>
+
+        <record id="action_clients" model="ir.actions.act_window">
+            <field name="name">Clients</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">oauth.application</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+		<menuitem action="action_clients" id="menu_clients" parent="menu_saas" sequence="6"/>
+
+    </data>
+</openerp>

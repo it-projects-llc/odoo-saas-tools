@@ -11,7 +11,11 @@ class oauth_application(osv.Model):
 
     _name = 'oauth.application'
     _columns = {
-        'client_id' : fields.char('Client ID', select=True),
+        'name': fields.char('Database name', readonly=True),
+        'client_id' : fields.char('Client ID', readonly=True, select=True),
+        'token_ids': fields.one2many('oauth.access_token', 'application_id', 'Tokens'),
+        'user_ids': fields.related('token_ids', 'user_id', readonly=True, type='one2many', relation='res.users', string='Users'),
+
         #user = models.ForeignKey(AUTH_USER_MODEL, related_name="%(app_label)s_%(class)s")
         #help_text = _("Allowed URIs list, space separated")
         #redirect_uris = models.TextField(help_text=help_text,

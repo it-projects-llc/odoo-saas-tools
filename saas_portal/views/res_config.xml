@@ -11,6 +11,8 @@
                         <button string="Apply" type="object" name="execute" class="oe_highlight"/>
                         or
                         <button string="Cancel" type="object" name="cancel" class="oe_link"/>
+						<!-- TODO -->
+						<button string="Update statistics from servers" name="action_update_stats" type="object"/>
                     </header>
                     <div>
                         <group string="Domain">

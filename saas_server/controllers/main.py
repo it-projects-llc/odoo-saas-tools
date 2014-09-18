@@ -85,9 +85,9 @@ class saas_server(http.Controller):
         scheme = request.httprequest.scheme
         return werkzeug.utils.redirect('{scheme}://{domain}/saas_client/new_database?{params}'.format(scheme=scheme, domain=new_db_domain, params=werkzeug.url_encode(params)))
 
-    @http.route(['/saas_server/stats'], type='json', auth='public')
+    @http.route(['/saas_server/stats'], type='http', auth='public')
     def stats(self, **post):
         # TODO auth
         server_db = db_monodb()
         res = request.registry['saas_server.client'].update_all(request.cr, SUPERUSER_ID, server_db)
-        return res
+        return simplejson.dumps(res)

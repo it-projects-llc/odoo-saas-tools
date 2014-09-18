@@ -15,6 +15,9 @@
             <field name="arch" type="xml">
                 <tree string="Clients">
 					<field name="name"/>
+					<field name="users_len"/>
+					<field name="file_storage"/>
+					<field name="db_storage"/>
                 </tree>
             </field>
         </record>
@@ -29,6 +32,10 @@
 						<group>
 							<field name="client_id"/>
 							<field name="name"/>
+							<field name="users_len"/>
+							<field name="file_storage"/>
+							<field name="db_storage"/>
+							<field name="server"/>
 						</group>
 					</group>
 					<field name="user_ids"/>

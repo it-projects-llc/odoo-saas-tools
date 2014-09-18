@@ -3,6 +3,7 @@ from openerp import SUPERUSER_ID
 from openerp.addons.web import http
 from openerp.addons.web.http import request
 from openerp.addons.auth_oauth.controllers.main import fragment_to_query_string
+from openerp.addons.web.controllers.main import db_monodb
 import werkzeug
 import werkzeug.utils
 import datetime
@@ -27,7 +28,7 @@ class saas_server(http.Controller):
         template_db = state.get('db_template')
 
         demo = False
-        action = 'base.open_module_tree' # TODO
+        action = 'base.open_module_tree'
 
         access_token = post['access_token']
 
@@ -83,3 +84,10 @@ class saas_server(http.Controller):
             }
         scheme = request.httprequest.scheme
         return werkzeug.utils.redirect('{scheme}://{domain}/saas_client/new_database?{params}'.format(scheme=scheme, domain=new_db_domain, params=werkzeug.url_encode(params)))
+
+    @http.route(['/saas_server/stats'], type='json', auth='public')
+    def stats(self, **post):
+        # TODO auth
+        server_db = db_monodb()
+        res = request.registry['saas_server.client'].update_all(request.cr, SUPERUSER_ID, server_db)
+        return res

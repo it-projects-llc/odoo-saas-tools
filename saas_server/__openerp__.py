@@ -14,13 +14,14 @@
     'description': '''
 Module for central database on odoo databases cluster. Cluster is a odoo installation. Each cluster is located on a separate server, in the main.
 
-Functions:
+Functions
+---------
 
 * create new databases
 * copy oauth provider data to new database
 * collect information about databases
 
-USING
+Usage
 =====
 
 * You have to use --db-filter option  so that database with this module be determine unambiguously by host of request

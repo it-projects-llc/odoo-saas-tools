@@ -13,8 +13,6 @@ def get_size(start_path = '.'):
             total_size += os.path.getsize(fp)
     return total_size
 
-print get_size()
-
 class saas_server_client(osv.Model):
     _name = 'saas_server.client'
     _columns = {

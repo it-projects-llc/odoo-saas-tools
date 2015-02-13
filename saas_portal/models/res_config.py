@@ -1,19 +1,16 @@
-from openerp.osv import fields, osv
+from openerp import models, fields
 from openerp.addons.web.http import request
 import urllib2
 import simplejson
 
-class saas_portal_config_wizard(osv.osv_memory):
+
+class SaasPortalConfigWizard(models.TransientModel):
     _name = 'saas_portal.config.settings'
     _inherit = 'res.config.settings'
-    _columns = {
-        'base_saas_domain': fields.char('Base saas domain',
-                                        help="e.g. odoo.com"),
-        'dbtemplate': fields.char('Template database',
-                                        help="Default template database (must exists on saas_server)"),
-        'saas_server_list': fields.char('Saas server list',
-                                        help="comma-separated list of saas_server"),
-    }
+
+    base_saas_domain = fields.Char('Base SaaS domain')
+    dbtemplate = fields.Char('Template database')
+    saas_server_list = fields.Char('SaaS server list')
 
     def get_default_base_saas_domain(self, cr, uid, ids, context=None):
         base_saas_domain = self.pool.get("ir.config_parameter").get_param(cr, uid, "saas_portal.base_saas_domain", default=None, context=context)

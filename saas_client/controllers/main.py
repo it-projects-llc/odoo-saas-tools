@@ -1,16 +1,11 @@
-import openerp
-from openerp import SUPERUSER_ID
-from openerp.addons.web import http
-from openerp.addons.web.http import request
+# -*- coding: utf-8 -*-
 import werkzeug
-import datetime
-import time
-import uuid
-from functools import wraps
+from openerp import http
 
-from openerp.tools.translate import _
 
-class saas_client(http.Controller):
-    @http.route(['/saas_client/new_database'], type='http', auth='none', website=True)
+class SaasClient(http.Controller):
+
+    @http.route('/saas_client/new_database', type='http', auth='none')
     def new_database(self, **post):
-        return werkzeug.utils.redirect('/auth_oauth/signin?%s' % werkzeug.url_encode(post))
+        params = werkzeug.url_encode(post)
+        return werkzeug.utils.redirect('/auth_oauth/signin?%s' % params)

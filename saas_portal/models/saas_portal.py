@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-from openerp.osv import osv,fields
-from openerp import SUPERUSER_ID
+from openerp import models, fields
 
-class oauth_application(osv.Model):
+
+class OauthApplication(models.Model):
     _inherit = 'oauth.application'
 
-    _columns = {
-        'users_len': fields.integer('Count users', readonly=True),
-        'file_storage': fields.integer('File storage (MB)', readonly=True),
-        'db_storage': fields.integer('DB storage (MB)', readonly=True),
-        'server': fields.char('Server', readonly=True),
-    }
+    name = fields.Char('Database name', readonly=True)
+    client_id = fields.Char('Client ID', readonly=True, select=True)
+    users_len = fields.Integer('Count users', readonly=True)
+    file_storage = fields.Integer('File storage (MB)', readonly=True)
+    db_storage = fields.Integer('DB storage (MB)', readonly=True)
+    server = fields.Char('Server', readonly=True)

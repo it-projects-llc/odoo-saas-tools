@@ -38,7 +38,7 @@
 							<field name="server"/>
 						</group>
 					</group>
-					<field name="user_ids"/>
+					<!--<field name="user_ids"/>-->
 				</form>
             </field>
         </record>

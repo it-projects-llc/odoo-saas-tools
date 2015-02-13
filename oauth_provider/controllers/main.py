@@ -20,6 +20,7 @@ from oauthlib.oauth2.rfc6749 import errors
 from oauthlib.common import urlencode, urlencoded, quote
 from urlparse import urlparse, parse_qs, urlunparse
 
+
 # see https://oauthlib.readthedocs.org/en/latest/oauth2/server.html
 class OAuth2(http.Controller):
     def __init__(self):
@@ -59,6 +60,7 @@ class OAuth2(http.Controller):
     def _response_from_error(self, e):
         _logger.info("Error %s", e)
         return 'Error (TODO)'
+
     def _response(self, headers, body, status=200):
         response = werkzeug.Response(response=body, status=status, headers=headers)
         return response
@@ -74,28 +76,22 @@ class OAuth2(http.Controller):
         # debug: False
         # scope: userinfo
         uri, http_method, body, headers = self._extract_params(request, kw)
-
-        client_redirect = kw.get('redirect')
-
         user = request.registry['res.users'].browse(request.cr, SUPERUSER_ID, request.uid)
 
         try:
             scopes, credentials = self._server.validate_authorization_request(
                 uri, http_method, body, headers)
-
         # Errors that should be shown to the user on the provider website
         except errors.FatalClientError as e:
             return self._response_from_error(e)
-
         # Errors embedded in the redirect URI back to the client
         except errors.OAuth2Error as e:
-            return self._response({'Location':e.redirect_uri}, None, 302)
+            return self._response({'Location': e.redirect_uri}, None, 302)
 
-
-        if  user.login == 'public':
+        if user.login == 'public':
             scope = kw.get('scope')
-            params = {'mode':'login',
-                      'scope':scope,
+            params = {'mode': 'login',
+                      'scope': scope,
                       #'debug':1,
                       #'login':?,
                       #'redirect_hostname':TODO,
@@ -104,37 +100,28 @@ class OAuth2(http.Controller):
             url = '/web/login'
             if 'trial' in scope.split(' '):
                 url = '/web/signup'
-            return self._response({'Location':'{url}?{params}'.format(url=url, params=werkzeug.url_encode(params))}, None, 302)
+            return self._response({'Location': '{url}?{params}'.format(url=url, params=werkzeug.url_encode(params))}, None, 302)
         else:
-            credentials.update({'user':user})
-        
+            credentials.update({'user': user})
             try:
                 headers, body, status = self._server.create_authorization_response(
                 uri, http_method, body, headers, scopes, credentials)
                 return self._response(headers, body, status)
-        
             except errors.FatalClientError as e:
                 return self._response_from_error(e)
 
-    #@http.route('/web/login', type='http', auth='none')
-
     @http.route('/oauth2/tokeninfo', type='http', auth='none')
     def tokeninfo(self, **kw):
-
         domain = request.httprequest.host.split(':')[0]
-
-        request.session.authenticate(domain) # domain == dbname (see __openerp__.py)
-
+        request.session.authenticate(domain)
         uri, http_method, body, headers = self._extract_params(request, kw)
-
-        is_valid, req = self._server.verify_request(uri, http_method, body, headers)
+        is_valid, req = self._server.verify_request(uri, http_method, body,
+                                                    headers)
         partner = req.user.partner_id
-
         headers = None
-        body = simplejson.dumps({'user_id':partner.id,
+        body = simplejson.dumps({'user_id': partner.id,
                                  'client_id': req.client.client_id,
-                                 'email':partner.email,
-                                 'name':partner.name})
+                                 'email': partner.email,
+                                 'name': partner.name})
         status = 200
-
         return self._response(headers, body, status)

@@ -18,6 +18,14 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
+from openerp import http
+from openerp.tools import config
 
-import connector
-import database
+db_monodb_org = http.db_monodb
+
+
+def db_monodb(httprequest=None):
+    db = db_monodb_org(httprequest)
+    return db and db or config.get('main_database', None)
+
+http.db_monodb = db_monodb

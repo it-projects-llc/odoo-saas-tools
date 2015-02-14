@@ -23,7 +23,7 @@ class SaasPortal(http.Controller):
         if self.exists_database(dbname):
             full_dbname = self.get_full_dbname(dbname)
             params = {'db': full_dbname, 'login': 'admin', 'key': 'admin'}
-            redirect = 'http://%s/login' % full_dbname
+            redirect = 'http://%s/login' % full_dbname.replace('_', '.')
         else:
             params = request.params
             auth_signup = signup.AuthSignupHome()

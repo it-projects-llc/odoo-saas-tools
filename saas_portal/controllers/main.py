@@ -78,7 +78,8 @@ class SaasPortal(http.Controller):
         return config.get_param(request.cr, SUPERUSER_ID, full_param)
 
     def get_full_dbname(self, dbname):
-        return '%s.%s' % (dbname, self.get_config_parameter('base_saas_domain'))
+        full_dbname = '%s.%s' % (dbname, self.get_config_parameter('base_saas_domain'))
+        return full_dbname.replace('.', '_')
 
     def get_saas_server(self):
         saas_server_list = self.get_config_parameter('saas_server_list')

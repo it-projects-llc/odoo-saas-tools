@@ -75,7 +75,7 @@ class SaasServer(http.Controller):
             'action': action
             }
         scheme = request.httprequest.scheme
-        return werkzeug.utils.redirect('{scheme}://{domain}/saas_client/new_database?{params}'.format(scheme=scheme, domain=new_db_domain, params=werkzeug.url_encode(params)))
+        return werkzeug.utils.redirect('{scheme}://{domain}/saas_client/new_database?{params}'.format(scheme=scheme, domain=new_db_domain.replace('_', '.'), params=werkzeug.url_encode(params)))
 
     @http.route(['/saas_server/stats'], type='http', auth='public')
     def stats(self, **post):

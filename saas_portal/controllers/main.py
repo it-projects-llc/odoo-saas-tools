@@ -29,6 +29,7 @@ class SaasPortal(http.Controller):
             auth_signup = signup.AuthSignupHome()
             qcontext = auth_signup.get_auth_signup_qcontext()
             auth_signup.do_signup(qcontext)
+            params['uid'] = request.uid
         return request.redirect('%s?%s' % (redirect, werkzeug.url_encode(params)))
 
     @http.route(['/saas_portal/trial_check'], type='json', auth='public', website=True)

@@ -76,7 +76,7 @@ class OAuth2(http.Controller):
         # debug: False
         # scope: userinfo
         uri, http_method, body, headers = self._extract_params(request, kw)
-        user = request.registry['res.users'].browse(request.cr, SUPERUSER_ID, request.uid)
+        user = self.get_user(kw)
 
         try:
             scopes, credentials = self._server.validate_authorization_request(
@@ -126,3 +126,8 @@ class OAuth2(http.Controller):
                                  'name': partner.name})
         status = 200
         return self._response(headers, body, status)
+
+    def get_user(self, kw):
+        user_obj = request.registry['res.users']
+        uid = kw.get('uid', False) or request.uid
+        return user_obj.browse(request.cr, SUPERUSER_ID, int(uid))

@@ -17,7 +17,7 @@ class SignupError(Exception):
 
 class SaasPortal(http.Controller):
 
-    @http.route('/saas_portal/signup', type='http', auth="none")
+    @http.route('/saas_portal/signup', type='http', auth="none", website=True)
     def web_portal_signup(self, redirect="/saas_portal/book_then_signup", **kw):
         dbname = request.params['dbname']
         if self.exists_database(dbname):
@@ -29,7 +29,7 @@ class SaasPortal(http.Controller):
             auth_signup = signup.AuthSignupHome()
             qcontext = auth_signup.get_auth_signup_qcontext()
             auth_signup.do_signup(qcontext)
-        return werkzeug.utils.redirect('%s?%s' % (redirect, werkzeug.url_encode(params)))
+        return request.redirect('%s?%s' % (redirect, werkzeug.url_encode(params)))
 
     @http.route(['/saas_portal/trial_check'], type='json', auth='public', website=True)
     def trial_check(self, **post):

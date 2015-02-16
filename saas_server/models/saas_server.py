@@ -2,6 +2,7 @@ import os
 import openerp
 from openerp import SUPERUSER_ID
 from openerp import models, fields
+from openerp.addons.saas_utils import connector
 
 
 def get_size(start_path='.'):
@@ -13,6 +14,34 @@ def get_size(start_path='.'):
     return total_size
 
 
+class SaasServerPlan(models.Model):
+    _name = 'saas_server.plan'
+
+    name = fields.Char('Plan')
+    template = fields.Char('Template')
+    demo = fields.Boolean('Demo Data')
+    state = fields.Selection([('draft', 'Draft'), ('confirmed', 'Confirmed')],
+                             'State', default='draft')
+    required_addons_ids = fields.Many2many('ir.module.module',
+                                           rel='company_required_addons_rel',
+                                           id1='company_id', id2='module_id',
+                                           string='Required Addons')
+    client_ids = fields.One2many('saas_server.client', 'plan_id', 'Clients')
+
+    def create_template(self, cr, uid, ids, context=None):
+        obj = self.browse(cr, uid, ids[0])
+        openerp.service.db.exp_create_database(obj.template, obj.demo, 'en_US')
+        addon_names = [x.name for x in obj.required_addons_ids]
+
+        to_search = [('name', 'in', addon_names)]
+        addon_ids = connector.call(obj.template, 'ir.module.module',
+                                   'search', to_search)
+        for addon_id in addon_ids:
+            connector.call(obj.template, 'ir.module.module',
+                           'button_immediate_install', addon_id)
+        return self.write(cr, uid, obj.id, {'state': 'confirmed'})
+
+
 class SaasServerClient(models.Model):
     _name = 'saas_server.client'
 
@@ -21,6 +50,7 @@ class SaasServerClient(models.Model):
     users_len = fields.Integer('Count users')
     file_storage = fields.Integer('File storage (MB)')
     db_storage = fields.Integer('DB storage (MB)')
+    plan_id = fields.Many2one('saas_server.plan', 'Plan')
 
     def update_all(self, cr, uid, server_db):
         db_list = openerp.service.db.exp_list()
@@ -62,3 +92,10 @@ class SaasServerClient(models.Model):
                 res.append(data)
 
         return res
+
+
+class ResUsers(models.Model):
+    _name = 'res.users'
+    _inherit = 'res.users'
+
+    plan_id = fields.Many2one('saas_server.plan', 'Plan')

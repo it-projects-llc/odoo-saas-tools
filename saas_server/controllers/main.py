@@ -2,6 +2,7 @@
 import openerp
 from openerp import SUPERUSER_ID
 from openerp import http
+from openerp.addons import auth_signup
 from openerp.addons.web.http import request
 from openerp.addons.auth_oauth.controllers.main import fragment_to_query_string
 from openerp.addons.web.controllers.main import db_monodb
@@ -23,7 +24,7 @@ class SaasServer(http.Controller):
 
         state = simplejson.loads(post.get('state'))
         new_db = state.get('d')
-        template_db = state.get('db_template')
+        template_db = self.get_template(state)
         action = 'base.open_module_tree'
         access_token = post['access_token']
         saas_oauth_provider = request.registry['ir.model.data'].xmlid_to_object(request.cr, SUPERUSER_ID, 'saas_server.saas_oauth_provider')
@@ -83,3 +84,38 @@ class SaasServer(http.Controller):
         server_db = db_monodb()
         res = request.registry['saas_server.client'].update_all(request.cr, SUPERUSER_ID, server_db)
         return simplejson.dumps(res)
+
+    def get_template(self, state):
+        user_model = request.registry.get('res.users')
+        user = user_model.browse(request.cr, SUPERUSER_ID, request.uid)
+        if user.plan_id and user.plan_id.state == 'confirmed':
+            return user.plan_id.template
+        return state.get('db_template')
+
+
+class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
+
+    def get_auth_signup_qcontext(self):
+        qcontext = super(AuthSignupHome, self).get_auth_signup_qcontext()
+        if not qcontext.get('plans', False):
+            sp = request.registry.get('saas_server.plan')
+            plans = sp.search_read(request.cr, 1,
+                                   [('state', '=', 'confirmed')],
+                                   ['template'])
+            qcontext['plans'] = [x['template'] for x in plans]
+        return qcontext
+
+    def do_signup(self, qcontext):
+        values = dict((key, qcontext.get(key)) for key in ('login', 'name', 'password'))
+        if qcontext.get('plan', False):
+            values['plan_id'] = self.get_plan(qcontext['plan'])
+        assert any([k for k in values.values()]), "The form was not properly filled in."
+        assert values.get('password') == qcontext.get('confirm_password'), "Passwords do not match; please retype them."
+        self._signup_with_values(qcontext.get('token'), values)
+        request.cr.commit()
+
+    def get_plan(self, plan):
+        domain = [('template', '=', plan)]
+        model = request.registry.get('saas_server.plan')
+        plan_ids = model.search(request.cr, SUPERUSER_ID, domain)
+        return plan_ids and plan_ids[0] or False

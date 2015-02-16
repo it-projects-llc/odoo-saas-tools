@@ -4,8 +4,12 @@
     'author': 'Ivan Yelizariev',
     'category': 'SaaS',
     'website': 'https://it-projects.info',
-    'depends': ['auth_oauth'],
-    'data': ['data/auth_oauth_data.xml'],
+    'depends': ['auth_oauth', 'saas_portal'],
+    'data': [
+        'data/auth_oauth_data.xml',
+        'views/saas_server.xml',
+        'views/signup.xml'
+    ],
     'installable': True,
     'description': '''
 

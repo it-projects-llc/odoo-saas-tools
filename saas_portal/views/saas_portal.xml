@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
-        <menuitem name="SaaS"
-            id="menu_base_saas"
-			sequence="30"
-            />
+        <menuitem name="SaaS" id="menu_base_saas" sequence="30" />
 		<menuitem id="menu_saas" parent="menu_base_saas" name="SaaS" sequence="1" />
 
 
@@ -18,6 +15,8 @@
 					<field name="users_len"/>
 					<field name="file_storage"/>
 					<field name="db_storage"/>
+					<button name="edit_db" type="object" icon="gtk-edit" />
+					<button name="upgrade_db" type="object" icon="gtk-execute" />
                 </tree>
             </field>
         </record>
@@ -38,7 +37,7 @@
 							<field name="server"/>
 						</group>
 					</group>
-					<!--<field name="user_ids"/>-->
+					<field name="user_ids"/>
 				</form>
             </field>
         </record>
@@ -52,6 +51,27 @@
         </record>
 
 		<menuitem action="action_clients" id="menu_clients" parent="menu_saas" sequence="6"/>
+		
+		<!-- Config -->
+		
+		<record id="action_database_form" model="ir.ui.view">
+            <field name="name">action.database.form</field>
+            <field name="model">saas.config</field>
+            <field name="arch" type="xml">
+                <form string="Configure Database" create="false" edit="false" delete="false">	
+				     <group>
+				     	<field name="action" readonly="1"/>
+						<field name="addons" attrs="{'invisible': [('action', '!=', 'upgrade')]}"/>
+				        <field name="database" readonly="1"/>
+				     </group>
+					 <footer>
+					 	<button name="execute_action" string="Execute" type="object" class="oe_highlight"/>
+	                    or
+	                    <button string="Cancel" class="oe_link" special="cancel"/>
+	                </footer>
+                </form>
+            </field>
+        </record>
 
     </data>
 </openerp>

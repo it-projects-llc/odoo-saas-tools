@@ -42,6 +42,11 @@ class SaasServerPlan(models.Model):
                            'button_immediate_install', addon_id)
         return self.write(cr, uid, obj.id, {'state': 'confirmed'})
 
+    def delete_template(self, cr, uid, ids, context=None):
+        obj = self.browse(cr, uid, ids[0])
+        openerp.service.db.exp_drop(obj.database)
+        return self.write(cr, uid, obj.id, {'state': 'draft'})
+
 
 class SaasServerClient(models.Model):
     _name = 'saas_server.client'

@@ -32,7 +32,8 @@ class SaasServerPlan(models.Model):
         obj = self.browse(cr, uid, ids[0])
         openerp.service.db.exp_create_database(obj.template, obj.demo, 'en_US')
         addon_names = [x.name for x in obj.required_addons_ids]
-
+        if 'saas_client' not in addon_names:
+            addon_names.append('saas_client')
         to_search = [('name', 'in', addon_names)]
         addon_ids = connector.call(obj.template, 'ir.module.module',
                                    'search', to_search)

@@ -44,7 +44,7 @@ class SaasServerPlan(models.Model):
 
     def delete_template(self, cr, uid, ids, context=None):
         obj = self.browse(cr, uid, ids[0])
-        openerp.service.db.exp_drop(obj.database)
+        openerp.service.db.exp_drop(obj.template)
         return self.write(cr, uid, obj.id, {'state': 'draft'})
 
 

@@ -27,6 +27,7 @@
 						<field name="name"/>
 						<field name="template"/>
 						<field name="demo"/>
+						<field name="sequence"/>
 					</group>
 					<notebook>
 						<page string="Required Addons" >

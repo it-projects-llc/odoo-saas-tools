@@ -20,6 +20,7 @@ class SaasServerPlan(models.Model):
     name = fields.Char('Plan')
     template = fields.Char('Template')
     demo = fields.Boolean('Demo Data')
+    sequence = fields.Integer('Sequence')
     state = fields.Selection([('draft', 'Draft'), ('confirmed', 'Confirmed')],
                              'State', default='draft')
     required_addons_ids = fields.Many2many('ir.module.module',
@@ -27,6 +28,8 @@ class SaasServerPlan(models.Model):
                                            id1='company_id', id2='module_id',
                                            string='Required Addons')
     client_ids = fields.One2many('saas_server.client', 'plan_id', 'Clients')
+
+    _order = 'sequence'
 
     def create_template(self, cr, uid, ids, context=None):
         obj = self.browse(cr, uid, ids[0])

@@ -112,7 +112,8 @@ class OAuth2(http.Controller):
 
     @http.route('/oauth2/tokeninfo', type='http', auth='none')
     def tokeninfo(self, **kw):
-        domain = request.httprequest.host.split(':')[0]
+        #domain = request.httprequest.host.split(':')[0]
+        domain = request.httprequest.host
         domain = domain.replace('.', '_')
         request.session.authenticate(domain)
         uri, http_method, body, headers = self._extract_params(request, kw)

@@ -60,7 +60,7 @@ class SaasConfig(models.TransientModel):
 
     def edit_database(self, cr, uid, obj, context=None):
         params = (obj.database.replace('_', '.'), obj.database)
-        url = 'https://%s/login?db=%s&login=admin&key=admin' % params
+        url = 'http://%s/login?db=%s&login=admin&key=admin' % params
         return {
             'type': 'ir.actions.act_url',
             'target': 'self',

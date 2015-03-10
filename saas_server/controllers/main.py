@@ -6,6 +6,7 @@ from openerp.addons import auth_signup
 from openerp.addons.web.http import request
 from openerp.addons.auth_oauth.controllers.main import fragment_to_query_string
 from openerp.addons.web.controllers.main import db_monodb
+from openerp.addons.saas_utils import connector
 
 import werkzeug.utils
 import simplejson
@@ -64,6 +65,10 @@ class SaasServer(http.Controller):
 
             # get action_id
             action_id = registry['ir.model.data'].xmlid_to_res_id(cr, SUPERUSER_ID, action)
+        
+        role = template_db
+        organization = new_db.split('_')
+        self.update_new_database(new_db, admin_data['email'], admin_data['name'], role, organization[0])
         new_db_domain = new_db
 
         params = {
@@ -91,6 +96,25 @@ class SaasServer(http.Controller):
         if user.plan_id and user.plan_id.state == 'confirmed':
             return user.plan_id.template
         return state.get('db_template')
+    
+    def update_new_database(self, database, login, name ,role, organization):
+        # Update created database
+        # 1. Set name to company
+        args = ([1], {'name': organization, 'role': role})
+        connector.call(database, 'res.company', 'write', *args)
+        # 2. Update user credentials
+        values={}
+        values['login'] = login
+        values['name'] = name
+        values['password'] = 'admin'
+        args = ([('login', '=', role)],)
+        user_ids = connector.call(database, 'res.users', 'search', *args)
+        user_ids = user_ids and user_ids or [1]
+        connector.call(database, 'res.users', 'write', user_ids, values)
+        # Update master database
+        # 4. Add new partner in master database
+        vals = {'name': organization, role: True}
+        request.registry.get('res.partner').create(request.cr, 1, vals)
 
 
 class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):

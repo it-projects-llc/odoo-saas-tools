@@ -34,6 +34,7 @@ class SaasServer(http.Controller):
         if admin_data.get("error"):
             raise Exception(admin_data['error'])
         client_id = admin_data.get('client_id')
+        organization = new_db.split('_')[0].capitalize()
 
         openerp.service.db.exp_drop(new_db) # for debug
         openerp.service.db.exp_duplicate_database(template_db, new_db)
@@ -59,9 +60,7 @@ class SaasServer(http.Controller):
             })
 
             # 1. Update company with organization
-            vals = {
-                'name': new_db.split('_')[0].capitalize()
-            }
+            vals = {'name': organization}
             registry['res.company'].write(cr, SUPERUSER_ID, 1, vals)
 
             # 2. Update user credentials
@@ -72,7 +71,6 @@ class SaasServer(http.Controller):
             user.write({
                 'login': admin_data['email'],
                 'name': admin_data['name'],
-                'password': 'admin',
                 'oauth_provider_id': oauth_provider_id,
                 'oauth_uid': admin_data['user_id'],
                 'oauth_access_token': access_token
@@ -81,6 +79,7 @@ class SaasServer(http.Controller):
             # get action_id
             action_id = registry['ir.model.data'].xmlid_to_res_id(cr, SUPERUSER_ID, action)
 
+        self.update_database(organization, new_db)
         params = {
             'access_token': post['access_token'],
             'state': simplejson.dumps({
@@ -107,6 +106,14 @@ class SaasServer(http.Controller):
             return user.plan_id.template
         return state.get('db_template')
 
+    def update_database(self, organization, database):
+        partner = request.registry.get('res.partner')
+        partner.create(request.cr, SUPERUSER_ID, {'name': organization,
+                                                  'is_company': True})
+        user = request.registry.get('res.users')
+        user.write(request.cr, SUPERUSER_ID, request.uid,
+                   {'database': database, 'organization': organization})
+
 
 class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
 
@@ -114,7 +121,7 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
         qcontext = super(AuthSignupHome, self).get_auth_signup_qcontext()
         if not qcontext.get('plans', False):
             sp = request.registry.get('saas_server.plan')
-            plans = sp.search_read(request.cr, 1,
+            plans = sp.search_read(request.cr, SUPERUSER_ID,
                                    [('state', '=', 'confirmed')],
                                    ['template'])
             qcontext['plans'] = [x['template'] for x in plans]

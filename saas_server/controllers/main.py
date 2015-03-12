@@ -119,33 +119,25 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
 
     def get_auth_signup_qcontext(self):
         qcontext = super(AuthSignupHome, self).get_auth_signup_qcontext()
+        context = request.context
         if not qcontext.get('plans', False):
             sp = request.registry.get('saas_server.plan')
-            plans = sp.search_read(request.cr, SUPERUSER_ID,
-                                   [('state', '=', 'confirmed')],
-                                   ['template'])
-            qcontext['plans'] = [x['template'] for x in plans]
-        if not qcontext.get('countries',False):
+            plan_ids = sp.search(request.cr, SUPERUSER_ID, [], context=context)
+            qcontext['plans'] = sp.browse(request.cr, SUPERUSER_ID, plan_ids, context=context)
+        if not qcontext.get('countries', False):
             orm_country = request.registry.get('res.country')
-            context = request.context
-            country_ids = orm_country.search(request.cr, SUPERUSER_ID, [],context=context)
-            countries = orm_country.browse(request.cr, SUPERUSER_ID, country_ids,context=context)
+            country_ids = orm_country.search(request.cr, SUPERUSER_ID, [], context=context)
+            countries = orm_country.browse(request.cr, SUPERUSER_ID, country_ids, context=context)
             qcontext['countries'] = countries
         return qcontext
 
     def do_signup(self, qcontext):
         values = dict((key, qcontext.get(key)) for key in ('login', 'name', 'password'))
         if qcontext.get('plan', False):
-            values['plan_id'] = self.get_plan(qcontext['plan'])
+            values['plan_id'] = qcontext['plan_id']
         if qcontext.get('country_id', False):
             values['country_id'] = qcontext['country_id']
         assert any([k for k in values.values()]), "The form was not properly filled in."
         assert values.get('password') == qcontext.get('confirm_password'), "Passwords do not match; please retype them."
         self._signup_with_values(qcontext.get('token'), values)
         request.cr.commit()
-
-    def get_plan(self, plan):
-        domain = [('template', '=', plan)]
-        model = request.registry.get('saas_server.plan')
-        plan_ids = model.search(request.cr, SUPERUSER_ID, domain)
-        return plan_ids and plan_ids[0] or False

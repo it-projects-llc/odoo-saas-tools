@@ -5,11 +5,12 @@
 		<template id="saas_server.signup_fields" inherit_id="auth_signup.fields" >
 			<xpath expr="//div[@class='form-group field-name']" position="after">
 				<div class="form-group field-role">
-	                <label for="plan" class="control-label">Plan</label>
-					<select name="plan" id="plan" class="form-control" required="required" t-att-readonly="'readonly' if only_passwords else None"
+	                <label for="plan_id" class="control-label">Plan</label>
+					<select name="plan_id" class="form-control" required="required" t-att-readonly="'readonly' if only_passwords else None"
 						t-att-autofocus="'autofocus' if login and not only_passwords else None">
-						<t t-foreach="plans" t-as="pl">
-                        	<option><t t-esc="pl"/></option>
+						<option value="">Plan...</option>
+						<t t-foreach="plans or []" t-as="plan">
+                        	<option t-att-value="plan.id"><t t-esc="plan.name"/></option>
                     	</t>
                     </select>
 	            </div>

@@ -4,6 +4,7 @@
 
 		<template id="saas_server.signup_fields" inherit_id="auth_signup.fields" >
 			<xpath expr="//div[@class='form-group field-name']" position="after">
+
 				<div class="form-group field-role">
 	                <label for="plan_id" class="control-label">Plan</label>
 					<select name="plan_id" class="form-control" required="required" t-att-readonly="'readonly' if only_passwords else None"
@@ -14,6 +15,14 @@
                     	</t>
                     </select>
 	            </div>
+
+				<div class="form-group field-name">
+	                <label for="organization" class="control-label">Organization</label>
+	                <input type="text" name="organization" t-att-value="organization" id="organization" class="form-control" placeholder="e.g. Reserva Inc."
+	                    required="required" t-att-readonly="'readonly' if only_passwords else None"
+	                    t-att-autofocus="'autofocus' if login and not only_passwords else None" />
+	            </div>
+
 	            <div t-attf-class="form-group  field-country">
                       <label class="control-label" for="country_id">Country</label>
                       <select name="country_id" class="form-control" t-att-readonly="'readonly' if only_passwords else None">
@@ -23,6 +32,7 @@
                           </t>
                       </select>
                   </div>
+
 			</xpath>
 		</template>
 		

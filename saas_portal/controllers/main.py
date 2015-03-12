@@ -50,6 +50,7 @@ class SaasPortal(http.Controller):
             'scope': 'userinfo force_login trial skiptheuse',
             'state': simplejson.dumps({
                 'd': full_dbname,
+                'o': post.get('organization'),
                 'u': '%s://%s' % (scheme, full_dbname),
                 'db_template': dbtemplate,
             }),

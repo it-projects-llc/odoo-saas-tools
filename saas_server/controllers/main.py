@@ -34,7 +34,7 @@ class SaasServer(http.Controller):
         if admin_data.get("error"):
             raise Exception(admin_data['error'])
         client_id = admin_data.get('client_id')
-        organization = new_db.split('_')[0].capitalize()
+        organization = state.get('o')
 
         openerp.service.db.exp_drop(new_db) # for debug
         openerp.service.db.exp_duplicate_database(template_db, new_db)

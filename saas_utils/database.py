@@ -19,13 +19,14 @@
 #
 ##############################################################################
 from openerp import http
-from openerp.tools import config
 
 db_monodb_org = http.db_monodb
 
 
 def db_monodb(httprequest=None):
     db = db_monodb_org(httprequest)
-    return db and db or config.get('main_database', None)
+    if not db:
+        return httprequest.host.replace('www.', '').replace('.', '_')
+    return db
 
 http.db_monodb = db_monodb

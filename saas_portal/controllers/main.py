@@ -57,7 +57,7 @@ class SaasPortal(http.Controller):
             'response_type': 'token',
             'client_id': client_id,
         }
-        return request.redirect('%s?%s' % (self.get_provider().auth_endpoint, werkzeug.url_encode(params)))
+        return request.redirect('/oauth2/auth?%s' % werkzeug.url_encode(params))
 
     @http.route(['/page/website.start', '/page/start'], type='http', auth="public", website=True)
     def start(self, **post):

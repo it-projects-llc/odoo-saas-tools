@@ -34,6 +34,7 @@ class SaasServer(http.Controller):
         if admin_data.get("error"):
             raise Exception(admin_data['error'])
         client_id = admin_data.get('client_id')
+        organization = new_db.split('_')[0].capitalize()
 
         openerp.service.db.exp_drop(new_db) # for debug
         openerp.service.db.exp_duplicate_database(template_db, new_db)
@@ -58,19 +59,27 @@ class SaasServer(http.Controller):
                 'res_id': oauth_provider_id,
             })
 
-            admin = registry['res.users'].browse(cr, SUPERUSER_ID, SUPERUSER_ID)
-            admin.write({'oauth_provider_id': oauth_provider_id,
-                         'oauth_uid': admin_data['user_id'],
-                         'oauth_access_token': access_token})
+            # 1. Update company with organization
+            vals = {'name': organization}
+            registry['res.company'].write(cr, SUPERUSER_ID, 1, vals)
+
+            # 2. Update user credentials
+            domain = [('login', '=', template_db)]
+            user_ids = registry['res.users'].search(cr, SUPERUSER_ID, domain)
+            user_id = user_ids and user_ids[0] or SUPERUSER_ID
+            user = registry['res.users'].browse(cr, SUPERUSER_ID, user_id)
+            user.write({
+                'login': admin_data['email'],
+                'name': admin_data['name'],
+                'oauth_provider_id': oauth_provider_id,
+                'oauth_uid': admin_data['user_id'],
+                'oauth_access_token': access_token
+            })
 
             # get action_id
             action_id = registry['ir.model.data'].xmlid_to_res_id(cr, SUPERUSER_ID, action)
-        
-        role = template_db
-        organization = new_db.split('_')
-        self.update_new_database(new_db, admin_data['email'], admin_data['name'], role, organization[0])
-        new_db_domain = new_db
 
+        self.update_database(organization, new_db)
         params = {
             'access_token': post['access_token'],
             'state': simplejson.dumps({
@@ -81,7 +90,7 @@ class SaasServer(http.Controller):
             'action': action
             }
         scheme = request.httprequest.scheme
-        return werkzeug.utils.redirect('{scheme}://{domain}/saas_client/new_database?{params}'.format(scheme=scheme, domain=new_db_domain.replace('_', '.'), params=werkzeug.url_encode(params)))
+        return werkzeug.utils.redirect('{scheme}://{domain}/saas_client/new_database?{params}'.format(scheme=scheme, domain=new_db.replace('_', '.'), params=werkzeug.url_encode(params)))
 
     @http.route(['/saas_server/stats'], type='http', auth='public')
     def stats(self, **post):
@@ -96,25 +105,14 @@ class SaasServer(http.Controller):
         if user.plan_id and user.plan_id.state == 'confirmed':
             return user.plan_id.template
         return state.get('db_template')
-    
-    def update_new_database(self, database, login, name ,role, organization):
-        # Update created database
-        # 1. Set name to company
-        args = ([1], {'name': organization, 'role': role})
-        connector.call(database, 'res.company', 'write', *args)
-        # 2. Update user credentials
-        values={}
-        values['login'] = login
-        values['name'] = name
-        values['password'] = 'admin'
-        args = ([('login', '=', role)],)
-        user_ids = connector.call(database, 'res.users', 'search', *args)
-        user_ids = user_ids and user_ids or [1]
-        connector.call(database, 'res.users', 'write', user_ids, values)
-        # Update master database
-        # 4. Add new partner in master database
-        vals = {'name': organization, role: True}
-        request.registry.get('res.partner').create(request.cr, 1, vals)
+
+    def update_database(self, organization, database):
+        partner = request.registry.get('res.partner')
+        partner.create(request.cr, SUPERUSER_ID, {'name': organization,
+                                                  'is_company': True})
+        user = request.registry.get('res.users')
+        user.write(request.cr, SUPERUSER_ID, request.uid,
+                   {'database': database, 'organization': organization})
 
 
 class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
@@ -123,7 +121,7 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
         qcontext = super(AuthSignupHome, self).get_auth_signup_qcontext()
         if not qcontext.get('plans', False):
             sp = request.registry.get('saas_server.plan')
-            plans = sp.search_read(request.cr, 1,
+            plans = sp.search_read(request.cr, SUPERUSER_ID,
                                    [('state', '=', 'confirmed')],
                                    ['template'])
             qcontext['plans'] = [x['template'] for x in plans]

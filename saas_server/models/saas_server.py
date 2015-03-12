@@ -108,3 +108,5 @@ class ResUsers(models.Model):
     _inherit = 'res.users'
 
     plan_id = fields.Many2one('saas_server.plan', 'Plan')
+    organization = fields.Char('Organization', size=64)
+    database = fields.Char('Database', size=64)

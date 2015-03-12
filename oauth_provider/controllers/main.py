@@ -62,7 +62,11 @@ class OAuth2(http.Controller):
         return 'Error (TODO)'
 
     def _response(self, headers, body, status=200):
-        response = werkzeug.Response(response=body, status=status, headers=headers)
+        try:
+            fixed_headers = {str(k): v for k, v in headers.items()}
+        except:
+            fixed_headers = headers
+        response = werkzeug.Response(response=body, status=status, headers=fixed_headers)
         return response
 
     @http.route('/oauth2/auth', type='http', auth='public')

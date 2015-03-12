@@ -125,12 +125,20 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
                                    [('state', '=', 'confirmed')],
                                    ['template'])
             qcontext['plans'] = [x['template'] for x in plans]
+        if not qcontext.get('countries',False):
+            orm_country = request.registry.get('res.country')
+            context = request.context
+            country_ids = orm_country.search(request.cr, SUPERUSER_ID, [],context=context)
+            countries = orm_country.browse(request.cr, SUPERUSER_ID, country_ids,context=context)
+            qcontext['countries'] = countries
         return qcontext
 
     def do_signup(self, qcontext):
         values = dict((key, qcontext.get(key)) for key in ('login', 'name', 'password'))
         if qcontext.get('plan', False):
             values['plan_id'] = self.get_plan(qcontext['plan'])
+        if qcontext.get('country_id', False):
+            values['country_id'] = qcontext['country_id']
         assert any([k for k in values.values()]), "The form was not properly filled in."
         assert values.get('password') == qcontext.get('confirm_password'), "Passwords do not match; please retype them."
         self._signup_with_values(qcontext.get('token'), values)

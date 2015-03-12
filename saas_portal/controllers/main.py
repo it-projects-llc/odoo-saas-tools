@@ -50,12 +50,12 @@ class SaasPortal(http.Controller):
             'scope': 'userinfo force_login trial skiptheuse',
             'state': simplejson.dumps({
                 'd': full_dbname,
-                'o': post.get('organization'),
                 'u': '%s://%s' % (scheme, full_dbname),
                 'db_template': dbtemplate,
             }),
             'redirect_uri': '{scheme}://{saas_server}/saas_server/new_database'.format(scheme=scheme, saas_server=saas_server),
             'response_type': 'token',
+            'organization': post.get('organization'),
             'client_id': client_id,
         }
         return request.redirect('/oauth2/auth?%s' % werkzeug.url_encode(params))

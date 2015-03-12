@@ -34,7 +34,9 @@ class SaasServer(http.Controller):
         if admin_data.get("error"):
             raise Exception(admin_data['error'])
         client_id = admin_data.get('client_id')
-        organization = state.get('o')
+
+        user = self.update_user_and_partner(new_db)
+        organization = user.organization
 
         openerp.service.db.exp_drop(new_db) # for debug
         openerp.service.db.exp_duplicate_database(template_db, new_db)
@@ -79,7 +81,6 @@ class SaasServer(http.Controller):
             # get action_id
             action_id = registry['ir.model.data'].xmlid_to_res_id(cr, SUPERUSER_ID, action)
 
-        self.update_database(organization, new_db)
         params = {
             'access_token': post['access_token'],
             'state': simplejson.dumps({
@@ -106,13 +107,14 @@ class SaasServer(http.Controller):
             return user.plan_id.template
         return state.get('db_template')
 
-    def update_database(self, organization, database):
-        partner = request.registry.get('res.partner')
-        partner.create(request.cr, SUPERUSER_ID, {'name': organization,
-                                                  'is_company': True})
-        user = request.registry.get('res.users')
-        user.write(request.cr, SUPERUSER_ID, request.uid,
-                   {'database': database, 'organization': organization})
+    def update_user_and_partner(self, database):
+        user_model = request.registry.get('res.users')
+        user = user_model.browse(request.cr, SUPERUSER_ID, request.uid)
+        user_model.write(request.cr, SUPERUSER_ID, user.id, {'database': database})
+        partner_model = request.registry.get('res.partner')
+        vals = {'name': user.organization, 'is_company': True}
+        partner_model.create(request.cr, SUPERUSER_ID, vals)
+        return user
 
 
 class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
@@ -133,8 +135,10 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
 
     def do_signup(self, qcontext):
         values = dict((key, qcontext.get(key)) for key in ('login', 'name', 'password'))
-        if qcontext.get('plan', False):
+        if qcontext.get('plan_id', False):
             values['plan_id'] = qcontext['plan_id']
+        if qcontext.get('organization', False):
+            values['organization'] = qcontext['organization']
         if qcontext.get('country_id', False):
             values['country_id'] = qcontext['country_id']
         assert any([k for k in values.values()]), "The form was not properly filled in."

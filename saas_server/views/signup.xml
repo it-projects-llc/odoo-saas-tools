@@ -13,6 +13,15 @@
                     	</t>
                     </select>
 	            </div>
+	            <div t-attf-class="form-group  field-country">
+                      <label class="control-label" for="country_id">Country</label>
+                      <select name="country_id" class="form-control" t-att-readonly="'readonly' if only_passwords else None">
+                          <option value="">Country...</option>
+                          <t t-foreach="countries or []" t-as="country">
+                          	   <option t-att-value="country.id"><t t-esc="country.name"/></option>
+                          </t>
+                      </select>
+                  </div>
 			</xpath>
 		</template>
 		

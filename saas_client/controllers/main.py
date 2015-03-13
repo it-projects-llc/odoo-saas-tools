@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import werkzeug
 from openerp import http
+from openerp.http import request
 
 
 class SaasClient(http.Controller):

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import openerp
 from openerp import models, fields
 from openerp.addons.saas_utils import connector
 from openerp import http
@@ -69,7 +70,7 @@ class SaasConfig(models.TransientModel):
             'url': url
         }
 
-    def upgrade_database(self, cr, uid, obj, context=None):  
+    def upgrade_database(self, cr, uid, obj, context=None):
         domain = [('name', 'in', obj.addons.split(','))]
         for db_name in self.get_databases(obj.database):
             openerp.sql_db.close_db(db_name)
@@ -80,6 +81,6 @@ class SaasConfig(models.TransientModel):
                 aids = connector.call(db_name, 'ir.module.module', 'search', domain)
                 connector.call(db_name, 'ir.module.module', 'button_upgrade', aids)
         return True
-    
+
     def get_databases(self, template):
         return [x for x in http.db_list() if x.split('_')[0] == template]

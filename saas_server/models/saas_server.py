@@ -1,7 +1,9 @@
 import os
+import netifaces
 import openerp
 from openerp import SUPERUSER_ID
 from openerp import models, fields
+from openerp.tools import config
 from openerp.addons.saas_utils import connector
 
 
@@ -46,7 +48,15 @@ class SaasServerPlan(models.Model):
         return self.write(cr, uid, obj.id, {'state': 'confirmed'})
 
     def edit_template(self, cr, uid, ids, context=None):
-        pass
+        obj = self.browse(cr, uid, ids[0])
+        d = config.get('local_url')
+        url = '%s/login?db=%s&login=admin&key=admin' % (d, obj.template)
+        return {
+            'type': 'ir.actions.act_url',
+            'target': 'self',
+            'name': 'Edit Template',
+            'url': url
+        }
 
     def delete_template(self, cr, uid, ids, context=None):
         obj = self.browse(cr, uid, ids[0])

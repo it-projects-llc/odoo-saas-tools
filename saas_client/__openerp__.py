@@ -5,7 +5,7 @@
     'category': 'SaaS',
     'website': 'https://it-projects.info',
     'depends': ['auth_oauth', 'auth_oauth_check_client_id'],
-    'data': [],
+    'data': ['views/login.xml'],
     'installable': True,
     'description': '''
 

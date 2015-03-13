@@ -81,7 +81,7 @@ class SaasPortal(http.Controller):
 
     def get_full_dbname(self, dbname):
         full_dbname = '%s.%s' % (dbname, self.get_config_parameter('base_saas_domain'))
-        return full_dbname.replace('.', '_')
+        return full_dbname.replace('www.', '').replace('.', '_')
 
     def get_saas_server(self):
         saas_server_list = self.get_config_parameter('saas_server_list')

@@ -4,7 +4,7 @@ import openerp
 from openerp import SUPERUSER_ID
 from openerp import models, fields
 from openerp.tools import config
-from openerp.addons.saas_utils import connector
+from openerp.addons.saas_utils import connector, database
 
 
 def get_size(start_path='.'):
@@ -75,7 +75,7 @@ class SaasServerClient(models.Model):
     plan_id = fields.Many2one('saas_server.plan', 'Plan')
 
     def update_all(self, cr, uid, server_db):
-        db_list = openerp.service.db.exp_list()
+        db_list = database.get_market_dbs()
         try:
             client_list.remove(server_db)
         except:

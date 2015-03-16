@@ -60,11 +60,9 @@ class SaasServer(http.Controller):
                 'model': 'auth.oauth.provider',
                 'res_id': oauth_provider_id,
             })
-
             # 1. Update company with organization
             vals = {'name': organization}
             registry['res.company'].write(cr, SUPERUSER_ID, 1, vals)
-
             # 2. Update user credentials
             domain = [('login', '=', template_db)]
             user_ids = registry['res.users'].search(cr, SUPERUSER_ID, domain)
@@ -73,11 +71,11 @@ class SaasServer(http.Controller):
             user.write({
                 'login': admin_data['email'],
                 'name': admin_data['name'],
+                'email': admin_data['email'],
                 'oauth_provider_id': oauth_provider_id,
                 'oauth_uid': admin_data['user_id'],
                 'oauth_access_token': access_token
             })
-
             # get action_id
             action_id = registry['ir.model.data'].xmlid_to_res_id(cr, SUPERUSER_ID, action)
 
@@ -110,10 +108,11 @@ class SaasServer(http.Controller):
     def update_user_and_partner(self, database):
         user_model = request.registry.get('res.users')
         user = user_model.browse(request.cr, SUPERUSER_ID, request.uid)
-        user_model.write(request.cr, SUPERUSER_ID, user.id, {'database': database})
+        vals = {'database': database, 'email': user.login}
+        user_model.write(request.cr, SUPERUSER_ID, user.id, vals)
         partner_model = request.registry.get('res.partner')
-        vals = {'name': user.organization, 'is_company': True}
-        partner_model.create(request.cr, SUPERUSER_ID, vals)
+        wals = {'name': user.organization, 'is_company': True}
+        partner_model.create(request.cr, SUPERUSER_ID, wals)
         return user
 
 

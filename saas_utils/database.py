@@ -18,7 +18,8 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
-from openerp import http
+from openerp import http, SUPERUSER_ID as SI
+from openerp.addons.web.http import request
 
 db_monodb_org = http.db_monodb
 
@@ -30,3 +31,9 @@ def db_monodb(httprequest=None):
     return db
 
 http.db_monodb = db_monodb
+
+
+def get_market_dbs():
+    icp = request.registry.get('ir.config_parameter')
+    bd = icp.get_param(request.cr, SI, 'saas_portal.base_saas_domain')
+    return [db for db in http.db_list(force=True) if db.endswith('_%s' % bd)]

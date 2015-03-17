@@ -40,6 +40,7 @@ class SaasPortal(http.Controller):
 
     @http.route(['/saas_portal/book_then_signup'], type='http', auth='public', website=True)
     def book_then_signup(self, **post):
+        # TDOD: check if domain exists
         saas_server = self.get_saas_server()
         scheme = request.httprequest.scheme
         full_dbname = self.get_full_dbname(post.get('dbname'))

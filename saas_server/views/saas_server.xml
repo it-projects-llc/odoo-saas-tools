@@ -13,6 +13,7 @@
 					<field name="state" />
 					<button name="create_template" type="object" states="draft" icon="gtk-apply" />
 					<button name="edit_template" type="object" states="confirmed" icon="gtk-edit" />
+					<button name="upgrade_template" type="object" states="confirmed" icon="gtk-redo" />
 					<button name="delete_template" type="object" states="confirmed" icon="gtk-cancel" />
                 </tree>
             </field>

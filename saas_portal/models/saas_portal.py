@@ -3,6 +3,7 @@ import openerp
 from openerp import models, fields
 from openerp.addons.saas_utils import connector, database
 from openerp import http
+from contextlib import closing
 
 
 class OauthApplication(models.Model):
@@ -71,8 +72,13 @@ class SaasConfig(models.TransientModel):
         }
 
     def upgrade_database(self, cr, uid, obj, context=None):
+        dbs = []
+        if obj.databse:
+            dbs = [obj.database]
+        else:
+            dbs = database.get_market_dbs()
         domain = [('name', 'in', obj.addons.split(','))]
-        for db_name in database.get_market_dbs():
+        for db_name in dbs:
             openerp.sql_db.close_db(db_name)
             db = openerp.sql_db.db_connect('postgres')
             with closing(db.cursor()) as cr:

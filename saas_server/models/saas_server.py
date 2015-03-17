@@ -58,6 +58,20 @@ class SaasServerPlan(models.Model):
             'url': url
         }
 
+    def upgrade_template(self, cr, uid, ids, context=None):
+        obj = self.browse(cr, uid, ids[0])
+        return {
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'saas.config',
+            'target': 'new',
+            'context': {
+                'default_action': 'upgrade',
+                'default_database': obj.template
+            }
+        }
+
     def delete_template(self, cr, uid, ids, context=None):
         obj = self.browse(cr, uid, ids[0])
         openerp.service.db.exp_drop(obj.template)

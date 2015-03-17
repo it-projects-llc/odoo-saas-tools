@@ -33,7 +33,14 @@ def db_monodb(httprequest=None):
 http.db_monodb = db_monodb
 
 
-def get_market_dbs():
+def get_market_dbs(with_templates=True):
+    dbs = []
+    if with_templates:
+        sp = request.registry.get('saas_server.plan')
+        data = sp.search_read(request.cr, SI, [('state', '=', 'confirmed')],
+                               ['template'])
+        dbs += [d['template'] for d in data]
     icp = request.registry.get('ir.config_parameter')
     bd = icp.get_param(request.cr, SI, 'saas_portal.base_saas_domain')
-    return [db for db in http.db_list(force=True) if db.endswith('_%s' % bd)]
+    dbs += [db for db in http.db_list(force=True) if db.endswith('_%s' % bd)]
+    return dbs

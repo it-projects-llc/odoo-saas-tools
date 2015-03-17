@@ -25,9 +25,12 @@
 				
 				<div class="form-group field-name">
 	                <label for="dbname" class="control-label">Subdomain</label>
-	                <input type="text" name="dbname" t-att-value="dbname" id="dbname" class="form-control" placeholder="reserva"
-	                    required="required" t-att-readonly="'readonly' if only_passwords else None"
-	                    t-att-autofocus="'autofocus' if login and not only_passwords else None" />
+	                    <div class="input-group">
+		                    <input type="text" name="dbname" t-att-value="dbname" id="dbname" class="form-control" placeholder="your-company-name"
+		                    required="required" t-att-readonly="'readonly' if only_passwords else None"
+		                    t-att-autofocus="'autofocus' if login and not only_passwords else None" />
+							<span class="input-group-addon">.<t t-raw="base_saas_domain"/></span>
+						</div> 
 	            </div>
 
 	            <div t-attf-class="form-group  field-country">

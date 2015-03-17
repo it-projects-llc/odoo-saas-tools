@@ -73,7 +73,7 @@ class SaasConfig(models.TransientModel):
 
     def upgrade_database(self, cr, uid, obj, context=None):
         dbs = []
-        if obj.databse:
+        if obj.database:
             dbs = [obj.database]
         else:
             dbs = database.get_market_dbs()

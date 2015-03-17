@@ -8,5 +8,11 @@
 			</xpath>
 		</template>
 		
+		<template id="login_no_link_saas_provider" inherit_id="auth_oauth.providers" >
+			<xpath expr="//div[@t-foreach='providers']" position="replace">
+
+			</xpath>
+		</template>
+		
 	</data>
 </openerp>

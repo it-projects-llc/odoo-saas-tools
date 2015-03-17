@@ -22,6 +22,13 @@
 	                    required="required" t-att-readonly="'readonly' if only_passwords else None"
 	                    t-att-autofocus="'autofocus' if login and not only_passwords else None" />
 	            </div>
+				
+				<div class="form-group field-name">
+	                <label for="dbname" class="control-label">Subdomain</label>
+	                <input type="text" name="dbname" t-att-value="dbname" id="dbname" class="form-control" placeholder="reserva"
+	                    required="required" t-att-readonly="'readonly' if only_passwords else None"
+	                    t-att-autofocus="'autofocus' if login and not only_passwords else None" />
+	            </div>
 
 	            <div t-attf-class="form-group  field-country">
                       <label class="control-label" for="country_id">Country</label>
@@ -33,6 +40,13 @@
                       </select>
                   </div>
 
+			</xpath>
+		</template>
+		
+		<template id="saas_server.tenant" inherit_id="website.layout" >
+			<xpath expr="//li/a[@t-attf-href='/web/session/logout?redirect=/']" position="before">
+				<li><a href="/saas_server/tenant" role="menuitem">My Odoo</a></li>
+				<li class="divider"/>
 			</xpath>
 		</template>
 		

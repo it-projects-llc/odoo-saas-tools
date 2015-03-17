@@ -65,11 +65,11 @@
 				</t>
 		</template>
 		
-		<template id="show_sign_in_or_sign_up" inherit_id="auth_signup.login" >
+		<!--<template id="show_sign_in_or_sign_up" inherit_id="auth_signup.login" >
 			<xpath expr="//a[@t-if='signup_enabled']" position="replace">
 				<a t-if="signup_enabled" t-attf-href="/page/start" class="btn btn-link pull-right">Sign up</a>
 			</xpath>
-		</template>
+		</template>-->
 
 	 </data>
 </openerp>

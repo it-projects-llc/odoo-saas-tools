@@ -98,6 +98,32 @@ class SaasServer(http.Controller):
         res = request.registry['saas_server.client'].update_all(request.cr, SUPERUSER_ID, server_db)
         return simplejson.dumps(res)
 
+    @http.route('/saas_server/tenant', type='http', auth='public', website=True)
+    def tenant(self, **post):
+        user = request.registry.get('res.users').browse(request.cr,
+                                                        SUPERUSER_ID,
+                                                        request.uid)
+        db = user.database
+        registry = openerp.modules.registry.RegistryManager.get(db)
+        with registry.cursor() as cr:
+            to_search = [('login', '=', user.login)]
+            fields = ['oauth_provider_id', 'oauth_access_token']
+            data = registry['res.users'].search_read(cr, SUPERUSER_ID,
+                                                     to_search, fields)
+        if not data:
+            raise Exception("Missing User!!!")
+        params = {
+            'access_token': data[0]['oauth_access_token'],
+            'state': simplejson.dumps({
+                'd': db,
+                'p': data[0]['oauth_provider_id'][0]
+            }),
+        }
+        scheme = request.httprequest.scheme
+        domain = db.replace('_', '.')
+        params = werkzeug.url_encode(params)
+        return werkzeug.utils.redirect('{scheme}://{domain}/auth_oauth/signin?{params}'.format(scheme=scheme, domain=domain, params=params))
+
     def get_template(self, state):
         user_model = request.registry.get('res.users')
         user = user_model.browse(request.cr, SUPERUSER_ID, request.uid)

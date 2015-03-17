@@ -98,6 +98,8 @@ class OAuthLogin(oauth.OAuthLogin):
     @http.route()
     def web_auth_signup(self, *args, **kw):
         providers = self.list_providers()
+        if 'dbname' in kw:
+            kw['redirect'] = '/saas_portal/book_then_signup?dbname=%s' % kw['dbname']
         response = super(oauth.OAuthLogin, self).web_auth_signup(*args, **kw)
         response.qcontext.update(providers=providers)
         return response

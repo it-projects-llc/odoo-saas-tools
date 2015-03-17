@@ -39,6 +39,7 @@ class SaasServer(http.Controller):
         organization = user.organization
         country_id = user.country_id and user.country_id.id
 
+        openerp.service.db._drop_conn(template_db)
         openerp.service.db.exp_drop(new_db) # for debug
         openerp.service.db.exp_duplicate_database(template_db, new_db)
 

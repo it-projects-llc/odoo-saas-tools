@@ -45,7 +45,7 @@
 		
 		<template id="saas_server.tenant" inherit_id="website.layout" >
 			<xpath expr="//ul[@role='menu']/li[@class='divider']" position="after">
-				<li><a href="/saas_server/tenant" role="menuitem">My Odoo</a></li>
+				<li><a href="/saas_server/tenant" role="menuitem">Workspace</a></li>
 				<li class="divider"/>
 			</xpath>
 		</template>

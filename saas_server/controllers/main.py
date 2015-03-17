@@ -184,6 +184,11 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
             values['organization'] = qcontext['organization']
         if qcontext.get('country_id', False):
             values['country_id'] = qcontext['country_id']
+        if qcontext.get('dbname', False):
+            f_dbname = '%s.%s' % (qcontext['dbname'], self.get_saas_domain())
+            full_dbname = f_dbname.replace('www.', '').replace('.', '_')
+            db_exists = openerp.service.db.exp_db_exist(full_dbname)
+            assert db_exists==False, "Domain exists"
         assert any([k for k in values.values()]), "The form was not properly filled in."
         assert values.get('password') == qcontext.get('confirm_password'), "Passwords do not match; please retype them."
         self._signup_with_values(qcontext.get('token'), values)

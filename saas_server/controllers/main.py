@@ -164,7 +164,15 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
             country_ids = orm_country.search(request.cr, SUPERUSER_ID, [], context=context)
             countries = orm_country.browse(request.cr, SUPERUSER_ID, country_ids, context=context)
             qcontext['countries'] = countries
+        if not qcontext.get('base_saas_domain', False):
+            qcontext['base_saas_domain'] = self.get_saas_domain()
         return qcontext
+    
+    def get_saas_domain(self):
+        config = request.registry['ir.config_parameter']
+        full_param = 'saas_portal.base_saas_domain'
+        base_saas_domain = config.get_param(request.cr, SUPERUSER_ID, full_param)
+        return base_saas_domain
 
     def do_signup(self, qcontext):
         values = dict((key, qcontext.get(key)) for key in ('login', 'name', 'password'))

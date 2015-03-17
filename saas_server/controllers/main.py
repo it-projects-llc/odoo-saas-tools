@@ -37,6 +37,7 @@ class SaasServer(http.Controller):
 
         user = self.update_user_and_partner(new_db)
         organization = user.organization
+        country_id = user.country_id and user.country_id.id
 
         openerp.service.db.exp_drop(new_db) # for debug
         openerp.service.db.exp_duplicate_database(template_db, new_db)
@@ -61,7 +62,7 @@ class SaasServer(http.Controller):
                 'res_id': oauth_provider_id,
             })
             # 1. Update company with organization
-            vals = {'name': organization}
+            vals = {'name': organization, 'country_id': country_id}
             registry['res.company'].write(cr, SUPERUSER_ID, 1, vals)
             # 2. Update user credentials
             domain = [('login', '=', template_db)]
@@ -72,6 +73,7 @@ class SaasServer(http.Controller):
                 'login': admin_data['email'],
                 'name': admin_data['name'],
                 'email': admin_data['email'],
+                'country_id': country_id,
                 'oauth_provider_id': oauth_provider_id,
                 'oauth_uid': admin_data['user_id'],
                 'oauth_access_token': access_token
@@ -100,6 +102,8 @@ class SaasServer(http.Controller):
 
     @http.route('/saas_server/tenant', type='http', auth='public', website=True)
     def tenant(self, **post):
+        if request.uid == SUPERUSER_ID:
+            return werkzeug.utils.redirect('/web')
         user = request.registry.get('res.users').browse(request.cr,
                                                         SUPERUSER_ID,
                                                         request.uid)
@@ -137,7 +141,11 @@ class SaasServer(http.Controller):
         vals = {'database': database, 'email': user.login}
         user_model.write(request.cr, SUPERUSER_ID, user.id, vals)
         partner_model = request.registry.get('res.partner')
-        wals = {'name': user.organization, 'is_company': True}
+        wals = {
+            'name': user.organization,
+            'is_company': True,
+            'country_id': user.country_id and user.country_id.id
+        }
         partner_model.create(request.cr, SUPERUSER_ID, wals)
         return user
 
@@ -160,6 +168,7 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
 
     def do_signup(self, qcontext):
         values = dict((key, qcontext.get(key)) for key in ('login', 'name', 'password'))
+        values['email'] = qcontext['login']
         if qcontext.get('plan_id', False):
             values['plan_id'] = qcontext['plan_id']
         if qcontext.get('organization', False):

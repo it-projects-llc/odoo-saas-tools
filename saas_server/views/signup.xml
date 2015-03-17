@@ -44,7 +44,7 @@
 		</template>
 		
 		<template id="saas_server.tenant" inherit_id="website.layout" >
-			<xpath expr="//li/a[@t-attf-href='/web/session/logout?redirect=/']" position="before">
+			<xpath expr="//ul[@role='menu']/li[@class='divider']" position="after">
 				<li><a href="/saas_server/tenant" role="menuitem">My Odoo</a></li>
 				<li class="divider"/>
 			</xpath>

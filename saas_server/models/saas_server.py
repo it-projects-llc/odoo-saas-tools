@@ -1,5 +1,4 @@
 import os
-import netifaces
 import openerp
 from openerp import SUPERUSER_ID
 from openerp import models, fields

@@ -44,6 +44,21 @@ class OauthApplication(models.Model):
             }
         }
 
+    def unlink(self, cr, uid, ids, context=None):
+        user_model = self.pool.get('res.users')
+        token_model = self.pool.get('oauth.access_token')
+        for obj in self.browse(cr, uid, ids):
+            to_search1 = [('application_id', '=', obj.id)]
+            tk_ids = token_model.search(cr, uid, to_search1, context=context)
+            if tk_ids:
+                token_model.unlink(cr, uid, tk_ids)
+            to_search2 = [('database', '=', obj.name)]
+            user_ids = user_model.search(cr, uid, to_search2, context=context)
+            if user_ids:
+                user_model.unlink(cr, uid, user_ids)
+            openerp.service.db.exp_drop(obj.name)
+        return super(OauthApplication, self).unlink(cr, uid, ids, context)
+
 
 class SaasConfig(models.TransientModel):
     _name = 'saas.config'

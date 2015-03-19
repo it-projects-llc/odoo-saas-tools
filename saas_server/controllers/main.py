@@ -168,7 +168,7 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
         if not qcontext.get('base_saas_domain', False):
             qcontext['base_saas_domain'] = self.get_saas_domain()
         return qcontext
-    
+
     def get_saas_domain(self):
         config = request.registry['ir.config_parameter']
         full_param = 'saas_portal.base_saas_domain'

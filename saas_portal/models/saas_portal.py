@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import openerp
-from openerp import models, fields
+from openerp import models, fields, api
 from openerp.addons.saas_utils import connector, database
 from openerp import http
 from contextlib import closing
@@ -15,6 +15,7 @@ class OauthApplication(models.Model):
     file_storage = fields.Integer('File storage (MB)', readonly=True)
     db_storage = fields.Integer('DB storage (MB)', readonly=True)
     server = fields.Char('Server', readonly=True)
+    plan = fields.Char(compute='_get_plan', string='Plan', size=64)
 
     def edit_db(self, cr, uid, ids, context=None):
         obj = self.browse(cr, uid, ids[0])
@@ -58,6 +59,16 @@ class OauthApplication(models.Model):
                 user_model.unlink(cr, uid, user_ids)
             openerp.service.db.exp_drop(obj.name)
         return super(OauthApplication, self).unlink(cr, uid, ids, context)
+
+    @api.one
+    def _get_plan(self):
+        oat = self.pool.get('oauth.access_token')
+        to_search = [('application_id', '=', self.id)]
+        access_token_ids = oat.search(self.env.cr, self.env.uid, to_search)
+        if access_token_ids:
+            access_token = oat.browse(self.env.cr, self.env.uid,
+                                      access_token_ids[0])
+            self.plan = access_token.user_id.plan_id.name
 
 
 class SaasConfig(models.TransientModel):

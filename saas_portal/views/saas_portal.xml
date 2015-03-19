@@ -12,6 +12,7 @@
             <field name="arch" type="xml">
                 <tree string="Clients">
 					<field name="name"/>
+					<field name="plan"/>
 					<field name="users_len"/>
 					<field name="file_storage"/>
 					<field name="db_storage"/>
@@ -72,6 +73,23 @@
                 </form>
             </field>
         </record>
+
+		<!-- Upgrade Databases -->
+		
+		<record id="action_updb" model="ir.actions.act_window">
+            <field name="name">Upgrade Databases</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">saas.config</field>
+            <field name="view_type">form</field>
+			<field name="target">new</field>
+        </record>
+		
+		<record id="action_binding_updb" model="ir.values">
+			<field name="name">Upgrade Databases</field>
+			<field name="key2">client_action_multi</field>
+			<field name="model">saas.config</field>
+			<field name="value_unpickle" eval="'ir.actions.act_window,'+str(action_updb)"/> 
+		</record>
 
     </data>
 </openerp>

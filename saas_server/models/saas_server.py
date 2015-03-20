@@ -88,7 +88,7 @@ class SaasServerClient(models.Model):
     plan_id = fields.Many2one('saas_server.plan', 'Plan')
 
     def update_all(self, cr, uid, server_db):
-        db_list = database.get_market_dbs()
+        db_list = database.get_market_dbs(with_templates=False)
         try:
             client_list.remove(server_db)
         except:

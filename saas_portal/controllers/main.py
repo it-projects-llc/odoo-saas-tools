@@ -40,7 +40,6 @@ class SaasPortal(http.Controller):
 
     @http.route(['/saas_portal/book_then_signup'], type='http', auth='public', website=True)
     def book_then_signup(self, **post):
-        # TDOD: check if domain exists
         saas_server = self.get_saas_server()
         scheme = request.httprequest.scheme
         full_dbname = self.get_full_dbname(post.get('dbname'))
@@ -97,10 +96,19 @@ class SaasPortal(http.Controller):
 class OAuthLogin(oauth.OAuthLogin):
 
     @http.route()
+    def web_login(self, *args, **kw):
+        if kw.get('login', False):
+            user = request.registry.get('res.users')
+            domain = [('login', '=', kw['login'])]
+            fields = ['share', 'database']
+            data = user.search_read(request.cr, SUPERUSER_ID, domain, fields)
+            if data and data[0]['share'] and data[0]['database']:
+                kw['redirect'] = '/saas_server/tenant'
+        return super(OAuthLogin, self).web_login(*args, **kw)
+
+    @http.route()
     def web_auth_signup(self, *args, **kw):
-        providers = self.list_providers()
-        if 'dbname' in kw:
-            kw['redirect'] = '/saas_portal/book_then_signup?dbname=%s' % kw['dbname']
-        response = super(oauth.OAuthLogin, self).web_auth_signup(*args, **kw)
-        response.qcontext.update(providers=providers)
-        return response
+        if kw.get('dbname', False):
+            redirect = '/saas_portal/book_then_signup'
+            kw['redirect'] = '%s?dbname=%s' % (redirect, kw['dbname'])
+        return super(OAuthLogin, self).web_auth_signup(*args, **kw)

@@ -65,6 +65,9 @@ class SaasServer(http.Controller):
             # 1. Update company with organization
             vals = {'name': organization, 'country_id': country_id}
             registry['res.company'].write(cr, SUPERUSER_ID, 1, vals)
+            partner = registry['res.company'].browse(cr, SUPERUSER_ID, 1)
+            registry['res.partner'].write(cr, SUPERUSER_ID,
+                                          {'email': admin_data['email']})
             # 2. Update user credentials
             domain = [('login', '=', template_db)]
             user_ids = registry['res.users'].search(cr, SUPERUSER_ID, domain)
@@ -75,10 +78,16 @@ class SaasServer(http.Controller):
                 'name': admin_data['name'],
                 'email': admin_data['email'],
                 'country_id': country_id,
+                'parent_id': partner.id,
                 'oauth_provider_id': oauth_provider_id,
                 'oauth_uid': admin_data['user_id'],
                 'oauth_access_token': access_token
             })
+            # 3. Set suffix for all sequences
+            seq_ids = registry['ir.sequence'].search(cr, SUPERUSER_ID,
+                                                     [('suffix', '=', False)])
+            suffix = {'suffix': client_id.split('-')[0]}
+            registry['ir.sequence'].write(cr, SUPERUSER_ID, seq_ids, suffix)
             # get action_id
             action_id = registry['ir.model.data'].xmlid_to_res_id(cr, SUPERUSER_ID, action)
 

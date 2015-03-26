@@ -9,6 +9,7 @@ class SaasPricingPrice(models.Model):
     _name = 'saas_pricing.price'
     
     name = fields.Char('Price name')
+    interval = fields.Char('Price interval')
     price = fields.Float('Price', digits=(16,2))
     
 class SaasPricingPlan(models.Model):

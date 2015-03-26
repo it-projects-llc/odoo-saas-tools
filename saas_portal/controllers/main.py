@@ -112,3 +112,14 @@ class OAuthLogin(oauth.OAuthLogin):
             redirect = '/saas_portal/book_then_signup'
             kw['redirect'] = '%s?dbname=%s' % (redirect, kw['dbname'])
         return super(OAuthLogin, self).web_auth_signup(*args, **kw)
+
+    @http.route()
+    def web_auth_reset_password(self, *args, **kw):
+        if kw.get('login', False):
+            user = request.registry.get('res.users')
+            domain = [('login', '=', kw['login'])]
+            fields = ['share', 'database']
+            data = user.search_read(request.cr, SUPERUSER_ID, domain, fields)
+            if data and data[0]['share'] and data[0]['database']:
+                kw['redirect'] = '/saas_server/tenant'
+        return super(OAuthLogin, self).web_auth_reset_password(*args, **kw)

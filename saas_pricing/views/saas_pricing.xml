@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+         <record id="view_pricing_tree" model="ir.ui.view">
+            <field name="name">saas_pricing.price.tree</field>
+            <field name="model">saas_pricing.price</field>
+            <field name="priority">4</field>
+            <field name="arch" type="xml">
+                <tree string="Plans">
+					<field name="name"/>
+					<field name="price"/>
+                </tree>
+            </field>
+       	 </record>
+    	 <record id="view_pricing_form" model="ir.ui.view">
+            <field name="name">saas_pricing.price.form</field>
+            <field name="model">saas_pricing.price</field>
+            <field name="arch" type="xml">
+				<form string="Pricing">
+				<sheet>
+					<group>
+						<field name="name"/>
+						<field name="price"/>
+					</group>
+				</sheet>
+				</form>
+            </field>
+        </record>
+        
+		<record model="ir.ui.view" id="view_plans_form">
+		    <field name="name">saas_server.plans.form.inherit</field>
+		    <field name="model">saas_server.plan</field>
+		    <field name="inherit_id" ref="saas_server.view_plans_form"/>
+		    <field name="arch" type="xml">
+		        <notebook position="inside">
+		            <page string="Pricing">
+		                <field name="pricing_ids" colspan="4" nolabel="1"/>
+		            </page>
+		        </notebook>
+		    </field>
+		</record>
+    </data>
+</openerp>

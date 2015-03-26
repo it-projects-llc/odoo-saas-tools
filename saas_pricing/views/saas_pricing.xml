@@ -8,6 +8,7 @@
             <field name="arch" type="xml">
                 <tree string="Plans">
 					<field name="name"/>
+					<field name="interval"/>
 					<field name="price"/>
                 </tree>
             </field>
@@ -20,6 +21,7 @@
 				<sheet>
 					<group>
 						<field name="name"/>
+						<field name="interval"/>
 						<field name="price"/>
 					</group>
 				</sheet>

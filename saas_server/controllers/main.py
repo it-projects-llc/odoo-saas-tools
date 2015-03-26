@@ -66,7 +66,7 @@ class SaasServer(http.Controller):
             vals = {'name': organization, 'country_id': country_id}
             registry['res.company'].write(cr, SUPERUSER_ID, 1, vals)
             partner = registry['res.company'].browse(cr, SUPERUSER_ID, 1)
-            registry['res.partner'].write(cr, SUPERUSER_ID,
+            registry['res.partner'].write(cr, SUPERUSER_ID, partner.id,
                                           {'email': admin_data['email']})
             # 2. Update user credentials
             domain = [('login', '=', template_db)]
@@ -148,15 +148,20 @@ class SaasServer(http.Controller):
     def update_user_and_partner(self, database):
         user_model = request.registry.get('res.users')
         user = user_model.browse(request.cr, SUPERUSER_ID, request.uid)
-        vals = {'database': database, 'email': user.login}
-        user_model.write(request.cr, SUPERUSER_ID, user.id, vals)
         partner_model = request.registry.get('res.partner')
         wals = {
             'name': user.organization,
             'is_company': True,
-            'country_id': user.country_id and user.country_id.id
+            'country_id': user.country_id and user.country_id.id,
+            'email': user.login
         }
-        partner_model.create(request.cr, SUPERUSER_ID, wals)
+        pid = partner_model.create(request.cr, SUPERUSER_ID, wals)
+        vals = {
+            'database': database,
+            'email': user.login,
+            'parent_id': pid
+        }
+        user_model.write(request.cr, SUPERUSER_ID, user.id, vals)
         return user
 
 

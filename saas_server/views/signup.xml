@@ -5,7 +5,7 @@
 		<template id="saas_server.signup_fields" inherit_id="auth_signup.fields" >
 			<xpath expr="//div[@class='form-group field-name']" position="after">
 
-				<div class="form-group field-role">
+				<div class="form-group field-role" t-if="login == false">
 	                <label for="plan_id" class="control-label">Plan</label>
 					<select name="plan_id" class="form-control" required="required" t-att-readonly="'readonly' if only_passwords else None"
 						t-att-autofocus="'autofocus' if login and not only_passwords else None">
@@ -16,14 +16,14 @@
                     </select>
 	            </div>
 
-				<div class="form-group field-name">
+				<div class="form-group field-name" t-if="login == false">
 	                <label for="organization" class="control-label">Organization</label>
 	                <input type="text" name="organization" t-att-value="organization" id="organization" class="form-control" placeholder="e.g. Reserva Inc."
 	                    required="required" t-att-readonly="'readonly' if only_passwords else None"
 	                    t-att-autofocus="'autofocus' if login and not only_passwords else None" />
 	            </div>
 				
-				<div class="form-group field-name">
+				<div class="form-group field-name" t-if="login == false">
 	                <label for="dbname" class="control-label">Subdomain</label>
 	                    <div class="input-group">
 		                    <input type="text" name="dbname" t-att-value="dbname" id="dbname" class="form-control" placeholder="your-company-name"
@@ -33,7 +33,7 @@
 						</div> 
 	            </div>
 
-	            <div t-attf-class="form-group  field-country">
+	            <div t-attf-class="form-group  field-country" t-if="login == false">
                       <label class="control-label" for="country_id">Country</label>
                       <select name="country_id" class="form-control" required="required" t-att-readonly="'readonly' if only_passwords else None">
                           <option value=""></option>
@@ -41,7 +41,7 @@
                           	   <option t-att-value="country.id"><t t-esc="country.name"/></option>
                           </t>
                       </select>
-                  </div>
+                </div>
 
 			</xpath>
 		</template>

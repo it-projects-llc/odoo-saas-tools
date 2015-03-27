@@ -11,7 +11,7 @@ class SaasPricingPrice(models.Model):
     name = fields.Char('Price name')
     interval = fields.Char('Price interval')
     price = fields.Float('Price', digits=(16,2))
-    stripe_plan_id = fields.Char('Stripe Plan id')
+    stripe_planid = fields.Char('Stripe Plan id')
     stripe_currency = fields.Many2one('res.currency')
     trial_period_days = fields.Char('Stripe trial period days')
     

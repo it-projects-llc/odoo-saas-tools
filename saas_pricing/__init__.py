@@ -1,2 +1,2 @@
-import models
 import controllers
+import models

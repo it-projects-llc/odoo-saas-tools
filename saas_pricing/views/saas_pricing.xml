@@ -10,6 +10,9 @@
 					<field name="name"/>
 					<field name="interval"/>
 					<field name="price"/>
+					<field name="stripe_planid"/>
+					<field name="stripe_currency"/>
+					<field name="trial_period_days"/>
                 </tree>
             </field>
        	 </record>
@@ -23,6 +26,9 @@
 						<field name="name"/>
 						<field name="interval"/>
 						<field name="price"/>
+						<field name="stripe_planid"/>
+						<field name="stripe_currency"/>
+						<field name="trial_period_days"/>
 					</group>
 				</sheet>
 				</form>

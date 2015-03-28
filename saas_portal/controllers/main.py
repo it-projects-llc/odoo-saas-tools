@@ -4,7 +4,6 @@ from openerp import SUPERUSER_ID
 from openerp.addons.web import http
 from openerp.addons.web.http import request
 from openerp.addons.auth_oauth.controllers import main as oauth
-from openerp.addons.auth_signup.controllers import main as signup
 import werkzeug
 import simplejson
 import uuid
@@ -16,21 +15,6 @@ class SignupError(Exception):
 
 
 class SaasPortal(http.Controller):
-
-    @http.route('/saas_portal/signup', type='http', auth="none", website=True)
-    def web_portal_signup(self, redirect="/saas_portal/book_then_signup", **kw):
-        dbname = request.params['dbname']
-        if self.exists_database(dbname):
-            full_dbname = self.get_full_dbname(dbname)
-            params = {'db': full_dbname, 'login': 'admin', 'key': 'admin'}
-            redirect = 'http://%s/login' % full_dbname.replace('_', '.')
-        else:
-            params = request.params
-            auth_signup = signup.AuthSignupHome()
-            qcontext = auth_signup.get_auth_signup_qcontext()
-            auth_signup.do_signup(qcontext)
-            params['uid'] = request.uid
-        return request.redirect('%s?%s' % (redirect, werkzeug.url_encode(params)))
 
     @http.route(['/saas_portal/trial_check'], type='json', auth='public', website=True)
     def trial_check(self, **post):
@@ -59,12 +43,6 @@ class SaasPortal(http.Controller):
             'client_id': client_id,
         }
         return request.redirect('/oauth2/auth?%s' % werkzeug.url_encode(params))
-
-    #@http.route(['/page/website.start', '/page/start'], type='http', auth="public", website=True)
-    #def start(self, **post):
-    #    base_saas_domain = self.get_config_parameter('base_saas_domain')
-    #    values = {'base_saas_domain': base_saas_domain}
-    #    return request.website.render("website.start", values)
 
     def get_provider(self):
         imd = request.registry['ir.model.data']

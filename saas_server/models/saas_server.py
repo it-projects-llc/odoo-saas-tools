@@ -28,6 +28,10 @@ class SaasServerPlan(models.Model):
                                            rel='company_required_addons_rel',
                                            id1='company_id', id2='module_id',
                                            string='Required Addons')
+    optional_addons_ids = fields.Many2many('ir.module.module',
+                                           rel='company_optional_addons_rel',
+                                           id1='company_id', id2='module_id',
+                                           string='Optional Addons')
     client_ids = fields.One2many('saas_server.client', 'plan_id', 'Clients')
 
     _order = 'sequence'

@@ -8,7 +8,11 @@
             <field name="arch" type="xml">
                 <tree string="Plans">
 					<field name="name"/>
+					<field name="interval"/>
 					<field name="price"/>
+					<field name="stripe_planid"/>
+					<field name="stripe_currency"/>
+					<field name="trial_period_days"/>
                 </tree>
             </field>
        	 </record>
@@ -20,7 +24,11 @@
 				<sheet>
 					<group>
 						<field name="name"/>
+						<field name="interval"/>
 						<field name="price"/>
+						<field name="stripe_planid"/>
+						<field name="stripe_currency"/>
+						<field name="trial_period_days"/>
 					</group>
 				</sheet>
 				</form>

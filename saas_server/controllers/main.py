@@ -7,6 +7,7 @@ from openerp.addons.web.http import request
 from openerp.addons.auth_oauth.controllers.main import fragment_to_query_string
 from openerp.addons.web.controllers.main import db_monodb
 from openerp.addons.saas_utils import connector
+import re
 
 import werkzeug.utils
 import simplejson

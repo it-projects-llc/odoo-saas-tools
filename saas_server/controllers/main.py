@@ -125,7 +125,7 @@ class SaasServer(http.Controller):
             data = registry['res.users'].search_read(cr, SUPERUSER_ID,
                                                      to_search, fields)
         if not data:
-            raise Exception("Missing User!!!")
+            return werkzeug.utils.redirect('/web')
         params = {
             'access_token': data[0]['oauth_access_token'],
             'state': simplejson.dumps({

@@ -35,6 +35,7 @@ class ResUsers(models.Model):
     @api.one
     def _compute_addons(self):
         addon_ids = []
+        add_names = []
         login = self.login
         db = config.get('db_master')
         registry = openerp.modules.registry.RegistryManager.get(db)

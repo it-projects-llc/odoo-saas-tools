@@ -52,7 +52,7 @@ class SaasServer(http.Controller):
                                                       'database.uuid',
                                                       client_id)
             # save auth data
-            oauth_provider_data = {'enabled': True, 'client_id': client_id}
+            oauth_provider_data = {'enabled': False, 'client_id': client_id}
             for attr in ['name', 'auth_endpoint', 'scope', 'validation_endpoint', 'data_endpoint', 'css_class', 'body']:
                 oauth_provider_data[attr] = getattr(saas_oauth_provider, attr)
             oauth_provider_id = registry['auth.oauth.provider'].create(cr, SUPERUSER_ID, oauth_provider_data)

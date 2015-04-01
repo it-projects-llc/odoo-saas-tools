@@ -16,12 +16,12 @@
 			<field name="perm_read" eval="False" />
 	    </record>
 		
-		<record id="not_change_partner_tenant_rule" model="ir.rule">
+		<!--<record id="not_change_partner_tenant_rule" model="ir.rule">
 	        <field name="name">Not Change Partner Tenant</field>
 	        <field name="model_id" ref="base.model_res_partner"/>
 	        <field name="domain_force">[('id', 'not in', [user.partner_id.id, user.partner_id.parent_id.id])]</field>
 			<field name="perm_read" eval="False" />
-	    </record>
+	    </record>-->
 		
 		<record id="slave_module_domain_rule" model="ir.rule">
             <field name="name">Addons Domain</field>

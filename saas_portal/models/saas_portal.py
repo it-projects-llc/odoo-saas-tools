@@ -57,8 +57,7 @@ class OauthApplication(models.Model):
             user_ids = user_model.search(cr, uid, to_search2, context=context)
             if user_ids:
                 user_model.unlink(cr, uid, user_ids)
-            if obj.name != obj.plan.lower():
-                openerp.service.db.exp_drop(obj.name)
+            openerp.service.db.exp_drop(obj.name)
         return super(OauthApplication, self).unlink(cr, uid, ids, context)
 
     @api.one

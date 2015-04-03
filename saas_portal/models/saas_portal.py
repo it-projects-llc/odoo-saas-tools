@@ -105,11 +105,10 @@ class SaasConfig(models.TransientModel):
             dbs = database.get_market_dbs()
         domain = [('name', 'in', obj.addons.split(','))]
         for db_name in dbs:
-            
             registry = openerp.modules.registry.RegistryManager.get(db_name)
             with registry.cursor() as cr:
                 # update database.uuid
                 openerp.service.db._drop_conn(cr, db_name)
-                aids = registry['ir.module.module'].search(cr,SUPERUSER_ID,domain) 
-                registry['ir.module.module'].button_upgrade(cr,SUPERUSER_ID,aids)               
+                aids = registry['ir.module.module'].search(cr, SUPERUSER_ID, domain)
+                registry['ir.module.module'].button_upgrade(cr, SUPERUSER_ID, aids)
         return True

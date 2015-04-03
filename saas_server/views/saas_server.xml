@@ -52,6 +52,18 @@
         </record>
 
 		<menuitem action="action_plans" id="menu_plans" parent="saas_portal.menu_saas" sequence="7"/>
+		
+		<record id="action_upgrade_clients" model="ir.actions.act_window">
+            <field name="name">Upgrade Clients</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">saas.config</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+			<field name="target">new</field>
+			<field name="context">{'default_action': 'upgrade'}</field>
+        </record>
+
+		<menuitem action="action_upgrade_clients" id="menu_upgrade_clients" parent="saas_portal.menu_saas" sequence="8"/>
 
     </data>
 </openerp>

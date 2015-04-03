@@ -203,9 +203,10 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
             f_dbname = '%s.%s' % (qcontext['dbname'], self.get_saas_domain())
             full_dbname = f_dbname.replace('www.', '').replace('.', '_')
             db_exists = openerp.service.db.exp_db_exist(full_dbname)
-            #assert re.match('[a-zA-Z0-9_.-]+$', qcontext.get('dbname'))== False, "The domain name can only contain letters or numbers"
+            assert re.match('[a-zA-Z0-9_.-]+$', qcontext.get('dbname')), "The domain name can only contain letters or numbers"
             assert db_exists == False, "Domain exists"
         assert any([k for k in values.values()]), "The form was not properly filled in."
         assert values.get('password') == qcontext.get('confirm_password'), "Passwords do not match; please retype them."
+        assert qcontext.get('organization')!= qcontext.get('name'),"Your name and organization..... "
         self._signup_with_values(qcontext.get('token'), values)
         request.cr.commit()

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import openerp
-from openerp import models, fields, api
+from openerp import models, fields, api, SUPERUSER_ID
 from openerp.addons.saas_utils import connector, database
 from openerp import http
 from contextlib import closing
@@ -105,11 +105,11 @@ class SaasConfig(models.TransientModel):
             dbs = database.get_market_dbs()
         domain = [('name', 'in', obj.addons.split(','))]
         for db_name in dbs:
-            openerp.sql_db.close_db(db_name)
-            db = openerp.sql_db.db_connect('postgres')
-            with closing(db.cursor()) as cr:
-                cr.autocommit(True)     # avoid transaction block
+            
+            registry = openerp.modules.registry.RegistryManager.get(db_name)
+            with registry.cursor() as cr:
+                # update database.uuid
                 openerp.service.db._drop_conn(cr, db_name)
-                aids = connector.call(db_name, 'ir.module.module', 'search', domain)
-                connector.call(db_name, 'ir.module.module', 'button_upgrade', aids)
+                aids = registry['ir.module.module'].search(cr,SUPERUSER_ID,domain) 
+                registry['ir.module.module'].button_upgrade(cr,SUPERUSER_ID,aids)               
         return True

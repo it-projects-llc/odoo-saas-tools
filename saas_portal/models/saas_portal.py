@@ -3,7 +3,6 @@ import openerp
 from openerp import models, fields, api, SUPERUSER_ID
 from openerp.addons.saas_utils import connector, database
 from openerp import http
-from contextlib import closing
 
 
 class OauthApplication(models.Model):
@@ -77,7 +76,8 @@ class SaasConfig(models.TransientModel):
     action = fields.Selection([('edit', 'Edit'), ('upgrade', 'Upgrade')],
                                 'Action')
     database = fields.Char('Database', size=128)
-    addons = fields.Char('Addons', size=256)
+    update_addons = fields.Char('Update Addons', size=256)
+    install_addons = fields.Char('Install Addons', size=256)
     fix_ids = fields.One2many('saas.config.fix', 'config_id', 'Fixes')
 
     def execute_action(self, cr, uid, ids, context=None):
@@ -104,16 +104,22 @@ class SaasConfig(models.TransientModel):
             dbs = [obj.database]
         else:
             dbs = database.get_market_dbs()
-        domain = [('name', 'in', obj.addons.split(','))]
+        uaddons = obj.update_addons and obj.update_addons.split(',') or []
+        update_domain = [('name', 'in', uaddons)]
+        iaddons = obj.install_addons and obj.install_addons.split(',') or []
+        install_domain = [('name', 'in', iaddons)]
         for db_name in dbs:
             registry = openerp.modules.registry.RegistryManager.get(db_name)
             with registry.cursor() as cr:
                 # update database.uuid
                 openerp.service.db._drop_conn(cr, db_name)
                 module = registry['ir.module.module']
-                aids = module.search(cr, SUPERUSER_ID, domain)
-                module.button_upgrade(cr, SUPERUSER_ID, aids)
-                # 2. Execute methods
+                uaids = module.search(cr, SUPERUSER_ID, update_domain)
+                module.button_upgrade(cr, SUPERUSER_ID, uaids)
+                # 2. Install new addons
+                iaids = module.search(cr, SUPERUSER_ID, install_domain)
+                module.button_immediate_install(cr, SUPERUSER_ID, iaids)
+                # 3. Execute methods
                 for fix in obj.fix_ids:
                     getattr(registry[fix.model], fix.method)(cr, SUPERUSER_ID)
         return True

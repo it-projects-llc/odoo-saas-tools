@@ -62,7 +62,8 @@
                 <form string="Configure Database" create="false" edit="false" delete="false">	
 				     <group>
 				     	<field name="action" readonly="1"/>
-						<field name="addons" attrs="{'invisible': [('action', '!=', 'upgrade')]}"/>
+						<field name="update_addons" attrs="{'invisible': [('action', '!=', 'upgrade')]}"/>
+						<field name="install_addons" attrs="{'invisible': [('action', '!=', 'upgrade')]}"/>
 				        <field name="database" readonly="1"/>
 				     </group>
 					 <group attrs="{'invisible': [('action', '!=', 'upgrade')]}">

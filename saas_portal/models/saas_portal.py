@@ -78,6 +78,7 @@ class SaasConfig(models.TransientModel):
                                 'Action')
     database = fields.Char('Database', size=128)
     addons = fields.Char('Addons', size=256)
+    fix_ids = fields.One2many('saas.config.fix', 'config_id', 'Fixes')
 
     def execute_action(self, cr, uid, ids, context=None):
         res = False
@@ -109,6 +110,18 @@ class SaasConfig(models.TransientModel):
             with registry.cursor() as cr:
                 # update database.uuid
                 openerp.service.db._drop_conn(cr, db_name)
-                aids = registry['ir.module.module'].search(cr, SUPERUSER_ID, domain)
-                registry['ir.module.module'].button_upgrade(cr, SUPERUSER_ID, aids)
+                module = registry['ir.module.module']
+                aids = module.search(cr, SUPERUSER_ID, domain)
+                module.button_upgrade(cr, SUPERUSER_ID, aids)
+                # 2. Execute methods
+                for fix in obj.fix_ids:
+                    getattr(registry[fix.model], fix.method)(cr, SUPERUSER_ID)
         return True
+
+
+class SaasConfigFix(models.TransientModel):
+    _name = 'saas.config.fix'
+
+    model = fields.Char('Model', required=1, size=64)
+    method = fields.Char('Method', required=1, size=64)
+    config_id = fields.Many2one('saas.config', 'Config')

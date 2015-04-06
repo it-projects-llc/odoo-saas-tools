@@ -65,6 +65,14 @@
 						<field name="addons" attrs="{'invisible': [('action', '!=', 'upgrade')]}"/>
 				        <field name="database" readonly="1"/>
 				     </group>
+					 <group attrs="{'invisible': [('action', '!=', 'upgrade')]}">
+					 	<field name="fix_ids" colspan="4" >
+					 		<tree string="Fixes" editable="bottom">
+					 			<field name="model" />
+								<field name="method" />
+							</tree>
+						</field>
+					 </group>
 					 <footer>
 					 	<button name="execute_action" string="Execute" type="object" class="oe_highlight"/>
 	                    or

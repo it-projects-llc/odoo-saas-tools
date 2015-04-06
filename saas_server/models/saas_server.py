@@ -24,6 +24,7 @@ class SaasServerPlan(models.Model):
     sequence = fields.Integer('Sequence')
     state = fields.Selection([('draft', 'Draft'), ('confirmed', 'Confirmed')],
                              'State', default='draft')
+    role_id = fields.Many2one('saas_server.role', 'Role')
     required_addons_ids = fields.Many2many('ir.module.module',
                                            rel='company_required_addons_rel',
                                            id1='company_id', id2='module_id',
@@ -79,6 +80,13 @@ class SaasServerPlan(models.Model):
         obj = self.browse(cr, uid, ids[0])
         openerp.service.db.exp_drop(obj.template)
         return self.write(cr, uid, obj.id, {'state': 'draft'})
+
+
+class SaasServerRole(models.Model):
+    _name = 'saas_server.role'
+
+    name = fields.Char('Name', size=64)
+    code = fields.Char('Code', size=64)
 
 
 class SaasServerClient(models.Model):

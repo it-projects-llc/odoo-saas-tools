@@ -28,6 +28,7 @@
 					<group>
 						<field name="name"/>
 						<field name="template"/>
+						<field name="role_id"/>
 						<field name="demo"/>
 						<field name="sequence"/>
 					</group>

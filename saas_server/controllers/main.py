@@ -156,6 +156,11 @@ class SaasServer(http.Controller):
             'country_id': user.country_id and user.country_id.id,
             'email': user.login
         }
+        try:
+            if hasattr(partner_model, user.plan_id.role_id.code):
+                wals[user.plan_id.role_id.code] = True
+        except:
+            pass
         pid = partner_model.create(request.cr, SUPERUSER_ID, wals)
         vals = {
             'database': database,

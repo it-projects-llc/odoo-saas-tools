@@ -114,9 +114,10 @@ class SaasConfig(models.TransientModel):
                 # update database.uuid
                 openerp.service.db._drop_conn(cr, db_name)
                 module = registry['ir.module.module']
+                # 1. Update existing modules
                 uaids = module.search(cr, SUPERUSER_ID, update_domain)
                 module.button_upgrade(cr, SUPERUSER_ID, uaids)
-                # 2. Install new addons
+                # 2. Install new modules
                 iaids = module.search(cr, SUPERUSER_ID, install_domain)
                 module.button_immediate_install(cr, SUPERUSER_ID, iaids)
                 # 3. Execute methods

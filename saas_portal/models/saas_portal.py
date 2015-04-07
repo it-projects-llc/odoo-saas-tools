@@ -109,21 +109,21 @@ class SaasConfig(models.TransientModel):
         for db_name in dbs:
             try:
                 registry = openerp.modules.registry.RegistryManager.get(db_name)
-                with registry.cursor() as cr:
+                with registry.cursor() as rcr:
                     # update database.uuid
-                    openerp.service.db._drop_conn(cr, db_name)
+                    openerp.service.db._drop_conn(rcr, db_name)
                     module = registry['ir.module.module']
                     # 1. Update existing modules
-                    uaids = module.search(cr, SUPERUSER_ID, update_domain)
+                    uaids = module.search(rcr, SUPERUSER_ID, update_domain)
                     if uaids:
-                        module.button_upgrade(cr, SUPERUSER_ID, uaids)
+                        module.button_upgrade(rcr, SUPERUSER_ID, uaids)
                     # 2. Install new modules
-                    iaids = module.search(cr, SUPERUSER_ID, install_domain)
+                    iaids = module.search(rcr, SUPERUSER_ID, install_domain)
                     if iaids:
-                        module.button_immediate_install(cr, SUPERUSER_ID, iaids)
+                        module.button_immediate_install(rcr, SUPERUSER_ID, iaids)
                     # 3. Execute methods
                     for fix in obj.fix_ids:
-                        getattr(registry[fix.model], fix.method)(cr, SUPERUSER_ID)
+                        getattr(registry[fix.model], fix.method)(rcr, SUPERUSER_ID)
             except:
                 no_update_dbs.append(db_name)
         if no_update_dbs:

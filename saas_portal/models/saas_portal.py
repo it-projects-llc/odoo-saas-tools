@@ -79,6 +79,7 @@ class SaasConfig(models.TransientModel):
     update_addons = fields.Char('Update Addons', size=256)
     install_addons = fields.Char('Install Addons', size=256)
     fix_ids = fields.One2many('saas.config.fix', 'config_id', 'Fixes')
+    description = fields.Text('Description')
 
     def execute_action(self, cr, uid, ids, context=None):
         res = False
@@ -99,31 +100,43 @@ class SaasConfig(models.TransientModel):
         }
 
     def upgrade_database(self, cr, uid, obj, context=None):
-        dbs = []
-        if obj.database:
-            dbs = [obj.database]
-        else:
-            dbs = database.get_market_dbs()
+        dbs = obj.database and [obj.database] or database.get_market_dbs()
         uaddons = obj.update_addons and obj.update_addons.split(',') or []
         update_domain = [('name', 'in', uaddons)]
         iaddons = obj.install_addons and obj.install_addons.split(',') or []
         install_domain = [('name', 'in', iaddons)]
+        no_update_dbs = []
         for db_name in dbs:
-            registry = openerp.modules.registry.RegistryManager.get(db_name)
-            with registry.cursor() as cr:
-                # update database.uuid
-                openerp.service.db._drop_conn(cr, db_name)
-                module = registry['ir.module.module']
-                # 1. Update existing modules
-                uaids = module.search(cr, SUPERUSER_ID, update_domain)
-                module.button_upgrade(cr, SUPERUSER_ID, uaids)
-                # 2. Install new modules
-                iaids = module.search(cr, SUPERUSER_ID, install_domain)
-                module.button_immediate_install(cr, SUPERUSER_ID, iaids)
-                # 3. Execute methods
-                for fix in obj.fix_ids:
-                    getattr(registry[fix.model], fix.method)(cr, SUPERUSER_ID)
-        return True
+            try:
+                registry = openerp.modules.registry.RegistryManager.get(db_name)
+                with registry.cursor() as cr:
+                    # update database.uuid
+                    openerp.service.db._drop_conn(cr, db_name)
+                    module = registry['ir.module.module']
+                    # 1. Update existing modules
+                    uaids = module.search(cr, SUPERUSER_ID, update_domain)
+                    if uaids:
+                        module.button_upgrade(cr, SUPERUSER_ID, uaids)
+                    # 2. Install new modules
+                    iaids = module.search(cr, SUPERUSER_ID, install_domain)
+                    if iaids:
+                        module.button_immediate_install(cr, SUPERUSER_ID, iaids)
+                    # 3. Execute methods
+                    for fix in obj.fix_ids:
+                        getattr(registry[fix.model], fix.method)(cr, SUPERUSER_ID)
+            except:
+                no_update_dbs.append(db_name)
+        if no_update_dbs:
+            desc = 'These databases were not updated: %s', ', '.join(no_update_dbs)
+            self.write(cr, uid, obj.id, {'description': desc})
+        return {
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'saas.config',
+            'res_id': obj.id,
+            'target': 'new',
+        }
 
 
 class SaasConfigFix(models.TransientModel):

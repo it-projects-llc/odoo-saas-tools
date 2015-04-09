@@ -2,12 +2,10 @@
 import openerp
 from openerp import SUPERUSER_ID
 from openerp import http
-from openerp.addons import auth_signup
 from openerp.addons.web.http import request
 from openerp.addons.auth_oauth.controllers.main import fragment_to_query_string
 from openerp.addons.web.controllers.main import db_monodb
 from openerp.addons.saas_utils import connector
-import re
 
 import werkzeug.utils
 import simplejson
@@ -26,7 +24,8 @@ class SaasServer(http.Controller):
 
         state = simplejson.loads(post.get('state'))
         new_db = state.get('d')
-        template_db = self.get_template(state)
+        organization = state.get('o')
+        template_db = state.get('db_template')
         action = 'base.open_module_tree'
         access_token = post['access_token']
         saas_oauth_provider = request.registry['ir.model.data'].xmlid_to_object(request.cr, SUPERUSER_ID, 'saas_server.saas_oauth_provider')
@@ -35,10 +34,6 @@ class SaasServer(http.Controller):
         if admin_data.get("error"):
             raise Exception(admin_data['error'])
         client_id = admin_data.get('client_id')
-
-        user = self.update_user_and_partner(new_db)
-        organization = user.organization
-        country_id = user.country_id and user.country_id.id
 
         openerp.service.db._drop_conn(request.cr, template_db)
         openerp.service.db.exp_drop(new_db) # for debug
@@ -64,7 +59,7 @@ class SaasServer(http.Controller):
                 'res_id': oauth_provider_id,
             })
             # 1. Update company with organization
-            vals = {'name': organization, 'country_id': country_id}
+            vals = {'name': organization}
             registry['res.company'].write(cr, SUPERUSER_ID, 1, vals)
             partner = registry['res.company'].browse(cr, SUPERUSER_ID, 1)
             registry['res.partner'].write(cr, SUPERUSER_ID, partner.id,
@@ -78,7 +73,6 @@ class SaasServer(http.Controller):
                 'login': admin_data['email'],
                 'name': admin_data['name'],
                 'email': admin_data['email'],
-                'country_id': country_id,
                 'parent_id': partner.id,
                 'oauth_provider_id': oauth_provider_id,
                 'oauth_uid': admin_data['user_id'],
@@ -110,108 +104,3 @@ class SaasServer(http.Controller):
         server_db = db_monodb()
         res = request.registry['saas_server.client'].update_all(request.cr, SUPERUSER_ID, server_db)
         return simplejson.dumps(res)
-
-    @http.route('/saas_server/tenant', type='http', auth='public', website=True)
-    def tenant(self, **post):
-        if request.uid == SUPERUSER_ID:
-            return werkzeug.utils.redirect('/web')
-        user = request.registry.get('res.users').browse(request.cr,
-                                                        SUPERUSER_ID,
-                                                        request.uid)
-        db = user.database
-        registry = openerp.modules.registry.RegistryManager.get(db)
-        with registry.cursor() as cr:
-            to_search = [('login', '=', user.login)]
-            fields = ['oauth_provider_id', 'oauth_access_token']
-            data = registry['res.users'].search_read(cr, SUPERUSER_ID,
-                                                     to_search, fields)
-        if not data:
-            return werkzeug.utils.redirect('/web')
-        params = {
-            'access_token': data[0]['oauth_access_token'],
-            'state': simplejson.dumps({
-                'd': db,
-                'p': data[0]['oauth_provider_id'][0]
-            }),
-        }
-        scheme = request.httprequest.scheme
-        domain = db.replace('_', '.')
-        params = werkzeug.url_encode(params)
-        return werkzeug.utils.redirect('{scheme}://{domain}/auth_oauth/signin?{params}'.format(scheme=scheme, domain=domain, params=params))
-
-    def get_template(self, state):
-        user_model = request.registry.get('res.users')
-        user = user_model.browse(request.cr, SUPERUSER_ID, request.uid)
-        if user.plan_id and user.plan_id.state == 'confirmed':
-            return user.plan_id.template
-        return state.get('db_template')
-
-    def update_user_and_partner(self, database):
-        user_model = request.registry.get('res.users')
-        user = user_model.browse(request.cr, SUPERUSER_ID, request.uid)
-        partner_model = request.registry.get('res.partner')
-        wals = {
-            'name': user.organization,
-            'is_company': True,
-            'country_id': user.country_id and user.country_id.id,
-            'email': user.login
-        }
-        try:
-            if hasattr(partner_model, user.plan_id.role_id.code):
-                wals[user.plan_id.role_id.code] = True
-        except:
-            pass
-        pid = partner_model.create(request.cr, SUPERUSER_ID, wals)
-        vals = {
-            'database': database,
-            'email': user.login,
-            'parent_id': pid
-        }
-        user_model.write(request.cr, SUPERUSER_ID, user.id, vals)
-        return user
-
-
-class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
-
-    def get_auth_signup_qcontext(self):
-        qcontext = super(AuthSignupHome, self).get_auth_signup_qcontext()
-        context = request.context
-        if not qcontext.get('plans', False):
-            sp = request.registry.get('saas_server.plan')
-            plan_ids = sp.search(request.cr, SUPERUSER_ID, [], context=context)
-            qcontext['plans'] = sp.browse(request.cr, SUPERUSER_ID, plan_ids, context=context)
-        if not qcontext.get('countries', False):
-            orm_country = request.registry.get('res.country')
-            country_ids = orm_country.search(request.cr, SUPERUSER_ID, [], context=context)
-            countries = orm_country.browse(request.cr, SUPERUSER_ID, country_ids, context=context)
-            qcontext['countries'] = countries
-        if not qcontext.get('base_saas_domain', False):
-            qcontext['base_saas_domain'] = self.get_saas_domain()
-        return qcontext
-
-    def get_saas_domain(self):
-        config = request.registry['ir.config_parameter']
-        full_param = 'saas_portal.base_saas_domain'
-        base_saas_domain = config.get_param(request.cr, SUPERUSER_ID, full_param)
-        return base_saas_domain
-
-    def do_signup(self, qcontext):
-        values = dict((key, qcontext.get(key)) for key in ('login', 'name', 'password'))
-        values['email'] = qcontext['login']
-        if qcontext.get('plan_id', False):
-            values['plan_id'] = qcontext['plan_id']
-        if qcontext.get('organization', False):
-            values['organization'] = qcontext['organization']
-        if qcontext.get('country_id', False):
-            values['country_id'] = qcontext['country_id']
-        if qcontext.get('dbname', False):
-            f_dbname = '%s.%s' % (qcontext['dbname'], self.get_saas_domain())
-            full_dbname = f_dbname.replace('www.', '').replace('.', '_')
-            db_exists = openerp.service.db.exp_db_exist(full_dbname)
-            assert re.match('[a-zA-Z0-9_.-]+$', qcontext.get('dbname')), "Only letters or numbers are allowed in domain."
-            assert db_exists == False, "Domain exists"
-        assert any([k for k in values.values()]), "The form was not properly filled in."
-        assert values.get('password') == qcontext.get('confirm_password'), "Passwords do not match; please retype them."
-        assert qcontext.get('organization') != qcontext.get('name'), "Name and Organization must be different."
-        self._signup_with_values(qcontext.get('token'), values)
-        request.cr.commit()

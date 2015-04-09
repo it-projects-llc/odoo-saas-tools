@@ -4,6 +4,7 @@
         <menuitem name="SaaS" id="menu_base_saas" sequence="30" />
 		<menuitem id="menu_saas" parent="menu_base_saas" name="SaaS" sequence="1" />
 
+        <!-- Client -->
 
         <record id="view_clients_tree" model="ir.ui.view">
             <field name="name">saas_portal.clients.tree</field>
@@ -53,6 +54,60 @@
 
 		<menuitem action="action_clients" id="menu_clients" parent="menu_saas" sequence="6"/>
 		
+		<!-- Plan -->
+		
+		<record id="view_plans_tree" model="ir.ui.view">
+            <field name="name">saas_server.plans.tree</field>
+            <field name="model">saas_server.plan</field>
+            <field name="priority">4</field>
+            <field name="arch" type="xml">
+                <tree string="Plans">
+					<field name="name"/>
+					<field name="template"/>
+					<field name="state" />
+					<button name="create_template" type="object" states="draft" icon="gtk-apply" />
+					<button name="edit_template" type="object" states="confirmed" icon="gtk-edit" />
+					<button name="upgrade_template" type="object" states="confirmed" icon="gtk-execute" />
+					<button name="delete_template" type="object" states="confirmed" icon="gtk-cancel" />
+                </tree>
+            </field>
+        </record>
+
+
+        <record id="view_plans_form" model="ir.ui.view">
+            <field name="name">saas_server.plans.form</field>
+            <field name="model">saas_server.plan</field>
+            <field name="arch" type="xml">
+				<form string="plans">
+					<group>
+						<field name="name"/>
+						<field name="template"/>
+						<field name="role_id"/>
+						<field name="demo"/>
+						<field name="sequence"/>
+					</group>
+					<notebook>
+						<page string="Required Addons" >
+							<field name="required_addons_ids" nolabel="1" />
+						</page>
+						<page string="Optional Addons" >
+							<field name="optional_addons_ids" nolabel="1" />
+						</page>
+					</notebook>
+				</form>
+            </field>
+        </record>
+
+        <record id="action_plans" model="ir.actions.act_window">
+            <field name="name">Plans</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">saas_server.plan</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+		<menuitem action="action_plans" id="menu_plans" parent="saas_portal.menu_saas" sequence="7"/>
+		
 		<!-- Config -->
 		
 		<record id="action_database_form" model="ir.ui.view">
@@ -86,6 +141,18 @@
                 </form>
             </field>
         </record>
+		
+		<record id="action_upgrade_clients" model="ir.actions.act_window">
+            <field name="name">Upgrade Clients</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">saas.config</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+			<field name="target">new</field>
+			<field name="context">{'default_action': 'upgrade'}</field>
+        </record>
+
+		<menuitem action="action_upgrade_clients" id="menu_upgrade_clients" parent="saas_portal.menu_saas" sequence="8"/>
 
 		<!-- Upgrade Databases -->
 		

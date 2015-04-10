@@ -1,0 +1,14 @@
+{
+    'name': 'SaaS Portal Sign Up',
+    'version': '1.0.0',
+    'author': 'Cesar Lage',
+    'category': 'SaaS',
+    'website': 'https://it-projects.info',
+    'depends': ['saas_portal'],
+    'data': ['views/signup.xml'],
+    'installable': True,
+
+    'description': '''
+Module to book a new client in SaaS Portal from sign up
+    ''',
+}

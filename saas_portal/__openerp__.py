@@ -7,6 +7,7 @@
     'depends': ['oauth_provider', 'website', 'auth_signup', 'saas_utils'],
     'data': [
         'views/website.xml',
+        'views/signup.xml',
         'views/saas_portal.xml',
         'views/res_config.xml',
         ],

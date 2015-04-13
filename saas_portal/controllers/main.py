@@ -30,6 +30,7 @@ class SaasPortal(http.Controller):
         dbtemplate = self.get_template()
         client_id = self.get_new_client_id(full_dbname)
         request.registry['oauth.application'].create(request.cr, SUPERUSER_ID, {'client_id': client_id, 'name':full_dbname})
+        # FIXME: line below should be deleted. This route called book_then_signup, but work as if user already signed up
         organization = self.update_user_and_partner(full_dbname)
         params = {
             'scope': 'userinfo force_login trial skiptheuse',

@@ -27,7 +27,7 @@ db_monodb_org = http.db_monodb
 def db_monodb(httprequest=None):
     db = db_monodb_org(httprequest)
     if not db:
-        return httprequest.host.replace('www.', '').replace('.', '_')
+        return httprequest.host.replace('.', '_')
     return db
 
 http.db_monodb = db_monodb

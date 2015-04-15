@@ -6,8 +6,8 @@ from openerp import http
 from openerp.tools import config
 
 
-class SaasServerPlan(models.Model):
-    _name = 'saas_server.plan'
+class SaasPortalPlan(models.Model):
+    _name = 'saas_portal.plan'
 
     name = fields.Char('Plan')
     template = fields.Char('Template')
@@ -148,6 +148,6 @@ class ResUsers(models.Model):
     _name = 'res.users'
     _inherit = 'res.users'
 
-    plan_id = fields.Many2one('saas_server.plan', 'Plan')
+    plan_id = fields.Many2one('saas_portal.plan', 'Plan')
     organization = fields.Char('Organization', size=64)
     database = fields.Char('Database', size=64)

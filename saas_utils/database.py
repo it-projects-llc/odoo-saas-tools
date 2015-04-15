@@ -36,7 +36,7 @@ http.db_monodb = db_monodb
 def get_market_dbs(with_templates=True):
     dbs = []
     if with_templates:
-        sp = request.registry.get('saas_server.plan')
+        sp = request.registry.get('saas_portal.plan')
         data = sp.search_read(request.cr, SI, [('state', '=', 'confirmed')],
                                ['template'])
         dbs += [d['template'] for d in data]

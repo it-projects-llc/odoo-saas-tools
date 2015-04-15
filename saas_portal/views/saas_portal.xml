@@ -57,8 +57,8 @@
 		<!-- Plan -->
 		
 		<record id="view_plans_tree" model="ir.ui.view">
-            <field name="name">saas_server.plans.tree</field>
-            <field name="model">saas_server.plan</field>
+            <field name="name">saas_portal.plans.tree</field>
+            <field name="model">saas_portal.plan</field>
             <field name="priority">4</field>
             <field name="arch" type="xml">
                 <tree string="Plans">
@@ -75,8 +75,8 @@
 
 
         <record id="view_plans_form" model="ir.ui.view">
-            <field name="name">saas_server.plans.form</field>
-            <field name="model">saas_server.plan</field>
+            <field name="name">saas_portal.plans.form</field>
+            <field name="model">saas_portal.plan</field>
             <field name="arch" type="xml">
 				<form string="plans">
 					<group>
@@ -101,7 +101,7 @@
         <record id="action_plans" model="ir.actions.act_window">
             <field name="name">Plans</field>
             <field name="type">ir.actions.act_window</field>
-            <field name="res_model">saas_server.plan</field>
+            <field name="res_model">saas_portal.plan</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
         </record>

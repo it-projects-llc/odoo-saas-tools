@@ -24,20 +24,25 @@ class SaasPortal(http.Controller):
 
     @http.route(['/saas_portal/book_then_signup'], type='http', auth='public', website=True)
     def book_then_signup(self, **post):
-        saas_server = self.get_saas_server()
-        scheme = request.httprequest.scheme
         full_dbname = self.get_full_dbname(post.get('dbname'))
         dbtemplate = self.get_template()
-        client_id = self.get_new_client_id(full_dbname)
-        request.registry['oauth.application'].create(request.cr, SUPERUSER_ID, {'client_id': client_id, 'name':full_dbname})
         # FIXME: line below should be deleted. This route called book_then_signup, but work as if user already signed up
         organization = self.update_user_and_partner(full_dbname)
+
+        return self.create_new_database(dbtemplate, full_dbname, organization=organization)
+
+    def create_new_database(dbtemplate, full_dbname, organization='YourCompany', saas_server=None):
+        client_id = self.get_new_client_id(full_dbname)
+        request.registry['oauth.application'].create(request.cr, SUPERUSER_ID, {'client_id': client_id, 'name':full_dbname})
+        scheme = request.httprequest.scheme
+        saas_server = saas_server or self.get_saas_server()
+
         params = {
             'scope': 'userinfo force_login trial skiptheuse',
             'state': simplejson.dumps({
                 'd': full_dbname,
                 'u': '%s://%s' % (scheme, full_dbname.replace('_', '.')),
-                'o': organization,
+                'o': organization, # FIXME: should be deleted. Organization name can be retrieved by saas_server via auth endpoint
                 'db_template': dbtemplate,
             }),
             'redirect_uri': '{scheme}://{saas_server}/saas_server/new_database'.format(scheme=scheme, saas_server=saas_server),

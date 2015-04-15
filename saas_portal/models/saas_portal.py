@@ -5,13 +5,14 @@ from openerp.addons.saas_utils import connector, database
 from openerp import http
 from openerp.tools import config
 
+import random
 
 class SaasPortalPlan(models.Model):
     _name = 'saas_portal.plan'
 
     name = fields.Char('Plan')
-    template = fields.Char('Template')
-    demo = fields.Boolean('Demo Data')
+    template = fields.Char('Source DB', help='Name for template database', placeholder='template1.odoo.com')
+    demo = fields.Boolean('Install Demo Data')
     sequence = fields.Integer('Sequence')
     state = fields.Selection([('draft', 'Draft'), ('confirmed', 'Confirmed')],
                              'State', default='draft')
@@ -26,6 +27,14 @@ class SaasPortalPlan(models.Model):
                                            string='Optional Addons')
 
     _order = 'sequence'
+
+    dbname_template = fields.Char('DB Names', help='Template for db name. Ignore if you use manually created db names', placeholder='crm-%i.odoo.com')
+    saas_server = fields.Char('SaaS Server', help='Force apply this saas server', placeholder='server1.odoo.com')
+
+    @api.one
+    def generate_dbname(self):
+        # TODO make more elegant solution
+        return self.dbname_template.replace('%i', str(random.randint(100, 10000)))
 
     def create_template(self, cr, uid, ids, context=None):
         obj = self.browse(cr, uid, ids[0])
@@ -88,6 +97,7 @@ class OauthApplication(models.Model):
     file_storage = fields.Integer('File storage (MB)', readonly=True)
     db_storage = fields.Integer('DB storage (MB)', readonly=True)
     server = fields.Char('Server', readonly=True)
+    # TODO: Why Char? Can it be replaces to plan_id = fields.Many2one ?
     plan = fields.Char(compute='_get_plan', string='Plan', size=64)
 
     def edit_db(self, cr, uid, ids, context=None):

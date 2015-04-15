@@ -31,7 +31,14 @@ class SaasPortal(http.Controller):
 
         return self.create_new_database(dbtemplate, full_dbname, organization=organization)
 
-    def create_new_database(dbtemplate, full_dbname, organization='YourCompany', saas_server=None):
+    def create_demo_database(self, plan_id):
+        cr, uid = request.cr, SUPERUSER_ID
+        plan = request.registry['saas_portal.plan'].browse(cr, uid, [plan_id])
+        full_dbname = plan.generate_dbname()[0]
+
+        return self.create_new_database(plan.template, full_dbname, saas_server=plan.saas_server)
+
+    def create_new_database(self, dbtemplate, full_dbname, organization='YourCompany', saas_server=None):
         client_id = self.get_new_client_id(full_dbname)
         request.registry['oauth.application'].create(request.cr, SUPERUSER_ID, {'client_id': client_id, 'name':full_dbname})
         scheme = request.httprequest.scheme

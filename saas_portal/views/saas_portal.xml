@@ -62,6 +62,7 @@
             <field name="priority">4</field>
             <field name="arch" type="xml">
                 <tree string="Plans">
+                    <field name="sequence" invisible="1"/>
 					<field name="name"/>
 					<field name="template"/>
 					<field name="state" />
@@ -79,11 +80,21 @@
             <field name="model">saas_portal.plan</field>
             <field name="arch" type="xml">
 				<form string="plans">
+                    <header>
+                        <button string="Create" name="create_template" type="object" states="draft" icon="gtk-apply" class="oe_highlight"/>
+                        <button string="Edit" name="edit_template" type="object" states="confirmed" icon="gtk-edit" class="oe_highlight"/>
+                        <button string="Upgrade" name="upgrade_template" type="object" states="confirmed" icon="gtk-execute" />
+                        <button string="Delete" name="delete_template" type="object" states="confirmed" icon="gtk-cancel" />
+                        <field name="state" widget="statusbar"/>
+                    </header>
+            <sheet>
 					<group>
 						<field name="name"/>
 						<field name="template"/>
 						<field name="role_id"/>
 						<field name="demo"/>
+						<field name="dbname_template"/>
+						<field name="saas_server"/>
 						<field name="sequence"/>
 					</group>
 					<notebook>
@@ -94,6 +105,7 @@
 							<field name="optional_addons_ids" nolabel="1" />
 						</page>
 					</notebook>
+            </sheet>
 				</form>
             </field>
         </record>

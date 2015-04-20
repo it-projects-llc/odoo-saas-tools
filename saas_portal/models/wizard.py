@@ -8,9 +8,10 @@ from openerp import http
 class SaasConfig(models.TransientModel):
     _name = 'saas.config'
 
-    action = fields.Selection([('edit', 'Edit'), ('upgrade', 'Upgrade')],
+    action = fields.Selection([('edit', 'Edit'), ('upgrade', 'Upgrade'), ('delete', 'Delete')],
                                 'Action')
     database = fields.Char('Database', size=128)
+    server = fields.Char('Server', size=128)
     update_addons = fields.Char('Update Addons', size=256)
     install_addons = fields.Char('Install Addons', size=256)
     fix_ids = fields.One2many('saas.config.fix', 'config_id', 'Fixes')
@@ -23,6 +24,28 @@ class SaasConfig(models.TransientModel):
         if hasattr(self, method):
             res = getattr(self, method)(cr, uid, obj, context)
         return res
+
+    def delete_database(self, cr, uid, obj, context=None):
+        scheme = 'http'
+        params = (obj.server, obj.database)
+        url = 'http://%s/login?db=%s&login=admin&key=admin' % params
+        return {
+            'type': 'ir.actions.act_url',
+            'target': 'self',
+            'name': 'Delete Database',
+            'url': url
+        }
+        params = {
+            'scope': 'userinfo force_login trial skiptheuse',
+            'state': simplejson.dumps({
+                'd': obj.name,
+            }),
+            'redirect_uri': '{scheme}://{saas_server}/saas_server/delete_database'.format(scheme=scheme, saas_server=obj.server),
+            'response_type': 'token',
+            'client_id': obj.client_id,
+        }
+
+        return request.redirect('/oauth2/auth?%s' % werkzeug.url_encode(params))
 
     def edit_database(self, cr, uid, obj, context=None):
         params = (obj.database.replace('_', '.'), obj.database)

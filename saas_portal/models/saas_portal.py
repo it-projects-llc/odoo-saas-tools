@@ -4,6 +4,8 @@ from openerp import models, fields, api, SUPERUSER_ID
 from openerp.addons.saas_utils import connector, database
 from openerp import http
 from openerp.tools import config
+import time
+from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
 
 import random
 
@@ -89,7 +91,8 @@ class SaasServerRole(models.Model):
 
 
 class OauthApplication(models.Model):
-    _inherit = 'oauth.application'
+    _name = 'oauth.application'
+    _inherit = ['oauth.application', 'mail.thread']
 
     name = fields.Char('Database name', readonly=True)
     client_id = fields.Char('Client ID', readonly=True, select=True)
@@ -99,6 +102,39 @@ class OauthApplication(models.Model):
     server = fields.Char('Server', readonly=True)
     # TODO: Why Char? Can it be replaces to plan_id = fields.Many2one ?
     plan = fields.Char(compute='_get_plan', string='Plan', size=64)
+    state = fields.Selection([('template', 'Template'),
+                              ('draft','New'),
+                              ('open','In Progress'),
+                              ('cancelled', 'Cancelled'),
+                              ('pending','Pending'),
+                              ('deleted','Deleted')],
+                             'State', default='open', track_visibility='onchange')
+    expiration = fields.Datetime('Expiration', track_visibility='onchange')
+    expired = fields.Boolean('Expiration', compute='_get_expired')
+
+    @api.model
+    def delete_expired_databases(self):
+        now = time.strftime(DEFAULT_SERVER_DATETIME_FORMAT)
+        self.search([('expiration', '<=', now)]).delete_db()
+
+    @api.one
+    def _get_expired(self):
+        now = fields.Datetime.now()
+        self.expired = self.expiration and self.expiration < now
+
+    def delete_db(self, cr, uid, ids, context=None):
+        obj = self.browse(cr, uid, ids[0])
+        return {
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'saas.config',
+            'target': 'new',
+            'context': {
+                'default_action': 'delete',
+                'default_database': obj.name
+            }
+        }
 
     def edit_db(self, cr, uid, ids, context=None):
         obj = self.browse(cr, uid, ids[0])
@@ -110,6 +146,7 @@ class OauthApplication(models.Model):
             'target': 'new',
             'context': {
                 'default_action': 'edit',
+                'default_server': obj.server,
                 'default_database': obj.name
             }
         }

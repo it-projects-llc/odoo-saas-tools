@@ -28,19 +28,33 @@
             <field name="name">saas_portal.clients.form</field>
             <field name="model">oauth.application</field>
             <field name="arch" type="xml">
-				<form string="Clients">
-					<group>
-						<group>
-							<field name="client_id"/>
-							<field name="name"/>
-							<field name="users_len"/>
-							<field name="file_storage"/>
-							<field name="db_storage"/>
-							<field name="server"/>
-						</group>
-					</group>
-					<field name="user_ids"/>
-				</form>
+                <form string="Clients">
+                    <field name="expired" invisible="1"/>
+                    <header>
+                        <button string="Edit" name="edit_db" type="object" attrs="{'invisible':[('state', 'in', ['deleted'])]}" icon="gtk-edit" class="oe_highlight"/>
+                        <button string="Upgrade" name="upgrade_db" type="object" attrs="{'invisible':[('state', 'in', ['deleted'])]}" icon="gtk-execute" />
+                        <button string="Delete" name="delete_db" type="object" attrs="{'invisible':[('state', 'not in', ['pending']),('expired','=',False)]}" icon="gtk-delete" />
+                        <field name="state" widget="statusbar" statusbar_visible="open,pending,deleted" readonly="1"/>
+                    </header>
+                    <sheet>
+                    <group>
+                        <group>
+                            <field name="client_id"/>
+                            <field name="name"/>
+                            <field name="users_len"/>
+                            <field name="file_storage"/>
+                            <field name="db_storage"/>
+                            <field name="server"/>
+                            <field name="expiration"/>
+                        </group>
+                    </group>
+                    <field name="user_ids"/>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
             </field>
         </record>
 

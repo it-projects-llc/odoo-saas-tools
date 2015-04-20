@@ -16,14 +16,25 @@ def get_size(start_path='.'):
 
 class SaasServerClient(models.Model):
     _name = 'saas_server.client'
+    _inherit = ['mail.thread']
 
+    # TODO: make inheritance from some base class to exclude dublicating fields with saas_portal->oauth.application
     name = fields.Char('Database name', readonly=True)
     client_id = fields.Char('Client ID', readonly=True, select=True)
     users_len = fields.Integer('Count users')
     file_storage = fields.Integer('File storage (MB)')
     db_storage = fields.Integer('DB storage (MB)')
+    state = fields.Selection([('template', 'Template'),
+                              ('draft','New'),
+                              ('open','In Progress'),
+                              ('cancelled', 'Cancelled'),
+                              ('pending','Pending'),
+                              ('deleted','Deleted')],
+                             'State', default='open', track_visibility='onchange')
 
     def update_all(self, cr, uid, server_db):
+        #TODO: mark database as deleted if it not found
+        #TODO: add state field
         db_list = database.get_market_dbs(with_templates=False)
         try:
             client_list.remove(server_db)

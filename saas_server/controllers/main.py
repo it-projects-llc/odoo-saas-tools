@@ -98,6 +98,31 @@ class SaasServer(http.Controller):
         scheme = request.httprequest.scheme
         return werkzeug.utils.redirect('{scheme}://{domain}/saas_client/new_database?{params}'.format(scheme=scheme, domain=new_db.replace('_', '.'), params=werkzeug.url_encode(params)))
 
+    @http.route('/saas_server/delete_database', type='http', auth='public')
+    @fragment_to_query_string
+    def delete_database(self, **post):
+        _logger.info('new_database post: %s', post)
+
+        state = simplejson.loads(post.get('state'))
+        client_id = 'TODO'
+        db = state.get('d')
+        access_token = post['access_token']
+        saas_oauth_provider = request.registry['ir.model.data'].xmlid_to_object(request.cr, SUPERUSER_ID, 'saas_server.saas_oauth_provider')
+
+        admin_data = request.registry['res.users']._auth_oauth_rpc(request.cr, SUPERUSER_ID, saas_oauth_provider.validation_endpoint, access_token)
+        # TODO: check access rights
+
+        client = request.registry['saas_server.client'].search(request.cr, SUPERUSER_ID, [('client_id', '=', client_id)])
+        if not client:
+            raise Exception('Client not found')
+        client = client[0]
+
+        openerp.service.db.exp_drop(client.name)
+        client.write({'state': 'deleted'})
+
+        return werkzeug.utils.redirect('/web?model={model}&id={id}'.format(model='saas_server.client', id=client.id))
+
+
     @http.route(['/saas_server/stats'], type='http', auth='public')
     def stats(self, **post):
         # TODO auth

@@ -20,24 +20,6 @@ Dependencies
 
 * https://github.com/idan/oauthlib
 
-Server wide
------------
-
-You have to mark this module as server wide, e.g.
-
-in command line:
-
-    ./openerp-server --load=web,web_kanban,oauth_provider ...
-
-or in config file:
-
-    server_wide_modules=web,web_kanban,oauth_provider
-
-Database name
--------------
-
-* Name of database must be equal to domain
-
 Basic flow
 ==========
 

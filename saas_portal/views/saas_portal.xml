@@ -4,6 +4,7 @@
         <menuitem name="SaaS" id="menu_base_saas" sequence="30" />
 		<menuitem id="menu_saas" parent="menu_base_saas" name="SaaS" sequence="1" />
 
+
         <!-- Client -->
 
         <record id="view_clients_tree" model="ir.ui.view">
@@ -44,7 +45,7 @@
                             <field name="users_len"/>
                             <field name="file_storage"/>
                             <field name="db_storage"/>
-                            <field name="server"/>
+                            <field name="server_id"/>
                             <field name="expiration"/>
                         </group>
                     </group>
@@ -66,8 +67,68 @@
             <field name="view_mode">tree,form</field>
         </record>
 
-		<menuitem action="action_clients" id="menu_clients" parent="menu_saas" sequence="6"/>
-		
+		<menuitem action="action_clients" id="menu_clients" parent="menu_saas" sequence="10"/>
+
+        <!-- Server -->
+
+        <record id="view_server_tree" model="ir.ui.view">
+            <field name="name">saas_portal.server.tree</field>
+            <field name="model">saas_portal.server</field>
+            <field name="priority">4</field>
+            <field name="arch" type="xml">
+                <tree string="Server">
+                    <field name="sequence" widget="handle"/>
+                    <field name="name"/>
+                    <field name="active"/>
+                </tree>
+            </field>
+        </record>
+
+
+        <record id="view_server_form" model="ir.ui.view">
+            <field name="name">saas_portal.server.form</field>
+            <field name="model">saas_portal.server</field>
+            <field name="arch" type="xml">
+                <form string="Server">
+                    <header>
+                        <button name="action_update_stats" type="object" string="Update client stats"/>
+                    </header>
+                    <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="active"/>
+                            <field name="https"/>
+                        </group>
+                    </group>
+                    <field name="client_ids" readonly="1">
+                        <tree>
+                            <field name="name"/>
+                            <field name="plan"/>
+                            <field name="users_len"/>
+                            <field name="file_storage"/>
+                            <field name="db_storage"/>
+                        </tree>
+                    </field>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_server" model="ir.actions.act_window">
+            <field name="name">Servers</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">saas_portal.server</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem action="saas_portal.action_server" id="menu_server" parent="saas_portal.menu_saas" sequence="20"/>
+
 		<!-- Plan -->
 		
 		<record id="view_plans_tree" model="ir.ui.view">
@@ -108,7 +169,7 @@
 						<field name="role_id"/>
 						<field name="demo"/>
 						<field name="dbname_template"/>
-						<field name="saas_server"/>
+						<field name="server_id"/>
 						<field name="sequence"/>
 					</group>
 					<notebook>
@@ -132,7 +193,7 @@
             <field name="view_mode">tree,form</field>
         </record>
 
-		<menuitem action="action_plans" id="menu_plans" parent="saas_portal.menu_saas" sequence="7"/>
+		<menuitem action="action_plans" id="menu_plans" parent="saas_portal.menu_saas" sequence="30"/>
 		
 		<!-- Config -->
 		
@@ -178,7 +239,7 @@
 			<field name="context">{'default_action': 'upgrade'}</field>
         </record>
 
-		<menuitem action="action_upgrade_clients" id="menu_upgrade_clients" parent="saas_portal.menu_saas" sequence="8"/>
+		<menuitem action="action_upgrade_clients" id="menu_upgrade_clients" parent="saas_portal.menu_saas" sequence="100"/>
 
 		<!-- Upgrade Databases -->
 		

@@ -11,14 +11,11 @@
                         <button string="Apply" type="object" name="execute" class="oe_highlight"/>
                         or
                         <button string="Cancel" type="object" name="cancel" class="oe_link"/>
-						<!-- TODO -->
-						<button string="Update statistics from servers" name="action_update_stats" type="object"/>
                     </header>
                     <div>
                         <group string="Domain">
 							<field name="base_saas_domain" placeholder="odoo.com" />
 							<field name="dbtemplate" placeholder="template.odoo.com" />
-							<field name="saas_server_list" placeholder="eu1.odoo.com,eu2.odoo.com" />
 						</group>
 					</div>
                 </form>

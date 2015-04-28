@@ -36,7 +36,7 @@ class SaasPortal(http.Controller):
         plan = request.registry['saas_portal.plan'].browse(cr, uid, [plan_id])
         full_dbname = plan.generate_dbname()[0]
 
-        return self.create_new_database(plan.template, full_dbname, saas_server=plan.saas_server)
+        return self.create_new_database(plan.template, full_dbname, saas_server=plan.server_id)
 
     def create_new_database(self, dbtemplate, full_dbname, organization='YourCompany', saas_server=None):
         client_id = self.get_new_client_id(full_dbname)
@@ -104,8 +104,7 @@ class SaasPortal(http.Controller):
         return full_dbname.replace('www.', '').replace('.', '_')
 
     def get_saas_server(self):
-        saas_server_list = self.get_config_parameter('saas_server_list')
-        saas_server_list = saas_server_list.split(',')
+        saas_server_list = request.env['saas_portal.server'].search([])
         return saas_server_list[random.randint(0, len(saas_server_list) - 1)]
 
     def exists_database(self, dbname):

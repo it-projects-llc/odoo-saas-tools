@@ -6,8 +6,41 @@ from openerp import http
 from openerp.tools import config
 import time
 from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
+import urllib2
+import simplejson
 
 import random
+
+class SaasPortalServer(models.Model):
+    _name = 'saas_portal.server'
+    _description = 'SaaS Server'
+
+    _inherit = ['mail.thread']
+
+    name = fields.Char('Database Name')
+    sequence = fields.Integer('Sequence')
+    active = fields.Boolean('Active', default=True)
+    https = fields.Boolean('HTTPS', default=False)
+    client_ids = fields.One2many('oauth.application', 'server_id', string='Clients')
+
+    @api.model
+    def action_update_stats_all(self):
+        self.search([]).action_update_stats()
+
+    @api.one
+    def action_update_stats(self):
+        scheme = 'https' if self.https else 'http'
+        url = '{scheme}://{domain}/saas_server/stats'.format(scheme=scheme, domain=self.name)
+        data = urllib2.urlopen(url).read()
+        data = simplejson.loads(data)
+        for r in data:
+            r['server_id'] = self.id
+            id = self.env['oauth.application'].search([('client_id', '=', r.get('client_id'))])
+            if not id:
+                self.env['oauth.application'].create(r)
+            else:
+                self.env['oauth.application'].write(id, r)
+        return None
 
 class SaasPortalPlan(models.Model):
     _name = 'saas_portal.plan'
@@ -31,7 +64,7 @@ class SaasPortalPlan(models.Model):
     _order = 'sequence'
 
     dbname_template = fields.Char('DB Names', help='Template for db name. Ignore if you use manually created db names', placeholder='crm-%i.odoo.com')
-    saas_server = fields.Char('SaaS Server', help='Force apply this saas server', placeholder='server1.odoo.com')
+    server_id = fields.Many2one('saas_portal.server', string='SaaS Server', help='Force apply this saas server')
 
     @api.one
     def generate_dbname(self):
@@ -99,7 +132,7 @@ class OauthApplication(models.Model):
     users_len = fields.Integer('Count users', readonly=True)
     file_storage = fields.Integer('File storage (MB)', readonly=True)
     db_storage = fields.Integer('DB storage (MB)', readonly=True)
-    server = fields.Char('Server', readonly=True)
+    server_id = fields.Many2one('saas_portal.server', string='Server', readonly=True)
     # TODO: Why Char? Can it be replaces to plan_id = fields.Many2one ?
     plan = fields.Char(compute='_get_plan', string='Plan', size=64)
     state = fields.Selection([('template', 'Template'),

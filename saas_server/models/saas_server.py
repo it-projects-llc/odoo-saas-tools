@@ -91,7 +91,7 @@ class SaasServerClient(models.Model):
             client_env['res.users'].create({
                 'login': OWNER_TEMPLATE_LOGIN,
                 'name': 'NAME',
-                'email': 'email@example.com',
+                'email': 'onwer-email@example.com',
             })
         else:
             access_token = self._context.get('access_token')
@@ -108,15 +108,8 @@ class SaasServerClient(models.Model):
                 'oauth_uid': saas_portal_user['user_id'],
                 'oauth_access_token': access_token
             })
-        # 3. Set suffix for all sequences
-        seq_ids = client_env['ir.sequence'].search(cr, SUPERUSER_ID,
-                                                 [('suffix', '=', False)])
-        suffix = {'suffix': client_id.split('-')[0]}
-        client_env['ir.sequence'].write(cr, SUPERUSER_ID, seq_ids, suffix)
-        # get action_id
-        action_id = client_env['ir.model.data'].xmlid_to_res_id(cr, SUPERUSER_ID, action)
 
-        # 4. install addons
+        # install addons
         addons = self._context.get('addons')
         if addons:
             for addon in client_env['ir.module.module'].search([('name', 'in', addons)]):

@@ -11,7 +11,7 @@ class SaasConfig(models.TransientModel):
     action = fields.Selection([('edit', 'Edit'), ('upgrade', 'Upgrade'), ('delete', 'Delete')],
                                 'Action')
     database = fields.Char('Database', size=128)
-    server = fields.Char('Server', size=128)
+    server_id = fields.Many2one('saas_portal.server', string='Server')
     update_addons = fields.Char('Update Addons', size=256)
     install_addons = fields.Char('Install Addons', size=256)
     fix_ids = fields.One2many('saas.config.fix', 'config_id', 'Fixes')
@@ -25,27 +25,13 @@ class SaasConfig(models.TransientModel):
             res = getattr(self, method)(cr, uid, obj, context)
         return res
 
-    def delete_database(self, cr, uid, obj, context=None):
-        scheme = 'http'
-        params = (obj.server, obj.database)
-        url = 'http://%s/login?db=%s&login=admin&key=admin' % params
-        return {
-            'type': 'ir.actions.act_url',
-            'target': 'self',
-            'name': 'Delete Database',
-            'url': url
+    @api.one
+    def delete_database(self):
+        state = {
+            'd': self.database
         }
-        params = {
-            'scope': 'userinfo force_login trial skiptheuse',
-            'state': simplejson.dumps({
-                'd': obj.name,
-            }),
-            'redirect_uri': '{scheme}://{saas_server}/saas_server/delete_database'.format(scheme=scheme, saas_server=obj.server),
-            'response_type': 'token',
-            'client_id': obj.client_id,
-        }
-
-        return request.redirect('/oauth2/auth?%s' % werkzeug.url_encode(params))
+        req = self.server_id._request(path='/saas_server/delete_database', state=state)
+        return request.redirect(req)
 
     def edit_database(self, cr, uid, obj, context=None):
         params = (obj.database.replace('_', '.'), obj.database)

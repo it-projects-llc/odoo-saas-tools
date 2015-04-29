@@ -10,8 +10,11 @@ import urllib2
 import simplejson
 import uuid
 import werkzeug
-
+import requests
 import random
+
+import logging
+_logger = logging.getLogger(__name__)
 
 class SaasPortalServer(models.Model):
     _name = 'saas_portal.server'
@@ -188,7 +191,16 @@ class OauthApplication(models.Model):
     @api.model
     def delete_expired_databases(self):
         now = time.strftime(DEFAULT_SERVER_DATETIME_FORMAT)
-        self.search([('expiration', '<=', now)]).delete_db()
+        self.search([('expiration', '<=', now)])._delete_db()
+
+    @api.one
+    def _delete_db(self):
+        state = {
+            'd': self.database
+        }
+        req = self.server_id._request(path='/saas_server/delete_database', state=state)
+        requests.get(req)
+        _logger.info('delete database: %s', req.text)
 
     @api.one
     def _get_expired(self):
@@ -205,7 +217,8 @@ class OauthApplication(models.Model):
             'target': 'new',
             'context': {
                 'default_action': 'delete',
-                'default_database': obj.name
+                'default_database': obj.name,
+                'default_server_id': obj.server_id.id
             }
         }
 

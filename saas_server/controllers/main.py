@@ -36,7 +36,7 @@ class SaasServer(http.Controller):
         client_id = admin_data.get('client_id')
 
         openerp.service.db._drop_conn(request.cr, template_db)
-        openerp.service.db.exp_drop(new_db) # for debug
+        #openerp.service.db.exp_drop(new_db) # for debug
         openerp.service.db.exp_duplicate_database(template_db, new_db)
 
         registry = openerp.modules.registry.RegistryManager.get(new_db)

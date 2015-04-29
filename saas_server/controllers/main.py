@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import openerp
-from openerp import SUPERUSER_ID
+from openerp import api, SUPERUSER_ID
 from openerp import http
 from openerp.addons.web.http import request
 from openerp.addons.auth_oauth.controllers.main import fragment_to_query_string
@@ -38,6 +38,12 @@ class SaasServer(http.Controller):
         context['access_token'] = access_token
         client_data = {'name':new_db, 'client_id': client_id}
         client = request.env['saas_server.client'].with_context(**context).create(client_data)
+
+        with client.registry()[0].cursor() as cr:
+            client_env = api.Environment(cr, SUPERUSER_ID, request.context)
+            oauth_provider_id = client_env.ref('saas_server.saas_oauth_provider').id
+            action_id = client_env.ref(action).id
+
         params = {
             'access_token': post['access_token'],
             'state': simplejson.dumps({

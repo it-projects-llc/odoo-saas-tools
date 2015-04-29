@@ -106,9 +106,6 @@ class SaasPortalPlan(models.Model):
         assert len(self)==1, 'This method is applied only for single record'
         plan = self[0]
         addons = [x.name for x in plan.required_addons_ids]
-        if 'saas_client' not in addons:
-            addons.append('saas_client')
-
         state = {
             'd': plan.template,
             'demo': plan.demo and 1 or 0,

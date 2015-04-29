@@ -33,11 +33,12 @@ class SaasServerClient(models.Model):
 
     def create(self, vals):
         template_db = self._context.get('template_db')
+        template_db = 't2.is-odoo.com'#debug
         new_db = vals.get('name')
         if template_db:
             openerp.service.db._drop_conn(self.env.cr, template_db)
-            #openerp.service.db.exp_drop(new_db) # for debug
-            openerp.service.db.exp_duplicate_database(template_db, self.name)
+            openerp.service.db.exp_drop(new_db) # for debug
+            openerp.service.db.exp_duplicate_database(template_db, new_db)
         else:
             demo = self._context.get('demo')
             lang = self._context.get('lang') or 'en_US'
@@ -48,44 +49,63 @@ class SaasServerClient(models.Model):
         return res
 
     @api.one
+    def registry(self):
+        return openerp.modules.registry.RegistryManager.get(self.name)
+
+    @api.one
     def prepare_database(self):
         if not self._context.get('saas_portal_user'):
             raise exceptions.Warning('You are not able to create client directly')
-        registry = openerp.modules.registry.RegistryManager.get(self.name)
-
-        with registry.cursor() as cr:
+        with self.registry()[0].cursor() as cr:
             env = api.Environment(cr, SUPERUSER_ID, self._context)
             self._prepare_database(env)
 
     @api.one
     def _prepare_database(self, client_env):
         client_id = self.client_id
-        saas_oauth_provider = self.env['ir.model.data'].ref('saas_server.saas_oauth_provider')
+        saas_oauth_provider = self.env.ref('saas_server.saas_oauth_provider')
         saas_portal_user = self._context.get('saas_portal_user')
         is_template_db = self._context.get('is_template_db')
 
         # update database.uuid
         client_env['ir.config_parameter'].set_param('database.uuid', client_id)
 
+        # install addons
+        addons = set(self._context.get('addons', []))
+        if is_template_db:
+            addons.add('auth_oauth')
+            addons.add('saas_client')
+        else:
+            addons.add('saas_client')
+        if addons:
+            for addon in client_env['ir.module.module'].search([('name', 'in', list(addons))]):
+                addon.button_immediate_install()
+
         # copy auth provider from saas_server
-        oauth_provider_data = {'enabled': False, 'client_id': client_id}
-        for attr in ['name', 'auth_endpoint', 'scope', 'validation_endpoint', 'data_endpoint', 'css_class', 'body']:
-            oauth_provider_data[attr] = getattr(saas_oauth_provider, attr)
-        oauth_provider_id = client_env['auth.oauth.provider'].create(cr, SUPERUSER_ID, oauth_provider_data)
-        client_env['ir.model.data'].create(cr, SUPERUSER_ID, {
-            'name': 'saas_oauth_provider',
-            'module': 'saas_server',
-            'noupdate': True,
-            'model': 'auth.oauth.provider',
-            'res_id': oauth_provider_id,
-        })
+        oauth_provider_id = None
+        if is_template_db:
+            oauth_provider_data = {'enabled': False, 'client_id': client_id}
+            for attr in ['name', 'auth_endpoint', 'scope', 'validation_endpoint', 'data_endpoint', 'css_class', 'body']:
+                oauth_provider_data[attr] = getattr(saas_oauth_provider, attr)
+            oauth_provider_id = client_env['auth.oauth.provider'].create(oauth_provider_data)
+            client_env['ir.model.data'].create({
+                'name': 'saas_oauth_provider',
+                'module': 'saas_server',
+                'noupdate': True,
+                'model': 'auth.oauth.provider',
+                'res_id': oauth_provider_id,
+            })
+        if not oauth_provider_id:
+            oauth_provider_id = client_env.ref('saas_server.saas_oauth_provider').id
+
         # Update company with organization
-        organization = self._context.get('o')
-        vals = {'name': organization}
-        client_env['res.company'].write(cr, SUPERUSER_ID, 1, vals)
-        partner = client_env['res.company'].browse(cr, SUPERUSER_ID, 1)
-        client_env['res.partner'].write(cr, SUPERUSER_ID, partner.id,
-                                      {'email': saas_portal_user['email']})
+        #FIXME
+        #organization = self._context.get('o')
+        #vals = {'name': organization}
+        #client_env['res.company'].browse(1).write(vals)
+        #partner = client_env['res.company'].browse(1)
+        #partner.write({'email': saas_portal_user['email']})
+
         # create user
         OWNER_TEMPLATE_LOGIN = 'owner_template'
         if is_template_db:
@@ -97,9 +117,9 @@ class SaasServerClient(models.Model):
         else:
             access_token = self._context.get('access_token')
             domain = [('login', '=', OWNER_TEMPLATE_LOGIN)]
-            user_ids = client_env['res.users'].search(cr, SUPERUSER_ID, domain)
+            user_ids = client_env['res.users'].search(domain)
             user_id = user_ids and user_ids[0] or SUPERUSER_ID
-            user = client_env['res.users'].browse(cr, SUPERUSER_ID, user_id)
+            user = client_env['res.users'].browse(user_id)
             user.write({
                 'login': saas_portal_user['email'],
                 'name': saas_portal_user['name'],
@@ -109,13 +129,6 @@ class SaasServerClient(models.Model):
                 'oauth_uid': saas_portal_user['user_id'],
                 'oauth_access_token': access_token
             })
-
-        # install addons
-        addons = self._context.get('addons')
-        if addons:
-            for addon in client_env['ir.module.module'].search([('name', 'in', addons)]):
-                client_env['ir.module.module'].button_immediate_install()
-
 
     def update_all(self, cr, uid, server_db):
         #TODO: mark database as deleted if it not found

@@ -32,8 +32,6 @@ class SaasServerClient(models.Model):
                              'State', default='open', track_visibility='onchange')
 
     def create(self, vals):
-        if not self._context.get('saas_portal_user'):
-            raise exceptions.Warning('You are not able to create client directly')
         template_db = self._context.get('template_db')
         new_db = vals.get('name')
         if template_db:
@@ -45,11 +43,14 @@ class SaasServerClient(models.Model):
             lang = self._context.get('lang') or 'en_US'
             openerp.service.db.exp_create_database(new_db, demo, lang)
         res = super(SaasServerClient, self).create(vals)
-        res.prepare_database()
+        if vals.get('state') != 'draft':
+            res.prepare_database()
         return res
 
     @api.one
     def prepare_database(self):
+        if not self._context.get('saas_portal_user'):
+            raise exceptions.Warning('You are not able to create client directly')
         registry = openerp.modules.registry.RegistryManager.get(self.name)
 
         with registry.cursor() as cr:
@@ -152,6 +153,7 @@ class SaasServerClient(models.Model):
                 }
                 oid = self.search(cr, uid, [('client_id', '=', client_id)])
                 if not oid:
+                    data['state'] = 'draft'
                     self.create(cr, uid, data)
                 else:
                     self.write(cr, uid, oid, data)

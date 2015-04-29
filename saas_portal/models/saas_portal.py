@@ -45,26 +45,26 @@ class SaasPortalServer(models.Model):
 class SaasPortalPlan(models.Model):
     _name = 'saas_portal.plan'
 
-    name = fields.Char('Plan')
-    template = fields.Char('Source DB', help='Name for template database', placeholder='template1.odoo.com')
+    name = fields.Char('Plan', required=True)
+    template = fields.Char('Template DB', help='Name for template database', placeholder='template1.odoo.com', required=True)
     demo = fields.Boolean('Install Demo Data')
     sequence = fields.Integer('Sequence')
     state = fields.Selection([('draft', 'Draft'), ('confirmed', 'Confirmed')],
                              'State', default='draft')
     role_id = fields.Many2one('saas_server.role', 'Role')
     required_addons_ids = fields.Many2many('ir.module.module',
-                                           rel='company_required_addons_rel',
-                                           id1='company_id', id2='module_id',
+                                           relation='plan_required_addons_rel',
+                                           column1='plan_id', column2='module_id',
                                            string='Required Addons')
     optional_addons_ids = fields.Many2many('ir.module.module',
-                                           rel='company_optional_addons_rel',
-                                           id1='company_id', id2='module_id',
+                                           relation='plan_optional_addons_rel',
+                                           column1='plan_id', column2='module_id',
                                            string='Optional Addons')
 
     _order = 'sequence'
 
-    dbname_template = fields.Char('DB Names', help='Template for db name. Ignore if you use manually created db names', placeholder='crm-%i.odoo.com')
-    server_id = fields.Many2one('saas_portal.server', string='SaaS Server', help='Force apply this saas server')
+    dbname_template = fields.Char('DB Names', help='Template for db name. Use %i for numbering. Ignore if you use manually created db names', placeholder='crm-%i.odoo.com')
+    server_id = fields.Many2one('saas_portal.server', string='SaaS Server', help='Force apply this saas server', states={'draft':[('readonly', False)]}, readonly=True, required=True)
 
     @api.one
     def generate_dbname(self):

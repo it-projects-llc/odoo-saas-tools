@@ -34,9 +34,14 @@ class SaasServer(http.Controller):
             raise Exception(admin_data['error'])
         client_id = admin_data.get('client_id')
 
-        openerp.service.db._drop_conn(request.cr, template_db)
-        #openerp.service.db.exp_drop(new_db) # for debug
-        openerp.service.db.exp_duplicate_database(template_db, new_db)
+        if template_db:
+            openerp.service.db._drop_conn(request.cr, template_db)
+            #openerp.service.db.exp_drop(new_db) # for debug
+            openerp.service.db.exp_duplicate_database(template_db, new_db)
+        else:
+            demo = state.get('demo')
+            lang = state.get('lang') or 'en_US'
+            openerp.service.db.exp_create_database(new_db, demo, lang)
 
         registry = openerp.modules.registry.RegistryManager.get(new_db)
 
@@ -45,6 +50,7 @@ class SaasServer(http.Controller):
             registry['ir.config_parameter'].set_param(cr, SUPERUSER_ID,
                                                       'database.uuid',
                                                       client_id)
+            #STOPHERE: fix for new template database
             # save auth data
             oauth_provider_data = {'enabled': False, 'client_id': client_id}
             for attr in ['name', 'auth_endpoint', 'scope', 'validation_endpoint', 'data_endpoint', 'css_class', 'body']:

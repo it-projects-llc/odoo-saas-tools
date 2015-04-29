@@ -50,6 +50,7 @@ class SaasPortalServer(models.Model):
 
     @api.one
     def action_update_stats(self):
+        # TODO: check for templates databases
         scheme = 'https' if self.https else 'http'
         url = '{scheme}://{domain}/saas_server/stats'.format(scheme=scheme, domain=self.name)
         data = urllib2.urlopen(url).read()
@@ -69,6 +70,10 @@ class SaasPortalPlan(models.Model):
     name = fields.Char('Plan', required=True)
     template = fields.Char('Template DB', help='Name for template database', placeholder='template1.odoo.com', required=True)
     demo = fields.Boolean('Install Demo Data')
+    def _get_default_lang_id(self):
+        lang =  self.env['res.lang'].search([('code', '=', self.env.lang)])
+        return lang and lang[0]
+    lang_id = fields.Many2one('res.lang', 'Language', default=_get_default_lang_id)
     sequence = fields.Integer('Sequence')
     state = fields.Selection([('draft', 'Draft'), ('confirmed', 'Confirmed')],
                              'State', default='draft')
@@ -87,6 +92,7 @@ class SaasPortalPlan(models.Model):
     dbname_template = fields.Char('DB Names', help='Template for db name. Use %i for numbering. Ignore if you use manually created db names', placeholder='crm-%i.odoo.com')
     server_id = fields.Many2one('saas_portal.server', string='SaaS Server', help='Force apply this saas server', states={'draft':[('readonly', False)]}, readonly=True, required=True)
 
+
     @api.one
     def generate_dbname(self):
         # TODO make more elegant solution
@@ -94,7 +100,6 @@ class SaasPortalPlan(models.Model):
 
     @api.multi
     def create_template(self):
-        # FIXME: mark oauth.application as template
         assert len(self)==1, 'This method is applied only for single record'
         plan = self[0]
         addons = [x.name for x in plan.required_addons_ids]
@@ -103,7 +108,9 @@ class SaasPortalPlan(models.Model):
 
         state = {
             'd': plan.template,
-            'addons': addons
+            'demo': plan.demo and 1 or 0,
+            'addons': addons,
+            'lang': plan.lang_id.code
         }
         url = plan.server_id._request(path='/saas_server/new_database', state=state)
         return {

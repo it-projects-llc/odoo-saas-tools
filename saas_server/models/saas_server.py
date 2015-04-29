@@ -1,7 +1,7 @@
 import os
 import openerp
 from openerp import SUPERUSER_ID
-from openerp import models, fields, Environment
+from openerp import models, fields, Environment, exceptions
 from openerp.addons.saas_utils import connector, database
 
 
@@ -33,6 +33,8 @@ class SaasServerClient(models.Model):
                              'State', default='open', track_visibility='onchange')
 
     def create(self, vals):
+        if not self._context.get('saas_portal_user'):
+            raise exceptions.Warning('You are not able to create client directly')
         template_db = self._context.get('template_db')
         if template_db:
             openerp.service.db._drop_conn(self.env.cr, template_db)
@@ -56,11 +58,15 @@ class SaasServerClient(models.Model):
 
     @api.one
     def _prepare_database(self, client_env):
+        client_id = self.client_id
+        saas_oauth_provider = self.env['ir.model.data'].ref('saas_server.saas_oauth_provider')
+        saas_portal_user = self._context.get('saas_portal_user')
+        is_template_db = self._context.get('is_template_db')
+
         # update database.uuid
-        client_env['ir.config_parameter'].set_param(cr, SUPERUSER_ID,
-                                                  'database.uuid',
-                                                  client_id)
-        # save auth data
+        client_env['ir.config_parameter'].set_param('database.uuid', client_id)
+
+        # copy auth provider from saas_server
         oauth_provider_data = {'enabled': False, 'client_id': client_id}
         for attr in ['name', 'auth_endpoint', 'scope', 'validation_endpoint', 'data_endpoint', 'css_class', 'body']:
             oauth_provider_data[attr] = getattr(saas_oauth_provider, attr)
@@ -72,26 +78,36 @@ class SaasServerClient(models.Model):
             'model': 'auth.oauth.provider',
             'res_id': oauth_provider_id,
         })
-        # 1. Update company with organization
+        # Update company with organization
+        organization = self._context.get('o')
         vals = {'name': organization}
         client_env['res.company'].write(cr, SUPERUSER_ID, 1, vals)
         partner = client_env['res.company'].browse(cr, SUPERUSER_ID, 1)
         client_env['res.partner'].write(cr, SUPERUSER_ID, partner.id,
-                                      {'email': admin_data['email']})
-        # 2. Update user credentials
-        domain = [('login', '=', template_db)]
-        user_ids = client_env['res.users'].search(cr, SUPERUSER_ID, domain)
-        user_id = user_ids and user_ids[0] or SUPERUSER_ID
-        user = client_env['res.users'].browse(cr, SUPERUSER_ID, user_id)
-        user.write({
-            'login': admin_data['email'],
-            'name': admin_data['name'],
-            'email': admin_data['email'],
-            'parent_id': partner.id,
-            'oauth_provider_id': oauth_provider_id,
-            'oauth_uid': admin_data['user_id'],
-            'oauth_access_token': access_token
-        })
+                                      {'email': saas_portal_user['email']})
+        # create user
+        OWNER_TEMPLATE_LOGIN = 'owner_template'
+        if is_template_db:
+            client_env['res.users'].create({
+                'login': OWNER_TEMPLATE_LOGIN,
+                'name': 'NAME',
+                'email': 'email@example.com',
+            })
+        else:
+            access_token = self._context.get('access_token')
+            domain = [('login', '=', OWNER_TEMPLATE_LOGIN)]
+            user_ids = client_env['res.users'].search(cr, SUPERUSER_ID, domain)
+            user_id = user_ids and user_ids[0] or SUPERUSER_ID
+            user = client_env['res.users'].browse(cr, SUPERUSER_ID, user_id)
+            user.write({
+                'login': saas_portal_user['email'],
+                'name': saas_portal_user['name'],
+                'email': saas_portal_user['email'],
+                #'parent_id': partner.id,
+                'oauth_provider_id': oauth_provider_id,
+                'oauth_uid': saas_portal_user['user_id'],
+                'oauth_access_token': access_token
+            })
         # 3. Set suffix for all sequences
         seq_ids = client_env['ir.sequence'].search(cr, SUPERUSER_ID,
                                                  [('suffix', '=', False)])
@@ -101,12 +117,10 @@ class SaasServerClient(models.Model):
         action_id = client_env['ir.model.data'].xmlid_to_res_id(cr, SUPERUSER_ID, action)
 
         # 4. install addons
-        addons = state.get('addons')
+        addons = self._context.get('addons')
         if addons:
-            addon_ids = client_env['ir.module.module'].search(cr, SUPERUSER_ID, [('name', 'in', addons)])
-            for addon_id in addon_ids:
-                client_env['ir.module.module'].button_immediate_install(cr, SUPERUSER_ID, addon_id)
-    
+            for addon in client_env['ir.module.module'].search([('name', 'in', addons)]):
+                client_env['ir.module.module'].button_immediate_install()
 
 
     def update_all(self, cr, uid, server_db):

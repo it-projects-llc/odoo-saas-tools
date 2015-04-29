@@ -23,19 +23,19 @@ class SaasServer(http.Controller):
 
         state = simplejson.loads(post.get('state'))
         new_db = state.get('d')
-        organization = state.get('o')
         template_db = state.get('db_template')
         action = 'base.open_module_tree'
         access_token = post['access_token']
         saas_oauth_provider = request.registry['ir.model.data'].xmlid_to_object(request.cr, SUPERUSER_ID, 'saas_server.saas_oauth_provider')
 
-        admin_data = request.registry['res.users']._auth_oauth_rpc(request.cr, SUPERUSER_ID, saas_oauth_provider.validation_endpoint, access_token)
-        if admin_data.get("error"):
-            raise Exception(admin_data['error'])
-        client_id = admin_data.get('client_id')
+        saas_portal_user = request.registry['res.users']._auth_oauth_rpc(request.cr, SUPERUSER_ID, saas_oauth_provider.validation_endpoint, access_token)
+        if saas_portal_user.get("error"):
+            raise Exception(saas_portal_user['error'])
+        client_id = saas_portal_user.get('client_id')
 
         context = state.copy()
-
+        context['saas_portal_user'] = saas_portal_user
+        context['access_token'] = access_token
         client_data = {'name':new_db, 'client_id': client_id}
         client = request.env['saas_server.client'].with_context(**context).create(client_data)
         params = {

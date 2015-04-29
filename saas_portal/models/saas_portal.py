@@ -110,7 +110,8 @@ class SaasPortalPlan(models.Model):
             'd': plan.template,
             'demo': plan.demo and 1 or 0,
             'addons': addons,
-            'lang': plan.lang_id.code
+            'lang': plan.lang_id.code,
+            'is_template_db': 1,
         }
         url = plan.server_id._request(path='/saas_server/new_database', state=state)
         return {

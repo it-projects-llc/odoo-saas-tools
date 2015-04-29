@@ -24,8 +24,7 @@ Functions
 Usage
 =====
 
-* You have to use --db-filter option  so that database with this module be
-determine unambiguously by host of request
+* You have to use --db-filter option  so that database with this module be determine unambiguously by host of request
 * install this module
 * Configure oauth provider data
 

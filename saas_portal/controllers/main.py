@@ -52,7 +52,7 @@ class SaasPortal(http.Controller):
                 'o': organization, # FIXME: should be deleted. Organization name can be retrieved by saas_server via auth endpoint
                 'db_template': dbtemplate,
             }),
-            'redirect_uri': '{scheme}://{saas_server}/saas_server/new_database'.format(scheme=scheme, saas_server=saas_server),
+            'redirect_uri': '{scheme}://{saas_server}/saas_server/new_database'.format(scheme=scheme, saas_server=saas_server.name),
             'response_type': 'token',
             'client_id': client_id,
         }
@@ -104,7 +104,7 @@ class SaasPortal(http.Controller):
         return full_dbname.replace('www.', '').replace('.', '_')
 
     def get_saas_server(self):
-        saas_server_list = request.env['saas_portal.server'].search([])
+        saas_server_list = request.env['saas_portal.server'].sudo().search([])
         return saas_server_list[random.randint(0, len(saas_server_list) - 1)]
 
     def exists_database(self, dbname):

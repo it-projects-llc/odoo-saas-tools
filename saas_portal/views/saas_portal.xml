@@ -156,17 +156,25 @@
             <field name="arch" type="xml">
 				<form string="plans">
                     <header>
-                        <button string="Create" name="create_template" type="object" states="draft" icon="gtk-apply" class="oe_highlight"/>
-                        <button string="Edit" name="edit_template" type="object" states="confirmed" icon="gtk-edit" class="oe_highlight"/>
-                        <button string="Upgrade" name="upgrade_template" type="object" states="confirmed" icon="gtk-execute" />
-                        <button string="Delete" name="delete_template" type="object" states="confirmed" icon="gtk-cancel" />
+                        <button string="Create template DB" name="create_template" type="object" states="draft" icon="gtk-apply" class="oe_highlight"/>
+                        <button string="Edit template DB" name="edit_template" type="object" states="confirmed" icon="gtk-edit" class="oe_highlight"/>
+                        <button string="Upgrade template DB" name="upgrade_template" type="object" states="confirmed" icon="gtk-execute" />
+                        <button string="Delete template DB" name="delete_template" type="object" states="confirmed" icon="gtk-cancel" />
                         <field name="state" widget="statusbar"/>
                     </header>
             <sheet>
+                <label for="name" class="oe_edit_only"/>
+                <h1>
+                    <field name="name" class="oe_inline"/>
+                </h1>
+
+
 					<group>
-						<field name="name"/>
 						<field name="template"/>
-						<field name="role_id"/>
+                        <!--
+                            role_id should be deleted or moved to separate module
+                        <field name="role_id"/>
+                        -->
 						<field name="demo"/>
 						<field name="dbname_template"/>
 						<field name="server_id"/>

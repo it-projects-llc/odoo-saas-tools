@@ -168,24 +168,24 @@
                     <field name="name" class="oe_inline"/>
                 </h1>
 
-                <group col="4">
-                <group string="Technical Settings">
-                    <field name="server_id"/>
-                    <field name="template"/>
-                    <field name="dbname_template"/>
-                    <!--
-                        role_id should be deleted or moved to separate module
-                        <field name="role_id"/>
-                    -->
-                </group>
+                <group>
+                    <group string="Technical Settings">
+                        <field name="server_id"/>
+                        <field name="template"/>
+                        <field name="dbname_template"/>
+                        <!--
+                            role_id should be deleted or moved to separate module
+                            <field name="role_id"/>
+                        -->
+                    </group>
+                    <group>
+                    </group>
                 </group>
 
                 <separator string="Odoo DB settings"/>
                 <group col="4">
-                <group>
                     <field name="demo"/>
                     <field name="lang_id"/>
-                </group>
                 </group>
 
 					<notebook>

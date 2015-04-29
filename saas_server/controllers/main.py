@@ -14,7 +14,6 @@ import simplejson
 import logging
 _logger = logging.getLogger(__name__)
 
-
 class SaasServer(http.Controller):
 
     @http.route('/saas_server/new_database', type='http', auth='public')
@@ -85,6 +84,13 @@ class SaasServer(http.Controller):
             registry['ir.sequence'].write(cr, SUPERUSER_ID, seq_ids, suffix)
             # get action_id
             action_id = registry['ir.model.data'].xmlid_to_res_id(cr, SUPERUSER_ID, action)
+
+            # 4. install addons
+            addons = state.get('addons')
+            if addons:
+                addon_ids = registry['ir.module.module'].search(cr, SUPERUSER_ID, [('name', 'in', addons)])
+                for addon_id in addon_ids:
+                    registry['ir.module.module'].button_immediate_install(cr, SUPERUSER_ID, addon_id)
 
         params = {
             'access_token': post['access_token'],

@@ -43,11 +43,12 @@ class SaasPortal(http.Controller):
         request.registry['oauth.application'].create(request.cr, SUPERUSER_ID, {'client_id': client_id, 'name':full_dbname})
         scheme = request.httprequest.scheme
         saas_server = saas_server or self.get_saas_server()
-
+        # TODO: use saas_server._request
         params = {
             'scope': 'userinfo force_login trial skiptheuse',
             'state': simplejson.dumps({
                 'd': full_dbname,
+                # TODO: It seems that instead of 'u' , 'r' should be used. See addons/auth_oauth/controllers/main.py
                 'u': '%s://%s' % (scheme, full_dbname.replace('_', '.')),
                 'o': organization, # FIXME: should be deleted. Organization name can be retrieved by saas_server via auth endpoint
                 'db_template': dbtemplate,

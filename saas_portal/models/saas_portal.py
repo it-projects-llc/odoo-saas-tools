@@ -8,6 +8,8 @@ import time
 from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
 import urllib2
 import simplejson
+import uuid
+import werkzeug
 
 import random
 
@@ -22,6 +24,25 @@ class SaasPortalServer(models.Model):
     active = fields.Boolean('Active', default=True)
     https = fields.Boolean('HTTPS', default=False)
     client_ids = fields.One2many('oauth.application', 'server_id', string='Clients')
+
+    @api.one
+    def _request_params(self, path='/web', scheme='http', state={}, scope=None, client_id=None):
+        scope = scope or ['userinfo', 'force_login', 'trial', 'skiptheuse']
+        scope = ' '.join(scope)
+        client_id = client_id or self.env['oauth.application'].generate_client_id()
+        params = {
+            'scope': scope,
+            'state': simplejson.dumps(state),
+            'redirect_uri': '{scheme}://{saas_server}{path}'.format(scheme=scheme, saas_server=self.name, path=path),
+            'response_type': 'token',
+            'client_id': client_id,
+        }
+        return params
+
+    @api.one
+    def _request(self, **kw):
+        params = self._request_params(**kw)[0]
+        return '/oauth2/auth?%s' % werkzeug.url_encode(params)
 
     @api.model
     def action_update_stats_all(self):
@@ -71,19 +92,26 @@ class SaasPortalPlan(models.Model):
         # TODO make more elegant solution
         return self.dbname_template.replace('%i', str(random.randint(100, 10000)))
 
-    def create_template(self, cr, uid, ids, context=None):
-        obj = self.browse(cr, uid, ids[0])
-        openerp.service.db.exp_create_database(obj.template, obj.demo, 'en_US')
-        addon_names = [x.name for x in obj.required_addons_ids]
-        if 'saas_client' not in addon_names:
-            addon_names.append('saas_client')
-        to_search = [('name', 'in', addon_names)]
-        addon_ids = connector.call(obj.template, 'ir.module.module',
-                                   'search', to_search)
-        for addon_id in addon_ids:
-            connector.call(obj.template, 'ir.module.module',
-                           'button_immediate_install', addon_id)
-        return self.write(cr, uid, obj.id, {'state': 'confirmed'})
+    @api.multi
+    def create_template(self):
+        # FIXME: mark oauth.application as template
+        assert len(self)==1, 'This method is applied only for single record'
+        plan = self[0]
+        addons = [x.name for x in plan.required_addons_ids]
+        if 'saas_client' not in addons:
+            addons.append('saas_client')
+
+        state = {
+            'd': plan.template,
+            'addons': addons
+        }
+        url = plan.server_id._request(path='/saas_server/new_database', state=state)
+        return {
+            'type': 'ir.actions.act_url',
+            'target': 'new',
+            'name': 'Create Template',
+            'url': url
+        }
 
     def edit_template(self, cr, uid, ids, context=None):
         obj = self.browse(cr, uid, ids[0])
@@ -144,6 +172,10 @@ class OauthApplication(models.Model):
                              'State', default='open', track_visibility='onchange')
     expiration = fields.Datetime('Expiration', track_visibility='onchange')
     expired = fields.Boolean('Expiration', compute='_get_expired')
+
+    @api.model
+    def generate_client_id(self):
+        return str(uuid.uuid1())
 
     @api.model
     def delete_expired_databases(self):

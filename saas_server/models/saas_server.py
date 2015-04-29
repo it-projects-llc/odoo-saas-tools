@@ -1,7 +1,6 @@
 import os
 import openerp
-from openerp import SUPERUSER_ID
-from openerp import models, fields, Environment, exceptions
+from openerp import api, models, fields, SUPERUSER_ID, exceptions
 from openerp.addons.saas_utils import connector, database
 
 
@@ -36,6 +35,7 @@ class SaasServerClient(models.Model):
         if not self._context.get('saas_portal_user'):
             raise exceptions.Warning('You are not able to create client directly')
         template_db = self._context.get('template_db')
+        new_db = vals.get('name')
         if template_db:
             openerp.service.db._drop_conn(self.env.cr, template_db)
             #openerp.service.db.exp_drop(new_db) # for debug
@@ -53,7 +53,7 @@ class SaasServerClient(models.Model):
         registry = openerp.modules.registry.RegistryManager.get(self.name)
 
         with registry.cursor() as cr:
-            env = Environment(cr, SUPERUSER_ID, self._context)
+            env = api.Environment(cr, SUPERUSER_ID, self._context)
             self._prepare_database(env)
 
     @api.one

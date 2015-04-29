@@ -168,7 +168,7 @@
                     <field name="name" class="oe_inline"/>
                 </h1>
 
-
+                <group col="4">
                 <group string="Technical Settings">
                     <field name="server_id"/>
                     <field name="template"/>
@@ -178,9 +178,14 @@
                         <field name="role_id"/>
                     -->
                 </group>
+                </group>
+
                 <separator string="Odoo DB settings"/>
+                <group col="4">
                 <group>
                     <field name="demo"/>
+                    <field name="lang_id"/>
+                </group>
                 </group>
 
 					<notebook>

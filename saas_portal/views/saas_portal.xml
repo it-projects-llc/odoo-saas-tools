@@ -169,17 +169,20 @@
                 </h1>
 
 
-					<group>
-						<field name="template"/>
-                        <!--
-                            role_id should be deleted or moved to separate module
+                <group string="Technical Settings">
+                    <field name="server_id"/>
+                    <field name="template"/>
+                    <field name="dbname_template"/>
+                    <!--
+                        role_id should be deleted or moved to separate module
                         <field name="role_id"/>
-                        -->
-						<field name="demo"/>
-						<field name="dbname_template"/>
-						<field name="server_id"/>
-						<field name="sequence"/>
-					</group>
+                    -->
+                </group>
+                <separator string="Odoo DB settings"/>
+                <group>
+                    <field name="demo"/>
+                </group>
+
 					<notebook>
 						<page string="Required Addons" >
 							<field name="required_addons_ids" nolabel="1" />

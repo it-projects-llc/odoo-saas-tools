@@ -82,21 +82,21 @@ class SaasServerClient(models.Model):
                 addon.button_immediate_install()
 
         # copy auth provider from saas_server
-        oauth_provider_id = None
+        oauth_provider = None
         if is_template_db:
             oauth_provider_data = {'enabled': False, 'client_id': client_id}
             for attr in ['name', 'auth_endpoint', 'scope', 'validation_endpoint', 'data_endpoint', 'css_class', 'body']:
                 oauth_provider_data[attr] = getattr(saas_oauth_provider, attr)
-            oauth_provider_id = client_env['auth.oauth.provider'].create(oauth_provider_data)
+            oauth_provider = client_env['auth.oauth.provider'].create(oauth_provider_data)
             client_env['ir.model.data'].create({
                 'name': 'saas_oauth_provider',
                 'module': 'saas_server',
                 'noupdate': True,
                 'model': 'auth.oauth.provider',
-                'res_id': oauth_provider_id,
+                'res_id': oauth_provider.id,
             })
-        if not oauth_provider_id:
-            oauth_provider_id = client_env.ref('saas_server.saas_oauth_provider').id
+        if not oauth_provider:
+            oauth_provider = client_env.ref('saas_server.saas_oauth_provider')
 
         # Update company with organization
         #FIXME
@@ -106,8 +106,10 @@ class SaasServerClient(models.Model):
         #partner = client_env['res.company'].browse(1)
         #partner.write({'email': saas_portal_user['email']})
 
-        # create user
+        # prepare users
         OWNER_TEMPLATE_LOGIN = 'owner_template'
+        user = None
+        access_token = self._context.get('access_token')
         if is_template_db:
             client_env['res.users'].create({
                 'login': OWNER_TEMPLATE_LOGIN,
@@ -115,20 +117,21 @@ class SaasServerClient(models.Model):
                 'email': 'onwer-email@example.com',
             })
         else:
-            access_token = self._context.get('access_token')
             domain = [('login', '=', OWNER_TEMPLATE_LOGIN)]
-            user_ids = client_env['res.users'].search(domain)
-            user_id = user_ids and user_ids[0] or SUPERUSER_ID
-            user = client_env['res.users'].browse(user_id)
-            user.write({
-                'login': saas_portal_user['email'],
-                'name': saas_portal_user['name'],
-                'email': saas_portal_user['email'],
-                #'parent_id': partner.id,
-                'oauth_provider_id': oauth_provider_id,
-                'oauth_uid': saas_portal_user['user_id'],
-                'oauth_access_token': access_token
-            })
+            res = client_env['res.users'].search(domain)
+            if res:
+                user = res[0]
+        if not user:
+            user = client_env['res.users'].browse(SUPERUSER_ID)
+        user.write({
+            'login': saas_portal_user['email'],
+            'name': saas_portal_user['name'],
+            'email': saas_portal_user['email'],
+            #'parent_id': partner.id,
+            'oauth_provider_id': oauth_provider.id,
+            'oauth_uid': saas_portal_user['user_id'],
+            'oauth_access_token': access_token
+        })
 
     def update_all(self, cr, uid, server_db):
         #TODO: mark database as deleted if it not found

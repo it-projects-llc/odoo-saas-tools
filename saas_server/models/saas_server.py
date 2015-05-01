@@ -29,49 +29,49 @@ class SaasServerClient(models.Model):
                               ('cancelled', 'Cancelled'),
                               ('pending','Pending'),
                               ('deleted','Deleted')],
-                             'State', default='open', track_visibility='onchange')
+                             'State', default='draft', track_visibility='onchange')
 
-    def create(self, vals):
-        template_db = self._context.get('template_db')
+    _sql_constraints = [
+        ('name_uniq', 'unique (name)', 'Record for this database already exists!'),
+        ('client_id_uniq', 'unique (client_id)', 'client_id should be unique!'),
+    ]
+
+    @api.one
+    def create_database(self, template_db=None, demo=False, lang='en_US'):
         template_db = 't2.is-odoo.com'#debug
-        new_db = vals.get('name')
+        new_db = self.name
         if template_db:
             openerp.service.db._drop_conn(self.env.cr, template_db)
             openerp.service.db.exp_drop(new_db) # for debug
             openerp.service.db.exp_duplicate_database(template_db, new_db)
         else:
-            demo = self._context.get('demo')
-            lang = self._context.get('lang') or 'en_US'
             openerp.service.db.exp_create_database(new_db, demo, lang)
-        res = super(SaasServerClient, self).create(vals)
-        if vals.get('state') != 'draft':
-            res.prepare_database()
-        return res
+        self.state = 'open'
 
     @api.one
     def registry(self):
         return openerp.modules.registry.RegistryManager.get(self.name)
 
     @api.one
-    def prepare_database(self):
-        if not self._context.get('saas_portal_user'):
-            raise exceptions.Warning('You are not able to create client directly')
+    def prepare_database(self, **kwargs):
         with self.registry()[0].cursor() as cr:
             env = api.Environment(cr, SUPERUSER_ID, self._context)
-            self._prepare_database(env)
+            self._prepare_database(env, **kwargs)
 
     @api.one
-    def _prepare_database(self, client_env):
+    def _prepare_database(self, client_env, saas_portal_user=None, is_template_db=False, addons=[], access_token=None):
         client_id = self.client_id
         saas_oauth_provider = self.env.ref('saas_server.saas_oauth_provider')
-        saas_portal_user = self._context.get('saas_portal_user')
-        is_template_db = self._context.get('is_template_db')
+
+        # update saas_server.client state
+        if is_template_db:
+            self.state = 'template'
 
         # update database.uuid
         client_env['ir.config_parameter'].set_param('database.uuid', client_id)
 
         # install addons
-        addons = set(self._context.get('addons', []))
+        addons = set(addons)
         if is_template_db:
             addons.add('auth_oauth')
             addons.add('saas_client')
@@ -109,7 +109,6 @@ class SaasServerClient(models.Model):
         # prepare users
         OWNER_TEMPLATE_LOGIN = 'owner_template'
         user = None
-        access_token = self._context.get('access_token')
         if is_template_db:
             client_env['res.users'].create({
                 'login': OWNER_TEMPLATE_LOGIN,
@@ -133,46 +132,38 @@ class SaasServerClient(models.Model):
             'oauth_access_token': access_token
         })
 
-    def update_all(self, cr, uid, server_db):
+
+    @api.model
+    def update_all(self):
         #TODO: mark database as deleted if it not found
-        #TODO: add state field
-        db_list = database.get_market_dbs(with_templates=False)
-        try:
-            client_list.remove(server_db)
-        except:
-            pass
 
-        res = []
-        for db in db_list:
-            registry = openerp.modules.registry.RegistryManager.get(db)
-            with registry.cursor() as db_cr:
-                client_id = registry['ir.config_parameter'].get_param(db_cr,
-                                                SUPERUSER_ID, 'database.uuid')
-                users = registry['res.users'].search(db_cr, SUPERUSER_ID,
-                                                     [('share', '=', False)])
-                users_len = len(users)
-                data_dir = openerp.tools.config['data_dir']
+        self.sudo().search([]).update()
 
-                file_storage = get_size('%s/filestore/%s' % (data_dir, db))
-                file_storage = int(file_storage / (1024 * 1024))
+    @api.one
+    def update(self):
+        with self.registry()[0].cursor() as client_cr:
+            client_env = api.Environment(client_cr, SUPERUSER_ID, self._context)
+            data = self._get_data(client_env)[0]
+            self.write(data)
 
-                db_cr.execute("select pg_database_size('%s')" % db)
-                db_storage = db_cr.fetchone()[0]
-                db_storage = int(db_storage / (1024 * 1024))
+    @api.one
+    def _get_data(self, client_env):
+        client_id = client_env['ir.config_parameter'].get_param('database.uuid')
+        users = client_env['res.users'].search([('share', '=', False)])
+        users_len = len(users)
+        data_dir = openerp.tools.config['data_dir']
 
-                data = {
-                    'name': db,
-                    'client_id': client_id,
-                    'users_len': users_len,
-                    'file_storage': file_storage,
-                    'db_storage': db_storage,
-                }
-                oid = self.search(cr, uid, [('client_id', '=', client_id)])
-                if not oid:
-                    data['state'] = 'draft'
-                    self.create(cr, uid, data)
-                else:
-                    self.write(cr, uid, oid, data)
-                res.append(data)
+        file_storage = get_size('%s/filestore/%s' % (data_dir, self.name))
+        file_storage = int(file_storage / (1024 * 1024))
 
-        return res
+        client_env.cr.execute("select pg_database_size('%s')" % self.name)
+        db_storage = client_env.cr.fetchone()[0]
+        db_storage = int(db_storage / (1024 * 1024))
+
+        data = {
+            'client_id': client_id,
+            'users_len': users_len,
+            'file_storage': file_storage,
+            'db_storage': db_storage,
+        }
+        return data

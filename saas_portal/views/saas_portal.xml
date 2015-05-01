@@ -14,6 +14,7 @@
             <field name="arch" type="xml">
                 <tree string="Clients">
 					<field name="name"/>
+                    <field name="state"/>
 					<field name="plan"/>
 					<field name="users_len"/>
 					<field name="file_storage"/>
@@ -104,6 +105,7 @@
                     <field name="client_ids" readonly="1">
                         <tree>
                             <field name="name"/>
+                            <field name="state"/>
                             <field name="plan"/>
                             <field name="users_len"/>
                             <field name="file_storage"/>

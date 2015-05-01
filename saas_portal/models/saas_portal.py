@@ -60,11 +60,11 @@ class SaasPortalServer(models.Model):
         data = simplejson.loads(data)
         for r in data:
             r['server_id'] = self.id
-            id = self.env['oauth.application'].search([('client_id', '=', r.get('client_id'))])
+            client = self.env['oauth.application'].search([('client_id', '=', r.get('client_id'))])
             if not id:
                 self.env['oauth.application'].create(r)
             else:
-                self.env['oauth.application'].write(id, r)
+                client.write(r)
         return None
 
 class SaasPortalPlan(models.Model):
@@ -181,6 +181,11 @@ class OauthApplication(models.Model):
     expiration = fields.Datetime('Expiration', track_visibility='onchange')
     expired = fields.Boolean('Expiration', compute='_get_expired')
 
+    _sql_constraints = [
+        ('name_uniq', 'unique (name)', 'Record for this database already exists!'),
+        ('client_id_uniq', 'unique (client_id)', 'client_id should be unique!'),
+    ]
+
     @api.model
     def generate_client_id(self):
         return str(uuid.uuid1())
@@ -256,11 +261,12 @@ class OauthApplication(models.Model):
             tk_ids = token_model.search(cr, uid, to_search1, context=context)
             if tk_ids:
                 token_model.unlink(cr, uid, tk_ids)
-            to_search2 = [('database', '=', obj.name)]
-            user_ids = user_model.search(cr, uid, to_search2, context=context)
-            if user_ids:
-                user_model.unlink(cr, uid, user_ids)
-            openerp.service.db.exp_drop(obj.name)
+            # TODO: it seems we don't need stuff below
+            #to_search2 = [('database', '=', obj.name)]
+            #user_ids = user_model.search(cr, uid, to_search2, context=context)
+            #if user_ids:
+            #    user_model.unlink(cr, uid, user_ids)
+            #openerp.service.db.exp_drop(obj.name)
         return super(OauthApplication, self).unlink(cr, uid, ids, context)
 
     @api.one

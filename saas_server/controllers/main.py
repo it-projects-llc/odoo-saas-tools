@@ -24,6 +24,10 @@ class SaasServer(http.Controller):
         state = simplejson.loads(post.get('state'))
         new_db = state.get('d')
         template_db = state.get('db_template')
+        demo = state.get('demo')
+        lang = state.get('lang', 'en_US')
+        addons = state.get('addons', [])
+        is_template_db = state.get('is_template_db')
         action = 'base.open_module_tree'
         access_token = post['access_token']
         saas_oauth_provider = request.registry['ir.model.data'].xmlid_to_object(request.cr, SUPERUSER_ID, 'saas_server.saas_oauth_provider')
@@ -33,11 +37,14 @@ class SaasServer(http.Controller):
             raise Exception(saas_portal_user['error'])
         client_id = saas_portal_user.get('client_id')
 
-        context = state.copy()
-        context['saas_portal_user'] = saas_portal_user
-        context['access_token'] = access_token
         client_data = {'name':new_db, 'client_id': client_id}
-        client = request.env['saas_server.client'].with_context(**context).create(client_data)
+        client = request.env['saas_server.client'].create(client_data)
+        client.create_database(template_db, demo, lang)
+        client.prepare_database(
+            saas_portal_user = saas_portal_user,
+            is_template_db = is_template_db,
+            addons = addons,
+            access_token = access_token)
 
         with client.registry()[0].cursor() as cr:
             client_env = api.Environment(cr, SUPERUSER_ID, request.context)
@@ -84,6 +91,14 @@ class SaasServer(http.Controller):
     @http.route(['/saas_server/stats'], type='http', auth='public')
     def stats(self, **post):
         # TODO auth
-        server_db = db_monodb()
-        res = request.registry['saas_server.client'].update_all(request.cr, SUPERUSER_ID, server_db)
+        request.env['saas_server.client'].update_all()
+        res = []
+        for client in request.env['saas_server.client'].sudo().search([('state', 'not in', ['draft'])]):
+            res.append({
+                'name': client.name,
+                'client_id': client.client_id,
+                'users_len': client.users_len,
+                'file_storage': client.file_storage,
+                'db_storage': client.db_storage,
+            })
         return simplejson.dumps(res)

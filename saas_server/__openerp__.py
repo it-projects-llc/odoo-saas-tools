@@ -6,7 +6,8 @@
     'website': 'https://it-projects.info',
     'depends': ['auth_oauth', 'saas_utils'],
     'data': [
-        'data/auth_oauth_data.xml'
+        'views/saas_server.xml',
+        'data/auth_oauth_data.xml',
     ],
     'installable': True,
     'description': '''

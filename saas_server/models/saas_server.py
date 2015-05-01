@@ -135,8 +135,6 @@ class SaasServerClient(models.Model):
 
     @api.model
     def update_all(self):
-        #TODO: mark database as deleted if it not found
-
         self.sudo().search([]).update()
 
     @api.one

@@ -53,18 +53,23 @@ class SaasPortalServer(models.Model):
 
     @api.one
     def action_update_stats(self):
-        # TODO: check for templates databases
         scheme = 'https' if self.https else 'http'
         url = '{scheme}://{domain}/saas_server/stats'.format(scheme=scheme, domain=self.name)
         data = urllib2.urlopen(url).read()
         data = simplejson.loads(data)
+        print 'data', data
         for r in data:
             r['server_id'] = self.id
             client = self.env['oauth.application'].search([('client_id', '=', r.get('client_id'))])
-            if not id:
-                self.env['oauth.application'].create(r)
+            if not client:
+                client = self.env['oauth.application'].create(r)
             else:
                 client.write(r)
+            if client.state == 'template':
+                plans = self.env['saas_portal.plan'].search([('template', '=', client.name)])
+                for p in plans:
+                    if p.state == 'draft':
+                        p.state = 'confirmed'
         return None
 
 class SaasPortalPlan(models.Model):

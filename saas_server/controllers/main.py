@@ -96,6 +96,7 @@ class SaasServer(http.Controller):
         for client in request.env['saas_server.client'].sudo().search([('state', 'not in', ['draft'])]):
             res.append({
                 'name': client.name,
+                'state': client.state,
                 'client_id': client.client_id,
                 'users_len': client.users_len,
                 'file_storage': client.file_storage,

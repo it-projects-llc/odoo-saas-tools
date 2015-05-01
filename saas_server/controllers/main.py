@@ -66,10 +66,10 @@ class SaasServer(http.Controller):
     @http.route('/saas_server/delete_database', type='http', auth='public')
     @fragment_to_query_string
     def delete_database(self, **post):
-        _logger.info('new_database post: %s', post)
+        _logger.info('delete_database post: %s', post)
 
         state = simplejson.loads(post.get('state'))
-        client_id = 'TODO'
+        client_id = state.get('client_id')
         db = state.get('d')
         access_token = post['access_token']
         saas_oauth_provider = request.registry['ir.model.data'].xmlid_to_object(request.cr, SUPERUSER_ID, 'saas_server.saas_oauth_provider')
@@ -77,7 +77,7 @@ class SaasServer(http.Controller):
         admin_data = request.registry['res.users']._auth_oauth_rpc(request.cr, SUPERUSER_ID, saas_oauth_provider.validation_endpoint, access_token)
         # TODO: check access rights
 
-        client = request.registry['saas_server.client'].search(request.cr, SUPERUSER_ID, [('client_id', '=', client_id)])
+        client = request.env['saas_server.client'].search([('client_id', '=', client_id)])
         if not client:
             raise Exception('Client not found')
         client = client[0]

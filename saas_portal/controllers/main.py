@@ -36,7 +36,7 @@ class SaasPortal(http.Controller):
         plan = request.registry['saas_portal.plan'].browse(cr, uid, [plan_id])
         full_dbname = plan.generate_dbname()[0]
 
-        return self.create_new_database(plan.template, full_dbname, saas_server=plan.server_id)
+        return self.create_new_database(plan.template_id.name, full_dbname, saas_server=plan.server_id)
 
     def create_new_database(self, dbtemplate, full_dbname, organization='YourCompany', saas_server=None):
         client_id = self.get_new_client_id(full_dbname)
@@ -116,7 +116,7 @@ class SaasPortal(http.Controller):
         user_model = request.registry.get('res.users')
         user = user_model.browse(request.cr, SUPERUSER_ID, request.uid)
         if user.plan_id and user.plan_id.state == 'confirmed':
-            return user.plan_id.template
+            return user.plan_id.template_id.name
         return self.get_config_parameter('dbtemplate')
 
     def update_user_and_partner(self, database):

@@ -2,7 +2,7 @@ import os
 import openerp
 from openerp import api, models, fields, SUPERUSER_ID, exceptions
 from openerp.addons.saas_utils import connector, database
-
+import psycopg2
 
 def get_size(start_path='.'):
     total_size = 0
@@ -141,7 +141,13 @@ class SaasServerClient(models.Model):
 
     @api.one
     def update(self):
-        with self.registry()[0].cursor() as client_cr:
+        try:
+            registry = self.registry()[0]
+        except psycopg2.OperationalError:
+            if self.state != 'draft':
+                self.state = 'deleted'
+            return
+        with registry.cursor() as client_cr:
             client_env = api.Environment(client_cr, SUPERUSER_ID, self._context)
             data = self._get_data(client_env)[0]
             self.write(data)

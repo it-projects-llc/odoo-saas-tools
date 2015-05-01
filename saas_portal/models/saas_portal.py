@@ -43,9 +43,19 @@ class SaasPortalServer(models.Model):
         return params
 
     @api.one
-    def _request(self, **kw):
+    def _request(self, add_host=False, **kw):
         params = self._request_params(**kw)[0]
-        return '/oauth2/auth?%s' % werkzeug.url_encode(params)
+        url = '/oauth2/auth?%s' % werkzeug.url_encode(params)
+        if add_host:
+            domain = self.env['ir.config_parameter'].get_param('saas_portal.base_saas_domain')
+            scheme = 'http'
+            url = '{scheme}://{domain}{url}'.format(scheme=scheme, domain=domain, url=url)
+        return url
+
+    @api.one
+    def _request_server(self, **kw):
+        # TODO: get access_token manually and make redirection
+        params = self._request_params(**kw)[0]
 
     @api.model
     def action_update_stats_all(self):
@@ -65,18 +75,13 @@ class SaasPortalServer(models.Model):
                 client = self.env['oauth.application'].create(r)
             else:
                 client.write(r)
-            if client.state == 'template':
-                plans = self.env['saas_portal.plan'].search([('template', '=', client.name)])
-                for p in plans:
-                    if p.state == 'draft':
-                        p.state = 'confirmed'
         return None
 
 class SaasPortalPlan(models.Model):
     _name = 'saas_portal.plan'
 
     name = fields.Char('Plan', required=True)
-    template = fields.Char('Template DB', help='Name for template database', placeholder='template1.odoo.com', required=True)
+    template_id = fields.Many2one('oauth.application', 'Template DB', required=True)
     demo = fields.Boolean('Install Demo Data')
     def _get_default_lang_id(self):
         lang =  self.env['res.lang'].search([('code', '=', self.env.lang)])
@@ -84,7 +89,7 @@ class SaasPortalPlan(models.Model):
     lang_id = fields.Many2one('res.lang', 'Language', default=_get_default_lang_id)
     sequence = fields.Integer('Sequence')
     state = fields.Selection([('draft', 'Draft'), ('confirmed', 'Confirmed')],
-                             'State', default='draft')
+                             'State', default='draft', compute='_get_state', store=True)
     role_id = fields.Many2one('saas_server.role', 'Role')
     required_addons_ids = fields.Many2many('ir.module.module',
                                            relation='plan_required_addons_rel',
@@ -102,6 +107,15 @@ class SaasPortalPlan(models.Model):
 
 
     @api.one
+    @api.depends('template_id.state')
+    def _get_state(self):
+        if self.template_id.state == 'template':
+            self.state = 'confirmed'
+        elif self.template_id.state == 'deleted':
+            self.state = 'draft'
+
+
+    @api.one
     def generate_dbname(self):
         # TODO make more elegant solution
         return self.dbname_template.replace('%i', str(random.randint(100, 10000)))
@@ -112,7 +126,7 @@ class SaasPortalPlan(models.Model):
         plan = self[0]
         addons = [x.name for x in plan.required_addons_ids]
         state = {
-            'd': plan.template,
+            'd': plan.template_id.name,
             'demo': plan.demo and 1 or 0,
             'addons': addons,
             'lang': plan.lang_id.code,
@@ -129,7 +143,7 @@ class SaasPortalPlan(models.Model):
     def edit_template(self, cr, uid, ids, context=None):
         obj = self.browse(cr, uid, ids[0])
         d = config.get('local_url')
-        url = '%s/login?db=%s&login=admin&key=admin' % (d, obj.template)
+        url = '%s/login?db=%s&login=admin&key=admin' % (d, obj.template_id.name)
         return {
             'type': 'ir.actions.act_url',
             'target': 'self',
@@ -147,14 +161,27 @@ class SaasPortalPlan(models.Model):
             'target': 'new',
             'context': {
                 'default_action': 'upgrade',
-                'default_database': obj.template
+                'default_database': obj.template_id.name
             }
         }
 
-    def delete_template(self, cr, uid, ids, context=None):
-        obj = self.browse(cr, uid, ids[0])
-        openerp.service.db.exp_drop(obj.template)
-        return self.write(cr, uid, obj.id, {'state': 'draft'})
+    @api.multi
+    def delete_template(self):
+        #self.template_id._delete_db()
+
+        #tmp solution:
+        state = {
+            'd': self.template_id.name,
+            'client_id': self.template_id.client_id,
+        }
+        url = self.server_id._request(path='/saas_server/delete_database', state=state)[0]
+        return {
+            'type': 'ir.actions.act_url',
+            'target': 'new',
+            'name': 'Delete Template',
+            'url': url
+        }
+
 
 
 class SaasServerRole(models.Model):
@@ -168,21 +195,21 @@ class OauthApplication(models.Model):
     _name = 'oauth.application'
     _inherit = ['oauth.application', 'mail.thread']
 
-    name = fields.Char('Database name', readonly=True)
+    name = fields.Char('Database name', readonly=False)
     client_id = fields.Char('Client ID', readonly=True, select=True)
     users_len = fields.Integer('Count users', readonly=True)
     file_storage = fields.Integer('File storage (MB)', readonly=True)
     db_storage = fields.Integer('DB storage (MB)', readonly=True)
     server_id = fields.Many2one('saas_portal.server', string='Server', readonly=True)
-    # TODO: Why Char? Can it be replaces to plan_id = fields.Many2one ?
-    plan = fields.Char(compute='_get_plan', string='Plan', size=64)
+    template_in_plan_ids = fields.One2many('saas_portal.plan', 'template_id', string='Template in Plans')
     state = fields.Selection([('template', 'Template'),
                               ('draft','New'),
                               ('open','In Progress'),
                               ('cancelled', 'Cancelled'),
                               ('pending','Pending'),
                               ('deleted','Deleted')],
-                             'State', default='open', track_visibility='onchange')
+                             'State', default='draft', track_visibility='onchange')
+    
     expiration = fields.Datetime('Expiration', track_visibility='onchange')
     expired = fields.Boolean('Expiration', compute='_get_expired')
 
@@ -203,11 +230,12 @@ class OauthApplication(models.Model):
     @api.one
     def _delete_db(self):
         state = {
-            'd': self.database
+            'd': self.name
         }
-        req = self.server_id._request(path='/saas_server/delete_database', state=state)
-        requests.get(req)
-        _logger.info('delete database: %s', req.text)
+        req = self.server_id._request_server(path='/saas_server/delete_database', state=state)[0]
+        res = requests.get(req)
+        _logger.info('delete database: %s', res.text)
+        self.state = 'deleted'
 
     @api.one
     def _get_expired(self):
@@ -273,16 +301,6 @@ class OauthApplication(models.Model):
             #    user_model.unlink(cr, uid, user_ids)
             #openerp.service.db.exp_drop(obj.name)
         return super(OauthApplication, self).unlink(cr, uid, ids, context)
-
-    @api.one
-    def _get_plan(self):
-        oat = self.pool.get('oauth.access_token')
-        to_search = [('application_id', '=', self.id)]
-        access_token_ids = oat.search(self.env.cr, self.env.uid, to_search)
-        if access_token_ids:
-            access_token = oat.browse(self.env.cr, self.env.uid,
-                                      access_token_ids[0])
-            self.plan = access_token.user_id.plan_id.name
 
 
 class ResUsers(models.Model):

@@ -15,7 +15,6 @@
                 <tree string="Clients">
 					<field name="name"/>
                     <field name="state"/>
-					<field name="plan"/>
 					<field name="users_len"/>
 					<field name="file_storage"/>
 					<field name="db_storage"/>
@@ -36,7 +35,7 @@
                         <button string="Edit" name="edit_db" type="object" attrs="{'invisible':[('state', 'in', ['deleted'])]}" icon="gtk-edit" class="oe_highlight"/>
                         <button string="Upgrade" name="upgrade_db" type="object" attrs="{'invisible':[('state', 'in', ['deleted'])]}" icon="gtk-execute" />
                         <button string="Delete" name="delete_db" type="object" attrs="{'invisible':[('state', 'not in', ['pending']),('expired','=',False)]}" icon="gtk-delete" />
-                        <field name="state" widget="statusbar" statusbar_visible="open,pending,deleted" readonly="1"/>
+                        <field name="state" widget="statusbar" statusbar_visible="open,pending,deleted" clickable="False"/>
                     </header>
                     <sheet>
                     <group>
@@ -50,7 +49,14 @@
                             <field name="expiration"/>
                         </group>
                     </group>
-                    <field name="user_ids"/>
+                    <notebook>
+                        <page string="Users">
+                            <field name="user_ids"/>
+                        </page>
+                        <page string="Template in Plans">
+                            <field name="template_in_plan_ids"/>
+                        </page>
+                    </notebook>
                     </sheet>
                     <div class="oe_chatter">
                         <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
@@ -106,7 +112,6 @@
                         <tree>
                             <field name="name"/>
                             <field name="state"/>
-                            <field name="plan"/>
                             <field name="users_len"/>
                             <field name="file_storage"/>
                             <field name="db_storage"/>
@@ -141,7 +146,7 @@
                 <tree string="Plans">
                     <field name="sequence" invisible="1"/>
 					<field name="name"/>
-					<field name="template"/>
+					<field name="template_id"/>
 					<field name="state" />
 					<button name="create_template" type="object" states="draft" icon="gtk-apply" />
 					<button name="edit_template" type="object" states="confirmed" icon="gtk-edit" />
@@ -173,7 +178,7 @@
                 <group>
                     <group string="Technical Settings">
                         <field name="server_id"/>
-                        <field name="template"/>
+                        <field name="template_id"/>
                         <field name="dbname_template"/>
                         <!--
                             role_id should be deleted or moved to separate module

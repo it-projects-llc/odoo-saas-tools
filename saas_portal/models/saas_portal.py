@@ -149,16 +149,9 @@ class SaasPortalPlan(models.Model):
             'url': url
         }
 
-    def edit_template(self, cr, uid, ids, context=None):
-        obj = self.browse(cr, uid, ids[0])
-        d = config.get('local_url')
-        url = '%s/login?db=%s&login=admin&key=admin' % (d, obj.template_id.name)
-        return {
-            'type': 'ir.actions.act_url',
-            'target': 'self',
-            'name': 'Edit Template',
-            'url': url
-        }
+    @api.multi
+    def edit_template(self):
+        return self[0].template_id.edit_db()
 
     def upgrade_template(self, cr, uid, ids, context=None):
         obj = self.browse(cr, uid, ids[0])
@@ -202,6 +195,8 @@ class SaasServerRole(models.Model):
 
 class OauthApplication(models.Model):
     _name = 'oauth.application'
+    _description = 'Client'
+
     _inherit = ['oauth.application', 'mail.thread']
 
     name = fields.Char('Database name', readonly=False)
@@ -276,7 +271,8 @@ class OauthApplication(models.Model):
             'target': 'new',
             'context': {
                 'default_action': 'edit',
-                'default_server': obj.server,
+                'default_server_id': obj.server_id.id,
+                'default_database_id': obj.id,
                 'default_database': obj.name
             }
         }

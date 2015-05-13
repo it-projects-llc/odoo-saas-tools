@@ -10,38 +10,45 @@ class SaasConfig(models.TransientModel):
 
     action = fields.Selection([('edit', 'Edit'), ('upgrade', 'Upgrade'), ('delete', 'Delete')],
                                 'Action')
-    database = fields.Char('Database', size=128)
+    database_id = fields.Many2one('oauth.application', string='Client')
     server_id = fields.Many2one('saas_portal.server', string='Server')
     update_addons = fields.Char('Update Addons', size=256)
     install_addons = fields.Char('Install Addons', size=256)
     fix_ids = fields.One2many('saas.config.fix', 'config_id', 'Fixes')
     description = fields.Text('Description')
 
-    def execute_action(self, cr, uid, ids, context=None):
+    @api.multi
+    def execute_action(self):
         res = False
-        obj = self.browse(cr, uid, ids[0], context)
-        method = '%s_database' % obj.action
+        method = '%s_database' % self.action
         if hasattr(self, method):
-            res = getattr(self, method)(cr, uid, obj, context)
+            res = getattr(self, method)()
         return res
 
-    @api.one
-    def delete_database(self):
-        state = {
-            'd': self.database
-        }
-        req = self.server_id._request(path='/saas_server/delete_database', state=state)
-        return request.redirect(req)
-
-    def edit_database(self, cr, uid, obj, context=None):
-        params = (obj.database.replace('_', '.'), obj.database)
-        url = 'http://%s/login?db=%s&login=admin&key=admin' % params
+    @api.model
+    def _proceed_url(self, url):
         return {
             'type': 'ir.actions.act_url',
-            'target': 'self',
-            'name': 'Edit Database',
+            'target': 'new',
+            'name': 'Redirection',
             'url': url
         }
+    @api.multi
+    def _request_to_server(self, path):
+        r = self[0]
+        state = {
+            'd': r.database_id.name,
+        }
+        url = r.server_id._request(path=path, state=state, client_id = r.database_id.client_id)
+        return self._proceed_url(url)
+
+    @api.multi
+    def delete_database(self):
+        return self._request_to_server('/saas_server/delete_database')
+
+    @api.multi
+    def edit_database(self):
+        return self._request_to_server('/saas_server/edit_database')
 
     def upgrade_database(self, cr, uid, obj, context=None):
         dbs = obj.database and [obj.database] or database.get_market_dbs()

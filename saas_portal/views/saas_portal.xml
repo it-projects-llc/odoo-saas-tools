@@ -229,7 +229,7 @@
 				     	<field name="action" readonly="1"/>
 						<field name="update_addons" attrs="{'invisible': [('action', '!=', 'upgrade')]}"/>
 						<field name="install_addons" attrs="{'invisible': [('action', '!=', 'upgrade')]}"/>
-				        <field name="database" readonly="1"/>
+				        <field name="database_id" readonly="1"/>
 				        <field name="server_id" readonly="1"/>
 				     </group>
 					 <group attrs="{'invisible': [('action', '!=', 'upgrade')]}">
@@ -249,7 +249,7 @@
 					 <footer>
 					 	<button name="execute_action" string="Execute" type="object" class="oe_highlight"/>
 	                    or
-	                    <button string="Cancel" class="oe_link" special="cancel"/>
+	                    <button string="Close" class="oe_link" special="cancel"/>
 	                </footer>
                 </form>
             </field>

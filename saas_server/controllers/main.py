@@ -65,13 +65,30 @@ class SaasServer(http.Controller):
         scheme = request.httprequest.scheme
         return werkzeug.utils.redirect('{scheme}://{domain}/saas_client/new_database?{params}'.format(scheme=scheme, domain=new_db.replace('_', '.'), params=werkzeug.url_encode(params)))
 
+    @http.route('/saas_server/edit_database', type='http', auth='public', website=True)
+    @fragment_to_query_string
+    def edit_database(self, **post):
+        _logger.info('edit_database post: %s', post)
+
+        scheme = request.httprequest.scheme
+        state = simplejson.loads(post.get('state'))
+        domain = state.get('d')
+
+        params = {
+            'access_token': post['access_token'],
+            'state': simplejson.dumps(state),
+        }
+        url = '{scheme}://{domain}/saas_client/edit_database?{params}'
+        url = url.format(scheme=scheme, domain=domain, params=werkzeug.url_encode(params))
+        return werkzeug.utils.redirect(url)
+
     @http.route('/saas_server/delete_database', type='http', auth='public')
     @fragment_to_query_string
     def delete_database(self, **post):
         _logger.info('delete_database post: %s', post)
 
         state = simplejson.loads(post.get('state'))
-        client_id = state.get('client_id')
+        client_id = post.get('client_id')
         db = state.get('d')
         access_token = post['access_token']
         saas_oauth_provider = request.registry['ir.model.data'].xmlid_to_object(request.cr, SUPERUSER_ID, 'saas_server.saas_oauth_provider')

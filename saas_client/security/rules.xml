@@ -31,6 +31,7 @@
 			<field name="perm_read" eval="True"/>
             <field name="perm_unlink" eval="True"/>
             <field name="perm_write" eval="True"/>
+            <field name="active" eval="False"/> <!--FIXME available_addons_ids doesn't work-->
         </record>
 
 		<record model="ir.ui.menu" id="base.menu_config">

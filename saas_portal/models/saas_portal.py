@@ -127,7 +127,10 @@ class SaasPortalPlan(models.Model):
     @api.one
     def generate_dbname(self):
         # TODO make more elegant solution
-        return self.dbname_template.replace('%i', str(random.randint(100, 10000)))
+        if not self.dbname_template:
+            raise exceptions.Warning(_('Template for db name is not configured'))
+        id = str(random.randint(100, 10000))
+        return self.dbname_template.replace('%i', id)
 
     @api.multi
     def create_template(self):
@@ -186,7 +189,7 @@ class OauthApplication(models.Model):
 
     _inherit = ['oauth.application', 'mail.thread']
 
-    name = fields.Char('Database name', readonly=False)
+    name = fields.Char('Database name', readonly=False, required=True)
     client_id = fields.Char('Client ID', readonly=True, select=True)
     users_len = fields.Integer('Count users', readonly=True)
     file_storage = fields.Integer('File storage (MB)', readonly=True)

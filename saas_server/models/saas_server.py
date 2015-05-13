@@ -38,7 +38,6 @@ class SaasServerClient(models.Model):
 
     @api.one
     def create_database(self, template_db=None, demo=False, lang='en_US'):
-        template_db = 't2.is-odoo.com'#debug
         new_db = self.name
         if template_db:
             openerp.service.db._drop_conn(self.env.cr, template_db)
@@ -98,6 +97,9 @@ class SaasServerClient(models.Model):
         if not oauth_provider:
             oauth_provider = client_env.ref('saas_server.saas_oauth_provider')
 
+        if not is_template_db:
+            oauth_provider.client_id = client_id
+
         # Update company with organization
         #FIXME
         #organization = self._context.get('o')
@@ -119,6 +121,10 @@ class SaasServerClient(models.Model):
             domain = [('login', '=', OWNER_TEMPLATE_LOGIN)]
             res = client_env['res.users'].search(domain)
             if res:
+                user = res[0]
+            res = client_env['res.users'].search([('login', '=', saas_portal_user['email'])])
+            if res:
+                # user already exists (e.g. administrator)
                 user = res[0]
         if not user:
             user = client_env['res.users'].browse(SUPERUSER_ID)

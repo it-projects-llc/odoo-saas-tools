@@ -35,10 +35,12 @@ class SaasServer(http.Controller):
         saas_portal_user = request.registry['res.users']._auth_oauth_rpc(request.cr, SUPERUSER_ID, saas_oauth_provider.validation_endpoint, access_token)
         if saas_portal_user.get("error"):
             raise Exception(saas_portal_user['error'])
+        if is_template_db:
+            # TODO: check access right to crete template db
+            pass
         client_id = saas_portal_user.get('client_id')
-
         client_data = {'name':new_db, 'client_id': client_id}
-        client = request.env['saas_server.client'].create(client_data)
+        client = request.env['saas_server.client'].sudo().create(client_data)
         client.create_database(template_db, demo, lang)
         client.prepare_database(
             saas_portal_user = saas_portal_user,

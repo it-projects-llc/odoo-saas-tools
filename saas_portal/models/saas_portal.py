@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 import openerp
-from openerp import models, fields, api, SUPERUSER_ID
+from openerp import models, fields, api, SUPERUSER_ID, exceptions
 from openerp.addons.saas_utils import connector, database
 from openerp import http
 from openerp.tools import config
+from openerp.tools.translate import _
 import time
 from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
 import urllib2
@@ -70,12 +71,19 @@ class SaasPortalServer(models.Model):
         print 'data', data
         for r in data:
             r['server_id'] = self.id
-            client = self.env['oauth.application'].search([('client_id', '=', r.get('client_id'))])
+            client = self.env['oauth.application'].search([
+                '|',
+                ('client_id', '=', r.get('client_id')),
+                ('name', '=', r.get('name'))
+            ])
             if not client:
                 client = self.env['oauth.application'].create(r)
+            elif client.name == r.get('name') and client.client_id != r.get('client_id') and client.state != 'deleted':
+                raise exceptions.Warning(_('Client with that name already exists: %s') % client.name)
             else:
                 client.write(r)
         return None
+
 
 class SaasPortalPlan(models.Model):
     _name = 'saas_portal.plan'
@@ -83,8 +91,9 @@ class SaasPortalPlan(models.Model):
     name = fields.Char('Plan', required=True)
     template_id = fields.Many2one('oauth.application', 'Template DB', required=True)
     demo = fields.Boolean('Install Demo Data')
+
     def _get_default_lang_id(self):
-        lang =  self.env['res.lang'].search([('code', '=', self.env.lang)])
+        lang = self.env['res.lang'].search([('code', '=', self.env.lang)])
         return lang and lang[0]
     lang_id = fields.Many2one('res.lang', 'Language', default=_get_default_lang_id)
     sequence = fields.Integer('Sequence')

@@ -240,10 +240,12 @@
 							</tree>
 						</field>
 					 </group>
-					 <separator />
-					 <group>
-					 	<field name="description" />
-					 </group>
+                     <!--
+                     <separator />
+                     <group>
+                         <field name="description" />
+                     </group>
+                     -->
 					 <footer>
 					 	<button name="execute_action" string="Execute" type="object" class="oe_highlight"/>
 	                    or

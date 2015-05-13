@@ -38,6 +38,7 @@ class SaasConfig(models.TransientModel):
         r = self[0]
         state = {
             'd': r.database_id.name,
+            'client_id': r.database_id.client_id,
         }
         url = r.server_id._request(path=path, state=state, client_id = r.database_id.client_id)
         return self._proceed_url(url)

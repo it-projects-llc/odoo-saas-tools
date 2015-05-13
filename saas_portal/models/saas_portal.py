@@ -169,20 +169,7 @@ class SaasPortalPlan(models.Model):
 
     @api.multi
     def delete_template(self):
-        #self.template_id._delete_db()
-
-        #tmp solution:
-        state = {
-            'd': self.template_id.name,
-            'client_id': self.template_id.client_id,
-        }
-        url = self.server_id._request(path='/saas_server/delete_database', state=state)[0]
-        return {
-            'type': 'ir.actions.act_url',
-            'target': 'new',
-            'name': 'Delete Template',
-            'url': url
-        }
+        return self[0].template_id.delete_db()
 
 
 
@@ -256,8 +243,8 @@ class OauthApplication(models.Model):
             'target': 'new',
             'context': {
                 'default_action': 'delete',
-                'default_database': obj.name,
-                'default_server_id': obj.server_id.id
+                'default_server_id': obj.server_id.id,
+                'default_database_id': obj.id,
             }
         }
 
@@ -273,7 +260,6 @@ class OauthApplication(models.Model):
                 'default_action': 'edit',
                 'default_server_id': obj.server_id.id,
                 'default_database_id': obj.id,
-                'default_database': obj.name
             }
         }
 

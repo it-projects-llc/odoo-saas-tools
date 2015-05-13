@@ -39,25 +39,30 @@ class SaasPortal(http.Controller):
         return self.create_new_database(plan.template_id.name, full_dbname, saas_server=plan.server_id)
 
     def create_new_database(self, dbtemplate, full_dbname, organization='YourCompany', saas_server=None):
-        client_id = self.get_new_client_id(full_dbname)
-        request.registry['oauth.application'].create(request.cr, SUPERUSER_ID, {'client_id': client_id, 'name':full_dbname})
-        scheme = request.httprequest.scheme
         saas_server = saas_server or self.get_saas_server()
-        # TODO: use saas_server._request
-        params = {
-            'scope': 'userinfo force_login trial skiptheuse',
-            'state': simplejson.dumps({
-                'd': full_dbname,
-                # TODO: It seems that instead of 'u' , 'r' should be used. See addons/auth_oauth/controllers/main.py
-                'u': '%s://%s' % (scheme, full_dbname.replace('_', '.')),
-                'o': organization, # FIXME: should be deleted. Organization name can be retrieved by saas_server via auth endpoint
-                'db_template': dbtemplate,
-            }),
-            'redirect_uri': '{scheme}://{saas_server}/saas_server/new_database'.format(scheme=scheme, saas_server=saas_server.name),
-            'response_type': 'token',
-            'client_id': client_id,
+        client_id = self.get_new_client_id(full_dbname)
+        scheme = request.httprequest.scheme,
+
+        vals = {'client_id': client_id,
+                'name': full_dbname,
+                'server_id': saas_server.id,
+                }
+        request.registry['oauth.application'].create(request.cr, SUPERUSER_ID, vals)
+
+        state = {
+            'd': full_dbname,
+            'r': '%s://%s/web' % (scheme, full_dbname),
+            #'o': organization, # FIXME: should be deleted. Organization name can be retrieved by saas_server via auth endpoint
+            'db_template': dbtemplate,
         }
-        return request.redirect('/oauth2/auth?%s' % werkzeug.url_encode(params))
+        scope = ['userinfo', 'force_login', 'trial', 'skiptheuse']
+        url = saas_server._request(path='/saas_server/new_database',
+                                   scheme=request.httprequest.scheme,
+                                   state=state,
+                                   client_id=client_id,
+                                   scope=scope,
+                                   )
+        return request.redirect(url[0])
 
     @http.route('/saas_portal/tenant', type='http', auth='public', website=True)
     def tenant(self, **post):

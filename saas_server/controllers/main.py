@@ -42,10 +42,11 @@ class SaasServer(http.Controller):
         client_data = {'name':new_db, 'client_id': client_id}
         client = request.env['saas_server.client'].sudo().create(client_data)
         client.create_database(template_db, demo, lang)
+        client.install_addons(addons=addons, is_template_db=is_template_db)
+        client.update_registry()
         client.prepare_database(
             saas_portal_user = saas_portal_user,
             is_template_db = is_template_db,
-            addons = addons,
             access_token = access_token)
 
         with client.registry()[0].cursor() as cr:

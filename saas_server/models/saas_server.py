@@ -39,17 +39,45 @@ class SaasServerClient(models.Model):
     @api.one
     def create_database(self, template_db=None, demo=False, lang='en_US'):
         new_db = self.name
+        openerp.service.db.exp_drop(new_db)  # for debug
         if template_db:
             openerp.service.db._drop_conn(self.env.cr, template_db)
-            openerp.service.db.exp_drop(new_db) # for debug
             openerp.service.db.exp_duplicate_database(template_db, new_db)
         else:
             openerp.service.db.exp_create_database(new_db, demo, lang)
         self.state = 'open'
 
     @api.one
-    def registry(self):
-        return openerp.modules.registry.RegistryManager.get(self.name)
+    def registry(self, new=False, **kwargs):
+        m = openerp.modules.registry.RegistryManager
+        if new:
+            return m.new(self.name, **kwargs)
+        else:
+            return m.get(self.name, **kwargs)
+
+    @api.one
+    def install_addons(self, addons, is_template_db):
+        addons = set(addons)
+        addons.add('mail_delete_sent_by_footer')  # debug
+        if is_template_db:
+            addons.add('auth_oauth')
+            addons.add('saas_client')
+        else:
+            addons.add('saas_client')
+        if not addons:
+            return
+        with self.registry()[0].cursor() as cr:
+            env = api.Environment(cr, SUPERUSER_ID, self._context)
+            self._install_addons(env, addons)
+
+    @api.one
+    def _install_addons(self, client_env, addons):
+        for addon in client_env['ir.module.module'].search([('name', 'in', list(addons))]):
+            addon.button_install()
+
+    @api.one
+    def update_registry(self):
+        self.registry(new=True, update_module=True)
 
     @api.one
     def prepare_database(self, **kwargs):
@@ -60,7 +88,6 @@ class SaasServerClient(models.Model):
     @api.one
     def _prepare_database(self, client_env, saas_portal_user=None, is_template_db=False, addons=[], access_token=None):
         client_id = self.client_id
-        saas_oauth_provider = self.env.ref('saas_server.saas_oauth_provider')
 
         # update saas_server.client state
         if is_template_db:
@@ -69,20 +96,10 @@ class SaasServerClient(models.Model):
         # update database.uuid
         client_env['ir.config_parameter'].set_param('database.uuid', client_id)
 
-        # install addons
-        addons = set(addons)
-        if is_template_db:
-            addons.add('auth_oauth')
-            addons.add('saas_client')
-        else:
-            addons.add('saas_client')
-        if addons:
-            for addon in client_env['ir.module.module'].search([('name', 'in', list(addons))]):
-                addon.button_immediate_install()
-
         # copy auth provider from saas_server
+        saas_oauth_provider = self.env.ref('saas_server.saas_oauth_provider')
         oauth_provider = None
-        if is_template_db:
+        if is_template_db and not client_env.ref('saas_server.saas_oauth_provider', raise_if_not_found=False):
             oauth_provider_data = {'enabled': False, 'client_id': client_id}
             for attr in ['name', 'auth_endpoint', 'scope', 'validation_endpoint', 'data_endpoint', 'css_class', 'body']:
                 oauth_provider_data[attr] = getattr(saas_oauth_provider, attr)

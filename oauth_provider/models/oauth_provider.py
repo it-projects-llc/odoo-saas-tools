@@ -12,7 +12,7 @@ class oauth_application(osv.Model):
     _name = 'oauth.application'
     _columns = {
         'name': fields.char('Database name', readonly=True),
-        'client_id' : fields.char('Client ID', readonly=True, select=True),
+        'client_id' : fields.char('Client ID', readonly=True, select=True, required=True),
         'token_ids': fields.one2many('oauth.access_token', 'application_id', 'Tokens'),
         'user_ids': fields.related('token_ids', 'user_id', readonly=True, type='one2many', relation='res.users', string='Users'),
 

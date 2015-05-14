@@ -98,7 +98,7 @@ class SaasPortalPlan(models.Model):
     lang_id = fields.Many2one('res.lang', 'Language', default=_get_default_lang_id)
     sequence = fields.Integer('Sequence')
     state = fields.Selection([('draft', 'Draft'), ('confirmed', 'Confirmed')],
-                             'State', default='draft', compute='_get_state', store=True)
+                             'State', compute='_get_state', store=True)
     role_id = fields.Many2one('saas_server.role', 'Role')
     required_addons_ids = fields.Many2many('ir.module.module',
                                            relation='plan_required_addons_rel',
@@ -112,7 +112,8 @@ class SaasPortalPlan(models.Model):
     _order = 'sequence'
 
     dbname_template = fields.Char('DB Names', help='Template for db name. Use %i for numbering. Ignore if you use manually created db names', placeholder='crm-%i.odoo.com')
-    server_id = fields.Many2one('saas_portal.server', string='SaaS Server', help='Force apply this saas server', states={'draft':[('readonly', False)]}, readonly=True, required=True)
+    server_id = fields.Many2one('saas_portal.server', string='SaaS Server',
+                                help='Force apply this saas server', required=True)
 
 
     @api.one
@@ -120,7 +121,7 @@ class SaasPortalPlan(models.Model):
     def _get_state(self):
         if self.template_id.state == 'template':
             self.state = 'confirmed'
-        elif self.template_id.state == 'deleted':
+        else:
             self.state = 'draft'
 
 
@@ -144,13 +145,18 @@ class SaasPortalPlan(models.Model):
             'lang': plan.lang_id.code,
             'is_template_db': 1,
         }
-        url = plan.server_id._request(path='/saas_server/new_database', state=state)
+        client_id = plan.template_id.client_id
+        url = plan.server_id._request(path='/saas_server/new_database', state=state, client_id=client_id)
         return {
             'type': 'ir.actions.act_url',
             'target': 'new',
             'name': 'Create Template',
             'url': url
         }
+
+    @api.one
+    def action_update_stats(self):
+        self.server_id.action_update_stats()
 
     @api.multi
     def edit_template(self):
@@ -189,8 +195,12 @@ class OauthApplication(models.Model):
 
     _inherit = ['oauth.application', 'mail.thread']
 
+    @api.model
+    def generate_client_id(self):
+        return str(uuid.uuid1())
+
     name = fields.Char('Database name', readonly=False, required=True)
-    client_id = fields.Char('Client ID', readonly=True, select=True)
+    client_id = fields.Char('Client ID', readonly=True, select=True, default=generate_client_id)
     users_len = fields.Integer('Count users', readonly=True)
     file_storage = fields.Integer('File storage (MB)', readonly=True)
     db_storage = fields.Integer('DB storage (MB)', readonly=True)
@@ -211,10 +221,6 @@ class OauthApplication(models.Model):
         ('name_uniq', 'unique (name)', 'Record for this database already exists!'),
         ('client_id_uniq', 'unique (client_id)', 'client_id should be unique!'),
     ]
-
-    @api.model
-    def generate_client_id(self):
-        return str(uuid.uuid1())
 
     @api.model
     def delete_expired_databases(self):

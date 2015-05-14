@@ -18,9 +18,9 @@
 					<field name="users_len"/>
 					<field name="file_storage"/>
 					<field name="db_storage"/>
-					<button name="edit_db" type="object" icon="gtk-edit" />
+					<button name="edit_db" type="object" icon="gtk-edit" attrs="{'invisible':[('state', 'in', ['deleted', 'draft'])]}"/>
                     <!--<button name="upgrade_db" type="object" icon="gtk-execute" />-->
-                    <button name="delete_db" type="object" icon="gtk-delete" />
+                    <button name="delete_db" type="object" attrs="{'invisible':[('state', 'in', ['pending'])]}" icon="gtk-delete" />
                 </tree>
             </field>
         </record>
@@ -33,9 +33,10 @@
                 <form string="Clients">
                     <field name="expired" invisible="1"/>
                     <header>
-                        <button string="Edit" name="edit_db" type="object" attrs="{'invisible':[('state', 'in', ['deleted'])]}" icon="gtk-edit" class="oe_highlight"/>
+                        <button string="Edit" name="edit_db" type="object" attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}" icon="gtk-edit" class="oe_highlight"/>
                         <!--<button string="Upgrade" name="upgrade_db" type="object" attrs="{'invisible':[('state', 'in', ['deleted'])]}" icon="gtk-execute" />-->
                         <button string="Delete" name="delete_db" type="object" attrs="{'invisible':[('state', 'not in', ['pending']),('expired','=',False)]}" icon="gtk-delete" />
+                        <button string="Sync server" type="object" name="action_update_stats"/>
                         <field name="state" widget="statusbar" statusbar_visible="open,pending,deleted" clickable="False"/>
                     </header>
                     <sheet>
@@ -99,7 +100,7 @@
             <field name="arch" type="xml">
                 <form string="Server">
                     <header>
-                        <button name="action_update_stats" type="object" string="Update client stats"/>
+                        <button name="action_update_stats" type="object" string="Sync server"/>
                     </header>
                     <sheet>
                     <group>

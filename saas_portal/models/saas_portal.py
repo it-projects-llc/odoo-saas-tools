@@ -57,7 +57,6 @@ class SaasPortalServer(models.Model):
     @api.one
     def _request_server(self, path=None, scheme='http', **kwargs):
         params = self._request_params(**kwargs)[0]
-        print '_request_params', kwargs, params
         access_token = self.env['oauth.access_token'].sudo().search([('user_id', '=', self.env.user.id)], order='id DESC', limit=1)
         access_token = access_token[0].token
         params.update({
@@ -78,7 +77,6 @@ class SaasPortalServer(models.Model):
         url = '{scheme}://{domain}/saas_server/stats'.format(scheme=scheme, domain=self.name)
         data = urllib2.urlopen(url).read()
         data = simplejson.loads(data)
-        print 'data', data
         for r in data:
             r['server_id'] = self.id
             client = self.env['oauth.application'].search([
@@ -190,6 +188,7 @@ class SaasPortalPlan(models.Model):
         if not self.dbname_template:
             raise exceptions.Warning(_('Template for db name is not configured'))
         id = str(random.randint(100, 10000))
+        id = '4918'  # debug
         return self.dbname_template.replace('%i', id)
 
     @api.multi

@@ -18,7 +18,7 @@
 					<field name="users_len"/>
 					<field name="file_storage"/>
 					<field name="db_storage"/>
-					<button name="edit_db" type="object" icon="gtk-edit" attrs="{'invisible':[('state', 'in', ['deleted', 'draft'])]}"/>
+                    <button name="edit_database" type="object" icon="gtk-edit" attrs="{'invisible':[('state', 'in', ['deleted', 'draft'])]}"/>
                     <!--<button name="upgrade_db" type="object" icon="gtk-execute" />-->
                     <button name="delete_db" type="object" attrs="{'invisible':[('state', 'in', ['pending'])]}" icon="gtk-delete" />
                 </tree>
@@ -33,7 +33,7 @@
                 <form string="Clients">
                     <field name="expired" invisible="1"/>
                     <header>
-                        <button string="Edit" name="edit_db" type="object" attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}" icon="gtk-edit" class="oe_highlight"/>
+                        <button string="Edit" name="edit_database" type="object" attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}" icon="gtk-edit" class="oe_highlight"/>
                         <!--<button string="Upgrade" name="upgrade_db" type="object" attrs="{'invisible':[('state', 'in', ['deleted'])]}" icon="gtk-execute" />-->
                         <button string="Delete" name="delete_db" type="object" attrs="{'invisible':[('state', 'not in', ['pending']),('expired','=',False)]}" icon="gtk-delete" />
                         <button string="Sync server" type="object" name="action_update_stats"/>
@@ -177,6 +177,7 @@
                 <h1>
                     <field name="name" class="oe_inline"/>
                 </h1>
+                <field name="summary" class="oe_inline"/>
 
                 <group>
                     <group string="Technical Settings">

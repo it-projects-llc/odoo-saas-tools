@@ -25,31 +25,9 @@ class SaasConfig(models.TransientModel):
             res = getattr(self, method)()
         return res
 
-    @api.model
-    def _proceed_url(self, url):
-        return {
-            'type': 'ir.actions.act_url',
-            'target': 'new',
-            'name': 'Redirection',
-            'url': url
-        }
-    @api.multi
-    def _request_to_server(self, path):
-        r = self[0]
-        state = {
-            'd': r.database_id.name,
-            'client_id': r.database_id.client_id,
-        }
-        url = r.server_id._request(path=path, state=state, client_id = r.database_id.client_id)
-        return self._proceed_url(url)
-
     @api.multi
     def delete_database(self):
-        return self._request_to_server('/saas_server/delete_database')
-
-    @api.multi
-    def edit_database(self):
-        return self._request_to_server('/saas_server/edit_database')
+        return self.database_id.delete_database()
 
     def upgrade_database(self, cr, uid, obj, context=None):
         dbs = obj.database and [obj.database] or database.get_market_dbs()

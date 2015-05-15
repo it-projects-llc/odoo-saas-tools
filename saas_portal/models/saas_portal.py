@@ -89,6 +89,7 @@ class SaasPortalPlan(models.Model):
     _name = 'saas_portal.plan'
 
     name = fields.Char('Plan', required=True)
+    summary = fields.Char('Summary')
     template_id = fields.Many2one('oauth.application', 'Template DB', required=True)
     demo = fields.Boolean('Install Demo Data')
 
@@ -160,7 +161,7 @@ class SaasPortalPlan(models.Model):
 
     @api.multi
     def edit_template(self):
-        return self[0].template_id.edit_db()
+        return self[0].template_id.edit_database()
 
     def upgrade_template(self, cr, uid, ids, context=None):
         obj = self.browse(cr, uid, ids[0])
@@ -223,6 +224,35 @@ class OauthApplication(models.Model):
     ]
 
     @api.model
+    def _proceed_url(self, url):
+        return {
+            'type': 'ir.actions.act_url',
+            'target': 'new',
+            'name': 'Redirection',
+            'url': url
+        }
+
+    @api.multi
+    def _request_to_server(self, path):
+        r = self[0]
+        state = {
+            'd': r.name,
+            'client_id': r.client_id,
+        }
+        url = r.server_id._request(path=path, state=state, client_id=r.client_id)
+        return self._proceed_url(url)
+
+
+    @api.multi
+    def edit_database(self):
+        return self._request_to_server('/saas_server/edit_database')
+
+    @api.multi
+    def delete_database(self):
+        return self._request_to_server('/saas_server/delete_database')
+
+
+    @api.model
     def delete_expired_databases(self):
         now = time.strftime(DEFAULT_SERVER_DATETIME_FORMAT)
         self.search([('expiration', '<=', now)])._delete_db()
@@ -252,21 +282,6 @@ class OauthApplication(models.Model):
             'target': 'new',
             'context': {
                 'default_action': 'delete',
-                'default_server_id': obj.server_id.id,
-                'default_database_id': obj.id,
-            }
-        }
-
-    def edit_db(self, cr, uid, ids, context=None):
-        obj = self.browse(cr, uid, ids[0])
-        return {
-            'type': 'ir.actions.act_window',
-            'view_type': 'form',
-            'view_mode': 'form',
-            'res_model': 'saas.config',
-            'target': 'new',
-            'context': {
-                'default_action': 'edit',
                 'default_server_id': obj.server_id.id,
                 'default_database_id': obj.id,
             }

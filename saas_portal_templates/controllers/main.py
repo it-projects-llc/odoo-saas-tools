@@ -17,9 +17,9 @@ class SaasPortalTemplates(saas_portal_controller):
 
     @http.route(['/saas_portal_templates/select-template'], type='http', auth='public', website=True)
     def select_template(self, **post):
-        cr, uid = request.cr, SUPERUSER_ID
         domain = [('state', 'in', ['confirmed'])]
-        templates = request.registry['saas_portal.plan'].search_read(cr, uid, domain, fields=['id', 'name'])
+        fields = ['id', 'name', 'summary']
+        templates = request.env['saas_portal.plan'].sudo().search_read(domain=domain, fields=fields)
         values = {'templates': templates}
         return request.website.render("saas_portal_templates.select_template", values)
 

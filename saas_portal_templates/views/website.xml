@@ -40,7 +40,7 @@
                                         <t t-esc="tmpl['name']"/>
                                     </h3>
                                     <div class="text-muted">
-                                        Some tagline can be here
+                                        <t t-esc="tmpl['summary'] or ''"/>
                                     </div>
                                     <a class="btn mt4 btn-primary odoo-install-app pull-left" t-attf-href="/saas_portal_templates/new_database?plan_id=#{tmpl['id']}">
                                         <t t-esc="tmpl['name']"/>

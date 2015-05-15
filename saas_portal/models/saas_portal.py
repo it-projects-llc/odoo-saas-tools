@@ -6,6 +6,7 @@ from openerp import http
 from openerp.tools import config
 from openerp.tools.translate import _
 import time
+from datetime import datetime, timedelta
 from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
 import urllib2
 import simplejson
@@ -44,8 +45,8 @@ class SaasPortalServer(models.Model):
         return params
 
     @api.one
-    def _request(self, add_host=False, **kw):
-        params = self._request_params(**kw)[0]
+    def _request(self, add_host=False, **kwargs):
+        params = self._request_params(**kwargs)[0]
         url = '/oauth2/auth?%s' % werkzeug.url_encode(params)
         if add_host:
             domain = self.env['ir.config_parameter'].get_param('saas_portal.base_saas_domain')
@@ -54,9 +55,18 @@ class SaasPortalServer(models.Model):
         return url
 
     @api.one
-    def _request_server(self, **kw):
-        # TODO: get access_token manually and make redirection
-        params = self._request_params(**kw)[0]
+    def _request_server(self, path=None, scheme='http', **kwargs):
+        params = self._request_params(**kwargs)[0]
+        print '_request_params', kwargs, params
+        access_token = self.env['oauth.access_token'].sudo().search([('user_id', '=', self.env.user.id)], order='id DESC', limit=1)
+        access_token = access_token[0].token
+        params.update({
+            'token_type': 'Bearer',
+            'access_token': access_token,
+            'expires_in': 3600,
+        })
+        url = '{scheme}://{saas_server}{path}?{params}'.format(scheme=scheme, saas_server=self.name, path=path, params=werkzeug.url_encode(params))
+        return url
 
     @api.model
     def action_update_stats_all(self):
@@ -132,22 +142,38 @@ class SaasPortalPlan(models.Model):
             self.state = 'draft'
 
     @api.one
-    def _create_new_database(self, dbname=None, scheme='http', client_id=None):
+    def _new_database_vals(self, vals):
+        if self.expiration:
+            now = datetime.now()
+            delta = timedelta(hours=self.expiration)
+            vals['expiration_datetime'] = (now + delta).strftime(DEFAULT_SERVER_DATETIME_FORMAT)
+        return vals
+
+    @api.one
+    def _create_new_database(self, scheme='http', dbname=None, client_id=None):
         server = self.server_id
         if not server:
             server = self.env['saas_portal.server'].get_saas_server()
 
-        vals = {'name': dbname,
+        vals = {'name': dbname or self.generate_dbname()[0],
                 'server_id': server.id,
                 }
+        client = self.env['oauth.application'].search([('name', '=', vals.get('name')), ('state', '=', 'deleted')])
+
         if client_id:
             vals['client_id'] = client_id
-        client = self.env['oauth.application'].create(vals)
+
+        vals = self._new_database_vals(vals)[0]
+
+        if client:
+            client.write(vals)
+            client_id = client.client_id
+        else:
+            client = self.env['oauth.application'].create(vals)
 
         state = {
             'd': client.name,
             'r': '%s://%s/web' % (scheme, client.name),
-            #'o': organization, # FIXME: should be deleted. Organization name can be retrieved by saas_server via auth endpoint
             'db_template': self.template_id.name,
         }
         scope = ['userinfo', 'force_login', 'trial', 'skiptheuse']
@@ -155,7 +181,7 @@ class SaasPortalPlan(models.Model):
                               scheme=scheme,
                               state=state,
                               client_id=client_id,
-                              scope=scope,)
+                              scope=scope,)[0]
         return url
 
     @api.one
@@ -247,7 +273,7 @@ class OauthApplication(models.Model):
                               ('deleted','Deleted')],
                              'State', default='draft', track_visibility='onchange')
     
-    expiration = fields.Datetime('Expiration', track_visibility='onchange')
+    expiration_datetime = fields.Datetime('Expiration', track_visibility='onchange')
     expired = fields.Boolean('Expiration', compute='_get_expired')
 
     _sql_constraints = [
@@ -269,7 +295,7 @@ class OauthApplication(models.Model):
         }
 
     @api.multi
-    def _request_to_server(self, path):
+    def _request(self, path):
         r = self[0]
         state = {
             'd': r.name,
@@ -281,32 +307,40 @@ class OauthApplication(models.Model):
 
     @api.multi
     def edit_database(self):
-        return self._request_to_server('/saas_server/edit_database')
+        return self._request('/saas_server/edit_database')
 
     @api.multi
     def delete_database(self):
-        return self._request_to_server('/saas_server/delete_database')
+        return self._request('/saas_server/delete_database')
 
 
     @api.model
     def delete_expired_databases(self):
         now = time.strftime(DEFAULT_SERVER_DATETIME_FORMAT)
-        self.search([('expiration', '<=', now)])._delete_db()
+        res = self.search([('state','not in', ['deleted']), ('expiration_datetime', '<=', now)])
+        _logger.info('delete_expired_databases %s', res)
+        res._delete_database_server()
 
     @api.one
-    def _delete_db(self):
+    def delete_database_server(self):
+        return self._delete_database_server()
+
+    @api.one
+    def _delete_database_server(self):
         state = {
-            'd': self.name
+            'd': self.name,
+            'client_id': self.client_id,
         }
-        req = self.server_id._request_server(path='/saas_server/delete_database', state=state)[0]
-        res = requests.get(req)
+        url = self.server_id._request_server(path='/saas_server/delete_database', state=state, client_id=self.client_id)[0]
+        res = requests.get(url)
         _logger.info('delete database: %s', res.text)
-        self.state = 'deleted'
+        if res.status_code != 500:
+            self.state = 'deleted'
 
     @api.one
     def _get_expired(self):
         now = fields.Datetime.now()
-        self.expired = self.expiration and self.expiration < now
+        self.expired = self.expiration_datetime and self.expiration_datetime < now
 
     def delete_db(self, cr, uid, ids, context=None):
         obj = self.browse(cr, uid, ids[0])

@@ -114,7 +114,8 @@ class SaasServer(http.Controller):
         state['d'] = request.db
         params['state'] = simplejson.dumps(state)
         # FIXME: server doesn't have auth data for admin (server is created manually currently)
-        return werkzeug.utils.redirect('/auth_oauth/signin?%s' % werkzeug.url_encode(params))
+        #return werkzeug.utils.redirect('/auth_oauth/signin?%s' % werkzeug.url_encode(params))
+        return werkzeug.utils.redirect('/web')
 
 
     @http.route(['/saas_server/stats'], type='http', auth='public')

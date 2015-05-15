@@ -18,9 +18,10 @@
 					<field name="users_len"/>
 					<field name="file_storage"/>
 					<field name="db_storage"/>
+                    <field name="expiration_datetime"/>
                     <button name="edit_database" type="object" icon="gtk-edit" attrs="{'invisible':[('state', 'in', ['deleted', 'draft'])]}"/>
                     <!--<button name="upgrade_db" type="object" icon="gtk-execute" />-->
-                    <button name="delete_db" type="object" attrs="{'invisible':[('state', 'in', ['pending'])]}" icon="gtk-delete" />
+                    <button name="delete_db" type="object" attrs="{'invisible':[('state', 'not in', ['pending'])]}" icon="gtk-delete" />
                 </tree>
             </field>
         </record>
@@ -35,7 +36,7 @@
                     <header>
                         <button string="Edit" name="edit_database" type="object" attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}" icon="gtk-edit" class="oe_highlight"/>
                         <!--<button string="Upgrade" name="upgrade_db" type="object" attrs="{'invisible':[('state', 'in', ['deleted'])]}" icon="gtk-execute" />-->
-                        <button string="Delete" name="delete_db" type="object" attrs="{'invisible':[('state', 'not in', ['pending']),('expired','=',False)]}" icon="gtk-delete" />
+                        <button string="Delete" name="delete_db" type="object" attrs="{'invisible':['|',('state', 'not in', ['pending'])]}" icon="gtk-delete" />
                         <button string="Sync server" type="object" name="action_update_stats" icon="gtk-refresh"/>
                         <field name="state" widget="statusbar" statusbar_visible="open,pending,deleted" clickable="False"/>
                     </header>
@@ -48,7 +49,7 @@
                             <field name="file_storage"/>
                             <field name="db_storage"/>
                             <field name="server_id"/>
-                            <field name="expiration"/>
+                            <field name="expiration_datetime"/>
                         </group>
                     </group>
                     <notebook>

@@ -39,6 +39,7 @@ class SaasServerClient(models.Model):
     @api.one
     def create_database(self, template_db=None, demo=False, lang='en_US'):
         new_db = self.name
+        #template_db = 't1.is-odoo.com'  # for debug
         openerp.service.db.exp_drop(new_db)  # for debug
         if template_db:
             openerp.service.db._drop_conn(self.env.cr, template_db)

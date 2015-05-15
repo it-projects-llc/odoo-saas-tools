@@ -6,8 +6,6 @@ from openerp.addons.web.http import request
 from openerp.addons.auth_oauth.controllers import main as oauth
 import werkzeug
 import simplejson
-import uuid
-import random
 
 
 class SignupError(Exception):
@@ -24,6 +22,7 @@ class SaasPortal(http.Controller):
 
     @http.route(['/saas_portal/book_then_signup'], type='http', auth='public', website=True)
     def book_then_signup(self, **post):
+        # TODO: this function should be updated (doesn't work now)
         full_dbname = self.get_full_dbname(post.get('dbname'))
         dbtemplate = self.get_template()
         # FIXME: line below should be deleted. This route called book_then_signup, but work as if user already signed up
@@ -31,37 +30,10 @@ class SaasPortal(http.Controller):
 
         return self.create_new_database(dbtemplate, full_dbname, organization=organization)
 
-    def create_demo_database(self, plan_id):
-        cr, uid = request.cr, SUPERUSER_ID
-        plan = request.registry['saas_portal.plan'].browse(cr, uid, [plan_id])
-        full_dbname = plan.generate_dbname()[0]
-
-        return self.create_new_database(plan.template_id.name, full_dbname, saas_server=plan.server_id)
-
-    def create_new_database(self, dbtemplate, full_dbname, organization='YourCompany', saas_server=None):
-        saas_server = saas_server or self.get_saas_server()
-        client_id = self.get_new_client_id(full_dbname)
+    def create_new_database(self, plan_id):
         scheme = request.httprequest.scheme,
-
-        vals = {'client_id': client_id,
-                'name': full_dbname,
-                'server_id': saas_server.id,
-                }
-        request.registry['oauth.application'].create(request.cr, SUPERUSER_ID, vals)
-
-        state = {
-            'd': full_dbname,
-            'r': '%s://%s/web' % (scheme, full_dbname),
-            #'o': organization, # FIXME: should be deleted. Organization name can be retrieved by saas_server via auth endpoint
-            'db_template': dbtemplate,
-        }
-        scope = ['userinfo', 'force_login', 'trial', 'skiptheuse']
-        url = saas_server._request(path='/saas_server/new_database',
-                                   scheme=request.httprequest.scheme,
-                                   state=state,
-                                   client_id=client_id,
-                                   scope=scope,
-                                   )
+        plan = request.env['saas_portal.plan'].sudo().browse(plan_id)
+        url = plan._create_new_database(scheme=scheme)
         return request.redirect(url[0])
 
     @http.route('/saas_portal/tenant', type='http', auth='public', website=True)
@@ -97,9 +69,6 @@ class SaasPortal(http.Controller):
         return imd.xmlid_to_object(request.cr, SUPERUSER_ID,
                                    'saas_server.saas_oauth_provider')
 
-    def get_new_client_id(self, name):
-        return str(uuid.uuid1())
-
     def get_config_parameter(self, param):
         config = request.registry['ir.config_parameter']
         full_param = 'saas_portal.%s' % param
@@ -108,10 +77,6 @@ class SaasPortal(http.Controller):
     def get_full_dbname(self, dbname):
         full_dbname = '%s.%s' % (dbname, self.get_config_parameter('base_saas_domain'))
         return full_dbname.replace('www.', '').replace('.', '_')
-
-    def get_saas_server(self):
-        saas_server_list = request.env['saas_portal.server'].sudo().search([])
-        return saas_server_list[random.randint(0, len(saas_server_list) - 1)]
 
     def exists_database(self, dbname):
         full_dbname = self.get_full_dbname(dbname)

@@ -9,7 +9,6 @@ from openerp.addons.saas_portal.controllers.main import SaasPortal as saas_porta
 
 import werkzeug
 import simplejson
-import uuid
 import random
 
 
@@ -29,4 +28,4 @@ class SaasPortalTemplates(saas_portal_controller):
             return login_redirect()
         plan_id = int(post.get('plan_id'))
 
-        return self.create_demo_database(plan_id)
+        return self.create_new_database(plan_id)

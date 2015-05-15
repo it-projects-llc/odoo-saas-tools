@@ -84,6 +84,11 @@ class SaasPortalServer(models.Model):
                 client.write(r)
         return None
 
+    @api.model
+    def get_saas_server(self):
+        saas_server_list = self.env['saas_portal.server'].sudo().search([])
+        return saas_server_list[random.randint(0, len(saas_server_list) - 1)]
+
 
 class SaasPortalPlan(models.Model):
     _name = 'saas_portal.plan'
@@ -101,6 +106,7 @@ class SaasPortalPlan(models.Model):
     state = fields.Selection([('draft', 'Draft'), ('confirmed', 'Confirmed')],
                              'State', compute='_get_state', store=True)
     role_id = fields.Many2one('saas_server.role', 'Role')
+    expiration = fields.Integer('Expiration (hours)', help='time to delete databse. Use for demo')
     required_addons_ids = fields.Many2many('ir.module.module',
                                            relation='plan_required_addons_rel',
                                            column1='plan_id', column2='module_id',
@@ -114,7 +120,7 @@ class SaasPortalPlan(models.Model):
 
     dbname_template = fields.Char('DB Names', help='Template for db name. Use %i for numbering. Ignore if you use manually created db names', placeholder='crm-%i.odoo.com')
     server_id = fields.Many2one('saas_portal.server', string='SaaS Server',
-                                help='Force apply this saas server', required=True)
+                                help='User this saas server or choose random')
 
 
     @api.one
@@ -125,6 +131,32 @@ class SaasPortalPlan(models.Model):
         else:
             self.state = 'draft'
 
+    @api.one
+    def _create_new_database(self, dbname=None, scheme='http', client_id=None):
+        server = self.server_id
+        if not server:
+            server = self.env['saas_portal.server'].get_saas_server()
+
+        vals = {'name': dbname,
+                'server_id': server.id,
+                }
+        if client_id:
+            vals['client_id'] = client_id
+        client = self.env['oauth.application'].create(vals)
+
+        state = {
+            'd': client.name,
+            'r': '%s://%s/web' % (scheme, client.name),
+            #'o': organization, # FIXME: should be deleted. Organization name can be retrieved by saas_server via auth endpoint
+            'db_template': self.template_id.name,
+        }
+        scope = ['userinfo', 'force_login', 'trial', 'skiptheuse']
+        url = server._request(path='/saas_server/new_database',
+                              scheme=scheme,
+                              state=state,
+                              client_id=client_id,
+                              scope=scope,)
+        return url
 
     @api.one
     def generate_dbname(self):

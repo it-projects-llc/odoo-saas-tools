@@ -36,7 +36,7 @@
                         <button string="Edit" name="edit_database" type="object" attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}" icon="gtk-edit" class="oe_highlight"/>
                         <!--<button string="Upgrade" name="upgrade_db" type="object" attrs="{'invisible':[('state', 'in', ['deleted'])]}" icon="gtk-execute" />-->
                         <button string="Delete" name="delete_db" type="object" attrs="{'invisible':[('state', 'not in', ['pending']),('expired','=',False)]}" icon="gtk-delete" />
-                        <button string="Sync server" type="object" name="action_update_stats"/>
+                        <button string="Sync server" type="object" name="action_update_stats" icon="gtk-refresh"/>
                         <field name="state" widget="statusbar" statusbar_visible="open,pending,deleted" clickable="False"/>
                     </header>
                     <sheet>
@@ -55,7 +55,7 @@
                         <page string="Users">
                             <field name="user_ids"/>
                         </page>
-                        <page string="Template in Plans">
+                        <page string="Template in Plans" attrs="{'invisible':[('state','not in',['template'])]}">
                             <field name="template_in_plan_ids"/>
                         </page>
                     </notebook>
@@ -100,7 +100,7 @@
             <field name="arch" type="xml">
                 <form string="Server">
                     <header>
-                        <button name="action_update_stats" type="object" string="Sync server"/>
+                        <button name="action_update_stats" type="object" string="Sync server" icon="gtk-refresh"/>
                     </header>
                     <sheet>
                     <group>
@@ -169,7 +169,7 @@
                         <button string="Edit template DB" name="edit_template" type="object" states="confirmed" icon="gtk-edit" class="oe_highlight"/>
                         <!--<button string="Upgrade template DB" name="upgrade_template" type="object" states="confirmed" icon="gtk-execute" />-->
                         <button string="Delete template DB" name="delete_template" type="object" states="confirmed" icon="gtk-cancel" />
-                        <button string="Sync server" type="object" name="action_update_stats"/>
+                        <button string="Sync server" type="object" name="action_update_stats" icon="gtk-refresh"/>
                         <field name="state" widget="statusbar"/>
                     </header>
             <sheet>

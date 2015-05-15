@@ -223,6 +223,10 @@ class OauthApplication(models.Model):
         ('client_id_uniq', 'unique (client_id)', 'client_id should be unique!'),
     ]
 
+    @api.one
+    def action_update_stats(self):
+        self.server_id.action_update_stats()
+
     @api.model
     def _proceed_url(self, url):
         return {

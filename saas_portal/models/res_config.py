@@ -7,7 +7,6 @@ class SaasPortalConfigWizard(models.TransientModel):
     _inherit = 'res.config.settings'
 
     base_saas_domain = fields.Char('Base SaaS domain')
-    dbtemplate = fields.Char('Template database')
 
     def get_default_base_saas_domain(self, cr, uid, ids, context=None):
         base_saas_domain = self.pool.get("ir.config_parameter").get_param(cr, uid, "saas_portal.base_saas_domain", default=None, context=context)
@@ -23,12 +22,3 @@ class SaasPortalConfigWizard(models.TransientModel):
         config_parameters = self.pool.get("ir.config_parameter")
         for record in self.browse(cr, uid, ids, context=context):
             config_parameters.set_param(cr, uid, "saas_portal.base_saas_domain", record.base_saas_domain or '', context=context)
-
-    def get_default_dbtemplate(self, cr, uid, ids, context=None):
-        dbtemplate = self.pool.get("ir.config_parameter").get_param(cr, uid, "saas_portal.dbtemplate", default=None, context=context)
-        return {'dbtemplate': dbtemplate or False}
-
-    def set_dbtemplate(self, cr, uid, ids, context=None):
-        config_parameters = self.pool.get("ir.config_parameter")
-        for record in self.browse(cr, uid, ids, context=context):
-            config_parameters.set_param(cr, uid, "saas_portal.dbtemplate", record.dbtemplate or '', context=context)

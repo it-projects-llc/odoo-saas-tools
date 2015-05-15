@@ -199,14 +199,16 @@
                     <field name="lang_id"/>
                 </group>
 
-					<notebook>
-						<page string="Required Addons" >
-							<field name="required_addons_ids" nolabel="1" />
-						</page>
-						<page string="Optional Addons" >
-							<field name="optional_addons_ids" nolabel="1" />
-						</page>
-					</notebook>
+                <!--
+                <notebook>
+                    <page string="Required Addons" >
+                        <field name="required_addons_ids" nolabel="1" />
+                    </page>
+                    <page string="Optional Addons" >
+                        <field name="optional_addons_ids" nolabel="1" />
+                    </page>
+                </notebook>
+                -->
             </sheet>
 				</form>
             </field>

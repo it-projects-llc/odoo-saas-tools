@@ -169,6 +169,7 @@
                         <button string="Edit template DB" name="edit_template" type="object" states="confirmed" icon="gtk-edit" class="oe_highlight"/>
                         <!--<button string="Upgrade template DB" name="upgrade_template" type="object" states="confirmed" icon="gtk-execute" />-->
                         <button string="Delete template DB" name="delete_template" type="object" states="confirmed" icon="gtk-cancel" />
+                        <button string="Sync server" type="object" name="action_update_stats"/>
                         <field name="state" widget="statusbar"/>
                     </header>
             <sheet>

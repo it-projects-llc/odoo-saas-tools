@@ -26,7 +26,7 @@ class SaasPortal(http.Controller):
         full_dbname = self.get_full_dbname(post.get('dbname'))
         dbtemplate = self.get_template()
         # FIXME: line below should be deleted. This route called book_then_signup, but work as if user already signed up
-        organization = self.update_user_and_partner(full_dbname)
+        #organization = self.update_user_and_partner(full_dbname)
 
         return self.create_new_database(dbtemplate, full_dbname, organization=organization)
 

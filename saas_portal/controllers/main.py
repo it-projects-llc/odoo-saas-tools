@@ -6,8 +6,6 @@ from openerp.addons.web.http import request
 from openerp.addons.auth_oauth.controllers import main as oauth
 import werkzeug
 import simplejson
-import uuid
-import random
 
 
 class SignupError(Exception):
@@ -24,27 +22,19 @@ class SaasPortal(http.Controller):
 
     @http.route(['/saas_portal/book_then_signup'], type='http', auth='public', website=True)
     def book_then_signup(self, **post):
-        saas_server = self.get_saas_server()
-        scheme = request.httprequest.scheme
+        # TODO: this function should be updated (doesn't work now)
         full_dbname = self.get_full_dbname(post.get('dbname'))
         dbtemplate = self.get_template()
-        client_id = self.get_new_client_id(full_dbname)
-        request.registry['oauth.application'].create(request.cr, SUPERUSER_ID, {'client_id': client_id, 'name':full_dbname})
         # FIXME: line below should be deleted. This route called book_then_signup, but work as if user already signed up
-        organization = self.update_user_and_partner(full_dbname)
-        params = {
-            'scope': 'userinfo force_login trial skiptheuse',
-            'state': simplejson.dumps({
-                'd': full_dbname,
-                'u': '%s://%s' % (scheme, full_dbname.replace('_', '.')),
-                'o': organization,
-                'db_template': dbtemplate,
-            }),
-            'redirect_uri': '{scheme}://{saas_server}/saas_server/new_database'.format(scheme=scheme, saas_server=saas_server),
-            'response_type': 'token',
-            'client_id': client_id,
-        }
-        return request.redirect('/oauth2/auth?%s' % werkzeug.url_encode(params))
+        #organization = self.update_user_and_partner(full_dbname)
+
+        return self.create_new_database(dbtemplate, full_dbname, organization=organization)
+
+    def create_new_database(self, plan_id):
+        scheme = request.httprequest.scheme
+        plan = request.env['saas_portal.plan'].sudo().browse(plan_id)
+        url = plan._create_new_database(scheme=scheme)[0]
+        return request.redirect(url)
 
     @http.route('/saas_portal/tenant', type='http', auth='public', website=True)
     def tenant(self, **post):
@@ -79,9 +69,6 @@ class SaasPortal(http.Controller):
         return imd.xmlid_to_object(request.cr, SUPERUSER_ID,
                                    'saas_server.saas_oauth_provider')
 
-    def get_new_client_id(self, name):
-        return str(uuid.uuid1())
-
     def get_config_parameter(self, param):
         config = request.registry['ir.config_parameter']
         full_param = 'saas_portal.%s' % param
@@ -91,11 +78,6 @@ class SaasPortal(http.Controller):
         full_dbname = '%s.%s' % (dbname, self.get_config_parameter('base_saas_domain'))
         return full_dbname.replace('www.', '').replace('.', '_')
 
-    def get_saas_server(self):
-        saas_server_list = self.get_config_parameter('saas_server_list')
-        saas_server_list = saas_server_list.split(',')
-        return saas_server_list[random.randint(0, len(saas_server_list) - 1)]
-
     def exists_database(self, dbname):
         full_dbname = self.get_full_dbname(dbname)
         return openerp.service.db.exp_db_exist(full_dbname)
@@ -104,7 +86,7 @@ class SaasPortal(http.Controller):
         user_model = request.registry.get('res.users')
         user = user_model.browse(request.cr, SUPERUSER_ID, request.uid)
         if user.plan_id and user.plan_id.state == 'confirmed':
-            return user.plan_id.template
+            return user.plan_id.template_id.name
         return self.get_config_parameter('dbtemplate')
 
     def update_user_and_partner(self, database):

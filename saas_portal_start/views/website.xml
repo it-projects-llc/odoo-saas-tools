@@ -5,13 +5,13 @@
 
 		<template id="theme" inherit_id="website.theme" name="saas portal assets">
 			<xpath expr="//link[@href='/website/static/src/css/website.css']" position="before">
-				<link rel='stylesheet' href='/saas_portal/static/src/css/odoo.css' t-ignore="true"/>
+				<link rel='stylesheet' href='/saas_portal_start/static/src/css/odoo.css' t-ignore="true"/>
 			</xpath>
 		</template>
 
 		<template id="assets_frontend" inherit_id="website.assets_frontend" name="saas portal assets">
 			<xpath expr="." position="inside">
-				<script type='text/javascript' src='/saas_portal/static/src/js/main.js'/>
+				<script type='text/javascript' src='/saas_portal_start/static/src/js/main.js'/>
 			</xpath>
 		</template>
 

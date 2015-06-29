@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+<!--
+        <template id="theme" inherit_id="website.theme" name="saas portal assets">
+            <xpath expr="//link[@href='/website/static/src/css/website.css']" position="before">
+                <link rel='stylesheet' href='/saas_portal_start/static/src/css/odoo.css' t-ignore="true"/>
+            </xpath>
+        </template>
+
+        <template id="assets_frontend" inherit_id="website.assets_frontend" name="saas portal assets">
+            <xpath expr="." position="inside">
+                <script type='text/javascript' src='/saas_portal/static/src/js/main.js'/>
+            </xpath>
+        </template>
+-->
+
+        <template id="select_template" name="Odoo templates" page="True">
+            <t t-call="website.layout">
+                <div id="wrap" class="oe_structure oe_empty">
+                    <section class="mt0 mb0">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h1 class="text-center">Choose an Template to start <span class="fa fa-arrow-down"></span></h1>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <section class="mb32">
+                        <div class="container">
+                            <div t-foreach="templates" t-as="tmpl">
+                                <div class="col-md-1 col-xs-2 col-md-offset-0 col-xs-offset-2 text-center">
+                                    <span class="fa fa-home fa-5x"></span>
+                                </div>
+
+                                <div class="col-md-3 col-xs-8 mb8">
+                                    <h3 class="mt0 mb0" style="white-space: nowrap;">
+                                        <t t-esc="tmpl['name']"/>
+                                    </h3>
+                                    <div class="text-muted">
+                                        <t t-esc="tmpl['summary'] or ''"/>
+                                    </div>
+                                    <a class="btn mt4 btn-primary odoo-install-app pull-left" t-attf-href="/saas_portal_templates/new_database?plan_id=#{tmpl['id']}">
+                                        <t t-esc="tmpl['name']"/>
+                                    </a>
+                                </div>
+                            </div>
+
+                        </div>
+                    </section>
+
+                </div>
+            </t>
+        </template>
+
+    </data>
+</openerp>

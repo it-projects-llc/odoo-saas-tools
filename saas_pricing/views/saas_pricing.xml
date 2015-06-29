@@ -36,8 +36,8 @@
         </record>
         
 		<record model="ir.ui.view" id="view_plans_form">
-		    <field name="name">saas_server.plans.form.inherit</field>
-		    <field name="model">saas_server.plan</field>
+		    <field name="name">saas_portal.plans.form.inherit</field>
+		    <field name="model">saas_portal.plan</field>
 		    <field name="inherit_id" ref="saas_server.view_plans_form"/>
 		    <field name="arch" type="xml">
 		        <notebook position="inside">

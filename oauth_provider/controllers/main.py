@@ -1,6 +1,7 @@
 import functools
 import logging
 import simplejson
+import traceback
 
 import openerp
 from openerp import SUPERUSER_ID
@@ -58,7 +59,7 @@ class OAuth2(http.Controller):
         return uri, http_method, body, headers
 
     def _response_from_error(self, e):
-        _logger.info("Error %s", e)
+        _logger.info("\n%s", traceback.format_exc())
         return 'Error (TODO)'
 
     def _response(self, headers, body, status=200):
@@ -114,11 +115,8 @@ class OAuth2(http.Controller):
             except errors.FatalClientError as e:
                 return self._response_from_error(e)
 
-    @http.route('/oauth2/tokeninfo', type='http', auth='none')
+    @http.route('/oauth2/tokeninfo', type='http', auth='public')
     def tokeninfo(self, **kw):
-        #domain = request.httprequest.host.split(':')[0]
-        domain = request.httprequest.host.replace('.', '_')
-        request.session.authenticate(domain)
         uri, http_method, body, headers = self._extract_params(request, kw)
         is_valid, req = self._server.verify_request(uri, http_method, body,
                                                     headers)

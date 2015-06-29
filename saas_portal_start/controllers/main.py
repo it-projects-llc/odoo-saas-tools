@@ -6,7 +6,6 @@ from openerp.addons.web.http import request
 from openerp.addons.auth_oauth.controllers import main as oauth
 import werkzeug
 import simplejson
-import uuid
 import random
 
 class SaasPortal(http.Controller):

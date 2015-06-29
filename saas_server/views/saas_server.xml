@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <menuitem name="SaaS Server" id="menu_base_saas" sequence="30" />
+        <menuitem id="menu_saas" parent="menu_base_saas" name="SaaS" sequence="1" />
+
+
+        <!-- Client -->
+
+        <!-- TODO create some template to unduplicate this source with one in saas_portal -->
+        <record id="view_clients_tree" model="ir.ui.view">
+            <field name="name">saas_server.clients.tree</field>
+            <field name="model">saas_server.client</field>
+            <field name="priority">4</field>
+            <field name="arch" type="xml">
+                <tree string="Databases">
+                    <field name="name"/>
+                    <field name="state"/>
+                    <field name="users_len"/>
+                    <field name="file_storage"/>
+                    <field name="db_storage"/>
+                </tree>
+            </field>
+        </record>
+
+
+        <record id="view_clients_form" model="ir.ui.view">
+            <field name="name">saas_server.clients.form</field>
+            <field name="model">saas_server.client</field>
+            <field name="arch" type="xml">
+                <form string="Database">
+                    <header>
+                        <field name="state" widget="statusbar" statusbar_visible="open,pending,deleted" readonly="1"/>
+                    </header>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="client_id"/>
+                                <field name="name"/>
+                                <field name="users_len"/>
+                                <field name="file_storage"/>
+                                <field name="db_storage"/>
+                            </group>
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_clients" model="ir.actions.act_window">
+            <field name="name">Databases</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">saas_server.client</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem action="action_clients" id="menu_clients" parent="menu_saas" sequence="10"/>
+
+    </data>
+</openerp>

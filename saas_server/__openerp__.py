@@ -6,7 +6,8 @@
     'website': 'https://it-projects.info',
     'depends': ['auth_oauth', 'saas_utils'],
     'data': [
-        'data/auth_oauth_data.xml'
+        'views/saas_server.xml',
+        'data/auth_oauth_data.xml',
     ],
     'installable': True,
     'description': '''
@@ -24,8 +25,7 @@ Functions
 Usage
 =====
 
-* You have to use --db-filter option  so that database with this module be
-determine unambiguously by host of request
+* You have to use --db-filter option  so that database with this module be determine unambiguously by host of request
 * install this module
 * Configure oauth provider data
 

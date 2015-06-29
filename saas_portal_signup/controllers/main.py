@@ -24,7 +24,7 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
         qcontext = super(AuthSignupHome, self).get_auth_signup_qcontext()
         context = request.context
         if not qcontext.get('plans', False):
-            sp = request.registry.get('saas_server.plan')
+            sp = request.registry.get('saas_portal.plan')
             plan_ids = sp.search(request.cr, SUPERUSER_ID, [], context=context)
             qcontext['plans'] = sp.browse(request.cr, SUPERUSER_ID, plan_ids, context=context)
         if not qcontext.get('countries', False):

@@ -8,31 +8,26 @@ from openerp import http
 class SaasConfig(models.TransientModel):
     _name = 'saas.config'
 
-    action = fields.Selection([('edit', 'Edit'), ('upgrade', 'Upgrade')],
+    action = fields.Selection([('edit', 'Edit'), ('upgrade', 'Upgrade'), ('delete', 'Delete')],
                                 'Action')
-    database = fields.Char('Database', size=128)
+    database_id = fields.Many2one('oauth.application', string='Client')
+    server_id = fields.Many2one('saas_portal.server', string='Server')
     update_addons = fields.Char('Update Addons', size=256)
     install_addons = fields.Char('Install Addons', size=256)
     fix_ids = fields.One2many('saas.config.fix', 'config_id', 'Fixes')
     description = fields.Text('Description')
 
-    def execute_action(self, cr, uid, ids, context=None):
+    @api.multi
+    def execute_action(self):
         res = False
-        obj = self.browse(cr, uid, ids[0], context)
-        method = '%s_database' % obj.action
+        method = '%s_database' % self.action
         if hasattr(self, method):
-            res = getattr(self, method)(cr, uid, obj, context)
+            res = getattr(self, method)()
         return res
 
-    def edit_database(self, cr, uid, obj, context=None):
-        params = (obj.database.replace('_', '.'), obj.database)
-        url = 'http://%s/login?db=%s&login=admin&key=admin' % params
-        return {
-            'type': 'ir.actions.act_url',
-            'target': 'self',
-            'name': 'Edit Database',
-            'url': url
-        }
+    @api.multi
+    def delete_database(self):
+        return self.database_id.delete_database()
 
     def upgrade_database(self, cr, uid, obj, context=None):
         dbs = obj.database and [obj.database] or database.get_market_dbs()

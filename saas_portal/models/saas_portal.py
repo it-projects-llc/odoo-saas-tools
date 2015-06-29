@@ -165,9 +165,9 @@ class SaasPortalPlan(models.Model):
 
         if client:
             client.write(vals)
-            client_id = client.client_id
         else:
             client = self.env['oauth.application'].create(vals)
+        client_id = client.client_id
 
         state = {
             'd': client.name,

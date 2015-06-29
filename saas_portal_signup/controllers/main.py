@@ -23,6 +23,8 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
     def get_auth_signup_qcontext(self):
         qcontext = super(AuthSignupHome, self).get_auth_signup_qcontext()
         context = request.context
+        if qcontext.get('token', False):
+            qcontext['reset'] = True
         if not qcontext.get('plans', False):
             sp = request.registry.get('saas_portal.plan')
             plan_ids = sp.search(request.cr, SUPERUSER_ID, [], context=context)

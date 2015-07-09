@@ -204,6 +204,7 @@ class SaasPortalPlan(models.Model):
             'is_template_db': 1,
         }
         client_id = plan.template_id.client_id
+        plan.template_id.server_id = plan.server_id
         url = plan.server_id._request(path='/saas_server/new_database', state=state, client_id=client_id)
         return {
             'type': 'ir.actions.act_url',

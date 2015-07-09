@@ -17,8 +17,11 @@ _logger = logging.getLogger(__name__)
 
 from ..validators import server
 
-from oauthlib.oauth2.rfc6749 import errors
-from oauthlib.common import urlencode, urlencoded, quote
+try:
+    from oauthlib.oauth2.rfc6749 import errors
+    from oauthlib.common import urlencode, urlencoded, quote
+except:
+    pass
 from urlparse import urlparse, parse_qs, urlunparse
 
 

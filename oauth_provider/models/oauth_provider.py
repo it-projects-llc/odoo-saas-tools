@@ -2,7 +2,10 @@
 from openerp.osv import osv,fields
 from openerp import SUPERUSER_ID
 from datetime import datetime
-from oauthlib.common import generate_client_id as oauthlib_generate_client_id
+try:
+    from oauthlib.common import generate_client_id as oauthlib_generate_client_id
+except:
+    pass
 from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT, DEFAULT_SERVER_DATE_FORMAT
 
 

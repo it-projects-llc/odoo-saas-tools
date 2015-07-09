@@ -2,7 +2,10 @@
 
 from openerp import SUPERUSER_ID
 import logging
-from oauthlib.oauth2 import RequestValidator, MobileApplicationServer
+try:
+    from oauthlib.oauth2 import RequestValidator, MobileApplicationServer
+except:
+    pass
 from datetime import datetime, timedelta
 from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT, DEFAULT_SERVER_DATE_FORMAT
 

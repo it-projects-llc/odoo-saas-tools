@@ -6,6 +6,9 @@
     'website' : 'https://it-projects.info',
 
     'depends' : ['web'],
+    'external_dependencies': {
+        'python' : ['oauthlib'],
+    },
     'data':[],
     'installable': True,
 

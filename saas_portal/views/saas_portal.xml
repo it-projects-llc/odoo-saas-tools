@@ -2,7 +2,7 @@
 <openerp>
     <data>
         <menuitem name="SaaS" id="menu_base_saas" sequence="30" />
-		<menuitem id="menu_saas" parent="menu_base_saas" name="SaaS" sequence="1" />
+        <menuitem id="menu_saas" parent="menu_base_saas" name="SaaS" sequence="1" />
 
 
         <!-- Client -->
@@ -13,11 +13,12 @@
             <field name="priority">4</field>
             <field name="arch" type="xml">
                 <tree string="Clients">
-					<field name="name"/>
+                    <field name="name"/>
                     <field name="state"/>
-					<field name="users_len"/>
-					<field name="file_storage"/>
-					<field name="db_storage"/>
+                    <field name="last_connection"/>
+                    <field name="users_len"/>
+                    <field name="file_storage"/>
+                    <field name="db_storage"/>
                     <field name="expiration_datetime"/>
                     <button name="edit_database" type="object" icon="gtk-edit" attrs="{'invisible':[('state', 'in', ['deleted', 'draft'])]}"/>
                     <!--<button name="upgrade_db" type="object" icon="gtk-execute" />-->
@@ -77,7 +78,7 @@
             <field name="view_mode">tree,form</field>
         </record>
 
-		<menuitem action="action_clients" id="menu_clients" parent="menu_saas" sequence="10"/>
+        <menuitem action="action_clients" id="menu_clients" parent="menu_saas" sequence="10"/>
 
         <!-- Server -->
 
@@ -139,22 +140,22 @@
 
         <menuitem action="saas_portal.action_server" id="menu_server" parent="saas_portal.menu_saas" sequence="20"/>
 
-		<!-- Plan -->
-		
-		<record id="view_plans_tree" model="ir.ui.view">
+        <!-- Plan -->
+
+        <record id="view_plans_tree" model="ir.ui.view">
             <field name="name">saas_portal.plans.tree</field>
             <field name="model">saas_portal.plan</field>
             <field name="priority">4</field>
             <field name="arch" type="xml">
                 <tree string="Plans">
                     <field name="sequence" invisible="1"/>
-					<field name="name"/>
-					<field name="template_id"/>
-					<field name="state" />
-					<button name="create_template" type="object" states="draft" icon="gtk-apply" />
-					<button name="edit_template" type="object" states="confirmed" icon="gtk-edit" />
+                    <field name="name"/>
+                    <field name="template_id"/>
+                    <field name="state" />
+                    <button name="create_template" type="object" states="draft" icon="gtk-apply" />
+                    <button name="edit_template" type="object" states="confirmed" icon="gtk-edit" />
                     <!--<button name="upgrade_template" type="object" states="confirmed" icon="gtk-execute" />-->
-					<button name="delete_template" type="object" states="confirmed" icon="gtk-cancel" />
+                    <button name="delete_template" type="object" states="confirmed" icon="gtk-cancel" />
                 </tree>
             </field>
         </record>
@@ -164,7 +165,7 @@
             <field name="name">saas_portal.plans.form</field>
             <field name="model">saas_portal.plan</field>
             <field name="arch" type="xml">
-				<form string="plans">
+                <form string="plans">
                     <header>
                         <button string="Create template DB" name="create_template" type="object" states="draft" icon="gtk-apply" class="oe_highlight"/>
                         <button string="Edit template DB" name="edit_template" type="object" states="confirmed" icon="gtk-edit" class="oe_highlight"/>
@@ -212,7 +213,7 @@
                 </notebook>
                 -->
             </sheet>
-				</form>
+                </form>
             </field>
         </record>
 
@@ -224,73 +225,75 @@
             <field name="view_mode">tree,form</field>
         </record>
 
-		<menuitem action="action_plans" id="menu_plans" parent="saas_portal.menu_saas" sequence="30"/>
-		
-		<!-- Config -->
-		
-		<record id="action_database_form" model="ir.ui.view">
+        <menuitem action="action_plans" id="menu_plans" parent="saas_portal.menu_saas" sequence="30"/>
+
+        <!-- Config -->
+
+        <record id="action_database_form" model="ir.ui.view">
             <field name="name">action.database.form</field>
             <field name="model">saas.config</field>
             <field name="arch" type="xml">
-                <form string="Configure Database" create="false" edit="false" delete="false">	
-				     <group>
-				     	<field name="action" readonly="1"/>
-						<field name="update_addons" attrs="{'invisible': [('action', '!=', 'upgrade')]}"/>
-						<field name="install_addons" attrs="{'invisible': [('action', '!=', 'upgrade')]}"/>
-				        <field name="database_id" readonly="1"/>
-				        <field name="server_id" readonly="1"/>
-				     </group>
-					 <group attrs="{'invisible': [('action', '!=', 'upgrade')]}">
-					 	<field name="fix_ids" colspan="4" >
-					 		<tree string="Fixes" editable="bottom">
-					 			<field name="model" />
-								<field name="method" />
-							</tree>
-						</field>
-					 </group>
+                <form string="Configure Database" create="false" edit="false" delete="false">
+                     <group>
+                        <field name="id" invisible="1" />
+                        <field name="action" readonly="1"/>
+                        <field name="update_addons" attrs="{'invisible': [('action', '!=', 'upgrade')]}"/>
+                        <field name="install_addons" attrs="{'invisible': [('action', '!=', 'upgrade')]}"/>
+                        <field name="uninstall_addons" attrs="{'invisible': [('action', '!=', 'upgrade')]}"/>
+                        <field name="database_id" />
+                        <field name="server_id" readonly="1"/>
+                     </group>
+                     <group attrs="{'invisible': [('action', '!=', 'upgrade')]}">
+                        <field name="fix_ids" colspan="4" >
+                            <tree string="Fixes" editable="bottom">
+                                <field name="model" />
+                                <field name="method" />
+                            </tree>
+                        </field>
+                     </group>
                      <!--
                      <separator />
                      <group>
-                         <field name="description" />
+                        <field name="description" attrs="{'invisible': [('id', '=', False)]}" />
                      </group>
                      -->
-					 <footer>
-					 	<button name="execute_action" string="Execute" type="object" class="oe_highlight"/>
-	                    or
-	                    <button string="Close" class="oe_link" special="cancel"/>
-	                </footer>
+                     <footer>
+                        <button name="execute_action" string="Execute" type="object" class="oe_highlight"/>
+                        or
+                        <button string="Close" class="oe_link" special="cancel"/>
+                    </footer>
                 </form>
             </field>
         </record>
-		
-		<record id="action_upgrade_clients" model="ir.actions.act_window">
+
+        <record id="action_upgrade_clients" model="ir.actions.act_window">
             <field name="name">Upgrade Clients</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">saas.config</field>
             <field name="view_type">form</field>
             <field name="view_mode">form</field>
-			<field name="target">new</field>
-			<field name="context">{'default_action': 'upgrade'}</field>
+            <field name="target">new</field>
+            <field name="context">{'default_action': 'upgrade'}</field>
         </record>
 
         <!--<menuitem action="action_upgrade_clients" id="menu_upgrade_clients" parent="saas_portal.menu_saas" sequence="100"/>-->
 
-		<!-- Upgrade Databases -->
-		
-		<record id="action_updb" model="ir.actions.act_window">
+        <!-- Upgrade Databases -->
+
+        <record id="action_updb" model="ir.actions.act_window">
             <field name="name">Upgrade Databases</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">saas.config</field>
             <field name="view_type">form</field>
-			<field name="target">new</field>
+            <field name="target">new</field>
         </record>
-		
-		<record id="action_binding_updb" model="ir.values">
-			<field name="name">Upgrade Databases</field>
-			<field name="key2">client_action_multi</field>
-			<field name="model">saas.config</field>
-			<field name="value_unpickle" eval="'ir.actions.act_window,'+str(action_updb)"/> 
-		</record>
+
+        <record id="action_binding_updb" model="ir.values">
+            <field name="name">Upgrade Databases</field>
+            <field name="key2">client_action_multi</field>
+            <field name="model">saas.config</field>
+            <field name="value_unpickle" eval="'ir.actions.act_window,'+str(action_updb)"/>
+        </record>
 
     </data>
 </openerp>

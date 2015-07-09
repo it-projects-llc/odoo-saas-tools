@@ -16,7 +16,7 @@ class SaasPricingPrice(models.Model):
     trial_period_days = fields.Char('Stripe trial period days')
     
 class SaasPricingPlan(models.Model):
-    _inherit = 'saas_portal.plan'
+    _inherit = 'saas_server.plan'
     
     pricing_ids = fields.Many2many('saas_pricing.price', 'saas_pricing_plan')
     

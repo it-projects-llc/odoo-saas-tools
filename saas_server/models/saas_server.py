@@ -4,6 +4,7 @@ from openerp import api, models, fields, SUPERUSER_ID, exceptions
 from openerp.addons.saas_utils import connector, database
 import psycopg2
 
+
 def get_size(start_path='.'):
     total_size = 0
     for dirpath, dirnames, filenames in os.walk(start_path):

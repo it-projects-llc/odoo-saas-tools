@@ -24,7 +24,7 @@ class SaasPortalServer(models.Model):
 
     _inherit = ['mail.thread']
 
-    name = fields.Char('Database Name')
+    name = fields.Char('Database Name', required=True)
     sequence = fields.Integer('Sequence')
     active = fields.Boolean('Active', default=True)
     https = fields.Boolean('HTTPS', default=False)
@@ -103,7 +103,7 @@ class SaasPortalPlan(models.Model):
 
     name = fields.Char('Plan', required=True)
     summary = fields.Char('Summary')
-    template_id = fields.Many2one('oauth.application', 'Template DB', required=True)
+    template_id = fields.Many2one('oauth.application', 'Template DB')
     demo = fields.Boolean('Install Demo Data')
 
     def _get_default_lang_id(self):

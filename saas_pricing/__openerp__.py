@@ -11,6 +11,6 @@
     'installable': True,
 
     'description': '''
-        Module to define plans pricing 
+        Module to define plans pricing
     ''',
 }

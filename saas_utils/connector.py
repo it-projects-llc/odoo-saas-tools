@@ -27,4 +27,4 @@ def call(dbname, model, method, *args, **kwargs):
     with instance.cursor() as cr:
         obj = instance.get(model)
         if hasattr(obj, method):
-            return getattr(obj, method)(cr, SUPERUSER_ID, *args)
+            return getattr(obj, method)(cr, SUPERUSER_ID, *args, **kwargs)

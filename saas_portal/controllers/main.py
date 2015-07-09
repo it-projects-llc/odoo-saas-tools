@@ -130,7 +130,6 @@ class OAuthLogin(oauth.OAuthLogin):
 
     @http.route()
     def web_auth_reset_password(self, *args, **kw):
-        kw['reset'] = True
         if kw.get('login', False):
             user = request.registry.get('res.users')
             domain = [('login', '=', kw['login'])]

@@ -271,14 +271,26 @@ class OauthApplication(models.Model):
                               ('pending','Pending'),
                               ('deleted','Deleted')],
                              'State', default='draft', track_visibility='onchange')
-    
+
     expiration_datetime = fields.Datetime('Expiration', track_visibility='onchange')
     expired = fields.Boolean('Expiration', compute='_get_expired')
+    last_connection = fields.Char(compute='_get_last_connection',
+                                  string='Last Connection', size=64)
 
     _sql_constraints = [
         ('name_uniq', 'unique (name)', 'Record for this database already exists!'),
         ('client_id_uniq', 'unique (client_id)', 'client_id should be unique!'),
     ]
+
+    @api.one
+    def _get_last_connection(self):
+        oat = self.pool.get('oauth.access_token')
+        to_search = [('application_id', '=', self.id)]
+        access_token_ids = oat.search(self.env.cr, self.env.uid, to_search)
+        if access_token_ids:
+            access_token = oat.browse(self.env.cr, self.env.uid,
+                                      access_token_ids[0])
+            self.last_connection = access_token.user_id.login_date
 
     @api.one
     def action_update_stats(self):

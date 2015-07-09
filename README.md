@@ -45,8 +45,8 @@ Usage
    * Open Settings/Users/OAuth Providers - SaaS
    * click [Edit]
    * update domain name at "Authentication URL" and "Validation URL", change https to http if needed. E.g.
-     * http:/**myodoo.com**/oauth2/auth
-     * http:/**myodoo.com**/oauth2/tokeninfo
+     * http://**myodoo.com**/oauth2/auth
+     * http://**myodoo.com**/oauth2/tokeninfo
 
 4. Configure **Main Database**:
    * open Settings/Configuration/SaaS Portal Settings

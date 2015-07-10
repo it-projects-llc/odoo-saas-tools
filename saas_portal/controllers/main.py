@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from ast import literal_eval
 import openerp
 from openerp import SUPERUSER_ID
 from openerp.addons.web import http
@@ -114,6 +115,14 @@ class SaasPortal(http.Controller):
         user_model.write(request.cr, SUPERUSER_ID, user.id, vals)
         return organization
 
+    @http.route(['/publisher-warranty/'], type='http', auth='public', website=True)
+    def publisher_warranty(self, **post):
+        # check addons/mail/update.py::_get_message for arg0 value
+        arg0 = post.get('arg0')
+        if arg0:
+            arg0 = literal_eval(arg0)
+        messages = []
+        return simplejson.dumps({'messages':messages})
 
 class OAuthLogin(oauth.OAuthLogin):
 

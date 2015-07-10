@@ -19,14 +19,26 @@
 #
 ##############################################################################
 import openerp
-from openerp import models, fields, api, SUPERUSER_ID as SI
+from openerp import models, fields, api, SUPERUSER_ID as SI, exceptions
 from openerp.tools import config
+from openerp.tools.translate import _
 from openerp.addons.saas_utils import connector
 
 
 class ResUsers(models.Model):
     _name = 'res.users'
     _inherit = 'res.users'
+
+    @api.model
+    def create(self, vals):
+        max_users = self.env["ir.config_parameter"].get_param("saas_client.max_users")
+        if max_users:
+            max_users = int(max_users)
+            cur_users = self.env['res.users'].search_count([('share', '=', False)])
+            if cur_users >= max_users:
+                raise exceptions.Warning(_('Maximimum allowed users is %(max_users)s, while you already have %(cur_users)s') % {'max_users':max_users, 'cur_users': cur_users})
+        return super(ResUsers, self).create(vals)
+
 
     available_addons_ids = fields.Many2many(compute='_compute_addons',
                                             comodel_name='ir.module.module',

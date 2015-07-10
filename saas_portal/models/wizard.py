@@ -85,11 +85,12 @@ class SaasPortalCreateClient(models.TransientModel):
 
     name = fields.Char('Database name', required=True, default=_default_name)
     plan_id = fields.Many2one('saas_portal.plan', string='Plan', readonly=True, default=_default_plan_id)
+    partner_id = fields.Many2one('res.partner', string='Partner')
 
     @api.multi
     def apply(self):
         wizard = self[0]
-        url = wizard.plan_id._create_new_database(dbname=wizard.name)
+        url = wizard.plan_id._create_new_database(dbname=wizard.name, partner_id=wizard.partner_id.id)
         return {
             'type': 'ir.actions.act_url',
             'target': 'new',

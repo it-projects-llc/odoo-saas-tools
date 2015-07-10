@@ -148,13 +148,15 @@ class SaasPortalPlan(models.Model):
         return vals
 
     @api.one
-    def _create_new_database(self, scheme='http', dbname=None, client_id=None):
+    def _create_new_database(self, scheme='http', dbname=None, client_id=None, partner_id=None):
         server = self.server_id
         if not server:
             server = self.env['saas_portal.server'].get_saas_server()
 
         vals = {'name': dbname or self.generate_dbname()[0],
                 'server_id': server.id,
+                'plan_id': self.id,
+                'partner_id': partner_id,
                 }
         client = self.env['oauth.application'].search([('name', '=', vals.get('name')), ('state', '=', 'deleted')])
 
@@ -261,6 +263,8 @@ class OauthApplication(models.Model):
         return str(uuid.uuid1())
 
     name = fields.Char('Database name', readonly=False, required=True)
+    partner_id = fields.Many2one('res.partner', string='Partner', track_visibility='onchange')
+    plan_id = fields.Many2one('saas_portal.plan', string='Plan', track_visibility='onchange')
     client_id = fields.Char('Client ID', readonly=True, select=True, default=generate_client_id)
     users_len = fields.Integer('Count users', readonly=True)
     file_storage = fields.Integer('File storage (MB)', readonly=True)

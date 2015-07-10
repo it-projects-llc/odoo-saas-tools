@@ -46,6 +46,8 @@
                         <group>
                             <field name="client_id"/>
                             <field name="name"/>
+                            <field name="plan_id"/>
+                            <field name="partner_id"/>
                             <field name="users_len"/>
                             <field name="file_storage"/>
                             <field name="db_storage"/>

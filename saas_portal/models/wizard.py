@@ -69,3 +69,30 @@ class SaasConfigFix(models.TransientModel):
     model = fields.Char('Model', required=1, size=64)
     method = fields.Char('Method', required=1, size=64)
     config_id = fields.Many2one('saas.config', 'Config')
+
+class SaasPortalCreateClient(models.TransientModel):
+    _name = 'saas_portal.create_client'
+
+    def _default_plan_id(self):
+        return self._context.get('active_id')
+
+    def _default_name(self):
+        plan_id = self._default_plan_id()
+        if plan_id:
+            plan = self.env['saas_portal.plan'].browse(plan_id)
+            return plan.generate_dbname(raise_error=False)[0]
+        return ''
+
+    name = fields.Char('Database name', required=True, default=_default_name)
+    plan_id = fields.Many2one('saas_portal.plan', string='Plan', readonly=True, default=_default_plan_id)
+
+    @api.multi
+    def apply(self):
+        wizard = self[0]
+        url = wizard.plan_id._create_new_database(dbname=wizard.name)
+        return {
+            'type': 'ir.actions.act_url',
+            'target': 'new',
+            'name': 'Create Client',
+            'url': url
+        }

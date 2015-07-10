@@ -6,6 +6,7 @@
     'website': 'https://it-projects.info',
     'depends': ['oauth_provider', 'website', 'auth_signup', 'saas_utils'],
     'data': [
+        'views/wizard.xml',
         'views/saas_portal.xml',
         'views/res_config.xml',
         ],

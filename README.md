@@ -7,7 +7,7 @@ Usage
 
 1. Configure Odoo installation
    * set dbfilter, e.g. *%h*
-   * execute line below to allow database names with dots:
+   * execute commands below to allow create databases with dots in name:
 
    > cd path/to/odoo
 
@@ -77,9 +77,9 @@ Usage
 8. Try to create database from template
    * open Plan
    * click [Sync Server]
-   * click [Create Client] **TODO**
-   * set DB Name, e.g. client-x.myodoo.com **TODO**
-   * click [Create] **TODO**
+   * click [Create Client]
+   * set DB Name, e.g. client-x.myodoo.com
+   * click [Create]
 
 9. Get more
    * check other saas_* modules for more features

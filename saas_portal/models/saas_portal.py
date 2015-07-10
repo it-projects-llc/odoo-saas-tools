@@ -183,10 +183,12 @@ class SaasPortalPlan(models.Model):
         return url
 
     @api.one
-    def generate_dbname(self):
+    def generate_dbname(self, raise_error=True):
         # TODO make more elegant solution
         if not self.dbname_template:
-            raise exceptions.Warning(_('Template for db name is not configured'))
+            if raise_error:
+                raise exceptions.Warning(_('Template for db name is not configured'))
+            return ''
         id = str(random.randint(100, 10000))
         id = '4918'  # debug
         return self.dbname_template.replace('%i', id)

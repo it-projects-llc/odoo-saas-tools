@@ -172,6 +172,7 @@
                         <!--<button string="Upgrade template DB" name="upgrade_template" type="object" states="confirmed" icon="gtk-execute" />-->
                         <button string="Delete template DB" name="delete_template" type="object" states="confirmed" icon="gtk-cancel" />
                         <button string="Sync server" type="object" name="action_update_stats" icon="gtk-refresh"/>
+                        <button string="Create Client" type="action" name="%(action_create_client)d"/>
                         <field name="state" widget="statusbar"/>
                     </header>
             <sheet>

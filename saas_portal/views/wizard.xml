@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="saas_portal_create_client_view_form" model="ir.ui.view">
+            <field name="name">saas_portal.create_client.form</field>
+            <field name="model">saas_portal.create_client</field>
+            <field name="arch" type="xml">
+                <form string="Create client">
+                     <group>
+                        <field name="name"/>
+                        <field name="plan_id"/>
+                        <field name="partner_id" class="oe_inline"/>
+                     </group>
+                     <footer>
+                        <button name="apply" string="Create" type="object" class="oe_highlight"/>
+                        or
+                        <button string="Close" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_create_client" model="ir.actions.act_window">
+            <field name="name">Create client</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">saas_portal.create_client</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="saas_portal_create_client_view_form"/>
+            <field name="target">new</field>
+        </record>
+    </data>
+</openerp>

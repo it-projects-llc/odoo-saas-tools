@@ -113,7 +113,6 @@ class SaasPortalPlan(models.Model):
     sequence = fields.Integer('Sequence')
     state = fields.Selection([('draft', 'Draft'), ('confirmed', 'Confirmed')],
                              'State', compute='_get_state', store=True)
-    role_id = fields.Many2one('saas_server.role', 'Role')
     expiration = fields.Integer('Expiration (hours)', help='time to delete databse. Use for demo')
     required_addons_ids = fields.Many2many('ir.module.module',
                                            relation='plan_required_addons_rel',
@@ -242,14 +241,6 @@ class SaasPortalPlan(models.Model):
     @api.multi
     def delete_template(self):
         return self[0].template_id.delete_db()
-
-
-
-class SaasServerRole(models.Model):
-    _name = 'saas_server.role'
-
-    name = fields.Char('Name', size=64)
-    code = fields.Char('Code', size=64)
 
 
 class OauthApplication(models.Model):

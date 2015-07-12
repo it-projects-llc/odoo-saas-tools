@@ -197,44 +197,42 @@ class SaasServerClient(models.Model):
         }
         return data
 
-    def upgrade_database(self, **post):
-        try:
-            db = request.httprequest.host.replace('.', '_')
-            pwd = config.get('tenant_passwd')
-            uid = request.session.authenticate(db, 'admin', pwd)
-            if uid:
-                module = request.registry['ir.module.module']
-                # 1. Update addons
-                update_addons = post.get('update_addons', '').split(',')
-                if update_addons:
-                    upids = module.search(request.cr, SUPERUSER_ID,
-                                          [('name', 'in', update_addons)])
-                    if upids:
-                        module.button_immediate_upgrade(request.cr, SUPERUSER_ID, upids)
-                # 2. Install addons
-                install_addons = post.get('install_addons', '').split(',')
-                if install_addons:
-                    inids = module.search(request.cr, SUPERUSER_ID,
-                                          [('name', 'in', install_addons)])
-                    if inids:
-                        module.button_immediate_install(request.cr, SUPERUSER_ID, inids)
-                # 3. Uninstall addons
-                uninstall_addons = post.get('uninstall_addons', '').split(',')
-                if uninstall_addons:
-                    unids = module.search(request.cr, SUPERUSER_ID,
-                                          [('name', 'in', uninstall_addons)])
-                    if unids:
-                        module.button_immediate_uninstall(request.cr, SUPERUSER_ID, unids)
-                # 4. Run fixes
-                fixes = post.get('fixes', '').split(',')
-                for fix in fixes:
-                    if fix:
-                        model, method = fix.split('-')
-                        getattr(request.registry[model], method)(request.cr,
-                                                                 SUPERUSER_ID)
-                status_code = 200
-            else:
-                status_code = 400
-        except:
-            status_code = 500
-        return werkzeug.wrappers.Response(status=status_code)
+    @api.one
+    def upgrade_database(self, **kwargs):
+        with self.registry()[0].cursor() as cr:
+            env = api.Environment(cr, SUPERUSER_ID, self._context)
+            return self._upgrade_database(env, **kwargs)[0]
+
+
+    @api.one
+    def _upgrade_database(self, client_env, data):
+        # "data" comes from saas_portal/models/wizard.py::upgrade_database
+        post = data
+        module = client_env['ir.module.module']
+        print '_upgrade_database', data
+        # 1. Update addons
+        update_addons = post.get('update_addons', [])
+        if update_addons:
+            module.search([('name', 'in', update_addons)]).button_immediate_upgrade()
+
+        # 2. Install addons
+        install_addons = post.get('install_addons', [])
+        if install_addons:
+            module.search([('name', 'in', install_addons)]).button_immediate_install()
+
+        # 3. Uninstall addons
+        uninstall_addons = post.get('uninstall_addons', [])
+        if uninstall_addons:
+            module.search([('name', 'in', uninstall_addons)]).button_immediate_uninstall()
+
+        # 4. Run fixes
+        fixes = post.get('fixes', [])
+        for model, method in fixes:
+            getattr(request.registry[model], method)()
+
+        # 5. update parameters
+        params = post.get('params', [])
+        for key, value in params:
+            client_env['ir.config_parameter'].set_param(key, value)
+
+        return 'OK'

@@ -21,7 +21,7 @@
                     <field name="db_storage"/>
                     <field name="expiration_datetime"/>
                     <button name="edit_database" type="object" icon="gtk-edit" attrs="{'invisible':[('state', 'in', ['deleted', 'draft'])]}"/>
-                    <!--<button name="upgrade_db" type="object" icon="gtk-execute" />-->
+                    <button name="upgrade_db" attrs="{'invisible':[('state', 'in', ['deleted'])]}" type="object" icon="gtk-execute" />
                     <button name="delete_db" type="object" attrs="{'invisible':[('state', 'not in', ['pending'])]}" icon="gtk-delete" />
                 </tree>
             </field>
@@ -36,7 +36,7 @@
                     <field name="expired" invisible="1"/>
                     <header>
                         <button string="Edit" name="edit_database" type="object" attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}" icon="gtk-edit" class="oe_highlight"/>
-                        <!--<button string="Upgrade" name="upgrade_db" type="object" attrs="{'invisible':[('state', 'in', ['deleted'])]}" icon="gtk-execute" />-->
+                        <button string="Upgrade" name="upgrade_db" type="object" attrs="{'invisible':[('state', 'in', ['deleted'])]}" icon="gtk-execute" />
                         <button string="Delete" name="delete_db" type="object" attrs="{'invisible':['|',('state', 'not in', ['pending'])]}" icon="gtk-delete" />
                         <button string="Sync server" type="object" name="action_update_stats" icon="gtk-refresh"/>
                         <field name="state" widget="statusbar" statusbar_visible="open,pending,deleted" clickable="False"/>
@@ -240,26 +240,40 @@
                      <group>
                         <field name="id" invisible="1" />
                         <field name="action" readonly="1"/>
-                        <field name="update_addons" attrs="{'invisible': [('action', '!=', 'upgrade')]}"/>
-                        <field name="install_addons" attrs="{'invisible': [('action', '!=', 'upgrade')]}"/>
-                        <field name="uninstall_addons" attrs="{'invisible': [('action', '!=', 'upgrade')]}"/>
                         <field name="database_id" />
-                        <field name="server_id" readonly="1"/>
+                        <field name="server_id"/>
                      </group>
-                     <group attrs="{'invisible': [('action', '!=', 'upgrade')]}">
-                        <field name="fix_ids" colspan="4" >
-                            <tree string="Fixes" editable="bottom">
-                                <field name="model" />
-                                <field name="method" />
-                            </tree>
-                        </field>
-                     </group>
-                     <!--
-                     <separator />
-                     <group>
-                        <field name="description" attrs="{'invisible': [('id', '=', False)]}" />
-                     </group>
-                     -->
+                     <notebook>
+                     <page string="Result"  attrs="{'invisible': [('id', '=', False)]}">
+                        <field name="description" />
+                     </page>
+
+                     <page string="Addons"  attrs="{'invisible': [('action', '!=', 'upgrade')]}">
+                         <p>Comma-separated list of addons to Update, Install or Uninstall</p>
+                         <group>
+                             <field name="update_addons"/>
+                             <field name="install_addons"/>
+                             <field name="uninstall_addons"/>
+                         </group>
+                     </page>
+                     <page string="Parameters" attrs="{'invisible': [('action', '!=', 'upgrade')]}">
+                         <field name="param_ids" colspan="4" >
+                             <tree editable="bottom">
+                                 <field name="key" />
+                                 <field name="value" />
+                             </tree>
+                         </field>
+                     </page>
+                     <page string="Commands" attrs="{'invisible': [('action', '!=', 'upgrade')]}">
+                         <p>This sections allows execute special commands on client. Ask developers for instructions.</p>
+                         <field name="fix_ids" colspan="4" >
+                             <tree editable="bottom">
+                                 <field name="model" />
+                                 <field name="method" />
+                             </tree>
+                         </field>
+                     </page>
+                     </notebook>
                      <footer>
                         <button name="execute_action" string="Execute" type="object" class="oe_highlight"/>
                         or

@@ -83,6 +83,23 @@ class SaasServer(http.Controller):
         url = url.format(scheme=scheme, domain=domain, params=werkzeug.url_encode(params))
         return werkzeug.utils.redirect(url)
 
+    @http.route('/saas_server/upgrade_database', type='http', auth='public')
+    @fragment_to_query_string
+    def upgrade_database(self, **post):
+        state = simplejson.loads(post.get('state'))
+        data = state.get('data')
+        access_token = post['access_token']
+        saas_oauth_provider = request.registry['ir.model.data'].xmlid_to_object(request.cr, SUPERUSER_ID, 'saas_server.saas_oauth_provider')
+
+        saas_portal_user = request.registry['res.users']._auth_oauth_rpc(request.cr, SUPERUSER_ID, saas_oauth_provider.validation_endpoint, access_token)
+        if saas_portal_user.get("error"):
+            raise Exception(saas_portal_user['error'])
+
+        client_id = saas_portal_user.get('client_id')
+        client = request.env['saas_server.client'].sudo().search([('client_id', '=', client_id)])
+        result = client.upgrade_database(data=state.get('data'))[0]
+        return simplejson.dumps({client.name: result})
+
     @http.route('/saas_server/delete_database', type='http', auth='public')
     @fragment_to_query_string
     def delete_database(self, **post):

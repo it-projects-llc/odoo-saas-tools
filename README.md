@@ -2,6 +2,29 @@ odoo-saas-tools
 =================
 Odoo (OpenERP) addons to provide SaaS
 
+Structure of SaaS system:
+
+* SaaS Portal - main database
+* SaaS Servers - technical databases to control client database. SaaS server create, edit, delete databases. Each SaaS Server can be installed on a separate machine (e.g. VPS)
+* SaaS Clients - client database to be used by customers. Each SaaS Client is attached to a SaaS Server.
+
+Features
+========
+
+* create SaaS Client databases:
+  * manually from SaaS Portal backend
+  * by client after choosing subdomain (similar to https://www.odoo.com/page/start ) - module saas_portal_start
+  * by client after choosing database template (e.g. template for POS, template for ECommerce etc) with auto-generated subdomain (e.g. demo-12345.odoo.com) - module saas_server_templates
+  * by client after singing up - module saas_portal_signup
+* prepare templates for new SaaS Client database. You are able to connect to template database, install modules you need, edit configuration, edit access rights for customer etc. Such template database will be exactly what a customer will see after database creating.
+* connect to existed SaaS Client database as administrator
+* control SaaS Client database from SaaS Portal backend:
+  * install, update, delete addons
+  * configure parameters (e.g. Max Allowed Users)
+* collect information from client databases (count of users, disk space usage, etc.)
+* notify customers about news by sending messages to Whole Company messaging group *(under development)*
+* show message at the top of a page (e.g. Your free trial will expire in about 4 hours  Register now to add 15 days for free!) *(under development)*
+
 Usage
 =====
 
@@ -82,7 +105,4 @@ Usage
    * click [Create]
 
 9. Get more
-   * check other saas_* modules for more features
-     * saas_portal_start - similar to https://www.odoo.com/page/start
-	 * saas_portal_templates - similar to https://accounts.odoo.com/odoo-enterprise/select-app but it is based on template databases, rather than apps
-	 * etc.
+   * check description of other saas_* modules to get more features

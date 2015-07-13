@@ -20,7 +20,7 @@
                     <field name="file_storage"/>
                     <field name="db_storage"/>
                     <field name="expiration_datetime"/>
-                    <button name="edit_database" type="object" icon="gtk-edit" attrs="{'invisible':[('state', 'in', ['deleted', 'draft'])]}"/>
+                    <button name="edit_database" type="object" icon="gtk-connect" attrs="{'invisible':[('state', 'in', ['deleted', 'draft'])]}"/>
                     <button name="upgrade_db" attrs="{'invisible':[('state', 'in', ['deleted'])]}" type="object" icon="gtk-execute" />
                     <button name="delete_db" type="object" attrs="{'invisible':[('state', 'not in', ['pending'])]}" icon="gtk-delete" />
                 </tree>
@@ -35,8 +35,8 @@
                 <form string="Clients">
                     <field name="expired" invisible="1"/>
                     <header>
-                        <button string="Edit" name="edit_database" type="object" attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}" icon="gtk-edit" class="oe_highlight"/>
-                        <button string="Upgrade" name="upgrade_db" type="object" attrs="{'invisible':[('state', 'in', ['deleted'])]}" icon="gtk-execute" />
+                        <button string="Log in" name="edit_database" type="object" attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}" icon="gtk-connect" class="oe_highlight"/>
+                        <button string="Configure" name="upgrade_db" type="object" attrs="{'invisible':[('state', 'in', ['deleted'])]}" icon="gtk-execute" />
                         <button string="Delete" name="delete_db" type="object" attrs="{'invisible':['|',('state', 'not in', ['pending'])]}" icon="gtk-delete" />
                         <button string="Sync server" type="object" name="action_update_stats" icon="gtk-refresh"/>
                         <field name="state" widget="statusbar" statusbar_visible="open,pending,deleted" clickable="False"/>
@@ -170,8 +170,8 @@
                 <form string="plans">
                     <header>
                         <button string="Create template DB" name="create_template" type="object" attrs="{'invisible':['|', ('state','not in', ['draft']), ('server_id','=',False)]}" icon="gtk-apply" class="oe_highlight"/>
-                        <button string="Edit template DB" name="edit_template" type="object" states="confirmed" icon="gtk-edit" class="oe_highlight"/>
-                        <!--<button string="Upgrade template DB" name="upgrade_template" type="object" states="confirmed" icon="gtk-execute" />-->
+                        <button string="Log in to template DB" name="edit_template" type="object" states="confirmed" icon="gtk-edit" class="oe_highlight"/>
+                        <!--<button string="Configure template DB" name="upgrade_template" type="object" states="confirmed" icon="gtk-execute" />-->
                         <button string="Delete template DB" name="delete_template" type="object" states="confirmed" icon="gtk-cancel" />
                         <button string="Sync server" type="object" name="action_update_stats" icon="gtk-refresh"/>
                         <button string="Create Client" type="action" name="%(action_create_client)d"/>
@@ -298,7 +298,7 @@
         <!-- Upgrade Databases -->
 
         <record id="action_updb" model="ir.actions.act_window">
-            <field name="name">Upgrade Databases</field>
+            <field name="name">Configure Databases</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">saas.config</field>
             <field name="view_type">form</field>
@@ -306,7 +306,7 @@
         </record>
 
         <record id="action_binding_updb" model="ir.values">
-            <field name="name">Upgrade Databases</field>
+            <field name="name">Configure Databases</field>
             <field name="key2">client_action_multi</field>
             <field name="model">saas.config</field>
             <field name="value_unpickle" eval="'ir.actions.act_window,'+str(action_updb)"/>

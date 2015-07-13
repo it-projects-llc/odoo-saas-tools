@@ -18,7 +18,7 @@ class SaasConfig(models.TransientModel):
     def _default_database_id(self):
         return self._context.get('active_id')
 
-    action = fields.Selection([('edit', 'Edit'), ('upgrade', 'Upgrade'), ('delete', 'Delete')],
+    action = fields.Selection([('edit', 'Edit'), ('upgrade', 'Configure'), ('delete', 'Delete')],
                                 'Action')
     database_id = fields.Many2one('oauth.application', string='Client', default=_default_database_id)
     server_id = fields.Many2one('saas_portal.server', string='Server', related='database_id.server_id', readonly=True)

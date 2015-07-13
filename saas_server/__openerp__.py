@@ -8,6 +8,7 @@
     'data': [
         'views/saas_server.xml',
         'data/auth_oauth_data.xml',
+        'data/ir_config_parameter.xml',
     ],
     'installable': True,
     'description': '''

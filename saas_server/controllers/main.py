@@ -135,6 +135,49 @@ class SaasServer(http.Controller):
         return werkzeug.utils.redirect('/web')
 
 
+    @http.route(['/saas_server/ab/css/<dbuuid>.css'], type='http', auth='public')
+    def ab_css(self, dbuuid=None):
+        content = '''
+.openerp .announcement_bar{
+        display:block;
+}
+.announcement_bar>.url>a:before{
+    content: 'Contact Us'
+}
+
+.announcement_bar {
+    color: #ffffff;
+    height: 30px;
+    vertical-align: middle !important;
+    text-align: center !important;
+    width: 100%;
+
+    border: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+
+    background-color: #8785C0;
+    background-image: -webkit-linear-gradient(135deg, rgba(255, 255, 255, 0.05) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.05) 50%, rgba(255, 255, 255, 0.05) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0) 100% );
+    background-size: 40px 40px;
+    -webkit-transition: all 350ms ease;
+    text-shadow: 0px 0px 2px rgba(0,0,0,0.2);
+    box-shadow: 0px 2px 10px rgba(0,0,0,0.38) inset;
+    display: none;
+}
+
+.announcement_bar a {
+    font-weight: bold;
+    color: #d3ffb0 !important;
+    text-decoration: none !important;
+    border-radius: 3px;
+    padding: 5px 8px;
+    cursor: pointer;
+    -webkit-transition: all 350ms ease;
+}
+        '''
+        return http.Response(content, mimetype='text/css')
+
+
     @http.route(['/saas_server/stats'], type='http', auth='public')
     def stats(self, **post):
         # TODO auth

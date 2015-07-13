@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<openerp>
+    <data noupdate="1">
+        <record id="web_debranding.custom_help" model="ir.config_parameter">
+            <field name="key">saas_client.ab_location</field>
+            <field name="value"></field>
+        </record>
+        <record id="web_debranding.custom_help" model="ir.config_parameter">
+            <field name="key">saas_client.ab_register</field>
+            <field name="value">https://www.it-projects.info/page/website.contactus/?</field>
+        </record>
+    </data>
+</openerp>

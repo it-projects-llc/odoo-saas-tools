@@ -87,6 +87,10 @@ class SaasServerClient(models.Model):
             env = api.Environment(cr, SUPERUSER_ID, self._context)
             self._prepare_database(env, **kwargs)
 
+    @api.model
+    def _config_parameters_to_copy():
+        return ['saas_client.ab_location', 'saas_client.ab_register']
+
     @api.one
     def _prepare_database(self, client_env, saas_portal_user=None, is_template_db=False, addons=[], access_token=None):
         client_id = self.client_id
@@ -97,6 +101,11 @@ class SaasServerClient(models.Model):
 
         # update database.uuid
         client_env['ir.config_parameter'].set_param('database.uuid', client_id)
+
+        # copy configs
+        for key in self._config_parameters_to_copy():
+            value = self.env['ir.config_parameter'].get_param(key, default='')
+            client_env['ir.config_parameter'].set_param(key, value)
 
         # copy auth provider from saas_server
         saas_oauth_provider = self.env.ref('saas_server.saas_oauth_provider')

@@ -88,16 +88,21 @@ class SaasServerClient(models.Model):
             self._prepare_database(env, **kwargs)
 
     @api.model
-    def _config_parameters_to_copy():
+    def _config_parameters_to_copy(self):
         return ['saas_client.ab_location', 'saas_client.ab_register']
 
     @api.one
-    def _prepare_database(self, client_env, saas_portal_user=None, is_template_db=False, addons=[], access_token=None):
+    def _prepare_database(self, client_env, saas_portal_user=None, is_template_db=False, addons=[], access_token=None, tz=None):
         client_id = self.client_id
 
         # update saas_server.client state
         if is_template_db:
             self.state = 'template'
+
+        # set tz
+        if tz:
+            client_env['res.users'].search([]).write({'tz': tz})
+            client_env['ir.values'].set_default('res.partner', 'tz', tz)
 
         # update database.uuid
         client_env['ir.config_parameter'].set_param('database.uuid', client_id)

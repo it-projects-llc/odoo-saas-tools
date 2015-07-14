@@ -3,8 +3,9 @@ import openerp
 from openerp import models, fields, api, SUPERUSER_ID, exceptions
 from openerp.addons.saas_utils import connector, database
 from openerp import http
-from openerp.tools import config
+from openerp.tools import config, scan_languages
 from openerp.tools.translate import _
+from openerp.addons.base.res.res_partner import _tz_get
 import time
 from datetime import datetime, timedelta
 from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
@@ -106,10 +107,14 @@ class SaasPortalPlan(models.Model):
     template_id = fields.Many2one('oauth.application', 'Template DB')
     demo = fields.Boolean('Install Demo Data')
 
-    def _get_default_lang_id(self):
-        lang = self.env['res.lang'].search([('code', '=', self.env.lang)])
-        return lang and lang[0]
-    lang_id = fields.Many2one('res.lang', 'Language', default=_get_default_lang_id)
+    def _get_default_lang(self):
+        return self.env.lang
+
+    def _default_tz(self):
+        return self.env.user.tz
+
+    lang = fields.Selection(scan_languages(), 'Language', default=_get_default_lang)
+    tz = fields.Selection(_tz_get, 'TimeZone', default=_default_tz)
     sequence = fields.Integer('Sequence')
     state = fields.Selection([('draft', 'Draft'), ('confirmed', 'Confirmed')],
                              'State', compute='_get_state', store=True)
@@ -203,7 +208,8 @@ class SaasPortalPlan(models.Model):
             'd': plan.template_id.name,
             'demo': plan.demo and 1 or 0,
             'addons': addons,
-            'lang': plan.lang_id.code,
+            'lang': plan.lang,
+            'tz': plan.tz,
             'is_template_db': 1,
         }
         client_id = plan.template_id.client_id

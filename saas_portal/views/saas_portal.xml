@@ -36,7 +36,7 @@
                     <field name="expired" invisible="1"/>
                     <header>
                         <button string="Log in" name="edit_database" type="object" attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}" icon="gtk-connect" class="oe_highlight"/>
-                        <button string="Configure" name="upgrade_db" type="object" attrs="{'invisible':[('state', 'in', ['deleted'])]}" icon="gtk-execute" />
+                        <button string="Configure" name="upgrade_db" type="object" attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}" icon="gtk-execute" />
                         <button string="Delete" name="delete_db" type="object" attrs="{'invisible':['|',('state', 'not in', ['pending'])]}" icon="gtk-delete" />
                         <button string="Sync server" type="object" name="action_update_stats" icon="gtk-refresh"/>
                         <field name="state" widget="statusbar" statusbar_visible="open,pending,deleted" clickable="False"/>
@@ -169,7 +169,7 @@
             <field name="arch" type="xml">
                 <form string="plans">
                     <header>
-                        <button string="Create template DB" name="create_template" type="object" attrs="{'invisible':['|', ('state','not in', ['draft']), ('server_id','=',False)]}" icon="gtk-apply" class="oe_highlight"/>
+                        <button string="Create template DB" name="create_template" type="object" attrs="{'invisible':['|', '|', ('state','not in', ['draft']), ('server_id','=',False), ('template_id','=',False)]}" icon="gtk-apply" class="oe_highlight"/>
                         <button string="Log in to template DB" name="edit_template" type="object" states="confirmed" icon="gtk-edit" class="oe_highlight"/>
                         <!--<button string="Configure template DB" name="upgrade_template" type="object" states="confirmed" icon="gtk-execute" />-->
                         <button string="Delete template DB" name="delete_template" type="object" states="confirmed" icon="gtk-cancel" />
@@ -202,7 +202,8 @@
                 <separator string="Odoo DB Settings"/>
                 <group col="4">
                     <field name="demo"/>
-                    <field name="lang_id"/>
+                    <field name="lang"/>
+                    <field name="tz"/>
                 </group>
 
                 <!--

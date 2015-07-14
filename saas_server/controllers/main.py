@@ -26,6 +26,7 @@ class SaasServer(http.Controller):
         template_db = state.get('db_template')
         demo = state.get('demo')
         lang = state.get('lang', 'en_US')
+        tz = state.get('tz', 'en_US')
         addons = state.get('addons', [])
         is_template_db = state.get('is_template_db')
         action = 'base.open_module_tree'
@@ -45,6 +46,7 @@ class SaasServer(http.Controller):
         client.install_addons(addons=addons, is_template_db=is_template_db)
         client.update_registry()
         client.prepare_database(
+            tz=tz,
             saas_portal_user = saas_portal_user,
             is_template_db = is_template_db,
             access_token = access_token)

@@ -38,7 +38,7 @@
                         <button string="Log in" name="edit_database" type="object" attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}" icon="gtk-connect" class="oe_highlight"/>
                         <button string="Configure" name="upgrade_db" type="object" attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}" icon="gtk-execute" />
                         <button string="Delete" name="delete_db" type="object" attrs="{'invisible':['|',('state', 'not in', ['pending'])]}" icon="gtk-delete" />
-                        <button string="Sync server" type="object" name="action_update_stats" icon="gtk-refresh"/>
+                        <button string="Sync server" type="object" name="action_sync_server" icon="gtk-refresh"/>
                         <field name="state" widget="statusbar" statusbar_visible="open,pending,deleted" clickable="False"/>
                     </header>
                     <sheet>
@@ -104,7 +104,7 @@
             <field name="arch" type="xml">
                 <form string="Server">
                     <header>
-                        <button name="action_update_stats" type="object" string="Sync server" icon="gtk-refresh"/>
+                        <button name="action_sync_server" type="object" string="Sync server" icon="gtk-refresh"/>
                     </header>
                     <sheet>
                     <group>
@@ -173,7 +173,7 @@
                         <button string="Log in to template DB" name="edit_template" type="object" states="confirmed" icon="gtk-edit" class="oe_highlight"/>
                         <!--<button string="Configure template DB" name="upgrade_template" type="object" states="confirmed" icon="gtk-execute" />-->
                         <button string="Delete template DB" name="delete_template" type="object" states="confirmed" icon="gtk-cancel" />
-                        <button string="Sync server" type="object" name="action_update_stats" icon="gtk-refresh"/>
+                        <button string="Sync server" type="object" name="action_sync_server" icon="gtk-refresh"/>
                         <button string="Create Client" type="action" name="%(action_create_client)d"/>
                         <field name="state" widget="statusbar"/>
                     </header>

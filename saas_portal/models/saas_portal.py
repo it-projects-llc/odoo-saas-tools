@@ -69,11 +69,11 @@ class SaasPortalServer(models.Model):
         return url
 
     @api.model
-    def action_update_stats_all(self):
-        self.search([]).action_update_stats()
+    def action_sync_server_all(self):
+        self.search([]).action_sync_server()
 
     @api.one
-    def action_update_stats(self):
+    def action_sync_server(self):
         scheme = 'https' if self.https else 'http'
         url = '{scheme}://{domain}/saas_server/stats'.format(scheme=scheme, domain=self.name)
         data = urllib2.urlopen(url).read()
@@ -223,8 +223,8 @@ class SaasPortalPlan(models.Model):
         }
 
     @api.one
-    def action_update_stats(self):
-        self.server_id.action_update_stats()
+    def action_sync_server(self):
+        self.server_id.action_sync_server()
 
     @api.multi
     def edit_template(self):
@@ -297,8 +297,8 @@ class OauthApplication(models.Model):
             self.last_connection = access_token.user_id.login_date
 
     @api.one
-    def action_update_stats(self):
-        self.server_id.action_update_stats()
+    def action_sync_server(self):
+        self.server_id.action_sync_server()
 
     @api.model
     def _proceed_url(self, url):

@@ -8,7 +8,7 @@
             <field name="interval_type">hours</field>
             <field name="numbercall">-1</field>
             <field eval="False" name="doall"/>
-            <field eval="'oauth.application'" name="model"/>
+            <field eval="'saas_server.client'" name="model"/>
             <field eval="'delete_expired_databases'" name="function"/>
             <field eval="'()'" name="args"/>
         </record>

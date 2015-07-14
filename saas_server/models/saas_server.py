@@ -31,6 +31,7 @@ class SaasServerClient(models.Model):
                               ('pending','Pending'),
                               ('deleted','Deleted')],
                              'State', default='draft', track_visibility='onchange')
+    expiration_datetime = fields.Datetime('Expiration', track_visibility='onchange')
 
     _sql_constraints = [
         ('name_uniq', 'unique (name)', 'Record for this database already exists!'),
@@ -250,3 +251,15 @@ class SaasServerClient(models.Model):
             client_env['ir.config_parameter'].set_param(key, value)
 
         return 'OK'
+
+    @api.model
+    def delete_expired_databases(self):
+        now = time.strftime(DEFAULT_SERVER_DATETIME_FORMAT)
+        res = self.search([('state','not in', ['deleted']), ('expiration_datetime', '<=', now)])
+        _logger.info('delete_expired_databases %s', res)
+        res.delete_database()
+
+    @api.one
+    def delete_database(self):
+        openerp.service.db.exp_drop(client.name)
+        self.write({'state': 'deleted'})

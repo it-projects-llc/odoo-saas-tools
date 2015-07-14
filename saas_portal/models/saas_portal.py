@@ -328,14 +328,6 @@ class OauthApplication(models.Model):
     def delete_database(self):
         return self._request('/saas_server/delete_database')
 
-
-    @api.model
-    def delete_expired_databases(self):
-        now = time.strftime(DEFAULT_SERVER_DATETIME_FORMAT)
-        res = self.search([('state','not in', ['deleted']), ('expiration_datetime', '<=', now)])
-        _logger.info('delete_expired_databases %s', res)
-        res._delete_database_server()
-
     @api.one
     def delete_database_server(self):
         return self._delete_database_server()

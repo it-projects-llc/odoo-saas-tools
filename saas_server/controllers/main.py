@@ -120,9 +120,7 @@ class SaasServer(http.Controller):
         if not client:
             raise Exception('Client not found')
         client = client[0]
-
-        openerp.service.db.exp_drop(client.name)
-        client.write({'state': 'deleted'})
+        client.delete_database()
 
         # redirect to server
         params = post.copy()

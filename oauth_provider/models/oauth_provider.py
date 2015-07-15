@@ -9,23 +9,28 @@ class OauthApplication(models.Model):
     CLIENT_ID_CHARACTER_SET = r'_-.:;=?!@0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
 
     _name = 'oauth.application'
+    _rec_name = 'client_id'
 
     def generate_client_id(self):
         return str(uuid.uuid1())
 
-    name = fields.Char('Database name', readonly=True)
-    client_id = fields.Char('Client ID', readonly=True, select=True, required=True, default=generate_client_id)
+    client_id = fields.Char('Client ID', select=True, required=True, default=generate_client_id)
     token_ids = fields.One2many('oauth.access_token', 'application_id', 'Tokens')
+
+    _sql_constraints = [
+        ('client_id_uniq', 'unique (client_id)', 'client_id should be unique!'),
+    ]
+
 
 class OauthAccessToken(models.Model):
     _name = 'oauth.access_token'
-    _columns = {
-        'application_id':fields.many2one('oauth.application', string='Application'),
-        'token' : fields.char('Access Token', required=True),
-        'user_id':fields.many2one('res.users', string='User', required=True),
-        'expires':fields.datetime('Expires', required=True),
-        'scope':fields.char('Scope'),
-    }
+
+    application_id = fields.Many2one('oauth.application', string='Application')
+    token = fields.Char('Access Token', required=True)
+    user_id = fields.Many2one('res.users', string='User', required=True)
+    expires = fields.Datetime('Expires', required=True)
+    scope = fields.Char('Scope')
+
     def is_valid(self, cr, uid, ids, scopes=None, context=None):
         """
         Checks if the access token is valid.

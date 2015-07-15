@@ -11,7 +11,6 @@ from datetime import datetime, timedelta
 from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
 import urllib2
 import simplejson
-import uuid
 import werkzeug
 import requests
 import random
@@ -22,20 +21,25 @@ _logger = logging.getLogger(__name__)
 class SaasPortalServer(models.Model):
     _name = 'saas_portal.server'
     _description = 'SaaS Server'
+    _rec_name = 'name'
 
     _inherit = ['mail.thread']
+    _inherits = {'oauth.application': 'oauth_application_id'}
 
-    name = fields.Char('Database Name', required=True)
+    name = fields.Char('Database name')
+    oauth_application_id = fields.Many2one('oauth.application', 'OAuth Application', required=True, ondelete='cascade')
     sequence = fields.Integer('Sequence')
     active = fields.Boolean('Active', default=True)
-    https = fields.Boolean('HTTPS', default=False)
-    client_ids = fields.One2many('oauth.application', 'server_id', string='Clients')
+    request_scheme = fields.Selection([('http', 'http'), ('https', 'https')], 'Scheme', default='http', required=True)
+    client_ids = fields.One2many('saas_portal.client', 'server_id', string='Clients')
+
 
     @api.one
-    def _request_params(self, path='/web', scheme='http', state={}, scope=None, client_id=None):
+    def _request_params(self, path='/web', scheme=None, state={}, scope=None, client_id=None):
+        scheme = scheme or self.request_scheme
         scope = scope or ['userinfo', 'force_login', 'trial', 'skiptheuse']
         scope = ' '.join(scope)
-        client_id = client_id or self.env['oauth.application'].generate_client_id()
+        client_id = client_id or self.env['saas_portal.client'].generate_client_id()
         params = {
             'scope': scope,
             'state': simplejson.dumps(state),
@@ -46,17 +50,14 @@ class SaasPortalServer(models.Model):
         return params
 
     @api.one
-    def _request(self, add_host=False, **kwargs):
+    def _request(self, **kwargs):
         params = self._request_params(**kwargs)[0]
         url = '/oauth2/auth?%s' % werkzeug.url_encode(params)
-        if add_host:
-            domain = self.env['ir.config_parameter'].get_param('saas_portal.base_saas_domain')
-            scheme = 'http'
-            url = '{scheme}://{domain}{url}'.format(scheme=scheme, domain=domain, url=url)
         return url
 
     @api.one
-    def _request_server(self, path=None, scheme='http', **kwargs):
+    def _request_server(self, path=None, scheme=None, **kwargs):
+        scheme = scheme or self.request_scheme
         params = self._request_params(**kwargs)[0]
         access_token = self.env['oauth.access_token'].sudo().search([('user_id', '=', self.env.user.id)], order='id DESC', limit=1)
         access_token = access_token[0].token
@@ -68,25 +69,43 @@ class SaasPortalServer(models.Model):
         url = '{scheme}://{saas_server}{path}?{params}'.format(scheme=scheme, saas_server=self.name, path=path, params=werkzeug.url_encode(params))
         return url
 
+    @api.multi
+    def action_redirect_to_server(self):
+        r = self[0]
+        url = '{scheme}://{saas_server}{path}'.format(scheme=r.request_scheme, saas_server=r.name, path='/web')
+        return {
+            'type': 'ir.actions.act_url',
+            'target': 'new',
+            'name': 'Redirection',
+            'url': url
+        }
+
     @api.model
     def action_sync_server_all(self):
         self.search([]).action_sync_server()
 
     @api.one
     def action_sync_server(self):
-        scheme = 'https' if self.https else 'http'
-        url = '{scheme}://{domain}/saas_server/stats'.format(scheme=scheme, domain=self.name)
-        data = urllib2.urlopen(url).read()
-        data = simplejson.loads(data)
+        state = {
+            'd': self.name,
+            'client_id': self.client_id,
+        }
+        url = self._request_server(path='/saas_server/sync_server', state=state, client_id=self.client_id)[0]
+        res = requests.get(url)
+        data = simplejson.loads(res.text)
         for r in data:
             r['server_id'] = self.id
-            client = self.env['oauth.application'].search([
+            client = self.env['saas_portal.client'].search([
                 '|',
                 ('client_id', '=', r.get('client_id')),
                 ('name', '=', r.get('name'))
             ])
             if not client:
-                client = self.env['oauth.application'].create(r)
+                database = self.env['saas_portal.database'].search([('client_id', '=', r.get('client_id'))])
+                if database:
+                    database.write(r)
+                    continue
+                client = self.env['saas_portal.client'].create(r)
             elif client.name == r.get('name') and client.client_id != r.get('client_id') and client.state != 'deleted':
                 raise exceptions.Warning(_('Client with that name already exists: %s') % client.name)
             else:
@@ -104,7 +123,7 @@ class SaasPortalPlan(models.Model):
 
     name = fields.Char('Plan', required=True)
     summary = fields.Char('Summary')
-    template_id = fields.Many2one('oauth.application', 'Template DB')
+    template_id = fields.Many2one('saas_portal.database', 'Template')
     demo = fields.Boolean('Install Demo Data')
 
     def _get_default_lang(self):
@@ -118,7 +137,7 @@ class SaasPortalPlan(models.Model):
     sequence = fields.Integer('Sequence')
     state = fields.Selection([('draft', 'Draft'), ('confirmed', 'Confirmed')],
                              'State', compute='_get_state', store=True)
-    expiration = fields.Integer('Expiration (hours)', help='time to delete databse. Use for demo')
+    expiration = fields.Integer('Expiration (hours)', help='time to delete database. Use for demo')
     required_addons_ids = fields.Many2many('ir.module.module',
                                            relation='plan_required_addons_rel',
                                            column1='plan_id', column2='module_id',
@@ -162,7 +181,7 @@ class SaasPortalPlan(models.Model):
                 'plan_id': self.id,
                 'partner_id': partner_id,
                 }
-        client = self.env['oauth.application'].search([('name', '=', vals.get('name')), ('state', '=', 'deleted')])
+        client = self.env['saas_portal.client'].search([('name', '=', vals.get('name')), ('state', 'in', ['deleted','draft'])])
 
         if client_id:
             vals['client_id'] = client_id
@@ -172,7 +191,7 @@ class SaasPortalPlan(models.Model):
         if client:
             client.write(vals)
         else:
-            client = self.env['oauth.application'].create(vals)
+            client = self.env['saas_portal.client'].create(vals)
         client_id = client.client_id
 
         state = {
@@ -248,43 +267,11 @@ class SaasPortalPlan(models.Model):
     def delete_template(self):
         return self[0].template_id.delete_db()
 
-
 class OauthApplication(models.Model):
-    _name = 'oauth.application'
-    _description = 'Client'
+    _inherit = 'oauth.application'
 
-    _inherit = ['oauth.application', 'mail.thread']
-
-    @api.model
-    def generate_client_id(self):
-        return str(uuid.uuid1())
-
-    name = fields.Char('Database name', readonly=False, required=True)
-    partner_id = fields.Many2one('res.partner', string='Partner', track_visibility='onchange')
-    plan_id = fields.Many2one('saas_portal.plan', string='Plan', track_visibility='onchange')
-    client_id = fields.Char('Client ID', readonly=True, select=True, default=generate_client_id)
-    users_len = fields.Integer('Count users', readonly=True)
-    file_storage = fields.Integer('File storage (MB)', readonly=True)
-    db_storage = fields.Integer('DB storage (MB)', readonly=True)
-    server_id = fields.Many2one('saas_portal.server', string='Server', readonly=True)
-    template_in_plan_ids = fields.One2many('saas_portal.plan', 'template_id', string='Template in Plans')
-    state = fields.Selection([('template', 'Template'),
-                              ('draft','New'),
-                              ('open','In Progress'),
-                              ('cancelled', 'Cancelled'),
-                              ('pending','Pending'),
-                              ('deleted','Deleted')],
-                             'State', default='draft', track_visibility='onchange')
-
-    expiration_datetime = fields.Datetime('Expiration', track_visibility='onchange')
-    expired = fields.Boolean('Expiration', compute='_get_expired')
     last_connection = fields.Char(compute='_get_last_connection',
                                   string='Last Connection', size=64)
-
-    _sql_constraints = [
-        ('name_uniq', 'unique (name)', 'Record for this database already exists!'),
-        ('client_id_uniq', 'unique (client_id)', 'client_id should be unique!'),
-    ]
 
     @api.one
     def _get_last_connection(self):
@@ -295,6 +282,27 @@ class OauthApplication(models.Model):
             access_token = oat.browse(self.env.cr, self.env.uid,
                                       access_token_ids[0])
             self.last_connection = access_token.user_id.login_date
+
+
+class SaasPortalDatabase(models.Model):
+    _name = 'saas_portal.database'
+
+    _inherits = {'oauth.application': 'oauth_application_id'}
+
+    name = fields.Char('Database name', readonly=False)
+    oauth_application_id = fields.Many2one('oauth.application', 'OAuth Application', required=True, ondelete='cascade')
+    server_id = fields.Many2one('saas_portal.server', string='Server', readonly=True)
+    state = fields.Selection([('draft','New'),
+                              ('open','In Progress'),
+                              ('cancelled', 'Cancelled'),
+                              ('pending','Pending'),
+                              ('deleted','Deleted'),
+                              ('template','Template'),
+                          ],
+                             'State', default='draft', track_visibility='onchange')
+    _sql_constraints = [
+        ('name_uniq', 'unique (name)', 'Record for this database already exists!')
+    ]
 
     @api.one
     def action_sync_server(self):
@@ -344,11 +352,6 @@ class OauthApplication(models.Model):
         if res.status_code != 500:
             self.state = 'deleted'
 
-    @api.one
-    def _get_expired(self):
-        now = fields.Datetime.now()
-        self.expired = self.expiration_datetime and self.expiration_datetime < now
-
     def delete_db(self, cr, uid, ids, context=None):
         obj = self.browse(cr, uid, ids[0])
         return {
@@ -378,6 +381,28 @@ class OauthApplication(models.Model):
             }
         }
 
+
+class SaasPortalClient(models.Model):
+    _name = 'saas_portal.client'
+    _description = 'Client'
+    _rec_name = 'name'
+
+    _inherit = ['mail.thread', 'saas_portal.database']
+
+    name = fields.Char(required=True)
+    partner_id = fields.Many2one('res.partner', string='Partner', track_visibility='onchange')
+    plan_id = fields.Many2one('saas_portal.plan', string='Plan', track_visibility='onchange')
+    users_len = fields.Integer('Count users', readonly=True)
+    file_storage = fields.Integer('File storage (MB)', readonly=True)
+    db_storage = fields.Integer('DB storage (MB)', readonly=True)
+    expiration_datetime = fields.Datetime('Expiration', track_visibility='onchange')
+    expired = fields.Boolean('Expiration', compute='_get_expired')
+
+    @api.one
+    def _get_expired(self):
+        now = fields.Datetime.now()
+        self.expired = self.expiration_datetime and self.expiration_datetime < now
+
     def unlink(self, cr, uid, ids, context=None):
         user_model = self.pool.get('res.users')
         token_model = self.pool.get('oauth.access_token')
@@ -392,13 +417,4 @@ class OauthApplication(models.Model):
             #if user_ids:
             #    user_model.unlink(cr, uid, user_ids)
             #openerp.service.db.exp_drop(obj.name)
-        return super(OauthApplication, self).unlink(cr, uid, ids, context)
-
-
-class ResUsers(models.Model):
-    _name = 'res.users'
-    _inherit = 'res.users'
-
-    plan_id = fields.Many2one('saas_portal.plan', 'Plan')
-    organization = fields.Char('Organization', size=64)
-    database = fields.Char('Database', size=64)
+        return super(SaasPortalClient, self).unlink(cr, uid, ids, context)

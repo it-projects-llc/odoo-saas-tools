@@ -123,12 +123,11 @@ class OAuth2(http.Controller):
         uri, http_method, body, headers = self._extract_params(request, kw)
         is_valid, req = self._server.verify_request(uri, http_method, body,
                                                     headers)
-        partner = req.user.partner_id
         headers = None
-        body = simplejson.dumps({'user_id': partner.id,
+        body = simplejson.dumps({'user_id': req.user.id,
                                  'client_id': req.client.client_id,
-                                 'email': partner.email,
-                                 'name': partner.name})
+                                 'email': req.user.email,
+                                 'name': req.user.name})
         status = 200
         return self._response(headers, body, status)
 

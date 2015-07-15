@@ -26,7 +26,7 @@ class SaasServer(http.Controller):
         template_db = state.get('db_template')
         demo = state.get('demo')
         lang = state.get('lang', 'en_US')
-        tz = state.get('tz', 'en_US')
+        tz = state.get('tz')
         addons = state.get('addons', [])
         is_template_db = state.get('is_template_db')
         action = 'base.open_module_tree'
@@ -178,9 +178,19 @@ class SaasServer(http.Controller):
         return http.Response(content, mimetype='text/css')
 
 
-    @http.route(['/saas_server/stats'], type='http', auth='public')
+    @http.route(['/saas_server/sync_server'], type='http', auth='public')
     def stats(self, **post):
-        # TODO auth
+        _logger.info('sync_server post: %s', post)
+
+        state = simplejson.loads(post.get('state'))
+        client_id = state.get('client_id')
+        db = state.get('d')
+        access_token = post['access_token']
+        saas_oauth_provider = request.registry['ir.model.data'].xmlid_to_object(request.cr, SUPERUSER_ID, 'saas_server.saas_oauth_provider')
+
+        user_data = request.registry['res.users']._auth_oauth_rpc(request.cr, SUPERUSER_ID, saas_oauth_provider.validation_endpoint, access_token)
+        # TODO: check access rights
+
         request.env['saas_server.client'].update_all()
         res = []
         for client in request.env['saas_server.client'].sudo().search([('state', 'not in', ['draft'])]):

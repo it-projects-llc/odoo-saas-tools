@@ -20,7 +20,7 @@ class SaasConfig(models.TransientModel):
 
     action = fields.Selection([('edit', 'Edit'), ('upgrade', 'Configure'), ('delete', 'Delete')],
                                 'Action')
-    database_id = fields.Many2one('oauth.application', string='Client', default=_default_database_id)
+    database_id = fields.Many2one('saas_portal.database', string='Database', default=_default_database_id)
     server_id = fields.Many2one('saas_portal.server', string='Server', related='database_id.server_id', readonly=True)
     update_addons = fields.Char('Update Addons', size=256)
     install_addons = fields.Char('Install Addons', size=256)

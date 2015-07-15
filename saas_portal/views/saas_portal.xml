@@ -8,8 +8,8 @@
         <!-- Client -->
 
         <record id="view_clients_tree" model="ir.ui.view">
-            <field name="name">saas_portal.clients.tree</field>
-            <field name="model">oauth.application</field>
+            <field name="name">saas_portal.client.tree</field>
+            <field name="model">saas_portal.client</field>
             <field name="priority">4</field>
             <field name="arch" type="xml">
                 <tree string="Clients">
@@ -29,8 +29,8 @@
 
 
         <record id="view_clients_form" model="ir.ui.view">
-            <field name="name">saas_portal.clients.form</field>
-            <field name="model">oauth.application</field>
+            <field name="name">saas_portal.client.form</field>
+            <field name="model">saas_portal.client</field>
             <field name="arch" type="xml">
                 <form string="Clients">
                     <field name="expired" invisible="1"/>
@@ -56,12 +56,16 @@
                         </group>
                     </group>
                     <notebook>
-                        <page string="Users">
-                            <field name="user_ids"/>
+                        <!--
+                        <page string="OAuth Users">
+                            <field name="token_ids" readonly="1">
+                                <tree>
+                                    <field name="user_id"/>
+                                    <field name="expires"/>
+                                </tree>
+                            </field>
                         </page>
-                        <page string="Template in Plans" attrs="{'invisible':[('state','not in',['template'])]}">
-                            <field name="template_in_plan_ids"/>
-                        </page>
+                        -->
                     </notebook>
                     </sheet>
                     <div class="oe_chatter">
@@ -75,7 +79,7 @@
         <record id="action_clients" model="ir.actions.act_window">
             <field name="name">Clients</field>
             <field name="type">ir.actions.act_window</field>
-            <field name="res_model">oauth.application</field>
+            <field name="res_model">saas_portal.client</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
         </record>
@@ -104,14 +108,16 @@
             <field name="arch" type="xml">
                 <form string="Server">
                     <header>
+                        <button string="Open Server" name="action_redirect_to_server" type="object" icon="gtk-connect" class="oe_highlight"/>
                         <button name="action_sync_server" type="object" string="Sync server" icon="gtk-refresh"/>
                     </header>
                     <sheet>
                     <group>
                         <group>
                             <field name="name"/>
+                            <field name="client_id"/>
                             <field name="active"/>
-                            <field name="https"/>
+                            <field name="request_scheme"/>
                         </group>
                     </group>
                     <field name="client_ids" readonly="1">

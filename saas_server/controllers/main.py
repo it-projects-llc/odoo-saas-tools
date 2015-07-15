@@ -114,7 +114,8 @@ class SaasServer(http.Controller):
         saas_oauth_provider = request.registry['ir.model.data'].xmlid_to_object(request.cr, SUPERUSER_ID, 'saas_server.saas_oauth_provider')
 
         user_data = request.registry['res.users']._auth_oauth_rpc(request.cr, SUPERUSER_ID, saas_oauth_provider.validation_endpoint, access_token)
-        # TODO: check access rights
+        if user_data.get("error"):
+            raise Exception(user_data['error'])
 
         client = request.env['saas_server.client'].sudo().search([('client_id', '=', client_id)])
         if not client:
@@ -189,7 +190,8 @@ class SaasServer(http.Controller):
         saas_oauth_provider = request.registry['ir.model.data'].xmlid_to_object(request.cr, SUPERUSER_ID, 'saas_server.saas_oauth_provider')
 
         user_data = request.registry['res.users']._auth_oauth_rpc(request.cr, SUPERUSER_ID, saas_oauth_provider.validation_endpoint, access_token)
-        # TODO: check access rights
+        if user_data.get("error"):
+            raise Exception(user_data['error'])
 
         request.env['saas_server.client'].update_all()
         res = []

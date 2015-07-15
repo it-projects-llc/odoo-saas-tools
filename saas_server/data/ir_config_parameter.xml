@@ -1,10 +1,6 @@
 <?xml version="1.0"?>
 <openerp>
     <data noupdate="1">
-        <record id="ab_location" model="ir.config_parameter">
-            <field name="key">saas_client.ab_location</field>
-            <field name="value">http://your_server_domain.example.com/saas_server/ab/css/%s.css</field>
-        </record>
         <record id="ab_register" model="ir.config_parameter">
             <field name="key">saas_client.ab_register</field>
             <field name="value">https://www.it-projects.info/page/website.contactus/?</field>

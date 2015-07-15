@@ -6,7 +6,6 @@
     'website': 'https://it-projects.info',
     'depends': ['auth_oauth', 'auth_oauth_check_client_id', 'saas_utils', 'mail'],
     'data': [
-        'views/login.xml',
         'views/saas_client.xml',
         'security/rules.xml'
     ],

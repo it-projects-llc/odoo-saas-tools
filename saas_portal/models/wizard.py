@@ -61,7 +61,7 @@ class SaasConfig(models.TransientModel):
             state=state,
         )[0]
         res = requests.get(url)
-        obj.write({'description': str(res.text)})
+        obj.write({'description': res.text})
         return {
             'type': 'ir.actions.act_window',
             'view_type': 'form',

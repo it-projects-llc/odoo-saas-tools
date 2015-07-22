@@ -91,6 +91,7 @@ Usage
 	 * click [Open Server]. Be sure that you allow pop-ups in your browser.
        * log out from SaaS Server
 	   * click "Log in via SaaS Portal"
+	   * now SaaS Portal has access_token to send commands to SaaS Server
 
 6. Create Plan
    * open Saas/SaaS/Plans

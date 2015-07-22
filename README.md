@@ -89,13 +89,15 @@ Usage
      * click [Save]
 
 6. Create Plan
-   * open Saas/SaaS/Plans - click [Create]
-   * set Plan's name, e.g. "POS + ECommerce"
-   * set SaaS Server
-   * set Template DB (via "Create and Edit"), e.g. **t1.odoo.local**
-   * click [Save]
-   * click [Create Template DB]. Be sure that you allow pop-ups in your browser
-   * wait couple minutes while Database is being created.
+   * open Saas/SaaS/Plans
+     * click [Create]
+     * set Plan's name, e.g. "POS + ECommerce"
+     * set SaaS Server
+     * set Template DB: type name, e.g. **t1.odoo.local**, and click "Create"
+     * click [Save]
+     * click [Create Template DB]. Be sure that you allow pop-ups in your browser
+     * wait couple minutes while Database is being created.
+	 * click [Sync server]
 
 7. Prepare Template Database for Plan
    * open template db, e.g. **t1.odoo.local**

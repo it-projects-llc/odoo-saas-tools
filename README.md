@@ -74,8 +74,7 @@ Usage
        * http://**odoo.local**/oauth2/tokeninfo
 	 * Edit Body according to your brand
 	 * click [Save]
-   * Open Settings/Parameters/System Parameters
-     * remember value for database.uuid.
+     * remember value of Client ID field. It's a database.uuid of SaaS Server.
    
 
 4. Configure **Main Database**:

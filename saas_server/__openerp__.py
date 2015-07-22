@@ -9,6 +9,7 @@
         'views/saas_server.xml',
         'data/auth_oauth_data.xml',
         'data/ir_config_parameter.xml',
+        'data/pre_install.yml',
     ],
     'installable': True,
     'description': '''

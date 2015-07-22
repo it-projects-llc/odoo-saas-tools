@@ -1,0 +1,5 @@
+-
+  !python {model: res.users}: |
+    SUPERUSER_ID = 1
+    oauth_provider_id = ref('saas_server.saas_oauth_provider')
+    self.write(cr, SUPERUSER_ID, [SUPERUSER_ID], {'oauth_provider_id': oauth_provider_id, 'oauth_uid': SUPERUSER_ID})

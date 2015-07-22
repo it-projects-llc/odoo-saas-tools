@@ -59,7 +59,7 @@ class SaasPortalServer(models.Model):
     def _request_server(self, path=None, scheme=None, **kwargs):
         scheme = scheme or self.request_scheme
         params = self._request_params(**kwargs)[0]
-        access_token = self.env['oauth.access_token'].sudo().search([('user_id', '=', self.env.user.id)], order='id DESC', limit=1)
+        access_token = self.env['oauth.access_token'].sudo().search([('application_id', '=', self.oauth_application_id.id)], order='id DESC', limit=1)
         access_token = access_token[0].token
         params.update({
             'token_type': 'Bearer',

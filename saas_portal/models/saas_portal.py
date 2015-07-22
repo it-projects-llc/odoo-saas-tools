@@ -270,6 +270,7 @@ class SaasPortalPlan(models.Model):
 class OauthApplication(models.Model):
     _inherit = 'oauth.application'
 
+    client_id = fields.Char('Database UUID')
     last_connection = fields.Char(compute='_get_last_connection',
                                   string='Last Connection', size=64)
 

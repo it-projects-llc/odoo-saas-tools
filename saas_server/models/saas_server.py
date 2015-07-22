@@ -20,7 +20,7 @@ class SaasServerClient(models.Model):
 
     # TODO: make inheritance from some base class to exclude dublicating fields with saas_portal->oauth.application
     name = fields.Char('Database name', readonly=True)
-    client_id = fields.Char('Client ID', readonly=True, select=True)
+    client_id = fields.Char('Database UUID', readonly=True, select=True)
     users_len = fields.Integer('Count users')
     file_storage = fields.Integer('File storage (MB)')
     db_storage = fields.Integer('DB storage (MB)')

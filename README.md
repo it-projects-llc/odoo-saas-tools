@@ -53,7 +53,9 @@ Usage
    > 127.0.0.1	client-z.odoo.local
 
    * Redirect requests to domains above to localhost:8069 (e.g. via nginx)
-
+   
+   * install dependencies:
+     * pip install oauthlib
 
 2. Create two databases:
 

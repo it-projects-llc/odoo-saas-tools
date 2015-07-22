@@ -76,12 +76,27 @@
             </field>
         </record>
 
+        <record id="view_saas_portal_client_filter" model="ir.ui.view">
+            <field name="name">saas_portal.client.select</field>
+            <field name="model">saas_portal.client</field>
+            <field name="arch" type="xml">
+                <search string="Search Client">
+                    <field name="name" string="Database Name"/>
+                    <filter string="In Progress" name="current" domain="[('state', '=','open')]"/>
+                    <separator/>
+                    <field name="partner_id" string="Contact" filter_domain="[('partner_id', 'child_of', self)]"/>
+                </search>
+            </field>
+        </record>
+
         <record id="action_clients" model="ir.actions.act_window">
             <field name="name">Clients</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">saas_portal.client</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="view_saas_portal_client_filter"/>
+            <field name="context">{'search_default_current': 1}</field>
         </record>
 
         <menuitem action="action_clients" id="menu_clients" parent="menu_saas" sequence="10"/>

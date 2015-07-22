@@ -74,7 +74,7 @@ Usage
 4. Configure **Main Database**:
    * open Settings/Configuration/SaaS Portal Settings
      * set *Base SaaS domain*, e.g. **odoo.local**
-     * click Apply (do it even if don't make changes)
+     * click Apply (do it even if you don't make changes)
 
 5. Register Server Database in Main Database
    * open SaaS/SaaS/Servers - click [Create]

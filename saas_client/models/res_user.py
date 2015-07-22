@@ -29,6 +29,9 @@ class ResUsers(models.Model):
     _name = 'res.users'
     _inherit = 'res.users'
 
+    _defaults = {
+        'oauth_provider_id': lambda self,cr,uid,ctx=None: self.pool['ir.model.data'].xmlid_to_res_id(cr, SI, 'saas_server.saas_oauth_provider')
+    }
     @api.model
     def create(self, vals):
         max_users = self.env["ir.config_parameter"].get_param("saas_client.max_users")

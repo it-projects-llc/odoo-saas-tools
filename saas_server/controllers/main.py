@@ -119,7 +119,9 @@ class SaasServer(http.Controller):
 
         client = request.env['saas_server.client'].sudo().search([('client_id', '=', client_id)])
         if not client:
-            raise Exception('Client not found')
+            if not state.get('force_delete'):
+                raise Exception('Client not found')
+            client = request.env['saas_server.client'].sudo().create({'name': db, 'client_id': client_id})
         client = client[0]
         client.delete_database()
 

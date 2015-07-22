@@ -34,7 +34,6 @@ class SaasServerClient(models.Model):
     expiration_datetime = fields.Datetime('Expiration', track_visibility='onchange')
 
     _sql_constraints = [
-        ('name_uniq', 'unique (name)', 'Record for this database already exists!'),
         ('client_id_uniq', 'unique (client_id)', 'client_id should be unique!'),
     ]
 
@@ -259,5 +258,5 @@ class SaasServerClient(models.Model):
 
     @api.one
     def delete_database(self):
-        openerp.service.db.exp_drop(client.name)
+        openerp.service.db.exp_drop(self.name)
         self.write({'state': 'deleted'})

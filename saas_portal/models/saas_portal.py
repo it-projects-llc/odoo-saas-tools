@@ -96,9 +96,7 @@ class SaasPortalServer(models.Model):
         for r in data:
             r['server_id'] = self.id
             client = self.env['saas_portal.client'].search([
-                '|',
                 ('client_id', '=', r.get('client_id')),
-                ('name', '=', r.get('name'))
             ])
             if not client:
                 database = self.env['saas_portal.database'].search([('client_id', '=', r.get('client_id'))])
@@ -106,8 +104,6 @@ class SaasPortalServer(models.Model):
                     database.write(r)
                     continue
                 client = self.env['saas_portal.client'].create(r)
-            elif client.name == r.get('name') and client.client_id != r.get('client_id') and client.state != 'deleted':
-                raise exceptions.Warning(_('Client with that name already exists: %s') % client.name)
             else:
                 client.write(r)
         return None
@@ -181,10 +177,10 @@ class SaasPortalPlan(models.Model):
                 'plan_id': self.id,
                 'partner_id': partner_id,
                 }
-        client = self.env['saas_portal.client'].search([('name', '=', vals.get('name')), ('state', 'in', ['deleted','draft'])])
-
+        client = None
         if client_id:
             vals['client_id'] = client_id
+            client = self.env['saas_portal.client'].search([('client_id', '=', client_id)])
 
         vals = self._new_database_vals(vals)[0]
 
@@ -301,9 +297,6 @@ class SaasPortalDatabase(models.Model):
                               ('template','Template'),
                           ],
                              'State', default='draft', track_visibility='onchange')
-    _sql_constraints = [
-        ('name_uniq', 'unique (name)', 'Record for this database already exists!')
-    ]
 
     @api.one
     def action_sync_server(self):
@@ -338,15 +331,17 @@ class SaasPortalDatabase(models.Model):
         return self._request('/saas_server/delete_database')
 
     @api.one
-    def delete_database_server(self):
-        return self._delete_database_server()
+    def delete_database_server(self, **kwargs):
+        return self._delete_database_server(**kwargs)
 
     @api.one
-    def _delete_database_server(self):
+    def _delete_database_server(self, force_delete=False):
         state = {
             'd': self.name,
             'client_id': self.client_id,
         }
+        if force_delete:
+            state['force_delete'] = 1
         url = self.server_id._request_server(path='/saas_server/delete_database', state=state, client_id=self.client_id)[0]
         res = requests.get(url)
         _logger.info('delete database: %s', res.text)

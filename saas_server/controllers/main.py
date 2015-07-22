@@ -97,12 +97,12 @@ class SaasServer(http.Controller):
         if saas_portal_user.get("error"):
             raise Exception(saas_portal_user['error'])
 
-        client_id = saas_portal_user.get('client_id')
+        client_id = post.get('client_id')
         client = request.env['saas_server.client'].sudo().search([('client_id', '=', client_id)])
         result = client.upgrade_database(data=state.get('data'))[0]
         return simplejson.dumps({client.name: result})
 
-    @http.route('/saas_server/delete_database', type='http', auth='public')
+    @http.route('/saas_server/delete_database', type='http', website=True, auth='public')
     @fragment_to_query_string
     def delete_database(self, **post):
         _logger.info('delete_database post: %s', post)

@@ -111,7 +111,6 @@ Usage
 	 
 8. Try to create database from template
    * open SaaS/Saas/Plans - select plan
-     * click [Sync Server]
      * click [Create Client]
      * set DB Name, e.g. client-x.odoo.local
      * click [Create]

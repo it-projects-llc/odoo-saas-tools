@@ -16,7 +16,7 @@ _logger = logging.getLogger(__name__)
 
 class SaasServer(http.Controller):
 
-    @http.route('/saas_server/new_database', type='http', auth='public')
+    @http.route('/saas_server/new_database', type='http', website=True, auth='public')
     @fragment_to_query_string
     def new_database(self, **post):
         _logger.info('new_database post: %s', post)

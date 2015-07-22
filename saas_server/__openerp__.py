@@ -4,7 +4,7 @@
     'author': 'Ivan Yelizariev',
     'category': 'SaaS',
     'website': 'https://it-projects.info',
-    'depends': ['auth_oauth', 'saas_utils'],
+    'depends': ['auth_oauth', 'saas_utils', 'website'],
     'data': [
         'views/saas_server.xml',
         'data/auth_oauth_data.xml',

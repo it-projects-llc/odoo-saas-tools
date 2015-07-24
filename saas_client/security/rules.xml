@@ -3,26 +3,13 @@
     <data>
     	
 		<record id="not_admin_tenant_rule" model="ir.rule">
-	        <field name="name">Not Admin Tenant</field>
+	        <field name="name">Only admin can edit admin</field>
 	        <field name="model_id" ref="base.model_res_users"/>
 			<field name="global" eval="1" />
 	        <field name="domain_force">[('id', '!=', 1)]</field>
+            <field name="perm_read" eval="False" />
 	    </record>
-		
-		<record id="not_change_user_tenant_rule" model="ir.rule">
-	        <field name="name">Not Change User Tenant</field>
-	        <field name="model_id" ref="base.model_res_users"/>
-	        <field name="domain_force">[('id', '!=', user.id)]</field>
-			<field name="perm_read" eval="False" />
-	    </record>
-		
-		<!--<record id="not_change_partner_tenant_rule" model="ir.rule">
-	        <field name="name">Not Change Partner Tenant</field>
-	        <field name="model_id" ref="base.model_res_partner"/>
-	        <field name="domain_force">[('id', 'not in', [user.partner_id.id, user.partner_id.parent_id.id])]</field>
-			<field name="perm_read" eval="False" />
-	    </record>-->
-		
+
 		<record id="slave_module_domain_rule" model="ir.rule">
             <field name="name">Addons Domain</field>
             <field name="model_id" ref="base.model_ir_module_module"/>
@@ -33,10 +20,5 @@
             <field name="perm_write" eval="True"/>
             <field name="active" eval="False"/> <!--FIXME available_addons_ids doesn't work-->
         </record>
-
-		<record model="ir.ui.menu" id="base.menu_config">
-            <field name="groups_id" eval="[(6, 0, [ref('base.group_system')])]"/>
-        </record>
-
     </data>
 </openerp>

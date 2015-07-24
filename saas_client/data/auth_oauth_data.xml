@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <delete id="auth_oauth.provider_openerp" model="auth.oauth.provider"/>
+    </data>
+</openerp>

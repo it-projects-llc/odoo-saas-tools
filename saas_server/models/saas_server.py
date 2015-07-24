@@ -184,12 +184,14 @@ class SaasServerClient(models.Model):
             return
         with registry.cursor() as client_cr:
             client_env = api.Environment(client_cr, SUPERUSER_ID, self._context)
-            data = self._get_data(client_env)[0]
+            data = self._get_data(client_env, self.client_id)[0]
             self.write(data)
 
     @api.one
-    def _get_data(self, client_env):
+    def _get_data(self, client_env, check_client_id):
         client_id = client_env['ir.config_parameter'].get_param('database.uuid')
+        if check_client_id != client_id:
+            return {'state': 'deleted'}
         users = client_env['res.users'].search([('share', '=', False)])
         users_len = len(users)
         data_dir = openerp.tools.config['data_dir']

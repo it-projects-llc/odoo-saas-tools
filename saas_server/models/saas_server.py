@@ -3,7 +3,8 @@ import openerp
 from openerp import api, models, fields, SUPERUSER_ID, exceptions
 from openerp.addons.saas_utils import connector, database
 import psycopg2
-
+import random
+import string
 
 def get_size(start_path='.'):
     total_size = 0
@@ -44,7 +45,8 @@ class SaasServerClient(models.Model):
             openerp.service.db._drop_conn(self.env.cr, template_db)
             openerp.service.db.exp_duplicate_database(template_db, new_db)
         else:
-            openerp.service.db.exp_create_database(new_db, demo, lang)
+            password = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(32))
+            openerp.service.db.exp_create_database(new_db, demo, lang, user_password=password)
         self.state = 'open'
 
     @api.one

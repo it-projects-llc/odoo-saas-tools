@@ -5,7 +5,7 @@ Odoo (OpenERP) addons to provide SaaS
 Structure of SaaS system:
 
 * SaaS Portal - main database
-* SaaS Servers - technical databases to control client database. SaaS server create, edit, delete databases. Each SaaS Server can be installed on a separate machine (e.g. VPS)
+* SaaS Servers - technical databases to control client databases. SaaS server create, edit, delete databases. Each SaaS Server can be installed on a separate machine (e.g. VPS)
 * SaaS Clients - client database to be used by customers. Each SaaS Client is attached to a SaaS Server.
 
 Features

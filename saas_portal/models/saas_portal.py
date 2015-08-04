@@ -148,6 +148,9 @@ class SaasPortalPlan(models.Model):
     dbname_template = fields.Char('DB Names', help='Template for db name. Use %i for numbering. Ignore if you use manually created db names', placeholder='crm-%i.odoo.com')
     server_id = fields.Many2one('saas_portal.server', string='SaaS Server',
                                 help='User this saas server or choose random')
+    
+    website_description = fields.Text('Website description')
+    logo = fields.Binary('Logo')
 
 
     @api.one

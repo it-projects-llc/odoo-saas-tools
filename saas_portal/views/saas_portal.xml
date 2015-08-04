@@ -198,46 +198,34 @@
                         <button string="Create Client" type="action" name="%(action_create_client)d"/>
                         <field name="state" widget="statusbar"/>
                     </header>
-            <sheet>
-                <label for="name" class="oe_edit_only"/>
-                <h1>
-                    <field name="name" class="oe_inline"/>
-                </h1>
-                <field name="summary" class="oe_inline"/>
-
-                <group>
-                    <group string="Technical Settings">
-                        <field name="server_id"/>
-                        <field name="template_id"/>
-                        <!--
-                            role_id should be deleted or moved to separate module
-                            <field name="role_id"/>
-                        -->
-                    </group>
-                    <group string="Plan Settings">
-                        <field name="dbname_template"/>
-                        <field name="expiration"/>
-                    </group>
-                </group>
-
-                <separator string="Odoo DB Settings"/>
-                <group col="4">
-                    <field name="demo"/>
-                    <field name="lang"/>
-                    <field name="tz"/>
-                </group>
-
-                <!--
-                <notebook>
-                    <page string="Required Addons" >
-                        <field name="required_addons_ids" nolabel="1" />
-                    </page>
-                    <page string="Optional Addons" >
-                        <field name="optional_addons_ids" nolabel="1" />
-                    </page>
-                </notebook>
-                -->
-            </sheet>
+                    <sheet>
+                        <label for="name" class="oe_edit_only"/>
+                        <h1>
+                            <field name="name" class="oe_inline"/>
+                        </h1>
+                        <field name="summary" class="oe_inline"/>
+                        <group>
+                            <group string="Technical Settings">
+                                <field name="server_id"/>
+                                <field name="template_id"/>
+                            </group>
+                            <group string="Plan Settings">
+                                <field name="dbname_template"/>
+                                <field name="expiration"/>
+                            </group>
+                        </group>
+                        <separator string="Odoo DB Settings"/>
+                        <group col="4">
+                            <field name="demo"/>
+                            <field name="lang"/>
+                            <field name="tz"/>
+                        </group>
+                        <separator string="Website Settings"/>
+                        <group>
+                            <field name="logo" col="4"/>
+                            <field name="website_description" col="4"/>
+                        </group>
+                    </sheet>
                 </form>
             </field>
         </record>

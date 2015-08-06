@@ -1,10 +1,15 @@
 import os
+import time
 import openerp
 from openerp import api, models, fields, SUPERUSER_ID, exceptions
-from openerp.addons.saas_utils import connector, database
+from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
 import psycopg2
 import random
 import string
+
+import logging
+_logger = logging.getLogger(__name__)
+
 
 def get_size(start_path='.'):
     total_size = 0

@@ -202,6 +202,7 @@ class SaasPortalPlan(models.Model):
         port = server.request_port
         state = {
             'd': client.name,
+            'e': client.expiration_datetime,
             'r': '%s://%s:%s/web' % (scheme, port, client.name),
         }
         if self.template_id:

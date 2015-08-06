@@ -388,15 +388,11 @@ class SaasPortalClient(models.Model):
     _description = 'Client'
     _rec_name = 'name'
 
-    _inherit = ['mail.thread', 'saas_portal.database']
+    _inherit = ['mail.thread', 'saas_portal.database', 'saas_base.client']
 
     name = fields.Char(required=True)
     partner_id = fields.Many2one('res.partner', string='Partner', track_visibility='onchange')
     plan_id = fields.Many2one('saas_portal.plan', string='Plan', track_visibility='onchange')
-    users_len = fields.Integer('Count users', readonly=True)
-    file_storage = fields.Integer('File storage (MB)', readonly=True)
-    db_storage = fields.Integer('DB storage (MB)', readonly=True)
-    expiration_datetime = fields.Datetime('Expiration', track_visibility='onchange')
     expired = fields.Boolean('Expiration', compute='_get_expired')
 
     @api.one

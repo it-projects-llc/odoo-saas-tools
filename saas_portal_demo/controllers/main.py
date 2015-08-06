@@ -7,9 +7,9 @@ from openerp.addons.saas_portal.controllers.main import SaasPortal
 
 class SaasPortalDemo(SaasPortal):
 
-    @http.route(['/demo/<string:version>/<string:module>'], type='http', auth='public', website=True)
-    def test_plan(self, version, module, **post):
-        domain = [('odoo_version', '=', version), ('page_url', '=', module),
+    @http.route(['/demo/<string:version>/<string:plan_url>'], type='http', auth='public', website=True)
+    def test_plan(self, version, plan_url, **post):
+        domain = [('odoo_version', '=', version), ('page_url', '=', plan_url),
                   ('state', '=', 'confirmed')]
         plan = request.env['saas_portal.plan'].sudo().search(domain)
         if not plan:

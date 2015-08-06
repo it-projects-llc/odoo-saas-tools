@@ -6,5 +6,5 @@ class SaasPortalPlan(models.Model):
     _name = 'saas_portal.plan'
     _inherit = 'saas_portal.plan'
     
-    page_url = fields.Char('Page URL', placeholder='module-xxx')
+    page_url = fields.Char('Page URL', placeholder='some-name')
     odoo_version = fields.Char('Odoo Version', placeholder='8.0')

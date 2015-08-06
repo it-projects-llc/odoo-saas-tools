@@ -199,11 +199,14 @@
                         <field name="state" widget="statusbar"/>
                     </header>
                     <sheet>
-                        <label for="name" class="oe_edit_only"/>
-                        <h1>
-                            <field name="name" class="oe_inline"/>
-                        </h1>
-                        <field name="summary" class="oe_inline"/>
+                    	<div class="oe_left" style="width: 500px;">
+                            <field name="logo" widget="image" class="oe_avatar oe_left"/>
+                            <div class="oe_title" style="width: 390px;">
+                                <label class="oe_edit_only" for="name" string="Name"/>
+                                <h1><field name="name" class="oe_inline"/></h1>
+								<field name="summary"/>
+                            </div>
+                        </div>
                         <group>
                             <group string="Technical Settings">
                                 <field name="server_id"/>
@@ -222,7 +225,6 @@
                         </group>
                         <separator string="Website Settings"/>
                         <group>
-                            <field name="logo" col="4"/>
                             <field name="website_description" col="4"/>
                         </group>
                     </sheet>

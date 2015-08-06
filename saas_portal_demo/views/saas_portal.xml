@@ -7,7 +7,7 @@
             <field name="model">saas_portal.plan</field>
             <field name="inherit_id" ref="saas_portal.view_plans_form" />
             <field name="arch" type="xml" >
-                <field name="logo" position="after" >
+                <field name="website_description" position="before" >
                     <field name="odoo_version" />
                     <field name="page_url" />
                 </field>

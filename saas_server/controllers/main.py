@@ -66,7 +66,8 @@ class SaasServer(http.Controller):
             'action': action
             }
         scheme = request.httprequest.scheme
-        return werkzeug.utils.redirect('{scheme}://{domain}/saas_client/new_database?{params}'.format(scheme=scheme, domain=new_db.replace('_', '.'), params=werkzeug.url_encode(params)))
+        port = self._get_port()
+        return werkzeug.utils.redirect('{scheme}://{domain}:{port}/saas_client/new_database?{params}'.format(scheme=scheme, domain=new_db, port=port, params=werkzeug.url_encode(params)))
 
     @http.route('/saas_server/edit_database', type='http', auth='public', website=True)
     @fragment_to_query_string
@@ -74,6 +75,7 @@ class SaasServer(http.Controller):
         _logger.info('edit_database post: %s', post)
 
         scheme = request.httprequest.scheme
+        port = self._get_port()
         state = simplejson.loads(post.get('state'))
         domain = state.get('d')
 
@@ -81,8 +83,8 @@ class SaasServer(http.Controller):
             'access_token': post['access_token'],
             'state': simplejson.dumps(state),
         }
-        url = '{scheme}://{domain}/saas_client/edit_database?{params}'
-        url = url.format(scheme=scheme, domain=domain, params=werkzeug.url_encode(params))
+        url = '{scheme}://{domain}:{port}/saas_client/edit_database?{params}'
+        url = url.format(scheme=scheme, domain=domain, port=port, params=werkzeug.url_encode(params))
         return werkzeug.utils.redirect(url)
 
     @http.route('/saas_server/upgrade_database', type='http', auth='public')
@@ -207,3 +209,7 @@ class SaasServer(http.Controller):
                 'db_storage': client.db_storage,
             })
         return simplejson.dumps(res)
+    
+    def _get_port(self):
+        host_parts = request.httprequest.host.split(':')
+        return len(host_parts) > 1 and host_parts[1] or 80

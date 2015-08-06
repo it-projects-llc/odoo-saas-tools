@@ -133,6 +133,7 @@
                             <field name="client_id"/>
                             <field name="active"/>
                             <field name="request_scheme"/>
+                            <field name="request_port"/>
                         </group>
                     </group>
                     <field name="client_ids" readonly="1">

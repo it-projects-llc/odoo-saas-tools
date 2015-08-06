@@ -31,19 +31,21 @@ class SaasPortalServer(models.Model):
     sequence = fields.Integer('Sequence')
     active = fields.Boolean('Active', default=True)
     request_scheme = fields.Selection([('http', 'http'), ('https', 'https')], 'Scheme', default='http', required=True)
+    request_port = fields.Integer('Request Port', default=80)
     client_ids = fields.One2many('saas_portal.client', 'server_id', string='Clients')
 
 
     @api.one
-    def _request_params(self, path='/web', scheme=None, state={}, scope=None, client_id=None):
+    def _request_params(self, path='/web', scheme=None, port=None, state={}, scope=None, client_id=None):
         scheme = scheme or self.request_scheme
+        port = port or self.request_port
         scope = scope or ['userinfo', 'force_login', 'trial', 'skiptheuse']
         scope = ' '.join(scope)
         client_id = client_id or self.env['saas_portal.client'].generate_client_id()
         params = {
             'scope': scope,
             'state': simplejson.dumps(state),
-            'redirect_uri': '{scheme}://{saas_server}{path}'.format(scheme=scheme, saas_server=self.name, path=path),
+            'redirect_uri': '{scheme}://{saas_server}:{port}{path}'.format(scheme=scheme, port=port, saas_server=self.name, path=path),
             'response_type': 'token',
             'client_id': client_id,
         }
@@ -56,8 +58,9 @@ class SaasPortalServer(models.Model):
         return url
 
     @api.one
-    def _request_server(self, path=None, scheme=None, **kwargs):
+    def _request_server(self, path=None, scheme=None, port=None, **kwargs):
         scheme = scheme or self.request_scheme
+        port = port or self.request_port
         params = self._request_params(**kwargs)[0]
         access_token = self.env['oauth.access_token'].sudo().search([('application_id', '=', self.oauth_application_id.id)], order='id DESC', limit=1)
         access_token = access_token[0].token
@@ -66,13 +69,13 @@ class SaasPortalServer(models.Model):
             'access_token': access_token,
             'expires_in': 3600,
         })
-        url = '{scheme}://{saas_server}{path}?{params}'.format(scheme=scheme, saas_server=self.name, path=path, params=werkzeug.url_encode(params))
+        url = '{scheme}://{saas_server}:{port}{path}?{params}'.format(scheme=scheme, saas_server=self.name, port=port, path=path, params=werkzeug.url_encode(params))
         return url
 
     @api.multi
     def action_redirect_to_server(self):
         r = self[0]
-        url = '{scheme}://{saas_server}{path}'.format(scheme=r.request_scheme, saas_server=r.name, path='/web')
+        url = '{scheme}://{saas_server}:{port}{path}'.format(scheme=r.request_scheme, saas_server=r.name, port=r.request_port, path='/web')
         return {
             'type': 'ir.actions.act_url',
             'target': 'new',
@@ -170,7 +173,7 @@ class SaasPortalPlan(models.Model):
         return vals
 
     @api.one
-    def _create_new_database(self, scheme='http', dbname=None, client_id=None, partner_id=None):
+    def _create_new_database(self, dbname=None, client_id=None, partner_id=None):
         server = self.server_id
         if not server:
             server = self.env['saas_portal.server'].get_saas_server()
@@ -195,14 +198,18 @@ class SaasPortalPlan(models.Model):
             client = self.env['saas_portal.client'].create(vals)
         client_id = client.client_id
 
+        scheme = server.request_scheme
+        port = server.request_port
         state = {
             'd': client.name,
-            'r': '%s://%s/web' % (scheme, client.name),
-            'db_template': self.template_id.name,
+            'r': '%s://%s:%s/web' % (scheme, port, client.name),
         }
+        if self.template_id:
+            state.update({'db_template': self.template_id.name})
         scope = ['userinfo', 'force_login', 'trial', 'skiptheuse']
         url = server._request(path='/saas_server/new_database',
                               scheme=scheme,
+                              port=port,
                               state=state,
                               client_id=client_id,
                               scope=scope,)[0]

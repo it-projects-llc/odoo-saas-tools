@@ -8,7 +8,7 @@ from openerp.addons.saas_portal.controllers.main import SaasPortal
 class SaasPortalDemo(SaasPortal):
 
     @http.route(['/demo/<string:version>/<string:plan_url>'], type='http', auth='public', website=True)
-    def test_plan(self, version, plan_url, **post):
+    def show_plan(self, version, plan_url, **post):
         domain = [('odoo_version', '=', version), ('page_url', '=', plan_url),
                   ('state', '=', 'confirmed')]
         plan = request.env['saas_portal.plan'].sudo().search(domain)
@@ -16,9 +16,9 @@ class SaasPortalDemo(SaasPortal):
             # TODO: maybe in this case we can redirect to saas_portal_templates.select_template
             return request.website.render("saas_portal_demo.unavailable_plan")
         values = {'plan': plan[0]}
-        return request.website.render("saas_portal_demo.test_plan", values)
+        return request.website.render("saas_portal_demo.show_plan", values)
 
-    @http.route(['/saas_portal_demo/new_database'], type='http', auth='public', website=True)
+    @http.route('/demo/new_database', type='http', auth='public', website=True)
     def new_database(self, **post):
         if not request.session.uid:
             return login_redirect()

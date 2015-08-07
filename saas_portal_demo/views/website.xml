@@ -2,7 +2,7 @@
 <openerp>
     <data>
 
-        <template id="test_plan" name="Odoo Plan" page="True">
+        <template id="show_plan" name="Odoo Plan" page="True">
             <t t-call="website.layout">
                 <div id="wrap" class="oe_structure oe_empty">
                     <section class="mt0 mb0">
@@ -25,7 +25,7 @@
                             <div class="col-md-3 col-xs-8 mb8">
                                 <div class="text-muted">
                                     <a class="btn mt4 btn-primary odoo-install-app pull-left"
-                                       t-attf-href="/saas_portal_demo/new_database?plan_id=#{plan['id']}">
+                                       t-attf-href="/demo/new_database?plan_id=#{plan['id']}">
                                        Start a Demo
                                     </a>	
                                 </div>

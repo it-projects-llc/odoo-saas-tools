@@ -273,7 +273,7 @@ class SaasPortalPlan(models.Model):
 
     @api.multi
     def delete_template(self):
-        return self[0].template_id.delete_db()
+        return self[0].template_id.delete_database()
 
 class OauthApplication(models.Model):
     _inherit = 'oauth.application'
@@ -359,35 +359,6 @@ class SaasPortalDatabase(models.Model):
         _logger.info('delete database: %s', res.text)
         if res.status_code != 500:
             self.state = 'deleted'
-
-    def delete_db(self, cr, uid, ids, context=None):
-        obj = self.browse(cr, uid, ids[0])
-        return {
-            'type': 'ir.actions.act_window',
-            'view_type': 'form',
-            'view_mode': 'form',
-            'res_model': 'saas.config',
-            'target': 'new',
-            'context': {
-                'default_action': 'delete',
-                'default_server_id': obj.server_id.id,
-                'default_database_id': obj.id,
-            }
-        }
-
-    def upgrade_db(self, cr, uid, ids, context=None):
-        obj = self.browse(cr, uid, ids[0])
-        return {
-            'type': 'ir.actions.act_window',
-            'view_type': 'form',
-            'view_mode': 'form',
-            'res_model': 'saas.config',
-            'target': 'new',
-            'context': {
-                'default_action': 'upgrade',
-                'default_database': obj.name
-            }
-        }
 
 
 class SaasPortalClient(models.Model):

@@ -19,7 +19,7 @@ class SaasPortalDemo(SaasPortal):
         return request.website.render("saas_portal_demo.show_plan", values)
 
     @http.route('/demo/new_database', type='http', auth='public', website=True)
-    def new_database(self, **post):
+    def new_demo_database(self, **post):
         if not request.session.uid:
             return login_redirect()
         plan_id = int(post.get('plan_id'))

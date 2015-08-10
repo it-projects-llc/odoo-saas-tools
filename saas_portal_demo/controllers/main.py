@@ -1,8 +1,18 @@
 # -*- coding: utf-8 -*-
+import werkzeug
 from openerp.addons.web import http
 from openerp.addons.web.http import request
 from openerp.addons.web.controllers.main import login_redirect
 from openerp.addons.saas_portal.controllers.main import SaasPortal
+
+
+def signup_redirect():
+    url = '/web/signup?'
+    redirect_url = '%s?%s' % (request.httprequest.base_url, werkzeug.urls.url_encode(request.params))
+    return """<html><head><script>
+        window.location = '%sredirect=' + encodeURIComponent("%s");
+    </script></head></html>
+    """ % (url, redirect_url)
 
 
 class SaasPortalDemo(SaasPortal):
@@ -21,7 +31,7 @@ class SaasPortalDemo(SaasPortal):
     @http.route('/demo/new_database', type='http', auth='public', website=True)
     def new_demo_database(self, **post):
         if not request.session.uid:
-            return login_redirect()
+            return signup_redirect()
         plan_id = int(post.get('plan_id'))
 
         return self.create_new_database(plan_id)

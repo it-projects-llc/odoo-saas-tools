@@ -25,7 +25,8 @@
                             <div class="col-md-3 col-xs-8 mb8">
                                 <div class="text-muted">
                                     <a class="btn mt4 btn-primary odoo-install-app pull-left"
-                                       t-attf-href="/demo/new_database?plan_id=#{plan['id']}">
+                                       t-attf-href="/demo/new_database?plan_id=#{plan['id']}"
+                                       rel="nofollow">
                                        Start a Demo
                                     </a>	
                                 </div>

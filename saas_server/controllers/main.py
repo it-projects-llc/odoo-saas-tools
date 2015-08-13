@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
+import datetime
 import openerp
 from openerp import api, SUPERUSER_ID
 from openerp import http
+from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
+from openerp.tools.translate import _
 from openerp.addons.web.http import request
 from openerp.addons.auth_oauth.controllers.main import fragment_to_query_string
 from openerp.addons.web.controllers.main import db_monodb, login_and_redirect
@@ -140,13 +143,20 @@ class SaasServer(http.Controller):
         #return werkzeug.utils.redirect('/auth_oauth/signin?%s' % werkzeug.url_encode(params))
         return werkzeug.utils.redirect('/web')
 
-
     @http.route(['/saas_server/ab/css/<dbuuid>.css'], type='http', auth='public')
     def ab_css(self, dbuuid=None):
-        content = '''
+        content = ''
+        message = self._get_message(dbuuid)
+        if message:
+            content = '''
 .openerp .announcement_bar{
         display:block;
 }
+
+.announcement_bar>span.message:before{
+    content: %s
+}
+
 .announcement_bar>.url>a:before{
     content: 'Contact Us'
 }
@@ -160,7 +170,7 @@ class SaasServer(http.Controller):
 
     border: 0 !important;
     margin: 0 !important;
-    padding: 0 !important;
+    padding: 8px !important;
 
     background-color: #8785C0;
     background-image: -webkit-linear-gradient(135deg, rgba(255, 255, 255, 0.05) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.05) 50%, rgba(255, 255, 255, 0.05) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0) 100% );
@@ -181,6 +191,7 @@ class SaasServer(http.Controller):
     -webkit-transition: all 350ms ease;
 }
         '''
+            content = content.replace('%s', message)
         return http.Response(content, mimetype='text/css')
 
 
@@ -214,3 +225,14 @@ class SaasServer(http.Controller):
     def _get_port(self):
         host_parts = request.httprequest.host.split(':')
         return len(host_parts) > 1 and host_parts[1] or 80
+    
+    def _get_message(self, dbuuid):
+        message = False
+        domain = [('client_id', '=', dbuuid)]
+        client = request.env['saas_server.client'].sudo().search(domain)
+        if client:
+            diff = datetime.datetime.strptime(client.expiration_datetime, DEFAULT_SERVER_DATETIME_FORMAT) - datetime.datetime.now()
+            hours_remaining = diff.seconds / 3600 + 1
+            plural = hours_remaining > 1 and 's' or ''
+            message = _("'You use a live preview. The database will be destroyed after %s hour%s.'") % (str(hours_remaining), plural)
+        return message

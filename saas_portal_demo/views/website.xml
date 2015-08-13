@@ -18,19 +18,19 @@
                         </div>
                     </section>
                     <section class="mt0 mb0">
-                        <div class="container">
+                        <div class="mb16 container">
                             <div class="col-md-3 col-xs-2 col-md-offset-0 col-xs-offset-2 text-center">
                                 <span itemprop="image" t-field="plan.logo" t-field-options='{"widget": "image"}'/>
                             </div>
-                            <div class="col-md-3 col-xs-8 mb8">
+                            <div class="col-xs-8 mb8">
                                 <div class="text-muted">
                                     <a class="btn mt4 btn-primary odoo-install-app pull-left"
                                        t-attf-href="/demo/new_database?plan_id=#{plan['id']}"
                                        rel="nofollow">
-                                       Start a Demo
+                                       Try it now
                                     </a>	
                                 </div>
-                                <div class="text-muted pull-left">
+                                <div class="mt8 text-muted pull-left">
                                     <t t-esc="plan.website_description or ''"/>
                                 </div>
                             </div>

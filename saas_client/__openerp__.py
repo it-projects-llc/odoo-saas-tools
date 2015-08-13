@@ -12,20 +12,4 @@
         'data/auth_oauth_data.xml',
     ],
     'installable': True,
-    'description': '''
-
-Module for client database. You have to install this module
-on template database (see saas_portal module)
-
-INSTALLATION
-============
-
-Server wide
------------
-
-You have to mark as server wide:
-
-* this module
-* module auth_oauth
-    ''',
 }

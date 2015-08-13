@@ -161,6 +161,14 @@ class SaasServer(http.Controller):
     content: 'Contact Us'
 }
 
+.announcement_bar .close {
+    height: 15px;
+    width: 15px;
+    background : url(/web/static/src/img/icons/gtk-close.png) no-repeat;
+    background-size : 15px 15px;
+    opacity: 1;
+}
+
 .announcement_bar {
     color: #ffffff;
     height: 30px;

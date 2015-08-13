@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_saas_portal_plan_public,saas_portal.plan,saas_portal.model_saas_portal_plan,,1,0,0,0

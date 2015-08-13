@@ -4,6 +4,23 @@
         <menuitem name="SaaS" id="menu_base_saas" sequence="30" />
         <menuitem id="menu_saas" parent="menu_base_saas" name="SaaS" sequence="1" />
 
+        <!-- Database -->
+
+       <record id="view_databases_form" model="ir.ui.view">
+            <field name="name">saas_portal.databases.form</field>
+            <field name="model">saas_portal.database</field>
+            <field name="arch" type="xml">
+                <form string="plans">
+                    <sheet>
+                        <group>
+                           <field name="name" />
+                           <field name="state" />
+                           <field name="client_id" readonly="1" />
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
 
         <!-- Client -->
 
@@ -133,6 +150,7 @@
                             <field name="client_id"/>
                             <field name="active"/>
                             <field name="request_scheme"/>
+                            <field name="request_port"/>
                         </group>
                     </group>
                     <field name="client_ids" readonly="1">
@@ -198,46 +216,36 @@
                         <button string="Create Client" type="action" name="%(action_create_client)d"/>
                         <field name="state" widget="statusbar"/>
                     </header>
-            <sheet>
-                <label for="name" class="oe_edit_only"/>
-                <h1>
-                    <field name="name" class="oe_inline"/>
-                </h1>
-                <field name="summary" class="oe_inline"/>
-
-                <group>
-                    <group string="Technical Settings">
-                        <field name="server_id"/>
-                        <field name="template_id"/>
-                        <!--
-                            role_id should be deleted or moved to separate module
-                            <field name="role_id"/>
-                        -->
-                    </group>
-                    <group string="Plan Settings">
-                        <field name="dbname_template"/>
-                        <field name="expiration"/>
-                    </group>
-                </group>
-
-                <separator string="Odoo DB Settings"/>
-                <group col="4">
-                    <field name="demo"/>
-                    <field name="lang"/>
-                    <field name="tz"/>
-                </group>
-
-                <!--
-                <notebook>
-                    <page string="Required Addons" >
-                        <field name="required_addons_ids" nolabel="1" />
-                    </page>
-                    <page string="Optional Addons" >
-                        <field name="optional_addons_ids" nolabel="1" />
-                    </page>
-                </notebook>
-                -->
-            </sheet>
+                    <sheet>
+                    	<div class="oe_left" style="width: 500px;">
+                            <field name="logo" widget="image" class="oe_avatar oe_left"/>
+                            <div class="oe_title" style="width: 390px;">
+                                <label class="oe_edit_only" for="name" string="Name"/>
+                                <h1><field name="name" class="oe_inline"/></h1>
+								<field name="summary"/>
+                            </div>
+                        </div>
+                        <group>
+                            <group string="Technical Settings">
+                                <field name="server_id"/>
+                                <field name="template_id"/>
+                            </group>
+                            <group string="Plan Settings">
+                                <field name="dbname_template"/>
+                                <field name="expiration"/>
+                            </group>
+                        </group>
+                        <separator string="Odoo DB Settings"/>
+                        <group col="4">
+                            <field name="demo"/>
+                            <field name="lang"/>
+                            <field name="tz"/>
+                        </group>
+                        <separator string="Website Settings"/>
+                        <group>
+                            <field name="website_description" col="4"/>
+                        </group>
+                    </sheet>
                 </form>
             </field>
         </record>

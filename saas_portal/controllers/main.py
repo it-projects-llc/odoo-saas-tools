@@ -32,9 +32,8 @@ class SaasPortal(http.Controller):
         return self.create_new_database(dbtemplate, full_dbname, organization=organization)
 
     def create_new_database(self, plan_id):
-        scheme = request.httprequest.scheme
         plan = request.env['saas_portal.plan'].sudo().browse(plan_id)
-        url = plan._create_new_database(scheme=scheme)[0]
+        url = plan._create_new_database()[0]
         return request.redirect(url)
 
     @http.route('/saas_portal/tenant', type='http', auth='public', website=True)

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <template id="show_plan" name="Odoo Plan" page="True">
+            <t t-call="website.layout">
+                <div id="wrap" class="oe_structure oe_empty">
+                    <section class="mt0 mb0">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h1 class="text-center"><t t-esc="plan.name"/></h1>
+                                </div>
+                                <div class="col-md-12">
+                                   <h3 class="text-center"><t t-esc="plan.summary or ''"/></h3>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <section class="mt0 mb0">
+                        <div class="mb16 container">
+                            <div class="col-md-3 col-xs-2 col-md-offset-0 col-xs-offset-2 text-center">
+                                <span itemprop="image" t-field="plan.logo" t-field-options='{"widget": "image"}'/>
+                            </div>
+                            <div class="col-xs-8 mb8">
+                                <div class="text-muted">
+                                    <a class="btn mt4 btn-primary odoo-install-app pull-left"
+                                       t-attf-href="/demo/new_database?plan_id=#{plan['id']}"
+                                       rel="nofollow">
+                                       Try it now
+                                    </a>	
+                                </div>
+                                <div class="mt8 text-muted pull-left">
+                                    <t t-esc="plan.website_description or ''"/>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+                <div id="wrap" class="oe_structure oe_empty">
+                </div>
+            </t>
+        </template>
+
+        <template id="unavailable_plan" name="Odoo Plan" page="True">
+            <t t-call="website.layout">
+                <div id="wrap" class="oe_structure oe_empty">
+                    <section class="mt0 mb0">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h1 class="text-center">
+                                         The Plan you asked for is not available!
+                                    </h1>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </t>
+        </template>
+
+    </data>
+</openerp>

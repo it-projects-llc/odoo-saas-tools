@@ -1,10 +1,15 @@
 import os
+import time
 import openerp
 from openerp import api, models, fields, SUPERUSER_ID, exceptions
-from openerp.addons.saas_utils import connector, database
+from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
 import psycopg2
 import random
 import string
+
+import logging
+_logger = logging.getLogger(__name__)
+
 
 def get_size(start_path='.'):
     total_size = 0
@@ -17,14 +22,10 @@ def get_size(start_path='.'):
 
 class SaasServerClient(models.Model):
     _name = 'saas_server.client'
-    _inherit = ['mail.thread']
+    _inherit = ['mail.thread', 'saas_base.client']
 
-    # TODO: make inheritance from some base class to exclude dublicating fields with saas_portal->oauth.application
     name = fields.Char('Database name', readonly=True)
     client_id = fields.Char('Database UUID', readonly=True, select=True)
-    users_len = fields.Integer('Count users')
-    file_storage = fields.Integer('File storage (MB)')
-    db_storage = fields.Integer('DB storage (MB)')
     state = fields.Selection([('template', 'Template'),
                               ('draft','New'),
                               ('open','In Progress'),
@@ -32,7 +33,6 @@ class SaasServerClient(models.Model):
                               ('pending','Pending'),
                               ('deleted','Deleted')],
                              'State', default='draft', track_visibility='onchange')
-    expiration_datetime = fields.Datetime('Expiration', track_visibility='onchange')
 
     _sql_constraints = [
         ('client_id_uniq', 'unique (client_id)', 'client_id should be unique!'),

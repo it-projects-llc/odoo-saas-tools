@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
+import datetime
 import openerp
 from openerp import api, SUPERUSER_ID
 from openerp import http
+from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
+from openerp.tools.translate import _
 from openerp.addons.web.http import request
 from openerp.addons.auth_oauth.controllers.main import fragment_to_query_string
 from openerp.addons.web.controllers.main import db_monodb, login_and_redirect
@@ -23,6 +26,7 @@ class SaasServer(http.Controller):
 
         state = simplejson.loads(post.get('state'))
         new_db = state.get('d')
+        expiration_db = state.get('e')
         template_db = state.get('db_template')
         demo = state.get('demo')
         lang = state.get('lang', 'en_US')
@@ -40,7 +44,7 @@ class SaasServer(http.Controller):
             # TODO: check access right to crete template db
             pass
         client_id = saas_portal_user.get('client_id')
-        client_data = {'name':new_db, 'client_id': client_id}
+        client_data = {'name':new_db, 'client_id': client_id, 'expiration_datetime': expiration_db}
         client = request.env['saas_server.client'].sudo().create(client_data)
         client.create_database(template_db, demo, lang)
         client.install_addons(addons=addons, is_template_db=is_template_db)
@@ -66,7 +70,8 @@ class SaasServer(http.Controller):
             'action': action
             }
         scheme = request.httprequest.scheme
-        return werkzeug.utils.redirect('{scheme}://{domain}/saas_client/new_database?{params}'.format(scheme=scheme, domain=new_db.replace('_', '.'), params=werkzeug.url_encode(params)))
+        port = self._get_port()
+        return werkzeug.utils.redirect('{scheme}://{domain}:{port}/saas_client/new_database?{params}'.format(scheme=scheme, domain=new_db, port=port, params=werkzeug.url_encode(params)))
 
     @http.route('/saas_server/edit_database', type='http', auth='public', website=True)
     @fragment_to_query_string
@@ -74,6 +79,7 @@ class SaasServer(http.Controller):
         _logger.info('edit_database post: %s', post)
 
         scheme = request.httprequest.scheme
+        port = self._get_port()
         state = simplejson.loads(post.get('state'))
         domain = state.get('d')
 
@@ -81,8 +87,8 @@ class SaasServer(http.Controller):
             'access_token': post['access_token'],
             'state': simplejson.dumps(state),
         }
-        url = '{scheme}://{domain}/saas_client/edit_database?{params}'
-        url = url.format(scheme=scheme, domain=domain, params=werkzeug.url_encode(params))
+        url = '{scheme}://{domain}:{port}/saas_client/edit_database?{params}'
+        url = url.format(scheme=scheme, domain=domain, port=port, params=werkzeug.url_encode(params))
         return werkzeug.utils.redirect(url)
 
     @http.route('/saas_server/upgrade_database', type='http', auth='public')
@@ -137,15 +143,30 @@ class SaasServer(http.Controller):
         #return werkzeug.utils.redirect('/auth_oauth/signin?%s' % werkzeug.url_encode(params))
         return werkzeug.utils.redirect('/web')
 
-
     @http.route(['/saas_server/ab/css/<dbuuid>.css'], type='http', auth='public')
     def ab_css(self, dbuuid=None):
-        content = '''
+        content = ''
+        message = self._get_message(dbuuid)
+        if message:
+            content = '''
 .openerp .announcement_bar{
         display:block;
 }
+
+.announcement_bar>span.message:before{
+    content: %s
+}
+
 .announcement_bar>.url>a:before{
     content: 'Contact Us'
+}
+
+.announcement_bar .close {
+    height: 15px;
+    width: 15px;
+    background : url(/web/static/src/img/icons/gtk-close.png) no-repeat;
+    background-size : 15px 15px;
+    opacity: 1;
 }
 
 .announcement_bar {
@@ -157,7 +178,7 @@ class SaasServer(http.Controller):
 
     border: 0 !important;
     margin: 0 !important;
-    padding: 0 !important;
+    padding: 8px !important;
 
     background-color: #8785C0;
     background-image: -webkit-linear-gradient(135deg, rgba(255, 255, 255, 0.05) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.05) 50%, rgba(255, 255, 255, 0.05) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0) 100% );
@@ -178,6 +199,7 @@ class SaasServer(http.Controller):
     -webkit-transition: all 350ms ease;
 }
         '''
+            content = content.replace('%s', message)
         return http.Response(content, mimetype='text/css')
 
 
@@ -207,3 +229,18 @@ class SaasServer(http.Controller):
                 'db_storage': client.db_storage,
             })
         return simplejson.dumps(res)
+    
+    def _get_port(self):
+        host_parts = request.httprequest.host.split(':')
+        return len(host_parts) > 1 and host_parts[1] or 80
+    
+    def _get_message(self, dbuuid):
+        message = False
+        domain = [('client_id', '=', dbuuid)]
+        client = request.env['saas_server.client'].sudo().search(domain)
+        if client:
+            diff = datetime.datetime.strptime(client.expiration_datetime, DEFAULT_SERVER_DATETIME_FORMAT) - datetime.datetime.now()
+            hours_remaining = diff.seconds / 3600 + 1
+            plural = hours_remaining > 1 and 's' or ''
+            message = _("'You use a live preview. The database will be destroyed after %s hour%s.'") % (str(hours_remaining), plural)
+        return message

@@ -224,7 +224,7 @@ class SaasPortalPlan(models.Model):
                 raise exceptions.Warning(_('Template for db name is not configured'))
             return ''
         id = str(random.randint(100, 10000))
-        return self.dbname_template.replace('%i', str(1234))
+        return self.dbname_template.replace('%i', id)
 
     @api.multi
     def create_template(self):

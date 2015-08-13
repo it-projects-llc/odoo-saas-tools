@@ -36,7 +36,8 @@
                             </div>
                         </div>
                     </section>
-
+                </div>
+                <div id="wrap" class="oe_structure oe_empty">
                 </div>
             </t>
         </template>

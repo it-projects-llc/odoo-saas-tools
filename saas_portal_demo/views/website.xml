@@ -27,8 +27,8 @@
                                     <a class="btn mt4 btn-primary odoo-install-app pull-left"
                                        t-attf-href="/demo/new_database?plan_id=#{plan['id']}"
                                        rel="nofollow">
-                                       Try it now
-                                    </a>	
+                                       Live Preview
+                                    </a>
                                 </div>
                                 <div class="mt8 text-muted pull-left">
                                     <t t-esc="plan.website_description or ''"/>

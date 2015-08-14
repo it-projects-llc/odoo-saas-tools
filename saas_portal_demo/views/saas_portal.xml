@@ -11,6 +11,40 @@
                     <field name="odoo_version" />
                     <field name="page_url" />
                 </field>
+                <xpath expr="(//sheet/group)[last()]" position="after">
+                    <separator string="Modules" />
+                    <group>
+                        <field name="app_store_module_ids" nolabel="1">
+                            <tree string="Modules">
+                                <field name="name" />
+                                <field name="technical_name" />
+                                <field name="author" />
+                            </tree>
+                        </field>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_plan_modules_form" model="ir.ui.view">
+            <field name="name">saas_portal.plan.modules.form</field>
+            <field name="model">saas_portal.module</field>
+            <field name="arch" type="xml">
+                <form string="Module">
+                    
+                        <group>
+                            <group>
+                                <field name="name"/>
+                                <field name="technical_name"/>
+                                <field name="author"/>
+                                <field name="summary"/>
+                            </group>
+                            <group>
+                                <field name="module_id"/>
+                            </group>
+                        </group>
+                    
+                </form>
             </field>
         </record>
 

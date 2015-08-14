@@ -31,19 +31,18 @@
             <field name="model">saas_portal.module</field>
             <field name="arch" type="xml">
                 <form string="Module">
-                    
                         <group>
                             <group>
-                                <field name="name"/>
-                                <field name="technical_name"/>
-                                <field name="author"/>
+                                <field name="name" placeholder="Reminders and Agenda (technical core)"/>
+                                <field name="technical_name" placeholder="reminder_base"/>
+                                <field name="author" placeholder="Ivan Yelizariev"/>
+                                <field name="url" placeholder="https://apps.odoo.com/apps/modules/8.0/reminder_base"/>
                                 <field name="summary"/>
                             </group>
                             <group>
                                 <field name="module_id"/>
                             </group>
                         </group>
-                    
                 </form>
             </field>
         </record>

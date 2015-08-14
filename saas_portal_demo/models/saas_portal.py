@@ -17,10 +17,11 @@ class SaasPortalPlan(models.Model):
 class SaaSPortalModule(models.Model):
     _name = 'saas_portal.module'
     
-    name = fields.Char('Name', placeholder='Reminders and Agenda (technical core)')
-    technical_name = fields.Char('Technical Name', placeholder='reminder_base')
+    name = fields.Char('Name')
+    technical_name = fields.Char('Technical Name')
     summary = fields.Text('Summary')
-    author = fields.Char('Author', placeholder='Ivan Yelizariev')
+    author = fields.Char('Author')
+    url = fields.Char('URL')
     module_id = fields.Many2one('ir.module.module', required=False)
     
     @api.onchange('module_id')
@@ -30,8 +31,9 @@ class SaaSPortalModule(models.Model):
             self.technical_name = self.module_id.name
             self.summary = self.module_id.summary
             self.author = self.module_id.author
+            self.url = self.module_id.url
         else:
-            self.name, self.technical_name, self.summary, self.author  = [False] * 4
+            self.name, self.technical_name, self.summary, self.author, self.url  = [False] * 5
             
     _sql_constraints = [
         ('technical_name_uniq', 'unique(technical_name)', 'The module already exists!'),

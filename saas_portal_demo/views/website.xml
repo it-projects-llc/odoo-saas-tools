@@ -34,7 +34,7 @@
                                     <t t-esc="plan.website_description or ''"/>
                                 </div>
                             </div>
-                            <div class="col-xs-8 mb8">
+                            <div t-if="plan.app_store_module_ids" class="col-xs-8 mb8">
                                 Modules:
                                 <div t-foreach="plan.app_store_module_ids" t-as="module">
                                     <a t-attf-href="#{module.url}"><t t-esc="module.name"/></a>

@@ -1,0 +1,100 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+
+        <record id="server1_com" model="saas_portal.server">
+            <field name="name">server1.com</field>
+        </record>
+
+        <!-- pos_product_available -->
+
+        <record id="template_pos_product_available" model="saas_portal.database">
+            <field name="name">template_pos_product_available.server1.com</field>
+        </record>
+
+        <record id="module_pos_product_available" model="saas_portal.module">
+            <field name="name">Available quantity of products in POS</field>
+            <field name="summary">Let a cashier know how many products are available</field>
+            <field name="technical_name">pos_product_available</field>
+            <field name="author">Ivan Yelizariev</field>
+            <field name="url">https://apps.odoo.com/apps/modules/8.0/pos_product_available/</field>
+        </record>
+
+        <record id="plan_pos_product_available" model="saas_portal.plan">
+            <field name="name">Available quantity of products in POS</field>
+            <field name="summary">Let a cashier know how many products are available</field>
+            <field name="lang">en_US</field>
+            <field name="tz">America/Havana</field>
+            <field name="expiration">3</field>
+            <field name="dbname_template">pos_product_available-%i.server1.com</field>
+            <field name="logo" type="base64" file="saas_portal_demo_example/static/img/reminder_and_agenda.png" />
+            <field name="page_url">pos_product_available</field>
+            <field name="odoo_version">8.0</field>
+            <field name="server_id" ref="server1_com" />
+            <field name="template_id" ref="template_pos_product_available" />
+            <field name="app_store_module_ids" eval="[(6, 0, [ref('module_pos_product_available')])]" />
+        </record>
+
+        <!-- reminders and agenda -->
+
+        <record id="template_reminders_and_agenda" model="saas_portal.database">
+            <field name="name">template_reminders_and_agenda.server1.com</field>
+        </record>
+
+        <record id="module_reminder_base" model="saas_portal.module">
+            <field name="name">Reminders and Agenda (technical core)</field>
+            <field name="summary">Organise all your tasks, todos, events, etc.</field>
+            <field name="technical_name">reminder_base</field>
+            <field name="author">Ivan Yelizariev</field>
+            <field name="url">https://apps.odoo.com/apps/modules/8.0/reminder_base/</field>
+        </record>
+
+        <record id="module_reminder_task_deadline" model="saas_portal.module">
+            <field name="name">Reminders and Agenda for Tasks</field>
+            <field name="summary">Reminders and Agenda for Tasks</field>
+            <field name="technical_name">reminder_task_deadline</field>
+            <field name="author">Ivan Yelizariev</field>
+            <field name="url">https://apps.odoo.com/apps/modules/8.0/reminder_task_deadline/</field>
+        </record>
+
+        <record id="module_reminder_crm_next_action" model="saas_portal.module">
+            <field name="name">Reminders and Agenda for Opportunities</field>
+            <field name="summary">Reminders and Agenda for Opportunities</field>
+            <field name="technical_name">reminder_crm_next_action</field>
+            <field name="author">Ivan Yelizariev</field>
+            <field name="url">https://apps.odoo.com/apps/modules/8.0/reminder_crm_next_action/</field>
+        </record>
+
+        <record id="module_reminder_phonecall" model="saas_portal.module">
+            <field name="name">Reminders and Agenda for Phonecalls</field>
+            <field name="summary">Reminders and Agenda for Phonecalls</field>
+            <field name="technical_name">reminder_phonecall</field>
+            <field name="author">Ivan Yelizariev</field>
+            <field name="url">https://apps.odoo.com/apps/modules/8.0/reminder_phonecall/</field>
+        </record>
+
+        <record id="module_reminder_issue_deadline" model="saas_portal.module">
+            <field name="name">Reminders and Agenda for Issues</field>
+            <field name="summary">Reminders and Agenda for Issues</field>
+            <field name="technical_name">reminder_issue_deadline</field>
+            <field name="author">Ivan Yelizariev</field>
+            <field name="url">https://apps.odoo.com/apps/modules/8.0/reminder_issue_deadline/</field>
+        </record>
+
+        <record id="plan_reminder_and_agenda" model="saas_portal.plan">
+            <field name="name">Reminder and Agenda</field>
+            <field name="summary">Reminders for tasks, opportunities, phonecalls and issues</field>
+            <field name="lang">en_US</field>
+            <field name="tz">America/Havana</field>
+            <field name="expiration">3</field>
+            <field name="dbname_template">reminder_and_agenda-%i.server1.com</field>
+            <field name="logo" type="base64" file="saas_portal_demo_example/static/img/pos_product_available.png" />
+            <field name="page_url">reminder_and_agenda</field>
+            <field name="odoo_version">8.0</field>
+            <field name="server_id" ref="server1_com" />
+            <field name="template_id" ref="template_reminders_and_agenda" />
+            <field name="app_store_module_ids" eval="[(6, 0, [ref('module_reminder_base'), ref('module_reminder_task_deadline'), ref('module_reminder_crm_next_action'), ref('module_reminder_phonecall'), ref('module_reminder_issue_deadline')])]" />
+        </record>
+
+    </data>
+</openerp>

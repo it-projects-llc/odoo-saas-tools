@@ -54,3 +54,6 @@ docs/_build/
 
 # Eclipse
 .settings
+
+# PyCharm
+.idea

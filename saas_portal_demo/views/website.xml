@@ -34,6 +34,13 @@
                                     <t t-esc="plan.website_description or ''"/>
                                 </div>
                             </div>
+                            <div t-if="plan.app_store_module_ids" class="col-xs-8 mb8">
+                                Modules:
+                                <div t-foreach="plan.app_store_module_ids" t-as="module">
+                                    <a t-attf-href="#{module.url}"><t t-esc="module.name"/></a>
+                                    <t t-esc="'    (' + module.author + ') --- ' + module.summary" />
+                                </div>
+                            </div>
                         </div>
                     </section>
                 </div>
@@ -42,7 +49,7 @@
             </t>
         </template>
 
-        <template id="unavailable_plan" name="Odoo Plan" page="True">
+        <template id="unavailable_plan" name="Odoo Not Found Plan" page="True">
             <t t-call="website.layout">
                 <div id="wrap" class="oe_structure oe_empty">
                     <section class="mt0 mb0">

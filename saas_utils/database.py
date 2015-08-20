@@ -21,17 +21,6 @@
 from openerp import http, SUPERUSER_ID as SI
 from openerp.addons.web.http import request
 
-db_monodb_org = http.db_monodb
-
-
-def db_monodb(httprequest=None):
-    db = db_monodb_org(httprequest)
-    if not db:
-        return httprequest.host.split(':')[0]
-    return db
-
-http.db_monodb = db_monodb
-
 
 def get_market_dbs(with_templates=True):
     dbs = []

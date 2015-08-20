@@ -7,7 +7,7 @@ from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
 from openerp.tools.translate import _
 from openerp.addons.web.http import request
 from openerp.addons.auth_oauth.controllers.main import fragment_to_query_string
-from openerp.addons.web.controllers.main import db_monodb, login_and_redirect
+from openerp.addons.web.controllers.main import login_and_redirect
 from openerp.addons.saas_utils import connector
 
 import werkzeug.utils

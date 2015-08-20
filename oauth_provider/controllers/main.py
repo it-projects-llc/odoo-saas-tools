@@ -7,7 +7,7 @@ import openerp
 from openerp import SUPERUSER_ID
 from openerp import http
 from openerp.http import request
-from openerp.addons.web.controllers.main import db_monodb, ensure_db, set_cookie_and_redirect, login_and_redirect
+from openerp.addons.web.controllers.main import ensure_db, set_cookie_and_redirect, login_and_redirect
 from openerp.addons.auth_signup.controllers.main import AuthSignupHome as Home
 from openerp.modules.registry import RegistryManager
 from openerp.tools.translate import _

@@ -29,7 +29,7 @@ Usage
 =====
 
 1. Configure Odoo installation
-   * set dbfilter, e.g. *%h*
+   * set dbfilter or run odoo with --db-filter parameter, e.g. ^%h$
    * execute commands below to allow create databases with dots in name:
 
    > cd path/to/odoo
@@ -57,7 +57,7 @@ Usage
    * install dependencies:
      * pip install oauthlib
 
-2. Create two databases:
+2. Create two databases (via /web/database/manager):
 
    * Main Database, e.g. **odoo.local**:
      * install saas_portal and saas_portal_* (optional) modules

@@ -60,14 +60,14 @@ class SaasConfig(models.TransientModel):
             client_id=self.database_id.client_id,
             state=state,
         )[0]
-        res = requests.get(url)
+        res = requests.get(url, verify=(self.server_id.request_scheme == 'https' and self.server_id.verify_ssl))
 	if res.ok != True:
-            msg = """Status Code - %s 
-            Reason - %s
-            URL - %s
-            """ % (res.status_code, res.reason, res.url)
-            raise Warning(msg)
-        obj.write({'description': res.text})
+	    msg = """Status Code - %s 
+	        Reason - %s
+	        URL - %s
+	        """ % (res.status_code, res.reason, res.url)
+	    raise Warning(msg)
+	obj.write({'description': res.text})
         return {
             'type': 'ir.actions.act_window',
             'view_type': 'form',

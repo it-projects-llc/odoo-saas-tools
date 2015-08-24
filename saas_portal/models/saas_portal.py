@@ -31,6 +31,7 @@ class SaasPortalServer(models.Model):
     sequence = fields.Integer('Sequence')
     active = fields.Boolean('Active', default=True)
     request_scheme = fields.Selection([('http', 'http'), ('https', 'https')], 'Scheme', default='http', required=True)
+    verify_ssl = fields.Boolean('Verify SSL', default=True, help="verify SSL certificates for HTTPS requests, just like a web browser")
     request_port = fields.Integer('Request Port', default=80)
     client_ids = fields.One2many('saas_portal.client', 'server_id', string='Clients')
 
@@ -94,13 +95,13 @@ class SaasPortalServer(models.Model):
             'client_id': self.client_id,
         }
         url = self._request_server(path='/saas_server/sync_server', state=state, client_id=self.client_id)[0]
-        res = requests.get(url)
+        res = requests.get(url, verify=(self.request_scheme == 'https' and self.verify_ssl))
 	if res.ok != True:
-            msg = """Status Code - %s 
-            Reason - %s
-            URL - %s
-            """ % (res.status_code, res.reason, res.url)
-            raise Warning(msg)
+	    msg = """Status Code - %s 
+		Reason - %s
+		URL - %s
+		""" % (res.status_code, res.reason, res.url)
+	    raise Warning(msg)
         data = simplejson.loads(res.text)
         for r in data:
             r['server_id'] = self.id

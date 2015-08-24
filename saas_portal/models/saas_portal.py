@@ -96,12 +96,12 @@ class SaasPortalServer(models.Model):
         }
         url = self._request_server(path='/saas_server/sync_server', state=state, client_id=self.client_id)[0]
         res = requests.get(url, verify=(self.request_scheme == 'https' and self.verify_ssl))
-	if res.ok != True:
-	    msg = """Status Code - %s 
-		Reason - %s
-		URL - %s
-		""" % (res.status_code, res.reason, res.url)
-	    raise Warning(msg)
+    	if res.ok != True:
+    	    msg = """Status Code - %s 
+    		Reason - %s
+    		URL - %s
+    		""" % (res.status_code, res.reason, res.url)
+    	    raise Warning(msg)
         data = simplejson.loads(res.text)
         for r in data:
             r['server_id'] = self.id

@@ -9,7 +9,7 @@ from openerp.addons.base.res.res_partner import _tz_get
 import time
 from datetime import datetime, timedelta
 from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
-from oauthlib import common
+from oauthlib import common as oauthlib_common
 import urllib2
 import simplejson
 import werkzeug
@@ -49,7 +49,7 @@ class SaasPortalServer(models.Model):
             'user_id': self.env.user.id,
             'scope': 'userinfo',
             'expires': expires.strftime(DEFAULT_SERVER_DATETIME_FORMAT),
-            'token': common.generate_token(),
+            'token': oauthlib_common.generate_token(),
             'application_id': self.oauth_application_id.id
         }
         return self.env['oauth.access_token'].create(vals)

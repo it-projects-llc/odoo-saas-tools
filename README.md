@@ -53,7 +53,16 @@ Usage
    > 127.0.0.1	client-z.odoo.local
 
    * Redirect requests to domains above to localhost:8069 (e.g. via nginx)
-   
+     * be sure, that odoo gets host header, e.g. for nginx:
+
+       > proxy_set_header Host $host;
+
+       > proxy_set_header X-Real-IP       $remote_addr;
+
+       > proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+       > proxy_set_header X-Forwarded-Proto $scheme;
+
    * install dependencies:
      * pip install oauthlib
 

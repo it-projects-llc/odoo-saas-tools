@@ -29,7 +29,9 @@ Usage
 =====
 
 1. Configure Odoo installation
-   * set dbfilter or run odoo with --db-filter parameter, e.g. ^%h$
+   * set dbfilter in config file or run odoo with --db-filter parameter, e.g. ^%h$
+     * be sure, that you don't use db_name in config file and don't run odoo with -d (--database) parameter
+
    * execute commands below to allow create databases with dots in name:
 
    > cd path/to/odoo

@@ -2,11 +2,6 @@
 <openerp>
     <data noupdate="1">
 
-        <record id="seq_type_saas_portal_plan" model="ir.sequence.type">
-            <field name="name">SaaS Portal Plan</field>
-            <field name="code">saas_portal.plan</field>
-        </record>
-
         <record id="seq_saas_portal_plan" model="ir.sequence">
             <field name="name">SaaS Portal Plan</field>
             <field name="code">saas_portal.plan</field>

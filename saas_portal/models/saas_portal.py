@@ -114,6 +114,12 @@ class SaasPortalServer(models.Model):
         }
         url = self._request_server(path='/saas_server/sync_server', state=state, client_id=self.client_id)[0]
         res = requests.get(url, verify=(self.request_scheme == 'https' and self.verify_ssl))
+    	if res.ok != True:
+    	    msg = """Status Code - %s 
+    		Reason - %s
+    		URL - %s
+    		""" % (res.status_code, res.reason, res.url)
+    	    raise Warning(msg)
         data = simplejson.loads(res.text)
         for r in data:
             r['server_id'] = self.id
@@ -373,7 +379,7 @@ class SaasPortalDatabase(models.Model):
         if force_delete:
             state['force_delete'] = 1
         url = self.server_id._request_server(path='/saas_server/delete_database', state=state, client_id=self.client_id)[0]
-        res = requests.get(url, verify=(self.server_id.request_scheme == 'https' and self.server_id.verify_ssl))
+        res = requests.get(url)
         _logger.info('delete database: %s', res.text)
         if res.status_code != 500:
             self.state = 'deleted'

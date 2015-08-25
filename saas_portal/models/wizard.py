@@ -66,7 +66,6 @@ class SaasConfig(models.TransientModel):
 Reason - %s
 URL - %s
             """ % (res.status_code, res.reason, res.url)
-            data = simplejson.loads(res.text)
             raise Warning(msg)
         obj.write({'description': res.text})
         return {

@@ -118,9 +118,9 @@ class SaasPortalServer(models.Model):
             msg = """Status Code - %s
 Reason - %s
 URL - %s
-            """ % (res.status_code, res.reason, res.url)
-            data = simplejson.loads(res.text)
+            """ % (res.status_code, res.reason, res.url)            
             raise Warning(msg)
+        data = simplejson.loads(res.text)
         for r in data:
             r['server_id'] = self.id
             client = self.env['saas_portal.client'].search([

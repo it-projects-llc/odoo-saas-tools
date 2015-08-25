@@ -9,6 +9,7 @@ from openerp.addons.base.res.res_partner import _tz_get
 import time
 from datetime import datetime, timedelta
 from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
+from oauthlib import common
 import urllib2
 import simplejson
 import werkzeug
@@ -35,6 +36,23 @@ class SaasPortalServer(models.Model):
     request_port = fields.Integer('Request Port', default=80)
     client_ids = fields.One2many('saas_portal.client', 'server_id', string='Clients')
 
+    @api.model
+    def create(self, vals):
+        self = super(SaasPortalServer, self).create(vals)
+        self.create_access_token()
+        return self
+
+    @api.model
+    def create_access_token(self):
+        expires = datetime.now() + timedelta(seconds=60*60)
+        vals = {
+            'user_id': self.env.user.id,
+            'scope': 'userinfo',
+            'expires': expires.strftime(DEFAULT_SERVER_DATETIME_FORMAT),
+            'token': common.generate_token(),
+            'application_id': self.oauth_application_id.id
+        }
+        return self.env['oauth.access_token'].create(vals)
 
     @api.one
     def _request_params(self, path='/web', scheme=None, port=None, state={}, scope=None, client_id=None):
@@ -219,13 +237,12 @@ class SaasPortalPlan(models.Model):
 
     @api.one
     def generate_dbname(self, raise_error=True):
-        # TODO make more elegant solution
         if not self.dbname_template:
             if raise_error:
                 raise exceptions.Warning(_('Template for db name is not configured'))
             return ''
-        id = str(random.randint(100, 10000))
-        return self.dbname_template.replace('%i', id)
+        sequence = self.env['ir.sequence'].get('saas_portal.plan')
+        return self.dbname_template.replace('%i', sequence)
 
     @api.multi
     def create_template(self):

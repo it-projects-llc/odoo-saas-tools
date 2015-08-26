@@ -281,19 +281,9 @@ class SaasPortalPlan(models.Model):
     def edit_template(self):
         return self[0].template_id.edit_database()
 
-    def upgrade_template(self, cr, uid, ids, context=None):
-        obj = self.browse(cr, uid, ids[0])
-        return {
-            'type': 'ir.actions.act_window',
-            'view_type': 'form',
-            'view_mode': 'form',
-            'res_model': 'saas.config',
-            'target': 'new',
-            'context': {
-                'default_action': 'upgrade',
-                'default_database': obj.template_id.name
-            }
-        }
+    @api.multi
+    def upgrade_template(self):
+        return self[0].template_id.upgrade_database()
 
     @api.multi
     def delete_template(self):
@@ -383,6 +373,21 @@ class SaasPortalDatabase(models.Model):
         _logger.info('delete database: %s', res.text)
         if res.status_code != 500:
             self.state = 'deleted'
+
+    @api.multi
+    def upgrade_database(self):
+        obj = self[0]
+        return {
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'saas.config',
+            'target': 'new',
+            'context': {
+               'default_action': 'upgrade',
+               'default_database': obj.name
+            }
+        }
 
 
 class SaasPortalClient(models.Model):

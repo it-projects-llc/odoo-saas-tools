@@ -38,7 +38,7 @@
                     <field name="db_storage"/>
                     <field name="expiration_datetime"/>
                     <button name="edit_database" type="object" icon="gtk-connect" attrs="{'invisible':[('state', 'in', ['deleted', 'draft'])]}"/>
-                    <button name="upgrade_db" attrs="{'invisible':[('state', 'in', ['deleted'])]}" type="object" icon="gtk-execute" />
+                    <button name="upgrade_database" attrs="{'invisible':[('state', 'in', ['deleted'])]}" type="object" icon="gtk-execute" />
                     <button name="delete_database" type="object" attrs="{'invisible':[('state', 'not in', ['pending'])]}" icon="gtk-delete" />
                 </tree>
             </field>
@@ -53,7 +53,7 @@
                     <field name="expired" invisible="1"/>
                     <header>
                         <button string="Log in" name="edit_database" type="object" attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}" icon="gtk-connect" class="oe_highlight"/>
-                        <button string="Configure" name="upgrade_db" type="object" attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}" icon="gtk-execute" />
+                        <button string="Configure" name="upgrade_database" type="object" attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}" icon="gtk-execute" />
                         <button string="Delete" name="delete_database" type="object" attrs="{'invisible':['|',('state', 'not in', ['pending'])]}" icon="gtk-delete" />
                         <button string="Sync server" type="object" name="action_sync_server" icon="gtk-refresh"/>
                         <field name="state" widget="statusbar" statusbar_visible="open,pending,deleted" clickable="False"/>

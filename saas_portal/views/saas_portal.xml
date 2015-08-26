@@ -141,8 +141,9 @@
                 <form string="Server">
                     <header>
                         <!-- TODO
-                             action_create_server will ask for master password only
-                        <button string="Create Server" name="%(action_create_server)d" type="action" class="oe_highlight"/>
+                             action_create_server will ask for master password only.
+                             * https://erppeek.readthedocs.org/en/latest/api.html#erppeek.Client.create_database
+                        <button string="Create Server" name="%(action_create_server)d" type="action" class="oe_highlight" states="draft"/>
                         -->
                         <button string="Open Server" name="action_redirect_to_server" type="object" icon="gtk-connect" class="oe_highlight"/>
                         <button name="action_sync_server" type="object" string="Sync server" icon="gtk-refresh"/>

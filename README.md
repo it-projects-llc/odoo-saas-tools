@@ -29,7 +29,9 @@ Usage
 =====
 
 1. Configure Odoo installation
-   * set dbfilter or run odoo with --db-filter parameter, e.g. ^%h$
+   * set dbfilter in config file or run odoo with --db-filter parameter, e.g. ^%h$
+     * be sure, that you don't use db_name in config file and don't run odoo with -d (--database) parameter
+
    * execute commands below to allow create databases with dots in name:
 
    > cd path/to/odoo
@@ -53,7 +55,16 @@ Usage
    > 127.0.0.1	client-z.odoo.local
 
    * Redirect requests to domains above to localhost:8069 (e.g. via nginx)
-   
+     * be sure, that odoo gets host header, e.g. for nginx:
+
+     > proxy_set_header Host $host;
+
+     > proxy_set_header X-Real-IP       $remote_addr;
+
+     > proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+     > proxy_set_header X-Forwarded-Proto $scheme;
+
    * install dependencies:
      * pip install oauthlib
 

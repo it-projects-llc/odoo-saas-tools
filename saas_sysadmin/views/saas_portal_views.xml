@@ -9,8 +9,7 @@
 		    <field name="arch" type="xml">
 		        <xpath expr="/form/sheet/group/group[1]" position="after">
                     <group>
-                    	<field name="zone_id" placeholder="example.com."/>
-                    	<field name="ip_address" attrs="{'required': [('zone_id', '=', True)]}"/>
+                    	<field name="ip_address" />
                     </group>
                 </xpath>
 		    </field>

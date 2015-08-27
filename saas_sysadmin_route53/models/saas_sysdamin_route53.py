@@ -1,11 +1,17 @@
 # -*- coding: utf-8 -*-
-import boto
+import logging
+_logger = logging.getLogger(__name__)
+
+try:
+    import boto
+    from boto.route53.exception import DNSServerError
+except:
+    raise Warning('SAAS Route53 Requires the python library Boto which is not \
+    found on installation')
+    
 from openerp import models, fields, api
 from openerp.exceptions import Warning
 
-import logging
-from boto.route53.exception import DNSServerError
-_logger = logging.getLogger(__name__)
 
 def _get_route53_conn(env):
     ir_params = env['ir.config_parameter']
@@ -16,13 +22,11 @@ def _get_route53_conn(env):
     return boto.connect_route53(aws_access_key_id, aws_secret_access_key)
 
 class SaasRoute53Zone(models.Model):
-    _name = 'saas_route53.zone'
+    _name = 'saas_sysdamin.route53.zone'
     
     name = fields.Char('Domain Name', required=True)
     create_zone = fields.Boolean('Create Zone', help="True if you want zone to be created for you. Leave unchecked if zone has already been created manually")
-    zone_id = fields.Char('Zone ID')
-    
-    
+    aws_hosted_zone = fields.Char('AWS Hosted Zone')
     
     @api.model
     @api.returns('self', lambda value:value.id)
@@ -35,7 +39,7 @@ class SaasRoute53Zone(models.Model):
             res = conn.create_zone(zone_name)
             zone.write({
                        'name' : zone_name,
-                       'zone_id' : res.id, #TODO check if right
+                       'aws_hosted_zone' : res.id,  # TODO check if right
                        })
         return zone
     
@@ -49,13 +53,10 @@ class SaasRoute53Zone(models.Model):
                 zone.delete()
         return super(SaasRoute53Zone, self).unlink()
                 
-               
 class SaasPortalServer(models.Model):
     _inherit = 'saas_portal.server'
     
-    zone_id = fields.Many2one('saas_route53.zone', 'Zone ID')
-    ip_address = fields.Char('Server IP Address')    
-    
+    aws_hosted_zone = fields.Many2one('saas_sysdamin.route53.zone', 'AWS Hosted Zone')
     
     def _update_zone(self, name=None, value=None, action='add', type='a'):
         '''
@@ -65,7 +66,7 @@ class SaasPortalServer(models.Model):
         if action in ('add', 'write') and value == None:
             raise Warning('This operation requires a supplied value')
         conn = _get_route53_conn(self.env)
-        zone = conn.get_zone(self.zone_id.name)
+        zone = conn.get_zone(self.aws_hosted_zone.name)
         method = '%s_%s' % (action, type)
         if action in ('add', 'update'):
             try:
@@ -83,7 +84,7 @@ class SaasPortalServer(models.Model):
     @api.returns('self', lambda value:value.id)
     def create(self, vals):
         server = super(SaasPortalServer, self).create(vals)
-        if server.zone_id:
+        if server.aws_hosted_zone:
             server._update_zone(server.name, value=server.ip_address)            
         return server
     
@@ -91,7 +92,7 @@ class SaasPortalServer(models.Model):
     def write(self, vals):
         super(SaasPortalServer, self).write(vals)
         for server in self:
-            if server.zone_id:
+            if server.aws_hosted_zone:
                 if 'ip_address' in vals:
                     self._update_zone(server.name, value=server.ip_address, action='update')
         return True
@@ -99,7 +100,7 @@ class SaasPortalServer(models.Model):
     @api.multi
     def unlink(self):
         for server in self:
-            if server.zone_id:
+            if server.aws_hosted_zone:
                 self._update_zone(server.name, action='delete')
         super(SaasPortalServer, self).unlink()
            
@@ -108,12 +109,10 @@ class SaasPortalPlan(models.Model):
     
     @api.multi
     def create_template(self):
-        assert len(self)==1, 'This method is applied only for single record'
+        assert len(self) == 1, 'This method is applied only for single record'
         plan = self[0]
         plan.server_id._update_zone(plan.template_id.name, value=plan.server_id.name, type='cname') 
         return super(SaasPortalPlan, self).create_template()
-        
-
     
     @api.multi
     def delete_template(self):
@@ -128,7 +127,7 @@ class SaasPortalClient(models.Model):
     @api.returns('self', lambda value:value.id)
     def create(self, vals):
         client = super(SaasPortalClient, self).create(vals)
-        if client.server_id.zone_id:
+        if client.server_id.aws_hosted_zone:
             client.server_id._update_zone(client.name, value=client.server_id.name, type='cname')            
         return client
     
@@ -136,7 +135,7 @@ class SaasPortalClient(models.Model):
     def write(self, vals):        
         for client in self:
             server = self.env['saas_portal.server'].browse(vals['server_id'])
-            if 'server_id' in vals and client.server_id.zone_id and server.id != client.server_id.id:
+            if 'server_id' in vals and client.server_id.aws_hosted_zone and server.id != client.server_id.id:
                 client.server_id._update_zone(client.name, value=client.server_id.name, type='cname', action='update') 
         super(SaasPortalClient, self).write(vals)    
         return True
@@ -144,6 +143,6 @@ class SaasPortalClient(models.Model):
     @api.multi
     def unlink(self):        
         for client in self:
-          if client.server_id.zone_id:
+          if client.server_id.aws_hosted_zone:
             client.server_id._update_zone(client.name, type='cname', action='delete')  
         return super(SaasPortalClient, self).unlink()

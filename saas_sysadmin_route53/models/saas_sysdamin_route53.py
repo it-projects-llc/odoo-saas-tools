@@ -6,8 +6,8 @@ try:
     import boto
     from boto.route53.exception import DNSServerError
 except:
-    raise Warning('SAAS Route53 Requires the python library Boto which is not \
-    found on installation')
+    _logger.critical('SAAS Route53 Requires the python library Boto which is not \
+    found on your installation')
     
 from openerp import models, fields, api
 from openerp.exceptions import Warning

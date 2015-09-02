@@ -7,10 +7,8 @@
             <field name="model">saas_portal.server</field>
             <field name="inherit_id" ref="saas_sysadmin.view_server_form"/>
             <field name="arch" type="xml">
-                <field name="ip_address" position="replace">
-                    <group>
+                <field name="ip_address" position="after">
                         <field name="aws_hosted_zone" placeholder="example.com." attrs="{'readonly': [('ip_address', '=', False)]}"/>
-                    </group>
                 </field>
             </field>
         </record>

@@ -77,11 +77,13 @@ class SaasPortalServer(models.Model):
                     getattr(zone, method)(name, value)
             except Exception as e:
                 _logger.exception('Error modifying AWS hosted zone')
+                pass
         elif action == 'delete':
             try:
                 getattr(zone, method)(name)
             except Exception as e:
                 _logger.exception('Error modifying AWS hosted zone')
+                pass
         else:
             raise Warning('Supported zone operation!')
   

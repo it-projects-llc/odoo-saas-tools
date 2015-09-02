@@ -75,8 +75,13 @@ class SaasPortalServer(models.Model):
                 if e.error_code == 'InvalidChangeBatch':
                     method = method.replace('add', 'update')
                     getattr(zone, method)(name, value)
+            except Exception as e:
+                _logger.exception('Error modifying AWS hosted zone')
         elif action == 'delete':
-            getattr(zone, method)(name)
+            try:
+                getattr(zone, method)(name)
+            except Exception as e:
+                _logger.exception('Error modifying AWS hosted zone')
         else:
             raise Warning('Supported zone operation!')
   

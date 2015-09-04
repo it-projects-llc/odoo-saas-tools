@@ -35,15 +35,18 @@ class SaasServer(http.Controller):
         is_template_db = state.get('is_template_db')
         action = 'base.open_module_tree'
         access_token = post['access_token']
-        saas_oauth_provider = request.registry['ir.model.data'].xmlid_to_object(request.cr, SUPERUSER_ID, 'saas_server.saas_oauth_provider')
 
-        saas_portal_user = request.registry['res.users']._auth_oauth_rpc(request.cr, SUPERUSER_ID, saas_oauth_provider.validation_endpoint, access_token)
-        if saas_portal_user.get("error"):
-            raise Exception(saas_portal_user['error'])
         if is_template_db:
             # TODO: check access right to crete template db
-            pass
-        client_id = saas_portal_user.get('client_id')
+            client_id = post['client_id']
+            saas_portal_user = None
+        else:
+            saas_oauth_provider = request.registry['ir.model.data'].xmlid_to_object(request.cr, SUPERUSER_ID, 'saas_server.saas_oauth_provider')
+            saas_portal_user = request.registry['res.users']._auth_oauth_rpc(request.cr, SUPERUSER_ID, saas_oauth_provider.validation_endpoint, access_token)
+            client_id = saas_portal_user.get('client_id')
+            if saas_portal_user.get("error"):
+                raise Exception(saas_portal_user['error'])
+
         client_data = {'name':new_db, 'client_id': client_id, 'expiration_datetime': expiration_db}
         client = request.env['saas_server.client'].sudo().create(client_data)
         client.create_database(template_db, demo, lang)
@@ -54,6 +57,14 @@ class SaasServer(http.Controller):
             saas_portal_user = saas_portal_user,
             is_template_db = is_template_db,
             access_token = access_token)
+
+        if is_template_db:
+            res = [{
+                'name': client.name,
+                'state': client.state,
+                'client_id': client.client_id
+            }]
+            return simplejson.dumps(res)
 
         with client.registry()[0].cursor() as cr:
             client_env = api.Environment(cr, SUPERUSER_ID, request.context)

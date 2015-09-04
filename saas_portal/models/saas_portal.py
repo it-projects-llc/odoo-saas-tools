@@ -39,18 +39,18 @@ class SaasPortalServer(models.Model):
     @api.model
     def create(self, vals):
         self = super(SaasPortalServer, self).create(vals)
-        self.create_access_token()
+        self.create_access_token(self.oauth_application_id.id)
         return self
 
     @api.model
-    def create_access_token(self):
+    def create_access_token(self, oauth_application_id):
         expires = datetime.now() + timedelta(seconds=60*60)
         vals = {
             'user_id': self.env.user.id,
             'scope': 'userinfo',
             'expires': expires.strftime(DEFAULT_SERVER_DATETIME_FORMAT),
             'token': oauthlib_common.generate_token(),
-            'application_id': self.oauth_application_id.id
+            'application_id': oauth_application_id
         }
         return self.env['oauth.access_token'].create(vals)
 
@@ -254,24 +254,43 @@ class SaasPortalPlan(models.Model):
     def create_template(self):
         assert len(self)==1, 'This method is applied only for single record'
         plan = self[0]
-        addons = [x.name for x in plan.required_addons_ids]
         state = {
             'd': plan.template_id.name,
             'demo': plan.demo and 1 or 0,
-            'addons': addons,
+            'addons': [],
             'lang': plan.lang,
             'tz': plan.tz,
             'is_template_db': 1,
         }
         client_id = plan.template_id.client_id
         plan.template_id.server_id = plan.server_id
-        url = plan.server_id._request(path='/saas_server/new_database', state=state, client_id=client_id)
-        return {
-            'type': 'ir.actions.act_url',
-            'target': 'new',
-            'name': 'Create Template',
-            'url': url
-        }
+        params = plan.server_id._request_params(path='/saas_server/new_database', state=state, client_id=client_id)[0]
+
+        domain = [('application_id', '=', plan.template_id.oauth_application_id.id)]
+        access_token = self.env['oauth.access_token'].sudo().search(domain, order='id DESC', limit=1)
+        if access_token:
+            access_token = access_token[0].token
+        else:
+            token_obj = plan.server_id.create_access_token(plan.template_id.oauth_application_id.id)
+            access_token = token_obj.token
+        params.update({
+            'token_type': 'Bearer',
+            'access_token': access_token,
+            'expires_in': 3600,
+        })
+        url = '{scheme}://{saas_server}:{port}{path}?{params}'.format(scheme=plan.server_id.request_scheme,
+                                                                      saas_server=plan.server_id.name,
+                                                                      port=plan.server_id.request_port,
+                                                                      path='/saas_server/new_database',
+                                                                      params=werkzeug.url_encode(params))
+        res = requests.get(url, verify=(plan.server_id.request_scheme == 'https' and plan.server_id.verify_ssl))
+        if res.ok != True:
+            msg = """Status Code - %s
+Reason - %s
+URL - %s
+            """ % (res.status_code, res.reason, res.url)
+            raise Warning(msg)
+        return self.action_sync_server()
 
     @api.one
     def action_sync_server(self):
@@ -288,6 +307,7 @@ class SaasPortalPlan(models.Model):
     @api.multi
     def delete_template(self):
         return self[0].template_id.delete_database()
+
 
 class OauthApplication(models.Model):
     _inherit = 'oauth.application'

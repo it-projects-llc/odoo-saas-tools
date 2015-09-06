@@ -19,6 +19,7 @@ import random
 import logging
 _logger = logging.getLogger(__name__)
 
+
 class SaasPortalServer(models.Model):
     _name = 'saas_portal.server'
     _description = 'SaaS Server'
@@ -179,7 +180,6 @@ class SaasPortalPlan(models.Model):
     
     website_description = fields.Text('Website description')
     logo = fields.Binary('Logo')
-
 
     @api.one
     @api.depends('template_id.state')

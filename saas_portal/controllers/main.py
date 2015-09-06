@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from ast import literal_eval
 import openerp
-from openerp import SUPERUSER_ID
+from openerp import SUPERUSER_ID, exceptions
+from openerp.tools.translate import _
 from openerp.addons.web import http
 from openerp.addons.web.http import request
 from openerp.addons.auth_oauth.controllers import main as oauth
@@ -23,18 +24,10 @@ class SaasPortal(http.Controller):
 
     @http.route(['/saas_portal/book_then_signup'], type='http', auth='public', website=True)
     def book_then_signup(self, **post):
-        # TODO: this function should be updated (doesn't work now)
-        full_dbname = self.get_full_dbname(post.get('dbname'))
-        dbtemplate = self.get_template()
-        # FIXME: line below should be deleted. This route called book_then_signup, but work as if user already signed up
-        #organization = self.update_user_and_partner(full_dbname)
-
-        return self.create_new_database(dbtemplate, full_dbname, organization=organization)
-
-    def create_new_database(self, plan_id):
-        plan = request.env['saas_portal.plan'].sudo().browse(plan_id)
-        url = plan._create_new_database()[0]
-        return request.redirect(url)
+        dbname = self.get_full_dbname(post.get('dbname'))
+        plan = self.get_default_plan()
+        url = plan._create_new_database(dbname)[0]
+        return werkzeug.utils.redirect(url)
 
     @http.route('/saas_portal/tenant', type='http', auth='public', website=True)
     def tenant(self, **post):
@@ -76,43 +69,19 @@ class SaasPortal(http.Controller):
 
     def get_full_dbname(self, dbname):
         full_dbname = '%s.%s' % (dbname, self.get_config_parameter('base_saas_domain'))
-        return full_dbname.replace('www.', '').replace('.', '_')
+        return full_dbname.replace('www.', '')
+
+    def get_default_plan(self):
+        # TODO: how we identify a default plan?
+        plan = request.registry['saas_portal.plan']
+        plan_ids = request.registry['saas_portal.plan'].search(request.cr, SUPERUSER_ID, [('state', '=', 'confirmed')])
+        if not plan_ids:
+            raise exceptions.Warning(_('There is no plan configured'))
+        return plan.browse(request.cr, SUPERUSER_ID, plan_ids[0])
 
     def exists_database(self, dbname):
         full_dbname = self.get_full_dbname(dbname)
         return openerp.service.db.exp_db_exist(full_dbname)
-
-    def get_template(self):
-        user_model = request.registry.get('res.users')
-        user = user_model.browse(request.cr, SUPERUSER_ID, request.uid)
-        if user.plan_id and user.plan_id.state == 'confirmed':
-            return user.plan_id.template_id.name
-        return self.get_config_parameter('dbtemplate')
-
-    def update_user_and_partner(self, database):
-        user_model = request.registry.get('res.users')
-        user = user_model.browse(request.cr, SUPERUSER_ID, request.uid)
-        partner_model = request.registry.get('res.partner')
-        organization = user.organization or database.split('_')[0]
-        wals = {
-            'name': user.organization,
-            'is_company': True,
-            'country_id': user.country_id and user.country_id.id,
-            'email': user.login
-        }
-        try:
-            if hasattr(partner_model, user.plan_id.role_id.code):
-                wals[user.plan_id.role_id.code] = True
-        except:
-            pass
-        pid = partner_model.create(request.cr, SUPERUSER_ID, wals)
-        vals = {
-            'database': database,
-            'email': user.login,
-            'parent_id': pid
-        }
-        user_model.write(request.cr, SUPERUSER_ID, user.id, vals)
-        return organization
 
     @http.route(['/publisher-warranty/'], type='http', auth='public', website=True)
     def publisher_warranty(self, **post):
@@ -122,6 +91,7 @@ class SaasPortal(http.Controller):
             arg0 = literal_eval(arg0)
         messages = []
         return simplejson.dumps({'messages':messages})
+
 
 class OAuthLogin(oauth.OAuthLogin):
 

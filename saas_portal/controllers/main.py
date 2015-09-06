@@ -5,7 +5,6 @@ from openerp import SUPERUSER_ID, exceptions
 from openerp.tools.translate import _
 from openerp.addons.web import http
 from openerp.addons.web.http import request
-from openerp.addons.auth_oauth.controllers import main as oauth
 import werkzeug
 import simplejson
 
@@ -22,45 +21,12 @@ class SaasPortal(http.Controller):
             return {"error": {"msg": "database already taken"}}
         return {"ok": 1}
 
-    @http.route(['/saas_portal/book_then_signup'], type='http', auth='public', website=True)
-    def book_then_signup(self, **post):
+    @http.route(['/saas_portal/add_new_client'], type='http', auth='public', website=True)
+    def add_new_client(self, **post):
         dbname = self.get_full_dbname(post.get('dbname'))
         plan = self.get_default_plan()
         url = plan._create_new_database(dbname)[0]
         return werkzeug.utils.redirect(url)
-
-    @http.route('/saas_portal/tenant', type='http', auth='public', website=True)
-    def tenant(self, **post):
-        if request.uid == SUPERUSER_ID:
-            return werkzeug.utils.redirect('/web')
-        user = request.registry.get('res.users').browse(request.cr,
-                                                        SUPERUSER_ID,
-                                                        request.uid)
-        db = user.database
-        registry = openerp.modules.registry.RegistryManager.get(db)
-        with registry.cursor() as cr:
-            to_search = [('login', '=', user.login)]
-            fields = ['oauth_provider_id', 'oauth_access_token']
-            data = registry['res.users'].search_read(cr, SUPERUSER_ID,
-                                                     to_search, fields)
-        if not data:
-            return werkzeug.utils.redirect('/web')
-        params = {
-            'access_token': data[0]['oauth_access_token'],
-            'state': simplejson.dumps({
-                'd': db,
-                'p': data[0]['oauth_provider_id'][0]
-            }),
-        }
-        scheme = request.httprequest.scheme
-        domain = db.replace('_', '.')
-        params = werkzeug.url_encode(params)
-        return werkzeug.utils.redirect('{scheme}://{domain}/auth_oauth/signin?{params}'.format(scheme=scheme, domain=domain, params=params))
-
-    def get_provider(self):
-        imd = request.registry['ir.model.data']
-        return imd.xmlid_to_object(request.cr, SUPERUSER_ID,
-                                   'saas_server.saas_oauth_provider')
 
     def get_config_parameter(self, param):
         config = request.registry['ir.config_parameter']
@@ -91,28 +57,3 @@ class SaasPortal(http.Controller):
             arg0 = literal_eval(arg0)
         messages = []
         return simplejson.dumps({'messages':messages})
-
-
-class OAuthLogin(oauth.OAuthLogin):
-
-    @http.route()
-    def web_login(self, *args, **kw):
-        if kw.get('login', False):
-            user = request.registry.get('res.users')
-            domain = [('login', '=', kw['login'])]
-            fields = ['share', 'database']
-            data = user.search_read(request.cr, SUPERUSER_ID, domain, fields)
-            if data and data[0]['share'] and data[0]['database']:
-                kw['redirect'] = '/saas_portal/tenant'
-        return super(OAuthLogin, self).web_login(*args, **kw)
-
-    @http.route()
-    def web_auth_reset_password(self, *args, **kw):
-        if kw.get('login', False):
-            user = request.registry.get('res.users')
-            domain = [('login', '=', kw['login'])]
-            fields = ['share', 'database']
-            data = user.search_read(request.cr, SUPERUSER_ID, domain, fields)
-            if data and data[0]['share'] and data[0]['database']:
-                kw['redirect'] = '/saas_portal/tenant'
-        return super(OAuthLogin, self).web_auth_reset_password(*args, **kw)

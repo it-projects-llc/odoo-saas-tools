@@ -24,8 +24,8 @@ class SaasPortal(http.Controller):
     @http.route(['/saas_portal/add_new_client'], type='http', auth='public', website=True)
     def add_new_client(self, **post):
         dbname = self.get_full_dbname(post.get('dbname'))
-        plan = self.get_default_plan()
-        url = plan._create_new_database(dbname)[0]
+        plan = self.get_plan(post.get('plan_id'))
+        url = plan.create_new_database(dbname)[0]
         return werkzeug.utils.redirect(url)
 
     def get_config_parameter(self, param):
@@ -37,13 +37,16 @@ class SaasPortal(http.Controller):
         full_dbname = '%s.%s' % (dbname, self.get_config_parameter('base_saas_domain'))
         return full_dbname.replace('www.', '')
 
-    def get_default_plan(self):
-        # TODO: how we identify a default plan?
+    def get_plan(self, plan_id=None):
         plan = request.registry['saas_portal.plan']
-        plan_ids = request.registry['saas_portal.plan'].search(request.cr, SUPERUSER_ID, [('state', '=', 'confirmed')])
-        if not plan_ids:
-            raise exceptions.Warning(_('There is no plan configured'))
-        return plan.browse(request.cr, SUPERUSER_ID, plan_ids[0])
+        if not plan_id:
+            domain = [('state', '=', 'confirmed')]
+            plan_ids = request.registry['saas_portal.plan'].search(request.cr, SUPERUSER_ID, domain)
+            if plan_ids:
+                plan_id = plan_ids[0]
+            else:
+                raise exceptions.Warning(_('There is no plan configured'))
+        return plan.browse(request.cr, SUPERUSER_ID, plan_id)
 
     def exists_database(self, dbname):
         full_dbname = self.get_full_dbname(dbname)

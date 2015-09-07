@@ -198,7 +198,7 @@ class SaasPortalPlan(models.Model):
         return vals
 
     @api.one
-    def _create_new_database(self, dbname=None, client_id=None, partner_id=None):
+    def create_new_database(self, dbname=None, client_id=None, partner_id=None):
         server = self.server_id
         if not server:
             server = self.env['saas_portal.server'].get_saas_server()

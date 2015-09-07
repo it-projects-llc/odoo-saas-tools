@@ -4,7 +4,7 @@
     'author': 'Cesar Lage',
     'category': 'SaaS',
     'website': 'https://it-projects.info',
-    'depends': ['saas_portal'],
+    'depends': ['auth_signup', 'saas_portal'],
     'data': ['views/signup.xml'],
     'installable': True,
 

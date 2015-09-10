@@ -133,14 +133,6 @@ class SaasServerClient(models.Model):
         if not is_template_db:
             oauth_provider.client_id = client_id
 
-        # Update company with organization
-        #FIXME
-        #organization = self._context.get('o')
-        #vals = {'name': organization}
-        #client_env['res.company'].browse(1).write(vals)
-        #partner = client_env['res.company'].browse(1)
-        #partner.write({'email': saas_portal_user['email']})
-
         # prepare users
         OWNER_TEMPLATE_LOGIN = 'owner_template'
         user = None
@@ -149,6 +141,9 @@ class SaasServerClient(models.Model):
                 'login': OWNER_TEMPLATE_LOGIN,
                 'name': 'NAME',
                 'email': 'onwer-email@example.com',
+                'oauth_provider_id': oauth_provider.id,
+                'oauth_uid': SUPERUSER_ID,
+                'oauth_access_token': access_token
             })
         else:
             domain = [('login', '=', OWNER_TEMPLATE_LOGIN)]
@@ -159,17 +154,16 @@ class SaasServerClient(models.Model):
             if res:
                 # user already exists (e.g. administrator)
                 user = res[0]
-        if not user:
-            user = client_env['res.users'].browse(SUPERUSER_ID)
-        user.write({
-            'login': saas_portal_user['email'],
-            'name': saas_portal_user['name'],
-            'email': saas_portal_user['email'],
-            #'parent_id': partner.id,
-            'oauth_provider_id': oauth_provider.id,
-            'oauth_uid': saas_portal_user['user_id'],
-            'oauth_access_token': access_token
-        })
+            if not user:
+                user = client_env['res.users'].browse(SUPERUSER_ID)
+            user.write({
+                'login': saas_portal_user['email'],
+                'name': saas_portal_user['name'],
+                'email': saas_portal_user['email'],
+                'oauth_provider_id': oauth_provider.id,
+                'oauth_uid': saas_portal_user['user_id'],
+                'oauth_access_token': access_token
+            })
 
 
     @api.model

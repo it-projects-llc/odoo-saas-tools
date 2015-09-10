@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <record model="ir.ui.view" id="view_server_form">
+            <field name="name">saas_portal.server.form</field>
+            <field name="model">saas_portal.server</field>
+            <field name="inherit_id" ref="saas_portal.view_server_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="/form/sheet/group/group[1]" position="after">
+                    <group name="sysadmin" string="System Admin Settings">
+                        <field name="ip_address" />
+                    </group>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</openerp>

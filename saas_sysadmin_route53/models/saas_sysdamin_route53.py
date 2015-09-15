@@ -141,9 +141,11 @@ class SaasPortalClient(models.Model):
     @api.multi
     def write(self, vals):        
         for client in self:
-            server = self.env['saas_portal.server'].browse(vals['server_id'])
-            if 'server_id' in vals and client.server_id.aws_hosted_zone and server.id != client.server_id.id:
-                client.server_id._update_zone(client.name, value=client.server_id.name, type='cname', action='update') 
+            if 'server_id' in vals:
+                server = self.env['saas_portal.server'].browse(vals['server_id'])
+                if client.server_id.aws_hosted_zone and server.id != client.server_id.id:
+                    client.server_id._update_zone(client.name, value=client.server_id.name, 
+                                                  type='cname', action='update') 
         super(SaasPortalClient, self).write(vals)    
         return True
     

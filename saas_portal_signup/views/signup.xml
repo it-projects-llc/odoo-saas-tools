@@ -2,7 +2,7 @@
 <openerp>
     <data>
 
-        <template id="saas_server.signup_fields" inherit_id="auth_signup.fields" >
+        <template id="saas_portal.signup_fields" inherit_id="auth_signup.fields" >
             <xpath expr="//div[@class='form-group field-name']" position="after">
 
                <t t-if="reset == false">
@@ -15,14 +15,6 @@
                                <option t-att-value="plan.id"><t t-esc="plan.name"/></option>
                            </t>
                        </select>
-                   </div>
-               </t>
-               <t t-if="reset == false">
-                   <div class="form-group field-name">
-                       <label for="organization" class="control-label">Organization</label>
-                       <input type="text" name="organization" t-att-value="organization" id="organization" class="form-control" placeholder="e.g. Reserva Inc."
-                            required="required" t-att-readonly="'readonly' if only_passwords else None"
-                            t-att-autofocus="'autofocus' if login and not only_passwords else None" />
                    </div>
                </t>
                <t t-if="reset == false">

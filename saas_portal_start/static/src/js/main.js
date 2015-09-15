@@ -77,7 +77,7 @@ $(document).ready(function () {
                         browser_offset += _.str.sprintf("%02d", Math.abs(offset / 60));
                         browser_offset += _.str.sprintf("%02d", Math.abs(offset % 60));
 
-                        var new_url = _.str.sprintf('/saas_portal/book_then_signup?lang=%s&dbname=%s&tz=%s&hosting=%s&app=%s',
+                        var new_url = _.str.sprintf('/saas_portal/add_new_client?lang=%s&dbname=%s&tz=%s&hosting=%s&app=%s',
                                                     lang, db_name, browser_offset, hosting, app);
                         window.location = new_url;
                     }

@@ -19,6 +19,7 @@ import random
 import logging
 _logger = logging.getLogger(__name__)
 
+
 class SaasPortalServer(models.Model):
     _name = 'saas_portal.server'
     _description = 'SaaS Server'
@@ -180,7 +181,6 @@ class SaasPortalPlan(models.Model):
     website_description = fields.Text('Website description')
     logo = fields.Binary('Logo')
 
-
     @api.one
     @api.depends('template_id.state')
     def _get_state(self):
@@ -198,7 +198,7 @@ class SaasPortalPlan(models.Model):
         return vals
 
     @api.one
-    def _create_new_database(self, dbname=None, client_id=None, partner_id=None):
+    def create_new_database(self, dbname=None, client_id=None, partner_id=None):
         server = self.server_id
         if not server:
             server = self.env['saas_portal.server'].get_saas_server()

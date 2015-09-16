@@ -18,7 +18,7 @@ class SaasPortalClient(models.Model):
     @api.multi
     def delete_database(self):
         self._check_termination_protection()
-        return self._request('/saas_server/delete_database')
+        return super(SaasPortalClient, self).delete_database()
     
     @api.multi
     def unlink(self):

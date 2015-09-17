@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>        
+        <record id="view_clients_form" model="ir.ui.view">
+            <field name="name">saas_portal.client.form</field>
+            <field name="model">saas_portal.client</field>
+            <field name="inherit_id" ref="saas_portal.view_clients_form" />
+            <field name="arch" type="xml">
+                <button name="action_sync_server" position="after">
+                    <button string="Backup DB" name="action_backup" type="object" attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}" icon="gtk-execute" />
+                </button>
+                <field name="expiration_datetime" position="after">
+                   <field name="backup"/>
+               </field>
+            </field>
+        </record>
+    </data>
+</openerp>

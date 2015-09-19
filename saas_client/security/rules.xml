@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
-    <data>
+    <data  noupdate="1">
     	
-		<record id="not_admin_tenant_rule" model="ir.rule">
+	<record id="not_admin_tenant_rule" model="ir.rule">
 	        <field name="name">Only admin can edit admin</field>
 	        <field name="model_id" ref="base.model_res_users"/>
 			<field name="global" eval="1" />

@@ -20,6 +20,7 @@
 ##############################################################################
 import openerp
 from openerp import models, fields, api, SUPERUSER_ID as SI, exceptions
+from openerp.addons.base.res.res_users import name_selection_groups, name_boolean_group
 from openerp.tools import config
 from openerp.tools.translate import _
 from openerp.addons.saas_utils import connector
@@ -75,3 +76,17 @@ class ResUsers(models.Model):
             dependencies.append(dep.depend_id.id)
             dependencies += self._get_dependencies(dep.depend_id)
         return dependencies
+
+    def fields_get(self, cr, uid, allfields=None, context=None, write_access=True):
+        '''
+        lets stop erp managers from having access to the technical access checkbox
+        '''
+        res = super(ResUsers, self).fields_get(cr, uid, allfields, context, write_access)
+        # add reified groups fields
+        for app, kind, gs in self.pool['res.groups'].get_groups_by_application(cr, uid, context):
+            for g in gs:
+                if g.name in ('Technical Features', 'Multi Companies', 'Show Modules Menu') and not uid == SI:
+                    # lets first delete the addition made by the previous before skipping
+                    res[name_boolean_group(g.id)].update({'invisible' : True})
+                    
+        return res   

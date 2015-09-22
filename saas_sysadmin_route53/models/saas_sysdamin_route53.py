@@ -118,13 +118,16 @@ class SaasPortalPlan(models.Model):
     def create_template(self):
         assert len(self) == 1, 'This method is applied only for single record'
         plan = self[0]
-        plan.server_id._update_zone(plan.template_id.name, value=plan.server_id.name, type='cname') 
+        if plan.server_id.aws_hosted_zone:
+            plan.server_id._update_zone(plan.template_id.name, value=plan.server_id.name, type='cname') 
         return super(SaasPortalPlan, self).create_template()
     
     @api.multi
     def delete_template(self):
         super(SaasPortalPlan, self).delete_template()
-        self[0].template_id.server_id._update_zone(self[0].template_id.name, type='cname', action='delete')
+        plan = self[0]
+        if plan.server_id.aws_hosted_zone:
+            plan.server_id._update_zone(plan.template_id.name, type='cname', action='delete')
         return True         
     
 class SaasPortalClient(models.Model):

@@ -28,6 +28,7 @@ class SaasServer(http.Controller):
         new_db = state.get('d')
         expiration_db = state.get('e')
         template_db = state.get('db_template')
+        disable_mail_server = state.get('disable_mail_server', False)
         demo = state.get('demo')
         lang = state.get('lang', 'en_US')
         tz = state.get('tz')
@@ -51,6 +52,8 @@ class SaasServer(http.Controller):
         client = request.env['saas_server.client'].sudo().create(client_data)
         client.create_database(template_db, demo, lang)
         client.install_addons(addons=addons, is_template_db=is_template_db)
+        if disable_mail_server:
+            client.disable_mail_servers()
         client.update_registry()
         client.prepare_database(
             tz=tz,

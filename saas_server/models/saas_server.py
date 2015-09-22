@@ -71,6 +71,20 @@ class SaasServerClient(models.Model):
         with self.registry()[0].cursor() as cr:
             env = api.Environment(cr, SUPERUSER_ID, self._context)
             self._install_addons(env, addons)
+    @api.one
+    def disable_mail_servers(self):
+        '''
+        disables mailserver on db to stop it from sending and receiving mails
+        '''
+        # let's disable incoming mail servers
+        incoming_mail_servers = self.env['fetchmail.server'].search([])
+        if len(incoming_mail_servers):
+            incoming_mail_servers.write({'active': False})
+            
+        # let's disable outgoing mailservers too
+        outgoing_mail_servers = self.env['ir.mail_server'].search([])
+        if len(outgoing_mail_servers):
+            outgoing_mail_servers.write({'active': False})
 
     @api.one
     def _install_addons(self, client_env, addons):

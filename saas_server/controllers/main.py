@@ -37,7 +37,7 @@ class SaasServer(http.Controller):
         access_token = post['access_token']
 
         if is_template_db:
-            # TODO: check access right to crete template db
+            # TODO: check access right to create template db
             client_id = post['client_id']
             saas_portal_user = None
         else:

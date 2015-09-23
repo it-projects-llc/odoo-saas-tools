@@ -442,3 +442,42 @@ class SaasPortalClient(models.Model):
             #    user_model.unlink(cr, uid, user_ids)
             #openerp.service.db.exp_drop(obj.name)
         return super(SaasPortalClient, self).unlink(cr, uid, ids, context)
+
+    @api.one
+    def duplicate_database(self, dbname=None, partner_id=None, expiration=None):
+        server = self.server_id
+        if not server:
+            server = self.env['saas_portal.server'].get_saas_server()
+
+        server.action_sync_server()
+
+        vals = {'name': dbname,
+                'server_id': server.id,
+                'plan_id': self.plan_id.id,
+                'partner_id': partner_id or self.partner_id.id,
+                }
+        if expiration:
+            now = datetime.now()
+            delta = timedelta(hours=expiration)
+            vals['expiration_datetime'] = (now + delta).strftime(DEFAULT_SERVER_DATETIME_FORMAT)
+
+        client = self.env['saas_portal.client'].create(vals)
+        client_id = client.client_id
+
+        scheme = server.request_scheme
+        port = server.request_port
+        state = {
+            'd': client.name,
+            'e': client.expiration_datetime,
+            'r': '%s://%s:%s/web' % (scheme, port, client.name),
+        }
+        sstate.update({'db_template': self.name,
+                      'disable_mail_server' : True})
+        scope = ['userinfo', 'force_login', 'trial', 'skiptheuse']
+        url = server._request(path='/saas_server/new_database',
+                              scheme=scheme,
+                              port=port,
+                              state=state,
+                              client_id=client_id,
+                              scope=scope,)[0]
+        return url

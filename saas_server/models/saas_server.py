@@ -168,6 +168,8 @@ class SaasServerClient(models.Model):
                 'oauth_access_token': access_token
             })
 
+            oauth_provider.write({'enabled': True})
+
 
     @api.model
     def update_all(self):

@@ -155,6 +155,9 @@ class SaasServerClient(models.Model):
                 'login': OWNER_TEMPLATE_LOGIN,
                 'name': 'NAME',
                 'email': 'onwer-email@example.com',
+            })
+
+            client_env['res.users'].browse(SUPERUSER_ID).write({
                 'oauth_provider_id': oauth_provider.id,
                 'oauth_uid': SUPERUSER_ID,
                 'oauth_access_token': access_token

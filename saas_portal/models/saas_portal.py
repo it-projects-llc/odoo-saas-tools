@@ -228,7 +228,7 @@ class SaasPortalPlan(models.Model):
         state = {
             'd': client.name,
             'e': client.expiration_datetime,
-            'r': '%s://%s:%s/web' % (scheme, port, client.name),
+            'r': '%s://%s:%s/web' % (scheme, client.name, port),
         }
         if self.template_id:
             state.update({'db_template': self.template_id.name})
@@ -366,7 +366,6 @@ class SaasPortalDatabase(models.Model):
         }
         url = r.server_id._request(path=path, state=state, client_id=r.client_id)
         return self._proceed_url(url)
-
 
     @api.multi
     def edit_database(self):

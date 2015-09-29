@@ -167,7 +167,7 @@ class SaasServerClient(models.Model):
             res = client_env['res.users'].search(domain)
             if res:
                 user = res[0]
-            res = client_env['res.users'].search([('login', '=', saas_portal_user['email'])])
+            res = client_env['res.users'].search([('oauth_uid', '=', saas_portal_user['user_id'])])
             if res:
                 # user already exists (e.g. administrator)
                 user = res[0]

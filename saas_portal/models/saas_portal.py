@@ -471,7 +471,7 @@ class SaasPortalClient(models.Model):
             'e': client.expiration_datetime,
             'r': '%s://%s:%s/web' % (scheme, port, client.name),
         }
-        sstate.update({'db_template': self.name,
+        state.update({'db_template': self.name,
                       'disable_mail_server' : True})
         scope = ['userinfo', 'force_login', 'trial', 'skiptheuse']
         url = server._request(path='/saas_server/new_database',

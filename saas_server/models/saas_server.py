@@ -71,6 +71,20 @@ class SaasServerClient(models.Model):
         with self.registry()[0].cursor() as cr:
             env = api.Environment(cr, SUPERUSER_ID, self._context)
             self._install_addons(env, addons)
+    @api.one
+    def disable_mail_servers(self):
+        '''
+        disables mailserver on db to stop it from sending and receiving mails
+        '''
+        # let's disable incoming mail servers
+        incoming_mail_servers = self.env['fetchmail.server'].search([])
+        if len(incoming_mail_servers):
+            incoming_mail_servers.write({'active': False})
+            
+        # let's disable outgoing mailservers too
+        outgoing_mail_servers = self.env['ir.mail_server'].search([])
+        if len(outgoing_mail_servers):
+            outgoing_mail_servers.write({'active': False})
 
     @api.one
     def _install_addons(self, client_env, addons):
@@ -133,14 +147,6 @@ class SaasServerClient(models.Model):
         if not is_template_db:
             oauth_provider.client_id = client_id
 
-        # Update company with organization
-        #FIXME
-        #organization = self._context.get('o')
-        #vals = {'name': organization}
-        #client_env['res.company'].browse(1).write(vals)
-        #partner = client_env['res.company'].browse(1)
-        #partner.write({'email': saas_portal_user['email']})
-
         # prepare users
         OWNER_TEMPLATE_LOGIN = 'owner_template'
         user = None
@@ -150,26 +156,31 @@ class SaasServerClient(models.Model):
                 'name': 'NAME',
                 'email': 'onwer-email@example.com',
             })
+
+            client_env['res.users'].browse(SUPERUSER_ID).write({
+                'oauth_provider_id': oauth_provider.id,
+                'oauth_uid': SUPERUSER_ID,
+                'oauth_access_token': access_token
+            })
         else:
             domain = [('login', '=', OWNER_TEMPLATE_LOGIN)]
             res = client_env['res.users'].search(domain)
             if res:
                 user = res[0]
-            res = client_env['res.users'].search([('login', '=', saas_portal_user['email'])])
+            res = client_env['res.users'].search([('oauth_uid', '=', saas_portal_user['user_id'])])
             if res:
                 # user already exists (e.g. administrator)
                 user = res[0]
-        if not user:
-            user = client_env['res.users'].browse(SUPERUSER_ID)
-        user.write({
-            'login': saas_portal_user['email'],
-            'name': saas_portal_user['name'],
-            'email': saas_portal_user['email'],
-            #'parent_id': partner.id,
-            'oauth_provider_id': oauth_provider.id,
-            'oauth_uid': saas_portal_user['user_id'],
-            'oauth_access_token': access_token
-        })
+            if not user:
+                user = client_env['res.users'].browse(SUPERUSER_ID)
+            user.write({
+                'login': saas_portal_user['email'],
+                'name': saas_portal_user['name'],
+                'email': saas_portal_user['email'],
+                'oauth_provider_id': oauth_provider.id,
+                'oauth_uid': saas_portal_user['user_id'],
+                'oauth_access_token': access_token
+            })
 
 
     @api.model

@@ -6,7 +6,7 @@
     'website': 'https://it-projects.info',
     'depends': ['saas_server'],
     'data': [
-        'data/saas_portal_autodelete.xml',
+        'data/ir_cron.xml',
         ],
     'installable': True,
 }

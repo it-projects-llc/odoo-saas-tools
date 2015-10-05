@@ -19,6 +19,7 @@ import random
 import logging
 _logger = logging.getLogger(__name__)
 
+
 class SaasPortalServer(models.Model):
     _name = 'saas_portal.server'
     _description = 'SaaS Server'
@@ -39,18 +40,18 @@ class SaasPortalServer(models.Model):
     @api.model
     def create(self, vals):
         self = super(SaasPortalServer, self).create(vals)
-        self.create_access_token()
+        self.create_access_token(self.oauth_application_id.id)
         return self
 
     @api.model
-    def create_access_token(self):
+    def create_access_token(self, oauth_application_id):
         expires = datetime.now() + timedelta(seconds=60*60)
         vals = {
             'user_id': self.env.user.id,
             'scope': 'userinfo',
             'expires': expires.strftime(DEFAULT_SERVER_DATETIME_FORMAT),
             'token': oauthlib_common.generate_token(),
-            'application_id': self.oauth_application_id.id
+            'application_id': oauth_application_id
         }
         return self.env['oauth.access_token'].create(vals)
 
@@ -180,7 +181,6 @@ class SaasPortalPlan(models.Model):
     website_description = fields.Text('Website description')
     logo = fields.Binary('Logo')
 
-
     @api.one
     @api.depends('template_id.state')
     def _get_state(self):
@@ -198,7 +198,7 @@ class SaasPortalPlan(models.Model):
         return vals
 
     @api.one
-    def _create_new_database(self, dbname=None, client_id=None, partner_id=None):
+    def create_new_database(self, dbname=None, client_id=None, partner_id=None):
         server = self.server_id
         if not server:
             server = self.env['saas_portal.server'].get_saas_server()
@@ -228,7 +228,7 @@ class SaasPortalPlan(models.Model):
         state = {
             'd': client.name,
             'e': client.expiration_datetime,
-            'r': '%s://%s:%s/web' % (scheme, port, client.name),
+            'r': '%s://%s:%s/web' % (scheme, client.name, port),
         }
         if self.template_id:
             state.update({'db_template': self.template_id.name})
@@ -254,24 +254,43 @@ class SaasPortalPlan(models.Model):
     def create_template(self):
         assert len(self)==1, 'This method is applied only for single record'
         plan = self[0]
-        addons = [x.name for x in plan.required_addons_ids]
         state = {
             'd': plan.template_id.name,
             'demo': plan.demo and 1 or 0,
-            'addons': addons,
+            'addons': [],
             'lang': plan.lang,
             'tz': plan.tz,
             'is_template_db': 1,
         }
         client_id = plan.template_id.client_id
         plan.template_id.server_id = plan.server_id
-        url = plan.server_id._request(path='/saas_server/new_database', state=state, client_id=client_id)
-        return {
-            'type': 'ir.actions.act_url',
-            'target': 'new',
-            'name': 'Create Template',
-            'url': url
-        }
+        params = plan.server_id._request_params(path='/saas_server/new_database', state=state, client_id=client_id)[0]
+
+        domain = [('application_id', '=', plan.template_id.oauth_application_id.id)]
+        access_token = self.env['oauth.access_token'].sudo().search(domain, order='id DESC', limit=1)
+        if access_token:
+            access_token = access_token[0].token
+        else:
+            token_obj = plan.server_id.create_access_token(plan.template_id.oauth_application_id.id)
+            access_token = token_obj.token
+        params.update({
+            'token_type': 'Bearer',
+            'access_token': access_token,
+            'expires_in': 3600,
+        })
+        url = '{scheme}://{saas_server}:{port}{path}?{params}'.format(scheme=plan.server_id.request_scheme,
+                                                                      saas_server=plan.server_id.name,
+                                                                      port=plan.server_id.request_port,
+                                                                      path='/saas_server/new_database',
+                                                                      params=werkzeug.url_encode(params))
+        res = requests.get(url, verify=(plan.server_id.request_scheme == 'https' and plan.server_id.verify_ssl))
+        if res.ok != True:
+            msg = """Status Code - %s
+Reason - %s
+URL - %s
+            """ % (res.status_code, res.reason, res.url)
+            raise Warning(msg)
+        return self.action_sync_server()
 
     @api.one
     def action_sync_server(self):
@@ -288,6 +307,7 @@ class SaasPortalPlan(models.Model):
     @api.multi
     def delete_template(self):
         return self[0].template_id.delete_database()
+
 
 class OauthApplication(models.Model):
     _inherit = 'oauth.application'
@@ -346,7 +366,6 @@ class SaasPortalDatabase(models.Model):
         }
         url = r.server_id._request(path=path, state=state, client_id=r.client_id)
         return self._proceed_url(url)
-
 
     @api.multi
     def edit_database(self):
@@ -422,3 +441,42 @@ class SaasPortalClient(models.Model):
             #    user_model.unlink(cr, uid, user_ids)
             #openerp.service.db.exp_drop(obj.name)
         return super(SaasPortalClient, self).unlink(cr, uid, ids, context)
+
+    @api.one
+    def duplicate_database(self, dbname=None, partner_id=None, expiration=None):
+        server = self.server_id
+        if not server:
+            server = self.env['saas_portal.server'].get_saas_server()
+
+        server.action_sync_server()
+
+        vals = {'name': dbname,
+                'server_id': server.id,
+                'plan_id': self.plan_id.id,
+                'partner_id': partner_id or self.partner_id.id,
+                }
+        if expiration:
+            now = datetime.now()
+            delta = timedelta(hours=expiration)
+            vals['expiration_datetime'] = (now + delta).strftime(DEFAULT_SERVER_DATETIME_FORMAT)
+
+        client = self.env['saas_portal.client'].create(vals)
+        client_id = client.client_id
+
+        scheme = server.request_scheme
+        port = server.request_port
+        state = {
+            'd': client.name,
+            'e': client.expiration_datetime,
+            'r': '%s://%s:%s/web' % (scheme, port, client.name),
+        }
+        state.update({'db_template': self.name,
+                      'disable_mail_server' : True})
+        scope = ['userinfo', 'force_login', 'trial', 'skiptheuse']
+        url = server._request(path='/saas_server/new_database',
+                              scheme=scheme,
+                              port=port,
+                              state=state,
+                              client_id=client_id,
+                              scope=scope,)[0]
+        return url

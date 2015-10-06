@@ -1,0 +1,95 @@
+#rootwizard {
+    border: solid 1px;
+    border-radius: 6px;
+    width: 90%;
+    max-width: 800px;
+    margin: auto;
+}
+
+.tab-pane {
+    margin: 0 15px;
+}
+
+.tab-pane .tab-title {
+    border-top-right-radius: 6px;
+    border-top-left-radius: 6px;
+    border-bottom: solid 1px;
+}
+
+.tab-pane .tab-title a.tab-prev {
+    margin: 1%;
+}
+
+.tab-pane .tab-body {
+    padding: 12px;
+}
+
+.tab-body .plan_choice .plan_inner {
+    border: solid 1px;
+    border-radius: 6px;
+}
+
+.tab-body .plan_choice .plan_inner img {
+    max-width: 100%;
+    height: auto;
+    min-height: 50px;
+}
+
+.tab-body .text-raw {
+    border: solid 1px;
+    padding: 0 30px;
+    margin: 24px;
+    text-align: left;
+}
+
+.tab-body .form-group .control-label {
+    padding-right: 3px;
+}
+
+.tab-body .form-group div.col-xs-9 {
+    padding-left: 3px;
+}
+
+.tab-body .addon_choice .addon_btn:hover {
+    text-decoration: none;
+}
+
+.tab-body .addon_choice .addon_btn.selected .addon-inner {
+    border: solid 1px;
+    border-radius: 6px;
+}
+
+.tab-body .addon_choice .addon-inner .addon-logo {
+    height: 80px;
+    margin: 12px 6px;
+}
+
+.tab-body .addon_choice .addon-inner .addon-logo img {
+    height: 100%;
+    width: auto;
+}
+
+.tab-body .addon_choice .addon-inner .addon-data {
+    height: 120px;
+    margin:6px;
+}
+
+.tab-body .addon_choice .addon_btn.selected .addon-inner .addon-data {
+    height: 118px;
+}
+
+.tab-pane .tab-actions {
+    border-top: dashed 1px;
+    padding: 12px;
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
+
+.tab-pane .tab-actions .tab-prev {
+    float: left;
+}
+
+.tab-pane .tab-actions button,
+.tab-pane .tab-actions .tab-next {
+    float: right;
+}

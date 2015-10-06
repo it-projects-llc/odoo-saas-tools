@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <template id="assets_frontend" inherit_id="website.assets_frontend"
+                  name="saas portal assets">
+            <xpath expr="." position="inside">
+                <link rel='stylesheet'
+                      href='/saas_portal_start_wizard/static/src/css/wizard.css'
+                      t-ignore="true"/>
+                <script type='text/javascript'
+                        src='/saas_portal_start_wizard/static/src/js/wizard.js'/>
+            </xpath>
+		</template>
+
+        <template id="page_tpl">
+            <div class="tab-pane row" t-att-id="tab_id">
+                <div class="tab-title row bg-primary">
+                    <h1><t t-esc="tab_title"/></h1>
+                </div>
+
+                <div class="tab-body row bg-info">
+                    <t t-raw="0"/>
+                </div>
+
+                <div class="tab-actions row bg-primary">
+                    <t t-set="prev_label" t-value="'Back'" />
+                    <t t-set="next_label" t-value="'Continue'" />
+                    <t t-if="custom_next">
+                        <t t-set="next_label" t-value="custom_next"/>
+                    </t>
+
+                    <t t-set="show_next" t-value="True" />
+                    <t t-if="hide_next">
+                        <t t-set="show_next" t-value="False"/>
+                    </t>
+
+                    <a t-att-href="prev_page"
+                       class="tab-prev btn btn-warning">
+                        <t t-esc="prev_label" />
+                    </a>
+
+                    <t t-if="show_next">
+                        <a t-att-href="next_page"
+                           class="tab-next btn btn-success">
+                            <t t-esc="next_label"/>
+                        </a>
+                    </t>
+                    <t t-if="show_submit">
+                        <button type="submit" id="wizard-submit"
+                                class="btn btn-success">
+                            Launch tenant
+                        </button>
+                    </t>
+                </div>
+            </div>
+        </template>
+
+		<template id="plan_tpl">
+			<div class="plan_choice col-sm-6 col-lg-4 mb16">
+                <a class="tab-next" t-att-href="next_page"
+                   t-att-data-planid="plan['id']">
+                    <div class="plan_inner bg-primary">
+                        <div class="plan-logo">
+                            <img t-att-src="plan['logo']" />
+                        </div>
+                        <div class="plan-data">
+                            <h3 class="plan-name">
+                                <t t-esc="plan['name']"/>
+                            </h3>
+                            <p class="mt4 text-muted">
+                                <t t-esc="plan['desc']"/>
+                            </p>
+                        </div>
+                    </div>
+                </a>
+			</div>
+		</template>
+
+        <template id="page_plan">
+            <t t-set="tab_id" t-value="'tab1'"/>
+            <t t-set="prev_page" t-value="'/page/start'"/>
+            <t t-set="tab_title" t-value="'Choose a Plan'"/>
+            <t t-set="hide_next" t-value="True"/>
+            <t t-set="next_page" t-value="'#tab3'"/>
+            <t t-if="terms">
+                <t t-set="next_page" t-value="'#tab2'"/>
+            </t>
+
+            <t t-call="saas_portal_start_wizard.page_tpl">
+                <t t-foreach="plans" t-as="plan">
+                    <t t-call="saas_portal_start_wizard.plan_tpl"/>
+                </t>
+            </t>
+        </template>
+
+        <template id="page_terms">
+            <t t-set="tab_id" t-value="'tab2'"/>
+            <t t-set="prev_page" t-value="'#tab1'"/>
+            <t t-set="tab_title" t-value="'Terms &amp; Conditions'"/>
+            <t t-set="next_page" t-value="'#tab3'"/>
+            <t t-set="custom_next" t-value="'I agree'"/>
+
+            <t t-call="saas_portal_start_wizard.page_tpl">
+                <div class="text-raw bg-warning">
+                    <t t-raw="terms"/>
+                </div>
+            </t>
+        </template>
+
+        <template id="page_payment">
+            <t t-set="tab_id" t-value="'tab3'"/>
+            <t t-set="prev_page" t-value="'#tab1'"/>
+            <t t-if="terms">
+                <t t-set="prev_page" t-value="'#tab2'"/>
+            </t>
+            <t t-set="tab_title" t-value="'Payment options'"/>
+            <t t-set="next_page" t-value="'#tab4'"/>
+
+            <t t-call="saas_portal_start_wizard.page_tpl">
+                <div class="col-md-6 text-right">
+                    <div class="form-group">
+                        <label class="control-label col-xs-3"
+                               for="company">
+                            Company:
+                        </label>
+                        <div class="col-xs-9">
+                            <input type="text" class="form-control" id="company" name="company"
+                                   placeholder="Enter company"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-xs-3"
+                               for="name">
+                            Name:
+                        </label>
+                        <div class="col-xs-9">
+                            <input type="text" class="form-control" id="name" name="name"
+                                   placeholder="Enter name"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-xs-3"
+                               for="zip">
+                            Zip:
+                        </label>
+                        <div class="col-xs-9">
+                            <input type="text" class="form-control" id="zip" name="zip"
+                                   placeholder="Enter zip"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-xs-3"
+                               for="country">
+                            Country:
+                        </label>
+                        <div class="col-xs-9">
+                            <input type="text" class="form-control" id="country" name="country"
+                                   placeholder="Enter country"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 text-right">
+                    <div class="form-group">
+                        <label class="control-label col-xs-3"
+                               for="vat">
+                            VAT:
+                        </label>
+                        <div class="col-xs-9">
+                            <input type="text" class="form-control" id="vat" name="vat"
+                                   placeholder="Enter VAT"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-xs-3"
+                               for="phone">
+                            Phone:
+                        </label>
+                        <div class="col-xs-9">
+                            <input type="text" class="form-control" id="phone" name="phone"
+                                   placeholder="Enter phone"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-xs-3"
+                               for="city">
+                            City:
+                        </label>
+                        <div class="col-xs-9">
+                            <input type="text" class="form-control" id="city" name="city"
+                                   placeholder="Enter city"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-xs-3"
+                               for="state">
+                            State:
+                        </label>
+                        <div class="col-xs-9">
+                            <input type="text" class="form-control" id="state" name="state"
+                                   placeholder="Enter state"/>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </template>
+
+        <template id="addon_tpl">
+            <div class="addon_choice col-xs-6 col-sm4 col-md-3 mb16">
+                <a class="addon_btn" href="#"
+                   t-att-data-addon_name="addon['id']">
+                    <div class="addon-inner">
+                        <div class="addon-logo">
+                            <img t-att-src="addon['logo']" />
+                        </div>
+                        <div class="addon-data" style="">
+                            <h3 class="addon-name">
+                                <t t-esc="addon['name']" />
+                            </h3>
+                            <p class="mt4 text-muted">
+                                <t t-esc="addon['summ']" />
+                            </p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </template>
+
+        <template id="page_addons">
+            <t t-set="tab_id" t-value="'tab4'"/>
+            <t t-set="prev_page" t-value="'#tab3'"/>
+            <t t-set="tab_title" t-value="'Choose apps to install'"/>
+            <t t-set="next_page" t-value="'#tab9'"/>
+
+            <t t-call="saas_portal_start_wizard.page_tpl">
+                <div class="addons-list row">
+                    <t t-foreach="addons" t-as="addon">
+                        <t t-call="saas_portal_start_wizard.addon_tpl"/>
+                    </t>
+                </div>
+            </t>
+        </template>
+
+        <template id="page_summary">
+            <t t-set="tab_id" t-value="'tab9'"/>
+            <t t-set="prev_page" t-value="'#tab4'"/>
+            <t t-set="tab_title" t-value="'Summary'"/>
+            <t t-set="hide_next" t-value="True"/>
+            <t t-set="show_submit" t-value="True"/>
+
+            <t t-call="saas_portal_start_wizard.page_tpl">
+                <div class="control-group">
+                    <label class="control-label">Selected Plan:</label>
+                    <label id="summary-plan_name"></label>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">Selected Addons:</label>
+                    <label id="summary-addons_list"></label>
+                </div>
+
+            </t>
+        </template>
+
+        <template id="wizard_tpl" name="New tenant wizard" page="True"
+                  priority="29">
+            <t t-call="website.layout">
+				<div id="wrap" class="oe_structure oe_empty">
+					<section class="odoo_secondary_A">
+						<div class="container">
+							<div class="row">
+								<div class="text-center mt16 mb92">
+									<div class="odoo_call_action">
+										<form role="form" id="wizard-form"
+                                              class="form-horizontal"
+                                              action="/saas_portal/add_new_client">
+											<div class="row">
+												<div id="rootwizard"
+													 class="tabbable tabs-left">
+													<ul>
+                                                        <li>
+                                                            <a href="#tab1"
+                                                               data-toggle="tab"/>
+                                                        </li>
+                                                        <li>
+                                                            <a href="#tab2"
+                                                               data-toggle="tab"/>
+                                                        </li>
+                                                        <li>
+                                                            <a href="#tab3"
+                                                               data-toggle="tab"/>
+                                                        </li>
+                                                        <li>
+                                                            <a href="#tab4"
+                                                               data-toggle="tab"/>
+                                                        </li>
+
+                                                        <li>
+                                                            <a href="#tab9"
+                                                               data-toggle="tab"/>
+                                                        </li>
+                                                    </ul>
+													<div class="tab-content">
+                                                        <t t-call="saas_portal_start_wizard.page_plan"/>
+                                                        <t t-if="terms">
+                                                            <t t-call="saas_portal_start_wizard.page_terms" />
+                                                        </t>
+                                                        <t t-call="saas_portal_start_wizard.page_payment" />
+                                                        <t t-call="saas_portal_start_wizard.page_addons" />
+
+                                                        <t t-call="saas_portal_start_wizard.page_summary" />
+                                                    </div>
+												</div>
+											</div>
+
+                                            <input id="upstream-app"
+                                                   t-att-value="app"
+                                                   type="hidden" name="app"/>
+                                            <input id="upstream-lang"
+                                                   t-att-value="lang"
+                                                   type="hidden" name="lang"/>
+                                            <input id="upstream-tz"
+                                                   t-att-value="tz"
+                                                   type="hidden" name="tz"/>
+                                            <input id="upstream-dbname"
+                                                   t-att-value="dbname"
+                                                   type="hidden" name="dbname"/>
+                                            <input id="upstream-hosting"
+                                                   t-att-value="hosting"
+                                                   type="hidden"
+                                                   name="hosting"/>
+
+                                            <input id="plan-id-hidden" value=""
+                                                   type="hidden" name="plan_id"
+                                                   data-plan_name=""/>
+                                            <input id="addons-hidden" value=""
+                                                   type="hidden" name="addons"/>
+
+                                        </form>
+									</div>
+
+								</div>
+							</div>
+						</div>
+					</section>
+
+				</div>
+			</t>
+		</template>
+
+	 </data>
+</openerp>

@@ -19,7 +19,7 @@
                     <h1><t t-esc="tab_title"/></h1>
                 </div>
 
-                <div class="tab-body row bg-info">
+                <div class="tab-body row">
                     <t t-raw="0"/>
                 </div>
 
@@ -60,7 +60,7 @@
 			<div class="plan_choice col-sm-6 col-lg-4 mb16">
                 <a class="tab-next" t-att-href="next_page"
                    t-att-data-planid="plan['id']">
-                    <div class="plan_inner bg-primary">
+                    <div class="plan_inner bg-info">
                         <div class="plan-logo">
                             <img t-att-src="plan['logo']" />
                         </div>
@@ -102,7 +102,7 @@
             <t t-set="custom_next" t-value="'I agree'"/>
 
             <t t-call="saas_portal_start_wizard.page_tpl">
-                <div class="text-raw bg-warning">
+                <div class="text-raw bg-info">
                     <t t-raw="terms"/>
                 </div>
             </t>
@@ -119,86 +119,122 @@
 
             <t t-call="saas_portal_start_wizard.page_tpl">
                 <div class="col-md-6 text-right">
-                    <div class="form-group">
+                    <div class="form-group has-error has-feedback">
                         <label class="control-label col-xs-3"
                                for="company">
                             Company:
                         </label>
                         <div class="col-xs-9">
                             <input type="text" class="form-control" id="company" name="company"
-                                   placeholder="Enter company"/>
+                                   placeholder="Enter company"
+                                   aria-describedby="companyStatus"/>
+                            <span class="glyphicon glyphicon-warning-sign form-control-feedback"
+                                  aria-hidden="true"></span>
+                            <span id="companyStatus" class="sr-only"></span>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label class="control-label col-xs-3"
-                               for="name">
-                            Name:
-                        </label>
-                        <div class="col-xs-9">
-                            <input type="text" class="form-control" id="name" name="name"
-                                   placeholder="Enter name"/>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="control-label col-xs-3"
-                               for="zip">
-                            Zip:
-                        </label>
-                        <div class="col-xs-9">
-                            <input type="text" class="form-control" id="zip" name="zip"
-                                   placeholder="Enter zip"/>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="control-label col-xs-3"
-                               for="country">
-                            Country:
-                        </label>
-                        <div class="col-xs-9">
-                            <input type="text" class="form-control" id="country" name="country"
-                                   placeholder="Enter country"/>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6 text-right">
-                    <div class="form-group">
+                    <div class="form-group has-error has-feedback">
                         <label class="control-label col-xs-3"
                                for="vat">
                             VAT:
                         </label>
                         <div class="col-xs-9">
-                            <input type="text" class="form-control" id="vat" name="vat"
-                                   placeholder="Enter VAT"/>
+                            <input type="text" class="form-control" id="vat"
+                                   name="vat"
+                                   placeholder="Enter VAT"
+                                   aria-describedby="vatStatus"/>
+                            <span class="glyphicon glyphicon-warning-sign form-control-feedback"
+                                  aria-hidden="true"></span>
+                            <span id="vatStatus" class="sr-only"></span>
                         </div>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group has-error has-feedback">
                         <label class="control-label col-xs-3"
                                for="phone">
                             Phone:
                         </label>
                         <div class="col-xs-9">
-                            <input type="text" class="form-control" id="phone" name="phone"
-                                   placeholder="Enter phone"/>
+                            <input type="text" class="form-control" id="phone"
+                                   name="phone"
+                                   placeholder="Enter phone"
+                                   aria-describedby="phoneStatus"/>
+                            <span class="glyphicon glyphicon-warning-sign form-control-feedback"
+                                  aria-hidden="true"></span>
+                            <span id="phoneStatus" class="sr-only"></span>
                         </div>
                     </div>
-                    <div class="form-group">
+                    <!--<div class="form-group has-error has-feedback">-->
+                        <!--<label class="control-label col-xs-3"-->
+                               <!--for="name">-->
+                            <!--Name:-->
+                        <!--</label>-->
+                        <!--<div class="col-xs-9">-->
+                            <!--<input type="text" class="form-control" id="name" name="name"-->
+                                   <!--placeholder="Enter name"-->
+                                   <!--aria-describedby="nameStatus"/>-->
+                            <!--<span class="glyphicon glyphicon-warning-sign form-control-feedback"-->
+                                  <!--aria-hidden="true"></span>-->
+                            <!--<span id="nameStatus" class="sr-only"></span>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                </div>
+                <div class="col-md-6 text-right">
+                    <div class="form-group has-error has-feedback">
                         <label class="control-label col-xs-3"
                                for="city">
                             City:
                         </label>
                         <div class="col-xs-9">
                             <input type="text" class="form-control" id="city" name="city"
-                                   placeholder="Enter city"/>
+                                   placeholder="Enter city"
+                                   aria-describedby="cityStatus"/>
+                            <span class="glyphicon glyphicon-warning-sign form-control-feedback"
+                                  aria-hidden="true"></span>
+                            <span id="cityStatus" class="sr-only"></span>
                         </div>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group has-error has-feedback">
                         <label class="control-label col-xs-3"
                                for="state">
                             State:
                         </label>
                         <div class="col-xs-9">
                             <input type="text" class="form-control" id="state" name="state"
-                                   placeholder="Enter state"/>
+                                   placeholder="Enter state"
+                                   aria-describedby="stateStatus"/>
+                            <span class="glyphicon glyphicon-warning-sign form-control-feedback"
+                                  aria-hidden="true"></span>
+                            <span id="stateStatus" class="sr-only"></span>
+                        </div>
+                    </div>
+                    <div class="form-group has-error has-feedback">
+                        <label class="control-label col-xs-3"
+                               for="country">
+                            Country:
+                        </label>
+                        <div class="col-xs-9">
+                            <input type="text" class="form-control" id="country"
+                                   name="country"
+                                   placeholder="Enter country"
+                                   aria-describedby="countryStatus"/>
+                            <span class="glyphicon glyphicon-warning-sign form-control-feedback"
+                                  aria-hidden="true"></span>
+                            <span id="countryStatus" class="sr-only"></span>
+                        </div>
+                    </div>
+                    <div class="form-group has-error has-feedback">
+                        <label class="control-label col-xs-3"
+                               for="zip">
+                            Zip:
+                        </label>
+                        <div class="col-xs-9">
+                            <input type="text" class="form-control" id="zip"
+                                   name="zip"
+                                   placeholder="Enter zip"
+                                   aria-describedby="zipStatus"/>
+                            <span class="glyphicon glyphicon-warning-sign form-control-feedback"
+                                  aria-hidden="true"></span>
+                            <span id="zipStatus" class="sr-only"></span>
                         </div>
                     </div>
                 </div>
@@ -249,16 +285,81 @@
             <t t-set="show_submit" t-value="True"/>
 
             <t t-call="saas_portal_start_wizard.page_tpl">
-                <div class="control-group">
-                    <label class="control-label">Selected Plan:</label>
-                    <label id="summary-plan_name"></label>
+                <div class="col-md-6 text-right">
+                    <h3 class="text-center">Technical data</h3>
+                    <div class="form-group">
+                        <label class="control-label col-xs-3">
+                            Plan:
+                        </label>
+                        <div class="col-xs-9 text-left">
+                            <p id="summary-plan_name"
+                               class="form-control-static"></p>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-xs-3">
+                            Addons:
+                        </label>
+                        <div class="col-xs-9 text-left">
+                            <p id="summary-addons_list"
+                               class="form-control-static"></p>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="control-group">
-                    <label class="control-label">Selected Addons:</label>
-                    <label id="summary-addons_list"></label>
-                </div>
+                <div class="col-md-6 text-right">
+                    <h3 class="text-center">Legal data</h3>
+                    <!--<div class="form-group">-->
+                        <!--<label class="control-label col-xs-3">-->
+                            <!--Name:-->
+                        <!--</label>-->
+                        <!--<div class="col-xs-9 text-left">-->
+                            <!--<p id="summary-name"-->
+                               <!--class="form-control-static"></p>-->
+                        <!--</div>-->
+                    <!--</div>-->
 
+                    <div class="form-group">
+                        <label class="control-label col-xs-3">
+                            Company:
+                        </label>
+                        <div class="col-xs-9 text-left">
+                            <p id="summary-company"
+                               class="form-control-static"></p>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-xs-3">
+                            VAT:
+                        </label>
+                        <div class="col-xs-9 text-left">
+                            <p id="summary-vat"
+                               class="form-control-static"></p>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-xs-3">
+                            Address:
+                        </label>
+                        <div class="col-xs-9 text-left">
+                            <p id="summary-address"
+                               class="form-control-static"></p>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label col-xs-3">
+                            Phone:
+                        </label>
+                        <div class="col-xs-9 text-left">
+                            <p id="summary-phone"
+                               class="form-control-static"></p>
+                        </div>
+                    </div>
+                </div>
             </t>
         </template>
 

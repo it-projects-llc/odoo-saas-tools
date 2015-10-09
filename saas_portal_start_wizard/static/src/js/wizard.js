@@ -37,21 +37,73 @@ $(document).ready(function() {
         event.preventDefault();
         if ($(this).hasClass('selected')) {
             $(this).removeClass('selected');
-            $('.addon-inner', this).removeClass('bg-primary');
+            $('.addon-inner', this).removeClass('bg-info');
         } else {
             $(this).addClass('selected');
-            $('.addon-inner', this).addClass('bg-primary');
+            $('.addon-inner', this).addClass('bg-info');
         }
 
         var list = "";
+        var list_ = "";
         $('.addons-list .addon_choice a.addon_btn.selected').each(function(){
             var name = $( this ).data('addon_name');
+            var title = $( '.addon-name', this ).html();
             list += name + ",";
+            list_ += " " + title + ",";
         });
 
         list = list.slice(0, list.length-1);
+        list_ = list_.slice(1, list_.length-1);
 
         $('#addons-hidden').val(list);
-        $('#summary-addons_list').html(list);
-    })
+        $('#summary-addons_list').html(list_);
+    });
+
+    function check_tab3() {
+        var valid = true;
+
+        $('#tab3 .form-group').each(function(){
+            valid = valid && $(this).hasClass('has-success');
+        });
+
+        if (valid)
+            $('#tab3 .tab-next').removeAttr("disabled");
+        else
+            $('#tab3 .tab-next').attr("disabled", "disabled");
+    }
+    check_tab3();
+
+    $('#tab3 input.form-control').on('input', function(event){
+        var input = $(this)
+        var parent = input.parent().parent();
+        var value = input.val();
+        var icon = $('span.glyphicon', parent);
+        var sr = $('span.sr-only', parent);
+
+        if (value) {
+            parent.removeClass('has-error').addClass('has-success');
+            icon.removeClass('glyphicon-warning-sign').addClass('glyphicon-ok');
+            sr.html("(success)");
+        } else {
+            parent.removeClass('has-success').addClass('has-error');
+            icon.removeClass('glyphicon-ok').addClass('glyphicon-warning-sign');
+            sr.html("(error)");
+        }
+
+        check_tab3();
+    });
+
+    $('#tab3 .tab-next').click(function(){
+//        var name = $('#name').val();
+        var company = $('#company').val();
+        var vat = $('#vat').val();
+        var phone = $('#phone').val();
+        var address = $('#city').val() + ", " + $('#state').val() + ", " + $('#country').val() + ". Zip: " + $('#zip').val();
+
+//        $('#summary-name').html(name);
+        $('#summary-company').html(company);
+        $('#summary-vat').html(vat);
+        $('#summary-phone').html(phone);
+        $('#summary-address').html(address);
+    });
 });

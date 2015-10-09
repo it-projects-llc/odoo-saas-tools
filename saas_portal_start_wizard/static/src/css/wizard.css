@@ -50,6 +50,10 @@
     padding-left: 3px;
 }
 
+.tab-body .form-group div.col-xs-9 .error {
+    display: none;
+}
+
 .tab-body .addon_choice .addon_btn:hover {
     text-decoration: none;
 }

@@ -7,6 +7,8 @@ import psycopg2
 import random
 import string
 
+from openerp.addons.saas_portal_start_wizard.utils import _levenshtein, acronym
+
 import logging
 _logger = logging.getLogger(__name__)
 
@@ -106,7 +108,66 @@ class SaasServerClient(models.Model):
         return ['saas_client.ab_location', 'saas_client.ab_register']
 
     @api.one
-    def _prepare_database(self, client_env, saas_portal_user=None, is_template_db=False, addons=[], access_token=None, tz=None):
+    def _preprocess_company_data(self, data, env=None):
+        if not env:
+            env = self.env
+        country_model = env['res.country']
+        country_name = data.get("country")
+        domain = [("name", "=", country_name)]
+        rc = country_model.search(domain)
+        if not rc:
+            recordset = country_model.search([])
+            rc = recordset.sorted(
+                key=lambda r: _levenshtein(country_name.lower(), r.name.lower()))
+            candidate = rc and rc[0]
+            if candidate:
+                d = _levenshtein(country_name.lower(), candidate.name.lower())
+                if d > len(country_name) * 0.33:
+                    candidate = None
+            if not candidate:
+                rc = [country_model.create({"name": country_name})]
+        rc = rc and rc[0]
+        country = rc
+        data.update({"country_id": country.id})
+
+        state_model = env['res.country.state']
+        state_name = data.get("state")
+        domain = [("country_id", "=", country.id)]
+        recordset = state_model.search(domain)
+        if not recordset:
+            state = state_model.create({
+                "country_id": country.id,
+                "name": state_name,
+                "code": acronym(state_name)[:3]
+            })
+        else:
+            domain = [("name", "=", state_name)]
+            rc = recordset.search(domain)
+            if not rc:
+                rc = recordset.sorted(
+                    key=lambda r: _levenshtein(state_name.lower(), r.name.lower()))
+            candidate = rc and rc[0]
+            if candidate:
+                d = _levenshtein(state_name.lower(), candidate.name.lower())
+                if d > len(state_name) * 0.33:
+                    candidate = None
+            if not candidate:
+                rc = [state_model.create({
+                    "country_id": country.id,
+                    "name": state_name,
+                    "code": acronym(state_name)[:3]
+                })]
+            rc = rc and rc[0]
+            state = rc
+        data.update({"state_id": state.id})
+
+        data.pop("state", False)
+        data.pop("country", False)
+
+        return data
+
+    @api.one
+    def _prepare_database(self, client_env, saas_portal_user=None, is_template_db=False, addons=[], access_token=None, tz=None, company_data={}):
         client_id = self.client_id
 
         # update saas_server.client state
@@ -184,6 +245,10 @@ class SaasServerClient(models.Model):
 
             oauth_provider.write({'enabled': True})
 
+            company_data = self._preprocess_company_data(company_data, client_env)[0]
+            company = client_env['ir.model.data'].xmlid_to_object("base.main_company")
+            company.write({"name": company_data['name']})
+            company.partner_id.write(company_data)
 
     @api.model
     def update_all(self):

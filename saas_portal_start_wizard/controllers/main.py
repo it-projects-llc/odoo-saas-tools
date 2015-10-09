@@ -4,6 +4,8 @@ from openerp.addons.web.http import request
 from openerp import SUPERUSER_ID, exceptions
 from openerp.addons.saas_portal_start.controllers.main import SaasPortalStart
 
+
+
 import werkzeug
 import logging
 import simplejson
@@ -77,25 +79,37 @@ class SaasPortalStartWizard(SaasPortalStart):
         if not post.get("plan_id", False):
             return werkzeug.utils.redirect(
                 '/page/start/wizard?{}'.format(werkzeug.url_encode(post)))
-        post.update({"plan_id": int(post["plan_id"])})
 
-        _logger.info("\n\nPOST: %s\n", post)
+        post.update({"plan_id": int(post["plan_id"])})
 
         dbname = self.get_full_dbname(post.get('dbname'))
         plan = self.get_plan(post.get('plan_id'))
         url = plan.create_new_database(dbname)[0]
 
+        base, params = url.split("?")
+        params = werkzeug.url_decode(params)
+        state = simplejson.loads(params['state'])
+
+        addons = []
         if post.get('addons', False):
             addons = post['addons'].split(",")
+        state.update({'addons': addons})
 
-            base, params = url.split("?")
-            params = werkzeug.url_decode(params)
+        company_data = {
+            "name": post.get("company"),
+            "vat": post.get("vat"),
+            "phone": post.get("phone"),
+            "city": post.get("city"),
+            "state": post.get("state"),
+            "country": post.get("country"),
+            "zip": post.get("zip"),
+        }
 
-            state = simplejson.loads(params['state'])
-            state.update({'addons': addons})
-            params['state'] = simplejson.dumps(state)
+        state.update({"company_data": company_data})
+        params['state'] = simplejson.dumps(state)
 
-            url = "{base}?{params}".format(base=base, params=werkzeug.url_encode(params))
+        url = "{base}?{params}".format(base=base, params=werkzeug.url_encode(params))
         _logger.info("\n\nFinal URL: %s\n", url)
 
         return werkzeug.utils.redirect(url)
+

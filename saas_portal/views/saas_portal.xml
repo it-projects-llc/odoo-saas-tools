@@ -348,6 +348,41 @@
             <field name="model">saas.config</field>
             <field name="value_unpickle" eval="'ir.actions.act_window,'+str(action_updb)"/>
         </record>
+        
+         <!-- Templates -->
+        <record id="view_databases_tree" model="ir.ui.view">
+            <field name="name">saas_portal.databases.tree</field>
+            <field name="model">saas_portal.database</field>
+            <field name="arch" type="xml">
+                <tree string="Plans">
+                     <field name="name" />
+                     <field name="state" />
+                     <field name="client_id" />
+                </tree>
+            </field>
+        </record>
+        
+        <record id="view_databases_filter" model="ir.ui.view">
+            <field name="name">saas_portal.database.select</field>
+            <field name="model">saas_portal.database</field>
+            <field name="arch" type="xml">
+                <search string="Search Databases">
+                    <field name="name" string="Database Name"/>
+                    <filter string="Templates" name="template" domain="[('state', '=','template')]"/>
+                </search>
+            </field>
+        </record>
+        
+        <record id="action_templates" model="ir.actions.act_window">
+            <field name="name">Templates</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">saas_portal.database</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{'search_default_template': 1}</field>
+        </record>
+
+        <menuitem action="action_templates" id="menu_templates" parent="menu_saas" sequence="40" groups="base.group_no_one"/>
 
     </data>
 </openerp>

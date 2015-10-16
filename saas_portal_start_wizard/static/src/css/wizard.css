@@ -1,4 +1,4 @@
-#rootwizard {
+#wizard-form {
     border: solid 1px;
     border-radius: 6px;
     width: 90%;
@@ -14,10 +14,7 @@
     border-top-right-radius: 6px;
     border-top-left-radius: 6px;
     border-bottom: solid 1px;
-}
-
-.tab-pane .tab-title a.tab-prev {
-    margin: 1%;
+    text-align: center;
 }
 
 .tab-pane .tab-body {
@@ -27,6 +24,7 @@
 .tab-body .plan_choice .plan_inner {
     border: solid 1px;
     border-radius: 6px;
+    text-align: center;
 }
 
 .tab-body .plan_choice .plan_inner img {
@@ -42,16 +40,12 @@
     text-align: left;
 }
 
-.tab-body .form-group .control-label {
-    padding-right: 3px;
-}
-
-.tab-body .form-group div.col-xs-9 {
-    padding-left: 3px;
-}
-
-.tab-body .form-group div.col-xs-9 .error {
+.tab-body .form-group .error {
     display: none;
+}
+
+.tab-body .form-group.optional label {
+    font-weight: normal;
 }
 
 .tab-body .addon_choice .addon_btn:hover {
@@ -93,7 +87,6 @@
     float: left;
 }
 
-.tab-pane .tab-actions button,
 .tab-pane .tab-actions .tab-next {
     float: right;
 }

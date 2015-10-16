@@ -14,7 +14,7 @@
 		</template>
 
         <template id="page_tpl">
-            <div class="tab-pane row" t-att-id="tab_id">
+            <div class="tab-pane row">
                 <div class="tab-title row bg-primary">
                     <h1><t t-esc="tab_title"/></h1>
                 </div>
@@ -30,46 +30,33 @@
                         <t t-set="next_label" t-value="custom_next"/>
                     </t>
 
-                    <t t-set="show_next" t-value="True" />
-                    <t t-if="hide_next">
-                        <t t-set="show_next" t-value="False"/>
-                    </t>
-
-                    <a t-att-href="prev_page"
-                       class="tab-prev btn btn-warning">
-                        <t t-esc="prev_label" />
-                    </a>
-
-                    <t t-if="show_next">
-                        <a t-att-href="next_page"
-                           class="tab-next btn btn-success">
-                            <t t-esc="next_label"/>
-                        </a>
-                    </t>
-                    <t t-if="show_submit">
-                        <button type="submit" id="wizard-submit"
-                                class="btn btn-success">
-                            Launch tenant
-                        </button>
-                    </t>
+                    <button type="submit" id="wizard-goback" name="page_prev"
+                            class="btn btn-warning tab-prev">
+                        <t t-esc="prev_label"/>
+                    </button>
+                    <button type="submit" id="wizard-submit" name="page_next"
+                            class="btn btn-success tab-next">
+                        <t t-esc="next_label"/>
+                    </button>
                 </div>
             </div>
         </template>
 
 		<template id="plan_tpl">
 			<div class="plan_choice col-sm-6 col-lg-4 mb16">
-                <a class="tab-next" t-att-href="next_page"
-                   t-att-data-planid="plan['id']">
-                    <div class="plan_inner bg-info">
+                <a class="plan_btn" href="#"
+                   t-att-data-planid="plan.id">
+                    <div class="plan_inner">
                         <div class="plan-logo">
-                            <img t-att-src="plan['logo']" />
+                            <span itemprop="image" t-field="plan.logo"
+                                  t-field-options='{"widget": "image", "class": "product_detail_img"}'/>
                         </div>
                         <div class="plan-data">
                             <h3 class="plan-name">
-                                <t t-esc="plan['name']"/>
+                                <t t-esc="plan.name"/>
                             </h3>
                             <p class="mt4 text-muted">
-                                <t t-esc="plan['desc']"/>
+                                <t t-esc="plan.summary"/>
                             </p>
                         </div>
                     </div>
@@ -78,27 +65,19 @@
 		</template>
 
         <template id="page_plan">
-            <t t-set="tab_id" t-value="'tab1'"/>
-            <t t-set="prev_page" t-value="'/page/start'"/>
             <t t-set="tab_title" t-value="'Choose a Plan'"/>
-            <t t-set="hide_next" t-value="True"/>
-            <t t-set="next_page" t-value="'#tab3'"/>
-            <t t-if="terms">
-                <t t-set="next_page" t-value="'#tab2'"/>
-            </t>
 
             <t t-call="saas_portal_start_wizard.page_tpl">
-                <t t-foreach="plans" t-as="plan">
-                    <t t-call="saas_portal_start_wizard.plan_tpl"/>
-                </t>
+                <div class="plans-list row">
+                    <t t-foreach="plans" t-as="plan">
+                        <t t-call="saas_portal_start_wizard.plan_tpl"/>
+                    </t>
+                </div>
             </t>
         </template>
 
         <template id="page_terms">
-            <t t-set="tab_id" t-value="'tab2'"/>
-            <t t-set="prev_page" t-value="'#tab1'"/>
             <t t-set="tab_title" t-value="'Terms &amp; Conditions'"/>
-            <t t-set="next_page" t-value="'#tab3'"/>
             <t t-set="custom_next" t-value="'I agree'"/>
 
             <t t-call="saas_portal_start_wizard.page_tpl">
@@ -109,134 +88,69 @@
         </template>
 
         <template id="page_payment">
-            <t t-set="tab_id" t-value="'tab3'"/>
-            <t t-set="prev_page" t-value="'#tab1'"/>
-            <t t-if="terms">
-                <t t-set="prev_page" t-value="'#tab2'"/>
-            </t>
             <t t-set="tab_title" t-value="'Payment options'"/>
-            <t t-set="next_page" t-value="'#tab4'"/>
 
             <t t-call="saas_portal_start_wizard.page_tpl">
-                <div class="col-md-6 text-right">
-                    <div class="form-group has-error has-feedback">
-                        <label class="control-label col-xs-3"
-                               for="company">
-                            Company:
-                        </label>
-                        <div class="col-xs-9">
-                            <input type="text" class="form-control" id="company" name="company"
-                                   placeholder="Enter company"
-                                   aria-describedby="companyStatus"/>
-                            <span class="glyphicon glyphicon-warning-sign form-control-feedback"
-                                  aria-hidden="true"></span>
-                            <span id="companyStatus" class="sr-only"></span>
-                        </div>
-                    </div>
-                    <div class="form-group has-error has-feedback">
-                        <label class="control-label col-xs-3"
-                               for="vat">
-                            VAT:
-                        </label>
-                        <div class="col-xs-9">
-                            <input type="text" class="form-control" id="vat"
-                                   name="vat"
-                                   placeholder="Enter VAT"
-                                   aria-describedby="vatStatus"/>
-                            <span class="glyphicon glyphicon-warning-sign form-control-feedback"
-                                  aria-hidden="true"></span>
-                            <span id="vatStatus" class="sr-only"></span>
-                        </div>
-                    </div>
-                    <div class="form-group has-error has-feedback">
-                        <label class="control-label col-xs-3"
-                               for="phone">
-                            Phone:
-                        </label>
-                        <div class="col-xs-9">
-                            <input type="text" class="form-control" id="phone"
-                                   name="phone"
-                                   placeholder="Enter phone"
-                                   aria-describedby="phoneStatus"/>
-                            <span class="glyphicon glyphicon-warning-sign form-control-feedback"
-                                  aria-hidden="true"></span>
-                            <span id="phoneStatus" class="sr-only"></span>
-                        </div>
-                    </div>
-                    <!--<div class="form-group has-error has-feedback">-->
-                        <!--<label class="control-label col-xs-3"-->
-                               <!--for="name">-->
-                            <!--Name:-->
-                        <!--</label>-->
-                        <!--<div class="col-xs-9">-->
-                            <!--<input type="text" class="form-control" id="name" name="name"-->
-                                   <!--placeholder="Enter name"-->
-                                   <!--aria-describedby="nameStatus"/>-->
-                            <!--<span class="glyphicon glyphicon-warning-sign form-control-feedback"-->
-                                  <!--aria-hidden="true"></span>-->
-                            <!--<span id="nameStatus" class="sr-only"></span>-->
-                        <!--</div>-->
-                    <!--</div>-->
+                <div class="col-lg-6 form-group has-feedback">
+                    <label class="control-label" for="name">Name:</label>
+                    <input type="text" class="form-control" id="name"
+                           name="name" placeholder="Enter name"
+                           t-att-value="name" />
                 </div>
-                <div class="col-md-6 text-right">
-                    <div class="form-group has-error has-feedback">
-                        <label class="control-label col-xs-3"
-                               for="city">
-                            City:
-                        </label>
-                        <div class="col-xs-9">
-                            <input type="text" class="form-control" id="city" name="city"
-                                   placeholder="Enter city"
-                                   aria-describedby="cityStatus"/>
-                            <span class="glyphicon glyphicon-warning-sign form-control-feedback"
-                                  aria-hidden="true"></span>
-                            <span id="cityStatus" class="sr-only"></span>
-                        </div>
-                    </div>
-                    <div class="form-group has-error has-feedback">
-                        <label class="control-label col-xs-3"
-                               for="state">
-                            State:
-                        </label>
-                        <div class="col-xs-9">
-                            <input type="text" class="form-control" id="state" name="state"
-                                   placeholder="Enter state"
-                                   aria-describedby="stateStatus"/>
-                            <span class="glyphicon glyphicon-warning-sign form-control-feedback"
-                                  aria-hidden="true"></span>
-                            <span id="stateStatus" class="sr-only"></span>
-                        </div>
-                    </div>
-                    <div class="form-group has-error has-feedback">
-                        <label class="control-label col-xs-3"
-                               for="country">
-                            Country:
-                        </label>
-                        <div class="col-xs-9">
-                            <input type="text" class="form-control" id="country"
-                                   name="country"
-                                   placeholder="Enter country"
-                                   aria-describedby="countryStatus"/>
-                            <span class="glyphicon glyphicon-warning-sign form-control-feedback"
-                                  aria-hidden="true"></span>
-                            <span id="countryStatus" class="sr-only"></span>
-                        </div>
-                    </div>
-                    <div class="form-group has-error has-feedback">
-                        <label class="control-label col-xs-3"
-                               for="zip">
-                            Zip:
-                        </label>
-                        <div class="col-xs-9">
-                            <input type="text" class="form-control" id="zip"
-                                   name="zip"
-                                   placeholder="Enter zip"
-                                   aria-describedby="zipStatus"/>
-                            <span class="glyphicon glyphicon-warning-sign form-control-feedback"
-                                  aria-hidden="true"></span>
-                            <span id="zipStatus" class="sr-only"></span>
-                        </div>
-                    </div>
+                <div class="col-lg-6 form-group has-feedback">
+                    <label class="control-label" for="phone">Phone:</label>
+                    <input type="text" class="form-control" id="phone"
+                           name="phone" placeholder="Enter phone"
+                           t-att-value="phone" />
+                </div>
+                <div class="col-lg-6 form-group has-feedback">
+                    <label class="control-label" for="company">Company:</label>
+                    <input type="text" class="form-control" id="company"
+                           name="company" placeholder="Enter company"
+                           t-att-value="company" />
+                </div>
+                <div class="col-lg-6 form-group has-feedback">
+                    <label class="control-label" for="vat">VAT:</label>
+                    <input type="text" class="form-control" id="vat"
+                           name="vat" placeholder="Enter VAT"
+                           t-att-value="vat" />
+                </div>
+                <div class="col-lg-6 form-group has-feedback">
+                    <label class="control-label" for="city">City:</label>
+                    <input type="text" class="form-control" id="city"
+                           name="city" placeholder="Enter city"
+                           t-att-value="city" />
+                </div>
+                <div class="col-lg-6 form-group has-feedback">
+                    <label class="control-label" for="zip">Zip:</label>
+                    <input type="text" class="form-control" id="zip_"
+                           name="zip_" placeholder="Enter zip"
+                           t-att-value="zip_" />
+                </div>
+                <div class="col-lg-6 form-group has-feedback">
+                    <label class="control-label" for="country_id">Country:</label>
+                    <select name="country_id" class="form-control">
+                        <option value="">Country...</option>
+                        <t t-foreach="countries or []" t-as="country">
+                            <option t-att-value="country.id"
+                                    t-att-selected="country.id == country_id">
+                                <t t-esc="country.name"/>
+                            </option>
+                        </t>
+                    </select>
+                </div>
+                <div class="col-lg-6 form-group has-feedback optional">
+                    <label class="control-label" for="state">State:</label>
+                    <select name="state_id" class="form-control">
+                        <option value="">select...</option>
+                        <t t-foreach="states or []" t-as="state">
+                            <option t-att-value="state.id" style="display:none;"
+                                    t-att-data-country_id="state.country_id.id"
+                                    t-att-selected="state.id == state_id">
+                                <t t-esc="state.name"/>
+                            </option>
+                        </t>
+                    </select>
                 </div>
             </t>
         </template>
@@ -363,91 +277,122 @@
             </t>
         </template>
 
-        <template id="wizard_tpl" name="New tenant wizard" page="True"
+        <template id="wizard_tpl" name="New tenant Wizard" page="True"
                   priority="29">
             <t t-call="website.layout">
-				<div id="wrap" class="oe_structure oe_empty">
-					<section class="odoo_secondary_A">
-						<div class="container">
-							<div class="row">
-								<div class="text-center mt16 mb92">
-									<div class="odoo_call_action">
-										<form role="form" id="wizard-form"
-                                              class="form-horizontal"
-                                              action="/saas_portal/add_new_client">
-											<div class="row">
-												<div id="rootwizard"
-													 class="tabbable tabs-left">
-													<ul>
-                                                        <li>
-                                                            <a href="#tab1"
-                                                               data-toggle="tab"/>
-                                                        </li>
-                                                        <li>
-                                                            <a href="#tab2"
-                                                               data-toggle="tab"/>
-                                                        </li>
-                                                        <li>
-                                                            <a href="#tab3"
-                                                               data-toggle="tab"/>
-                                                        </li>
-                                                        <li>
-                                                            <a href="#tab4"
-                                                               data-toggle="tab"/>
-                                                        </li>
+                <div id="wrap" class="container oe_structure oe_empty">
+                    <div class="row mt16 mb92">
+                        <div class="odoo_call_action">
+                            <form role="form" id="wizard-form" method="get"
+                                  action="/page/start/wizard/submit"
+                                  t-att-class="wizard_page">
+                                <t t-if="wizard_page=='page_plan_select'">
+                                    <t t-call="saas_portal_start_wizard.page_plan"/>
+                                </t>
+                                <t t-if="wizard_page=='page_terms_conds'">
+                                    <t t-call="saas_portal_start_wizard.page_terms"/>
+                                </t>
+                                <t t-if="wizard_page=='page_plan_confirm'">
+                                    <t t-call="saas_portal_start_wizard.page_payment"/>
+                                </t>
+                                <input type="hidden" name="wizard_page" t-att-value="wizard_page" />
+                                <t t-foreach="upstream" t-as="item">
+                                    <input type="hidden"
+                                           t-att-name="item[0]"
+                                           t-att-value="item[1]"/>
+                                </t>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </template>
 
-                                                        <li>
-                                                            <a href="#tab9"
-                                                               data-toggle="tab"/>
-                                                        </li>
-                                                    </ul>
-													<div class="tab-content">
-                                                        <t t-call="saas_portal_start_wizard.page_plan"/>
-                                                        <t t-if="terms">
-                                                            <t t-call="saas_portal_start_wizard.page_terms" />
-                                                        </t>
-                                                        <t t-call="saas_portal_start_wizard.page_payment" />
-                                                        <t t-call="saas_portal_start_wizard.page_addons" />
+        <!--<template id="wizard_tpl" name="New tenant wizard" page="True"-->
+                  <!--priority="29">-->
+            <!--<t t-call="website.layout">-->
+				<!--<div id="wrap" class="oe_structure oe_empty">-->
+					<!--<section class="odoo_secondary_A">-->
+						<!--<div class="container">-->
+							<!--<div class="row">-->
+								<!--<div class="text-center mt16 mb92">-->
+									<!--<div class="odoo_call_action">-->
+										<!--<form role="form" id="wizard-form"-->
+                                              <!--class="form-horizontal"-->
+                                              <!--action="/saas_portal/add_new_client">-->
+											<!--<div class="row">-->
+												<!--<div id="rootwizard"-->
+													 <!--class="tabbable tabs-left">-->
+													<!--<ul>-->
+                                                        <!--<li>-->
+                                                            <!--<a href="#tab1"-->
+                                                               <!--data-toggle="tab"/>-->
+                                                        <!--</li>-->
+                                                        <!--<li>-->
+                                                            <!--<a href="#tab2"-->
+                                                               <!--data-toggle="tab"/>-->
+                                                        <!--</li>-->
+                                                        <!--<li>-->
+                                                            <!--<a href="#tab3"-->
+                                                               <!--data-toggle="tab"/>-->
+                                                        <!--</li>-->
+                                                        <!--<li>-->
+                                                            <!--<a href="#tab4"-->
+                                                               <!--data-toggle="tab"/>-->
+                                                        <!--</li>-->
 
-                                                        <t t-call="saas_portal_start_wizard.page_summary" />
-                                                    </div>
-												</div>
-											</div>
+                                                        <!--<li>-->
+                                                            <!--<a href="#tab9"-->
+                                                               <!--data-toggle="tab"/>-->
+                                                        <!--</li>-->
+                                                    <!--</ul>-->
+													<!--<div class="tab-content">-->
+                                                        <!--<t t-call="saas_portal_start_wizard.page_plan"/>-->
+                                                        <!--<t t-if="terms">-->
+                                                            <!--<t t-call="saas_portal_start_wizard.page_terms" />-->
+                                                        <!--</t>-->
+                                                        <!--<t t-call="saas_portal_start_wizard.page_payment" />-->
+                                                        <!--<t t-call="saas_portal_start_wizard.page_addons" />-->
 
-                                            <input id="upstream-app"
-                                                   t-att-value="app"
-                                                   type="hidden" name="app"/>
-                                            <input id="upstream-lang"
-                                                   t-att-value="lang"
-                                                   type="hidden" name="lang"/>
-                                            <input id="upstream-tz"
-                                                   t-att-value="tz"
-                                                   type="hidden" name="tz"/>
-                                            <input id="upstream-dbname"
-                                                   t-att-value="dbname"
-                                                   type="hidden" name="dbname"/>
-                                            <input id="upstream-hosting"
-                                                   t-att-value="hosting"
-                                                   type="hidden"
-                                                   name="hosting"/>
+                                                        <!--<t t-call="saas_portal_start_wizard.page_summary" />-->
+                                                    <!--</div>-->
+												<!--</div>-->
+											<!--</div>-->
 
-                                            <input id="plan-id-hidden" value=""
-                                                   type="hidden" name="plan_id"
-                                                   data-plan_name=""/>
-                                            <input id="addons-hidden" value=""
-                                                   type="hidden" name="addons"/>
+                                            <!--<input id="upstream-app"-->
+                                                   <!--t-att-value="app"-->
+                                                   <!--type="hidden" name="app"/>-->
+                                            <!--<input id="upstream-lang"-->
+                                                   <!--t-att-value="lang"-->
+                                                   <!--type="hidden" name="lang"/>-->
+                                            <!--<input id="upstream-tz"-->
+                                                   <!--t-att-value="tz"-->
+                                                   <!--type="hidden" name="tz"/>-->
+                                            <!--<input id="upstream-dbname"-->
+                                                   <!--t-att-value="dbname"-->
+                                                   <!--type="hidden" name="dbname"/>-->
+                                            <!--<input id="upstream-hosting"-->
+                                                   <!--t-att-value="hosting"-->
+                                                   <!--type="hidden"-->
+                                                   <!--name="hosting"/>-->
 
-                                        </form>
-									</div>
+                                            <!--<input id="plan-id-hidden" value=""-->
+                                                   <!--type="hidden" name="plan_id"-->
+                                                   <!--data-plan_name=""/>-->
+                                            <!--<input id="addons-hidden" value=""-->
+                                                   <!--type="hidden" name="addons"/>-->
 
-								</div>
-							</div>
-						</div>
-					</section>
+                                        <!--</form>-->
+									<!--</div>-->
 
-				</div>
-			</t>
-		</template>
+								<!--</div>-->
+							<!--</div>-->
+						<!--</div>-->
+					<!--</section>-->
+
+				<!--</div>-->
+			<!--</t>-->
+		<!--</template>-->
 
 	 </data>
 </openerp>

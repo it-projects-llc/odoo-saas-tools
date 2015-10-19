@@ -31,11 +31,10 @@ $(document).ready(function() {
     function init_page_plan_select() {
         var id = $('input[name="plan_id"]').val();
         var flag = true;
-        $('.plans-list .plan_choice .plan_btn').each(function(){
+        $('.plans-list .btn').each(function(){
             if ($(this).data('planid') == id) {
                 flag = false;
-                $(this).addClass('selected');
-                $('.plan_inner', this).addClass('bg-info');
+                $(this).removeClass("btn-default").addClass('btn-info');
             }
             return flag;
         });
@@ -44,15 +43,13 @@ $(document).ready(function() {
     }
     init_page_plan_select();
 
-    $('.plan_choice a.plan_btn').click(function(event){
+    $('.plans-list .btn').click(function(event){
         event.preventDefault();
-        $('.plans-list .plan_choice .plan_btn').each(function(){
-            $( this ).removeClass('selected');
-            $('.plan_inner', this).removeClass('bg-info');
+        $('.plans-list .btn').each(function(){
+            $( this ).removeClass('btn-info').addClass("btn-default");
         });
 
-        $(this).addClass('selected');
-        $('.plan_inner', this).addClass('bg-info');
+        $(this).removeClass('btn-default').addClass("btn-info");
 
         var id = $( this ).data('planid');
         $('input[name="plan_id"]').val(id);
@@ -60,30 +57,22 @@ $(document).ready(function() {
         $('.tab-next').removeAttr('disabled');
     });
 
-    $('.addon_choice a.addon_btn').click(function(event){
+    $('.addons-list a.btn').click(function(event){
         event.preventDefault();
-        if ($(this).hasClass('selected')) {
-            $(this).removeClass('selected');
-            $('.addon-inner', this).removeClass('bg-info');
+        if ($(this).hasClass('btn-info')) {
+            $(this).removeClass('btn-info').addClass('btn-default');
         } else {
-            $(this).addClass('selected');
-            $('.addon-inner', this).addClass('bg-info');
+            $(this).removeClass('btn-default').addClass('btn-info');
         }
 
         var list = "";
-        var list_ = "";
-        $('.addons-list .addon_choice a.addon_btn.selected').each(function(){
+        $('.addons-list a.btn-info').each(function(){
             var name = $( this ).data('addon_name');
-            var title = $( '.addon-name', this ).html();
             list += name + ",";
-            list_ += " " + title + ",";
         });
 
         list = list.slice(0, list.length-1);
-        list_ = list_.slice(1, list_.length-1);
-
-        $('#addons-hidden').val(list);
-        $('#summary-addons_list').html(list_);
+        $('input[name="addons"]').val(list);
     });
 
     function check_page_plan_confirm() {

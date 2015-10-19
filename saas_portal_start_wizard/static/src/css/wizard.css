@@ -1,92 +1,36 @@
-#wizard-form {
-    border: solid 1px;
-    border-radius: 6px;
-    width: 90%;
-    max-width: 800px;
-    margin: auto;
+.tab-body .list .btn {
+    width: 100%;
+    white-space: normal;
 }
 
-.tab-pane {
-    margin: 0 15px;
+.addons-list .btn {
+    padding: 6px;
+    height: 120px;
 }
 
-.tab-pane .tab-title {
-    border-top-right-radius: 6px;
-    border-top-left-radius: 6px;
-    border-bottom: solid 1px;
-    text-align: center;
+.addons-list .btn .oe_module_icon,
+.addons-list .btn .oe_module_desc {
+    display: inline-block;
 }
 
-.tab-pane .tab-body {
-    padding: 12px;
-}
-
-.tab-body .plan_choice .plan_inner {
-    border: solid 1px;
-    border-radius: 6px;
-    text-align: center;
-}
-
-.tab-body .plan_choice .plan_inner img {
-    max-width: 100%;
+.addons-list .btn .oe_module_icon {
+    width: 80px;
     height: auto;
-    min-height: 50px;
+    vertical-align: top;
 }
 
-.tab-body .text-raw {
-    border: solid 1px;
-    padding: 0 30px;
-    margin: 24px;
+.addons-list .btn .oe_module_desc {
+    width: 150px;
+    padding-left: 6px;
     text-align: left;
 }
 
-.tab-body .form-group .error {
-    display: none;
+.addons-list .btn .oe_module_desc h4 {
+    font-size: 14px;
+    font-weight: bold;
+    margin-top: 0;
 }
 
-.tab-body .form-group.optional label {
-    font-weight: normal;
-}
-
-.tab-body .addon_choice .addon_btn:hover {
-    text-decoration: none;
-}
-
-.tab-body .addon_choice .addon_btn.selected .addon-inner {
-    border: solid 1px;
-    border-radius: 6px;
-}
-
-.tab-body .addon_choice .addon-inner .addon-logo {
-    height: 80px;
-    margin: 12px 6px;
-}
-
-.tab-body .addon_choice .addon-inner .addon-logo img {
-    height: 100%;
-    width: auto;
-}
-
-.tab-body .addon_choice .addon-inner .addon-data {
-    height: 120px;
-    margin:6px;
-}
-
-.tab-body .addon_choice .addon_btn.selected .addon-inner .addon-data {
-    height: 118px;
-}
-
-.tab-pane .tab-actions {
-    border-top: dashed 1px;
-    padding: 12px;
-    border-bottom-left-radius: 6px;
-    border-bottom-right-radius: 6px;
-}
-
-.tab-pane .tab-actions .tab-prev {
-    float: left;
-}
-
-.tab-pane .tab-actions .tab-next {
-    float: right;
+.addons-list .btn .oe_module_name {
+    font-size: 13px;
 }

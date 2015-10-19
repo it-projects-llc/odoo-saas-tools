@@ -33,10 +33,10 @@ WIZARD_FLOW = {
     },
     PAGE_ADDONS_SELECT: {
         "prev": PAGE_PLAN_CONFIRM,
-        "next": PAGE_SUMMARY,
-    },
-    PAGE_SUMMARY: {
-        "prev": PAGE_ADDONS_SELECT,
+    #     "next": PAGE_SUMMARY,
+    # },
+    # PAGE_SUMMARY: {
+    #     "prev": PAGE_ADDONS_SELECT,
         "next": None,
     },
 }
@@ -48,7 +48,7 @@ class SaasPortalStartWizard(SaasPortalStart):
     def start(self, **post):
         return super(SaasPortalStartWizard, self).start(**post)
 
-    def __get_plans(self):
+    def __get_plans(self, upstream={}):
         # Get available plans
         plan_model = request.registry['saas_portal.plan']
         domain = [('state', '=', 'confirmed')]
@@ -57,8 +57,9 @@ class SaasPortalStartWizard(SaasPortalStart):
 
         return {"plans": plans}
 
-    def __get_legal(self):
-        cr, uid, context, registry = request.cr, request.uid, request.context, request.registry
+    def __get_legal(self, upstream={}):
+        cr, uid = request.cr, request.uid
+        context, registry = request.context, request.registry
 
         orm_user = registry.get('res.users')
         orm_country = registry.get('res.country')
@@ -72,16 +73,21 @@ class SaasPortalStartWizard(SaasPortalStart):
                                   context).partner_id
 
         values = {
-            'name': partner.name or '',
-            'phone': partner.phone or getattr(partner.parent_id, "phone", ''),
-            'company': getattr(partner.parent_id, "name", ''),
-            'vat': getattr(partner.parent_id, "vat", ''),
-            'city': partner.city or getattr(partner.parent_id, "city", ''),
-            'zip_': partner.zip or getattr(partner.parent_id, "zip", ''),
-            'country_id': getattr(
+            'name': upstream.pop('name', False) or partner.name or '',
+            'phone': upstream.pop('phone', False) or partner.phone or getattr(
+                partner.parent_id, "phone", ''),
+            'company': upstream.pop('company', False) or getattr(
+                partner.parent_id, "name", ''),
+            'vat': upstream.pop('vat', False) or getattr(partner.parent_id,
+                                                         "vat", ''),
+            'city': upstream.pop('city', False) or partner.city or getattr(
+                partner.parent_id, "city", ''),
+            'zip_': upstream.pop('zip_', False) or partner.zip or getattr(
+                partner.parent_id, "zip", ''),
+            'country_id': upstream.pop('country_id', False) or getattr(
                 partner.country_id or getattr(partner.parent_id, "country_id",
                                               False), "id"),
-            'state_id': getattr(
+            'state_id': upstream.pop('state_id', False) or getattr(
                 partner.state_id or getattr(partner.parent_id, "state_id",
                                             False), "id"),
             'countries': countries,
@@ -89,13 +95,35 @@ class SaasPortalStartWizard(SaasPortalStart):
         }
         return values
 
-    def __get_terms(self):
+    def __get_terms(self, upstream={}):
         company = request.registry['ir.model.data'].xmlid_to_object(
             request.cr,
             SUPERUSER_ID,
             "base.main_company")
 
         return {"terms": company.terms_n_conds or False}
+
+    def __get_addons(self, upstream={}):
+        addon_model = request.registry['ir.module.module']
+        domain = [('application', '=', True)]
+        ids = addon_model.search(request.cr, SUPERUSER_ID, domain)
+        addons = addon_model.browse(request.cr, SUPERUSER_ID, ids)
+
+        upstream.update({"addons": None})
+
+        return {"addons": addons}
+
+    def __get_metadata(self, upstream={}):
+        data = [
+            (PAGE_PLAN_SELECT, {"crumb": "Plan selection"}),
+            (PAGE_TERMS_CONDS, {"crumb": "License agreement"}),
+            (PAGE_PLAN_CONFIRM, {"crumb": "Legal info"}),
+            (PAGE_ADDONS_SELECT, {"crumb": "Extra addons"}),
+        ]
+
+        # plan_model = request.registry['saas_portal.plan']
+
+        return data
 
     @http.route(['/page/start/wizard'], type='http', auth="user", website=True)
     def start_wizard(self, **post):
@@ -105,23 +133,7 @@ class SaasPortalStartWizard(SaasPortalStart):
 
         state.update(self.__get_plans())
         state.update({"wizard_page": PAGE_PLAN_SELECT})
-
-        #
-        # addon_model = request.registry['ir.module.module']
-        # domain = [('application', '=', True)]
-        # ids = addon_model.search(request.cr, SUPERUSER_ID, domain)
-        # addons = addon_model.browse(request.cr, SUPERUSER_ID, ids)
-        #
-        # addon_data = []
-        # for addon in addons:
-        #     data = {
-        #         "name": addon.shortdesc,
-        #         "summ": addon.summary,
-        #         "id": addon.name,
-        #         "logo": addon.icon,
-        #     }
-        #     addon_data.append(data)
-        # state.update({"addons": addon_data})
+        state.update({"meta": self.__get_metadata(post)})
 
         return request.website.render("saas_portal_start_wizard.wizard_tpl",
                                       state)
@@ -132,7 +144,7 @@ class SaasPortalStartWizard(SaasPortalStart):
         _logger.info("\n\nWIZARD SUBMIT with :: %s\n", post)
 
         current_page = post.pop("wizard_page")
-        action = "next" if post.pop("page_next", False) == '' else "prev"
+        action = "next" if post.pop("page_next", False) is not False else "prev"
         post.pop("page_prev", False)
 
         next_page = WIZARD_FLOW[current_page][action]
@@ -147,17 +159,20 @@ class SaasPortalStartWizard(SaasPortalStart):
                 )
             )
 
-        state = {"upstream": post.items()}
+        upstream = post.copy()
 
         data = {
             PAGE_PLAN_SELECT: self.__get_plans,
             PAGE_TERMS_CONDS: self.__get_terms,
             PAGE_PLAN_CONFIRM: self.__get_legal,
-        }[next_page]()
+            PAGE_ADDONS_SELECT: self.__get_addons,
+        }[next_page](upstream)
 
         _logger.info("\n\nData for next page: %s\n", data)
 
+        state = {"upstream": upstream.items()}
         state.update(data)
+        state.update({"meta": self.__get_metadata(upstream)})
         state.update({"wizard_page": next_page})
 
         return request.website.render("saas_portal_start_wizard.wizard_tpl",
@@ -186,19 +201,21 @@ class SaasPortalStartWizard(SaasPortalStart):
         state.update({'addons': addons})
 
         company_data = {
-            "name": post.get("company"),
+            "name": post.get("name"),
+            "company": post.get("company"),
             "vat": post.get("vat"),
             "phone": post.get("phone"),
             "city": post.get("city"),
-            "state": post.get("state"),
-            "country": post.get("country"),
-            "zip": post.get("zip"),
+            "state_id": post.get("state_id", False),
+            "country_id": post.get("country_id"),
+            "zip": post.get("zip_"),
         }
 
         state.update({"company_data": company_data})
         params['state'] = simplejson.dumps(state)
 
-        url = "{base}?{params}".format(base=base, params=werkzeug.url_encode(params))
+        url = "{base}?{params}".format(base=base,
+                                       params=werkzeug.url_encode(params))
         _logger.info("\n\nFinal URL: %s\n", url)
 
         return werkzeug.utils.redirect(url)

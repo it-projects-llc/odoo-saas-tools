@@ -15,15 +15,13 @@
 
         <template id="page_tpl">
             <div class="tab-pane row">
-                <div class="tab-title row bg-primary">
-                    <h1><t t-esc="tab_title"/></h1>
-                </div>
+                <h3 class="page-header mt16"><t t-esc="tab_title"/></h3>
 
                 <div class="tab-body row">
                     <t t-raw="0"/>
                 </div>
 
-                <div class="tab-actions row bg-primary">
+                <div class="tab-actions clearfix mt16 mb32">
                     <t t-set="prev_label" t-value="'Back'" />
                     <t t-set="next_label" t-value="'Continue'" />
                     <t t-if="custom_next">
@@ -31,11 +29,11 @@
                     </t>
 
                     <button type="submit" id="wizard-goback" name="page_prev"
-                            class="btn btn-warning tab-prev">
+                            class="btn btn-default tab-prev">
                         <t t-esc="prev_label"/>
                     </button>
                     <button type="submit" id="wizard-submit" name="page_next"
-                            class="btn btn-success tab-next">
+                            class="btn btn-primary tab-next pull-right">
                         <t t-esc="next_label"/>
                     </button>
                 </div>
@@ -43,8 +41,8 @@
         </template>
 
 		<template id="plan_tpl">
-			<div class="plan_choice col-sm-6 col-lg-4 mb16">
-                <a class="plan_btn" href="#"
+            <div class="col-sm-6 col-lg-4 mb16">
+                <a class="btn btn-default" href="#"
                    t-att-data-planid="plan.id">
                     <div class="plan_inner">
                         <div class="plan-logo">
@@ -61,14 +59,14 @@
                         </div>
                     </div>
                 </a>
-			</div>
+            </div>
 		</template>
 
         <template id="page_plan">
             <t t-set="tab_title" t-value="'Choose a Plan'"/>
 
             <t t-call="saas_portal_start_wizard.page_tpl">
-                <div class="plans-list row">
+                <div class="plans-list list row">
                     <t t-foreach="plans" t-as="plan">
                         <t t-call="saas_portal_start_wizard.plan_tpl"/>
                     </t>
@@ -81,7 +79,7 @@
             <t t-set="custom_next" t-value="'I agree'"/>
 
             <t t-call="saas_portal_start_wizard.page_tpl">
-                <div class="text-raw bg-info">
+                <div class="text-raw">
                     <t t-raw="terms"/>
                 </div>
             </t>
@@ -156,34 +154,26 @@
         </template>
 
         <template id="addon_tpl">
-            <div class="addon_choice col-xs-6 col-sm4 col-md-3 mb16">
-                <a class="addon_btn" href="#"
-                   t-att-data-addon_name="addon['id']">
-                    <div class="addon-inner">
-                        <div class="addon-logo">
-                            <img t-att-src="addon['logo']" />
-                        </div>
-                        <div class="addon-data" style="">
-                            <h3 class="addon-name">
-                                <t t-esc="addon['name']" />
-                            </h3>
-                            <p class="mt4 text-muted">
-                                <t t-esc="addon['summ']" />
-                            </p>
-                        </div>
+            <div class="col-xs-6 col-md-4 mb16">
+                <a class="btn btn-default" href="#"
+                   t-att-data-addon_name="addon.name">
+                    <img t-att-src="addon.icon" class="oe_module_icon"/>
+                    <div class="oe_module_desc">
+                        <h4><t t-esc="addon.shortdesc" /></h4>
+                        <p class="oe_module_name text-muted">
+                            <t t-esc="addon.summary" />
+                        </p>
                     </div>
                 </a>
             </div>
         </template>
 
         <template id="page_addons">
-            <t t-set="tab_id" t-value="'tab4'"/>
-            <t t-set="prev_page" t-value="'#tab3'"/>
             <t t-set="tab_title" t-value="'Choose apps to install'"/>
-            <t t-set="next_page" t-value="'#tab9'"/>
+            <t t-set="custom_next" t-value="'Launch'"/>
 
             <t t-call="saas_portal_start_wizard.page_tpl">
-                <div class="addons-list row">
+                <div class="addons-list list row">
                     <t t-foreach="addons" t-as="addon">
                         <t t-call="saas_portal_start_wizard.addon_tpl"/>
                     </t>
@@ -280,119 +270,77 @@
         <template id="wizard_tpl" name="New tenant Wizard" page="True"
                   priority="29">
             <t t-call="website.layout">
-                <div id="wrap" class="container oe_structure oe_empty">
-                    <div class="row mt16 mb92">
-                        <div class="odoo_call_action">
-                            <form role="form" id="wizard-form" method="get"
-                                  action="/page/start/wizard/submit"
-                                  t-att-class="wizard_page">
-                                <t t-if="wizard_page=='page_plan_select'">
-                                    <t t-call="saas_portal_start_wizard.page_plan"/>
+                <div id="wrap">
+                    <div class="container">
+                        <ul class="wizard pull-right">
+                            <t t-set="previous" t-value="True" />
+                            <t t-foreach="meta" t-as="page">
+                                <t t-if="page[0] == wizard_page">
+                                    <li class="text-primary">
+                                        <t t-esc="page[1]['crumb']" />
+                                        <span class="chevron"></span>
+                                    </li>
+                                    <t t-set="previous" t-value="False" />
                                 </t>
-                                <t t-if="wizard_page=='page_terms_conds'">
-                                    <t t-call="saas_portal_start_wizard.page_terms"/>
+                                <t t-if="page[0] != wizard_page">
+                                    <!--<t t-if="previous">-->
+                                        <!--<li>-->
+                                            <!--<a class="text-primary" href="#">-->
+                                                <!--<t t-esc="page[1]['crumb']"/>-->
+                                                <!--<span class="chevron"></span>-->
+                                            <!--</a>-->
+                                        <!--</li>-->
+                                    <!--</t>-->
+                                    <!--<t t-if="not previous">-->
+                                        <li class="text-muted">
+                                            <t t-esc="page[1]['crumb']"/>
+                                            <span class="chevron"></span>
+                                        </li>
+                                    <!--</t>-->
                                 </t>
-                                <t t-if="wizard_page=='page_plan_confirm'">
-                                    <t t-call="saas_portal_start_wizard.page_payment"/>
-                                </t>
-                                <input type="hidden" name="wizard_page" t-att-value="wizard_page" />
-                                <t t-foreach="upstream" t-as="item">
-                                    <input type="hidden"
-                                           t-att-name="item[0]"
-                                           t-att-value="item[1]"/>
-                                </t>
-                            </form>
-                        </div>
+                            </t>
+                        </ul>
+                        <h1 class="mb32">New Tenant wizard</h1>
+                        <form role="form" id="wizard-form" method="get"
+                              action="/page/start/wizard/submit"
+                              t-att-class="wizard_page">
+                            <div class="row">
+                                <div class="col-md-8 col-sm-9">
+                                    <t t-if="wizard_page=='page_plan_select'">
+                                        <t t-call="saas_portal_start_wizard.page_plan"/>
+                                    </t>
+                                    <t t-if="wizard_page=='page_terms_conds'">
+                                        <t t-call="saas_portal_start_wizard.page_terms"/>
+                                    </t>
+                                    <t t-if="wizard_page=='page_plan_confirm'">
+                                        <t t-call="saas_portal_start_wizard.page_payment"/>
+                                    </t>
+                                    <t t-if="wizard_page=='page_addons_select'">
+                                        <t t-call="saas_portal_start_wizard.page_addons"/>
+                                    </t>
+                                    <input type="hidden" name="wizard_page"
+                                           t-att-value="wizard_page"/>
+                                    <t t-foreach="upstream" t-as="item">
+                                        <input type="hidden"
+                                               t-att-name="item[0]"
+                                               t-att-value="item[1]"/>
+                                    </t>
+                                </div>
+                                <!--<div class="col-sm-3 col-md-offset-1">-->
+                                    <!--<h3 class="page-header mt16">Summary</h3>-->
+                                    <!--<div class="row">-->
+                                        <!--<h4>General Info</h4>-->
+                                        <!--<ul class="list-unstyled mb32">-->
+                                            <!--<li>Option 1</li>-->
+                                            <!--<li>Option 2</li>-->
+                                        <!--</ul>-->
+                                    <!--</div>-->
+                                <!--</div>-->
+                            </div>
+                        </form>
                     </div>
                 </div>
             </t>
         </template>
-
-        <!--<template id="wizard_tpl" name="New tenant wizard" page="True"-->
-                  <!--priority="29">-->
-            <!--<t t-call="website.layout">-->
-				<!--<div id="wrap" class="oe_structure oe_empty">-->
-					<!--<section class="odoo_secondary_A">-->
-						<!--<div class="container">-->
-							<!--<div class="row">-->
-								<!--<div class="text-center mt16 mb92">-->
-									<!--<div class="odoo_call_action">-->
-										<!--<form role="form" id="wizard-form"-->
-                                              <!--class="form-horizontal"-->
-                                              <!--action="/saas_portal/add_new_client">-->
-											<!--<div class="row">-->
-												<!--<div id="rootwizard"-->
-													 <!--class="tabbable tabs-left">-->
-													<!--<ul>-->
-                                                        <!--<li>-->
-                                                            <!--<a href="#tab1"-->
-                                                               <!--data-toggle="tab"/>-->
-                                                        <!--</li>-->
-                                                        <!--<li>-->
-                                                            <!--<a href="#tab2"-->
-                                                               <!--data-toggle="tab"/>-->
-                                                        <!--</li>-->
-                                                        <!--<li>-->
-                                                            <!--<a href="#tab3"-->
-                                                               <!--data-toggle="tab"/>-->
-                                                        <!--</li>-->
-                                                        <!--<li>-->
-                                                            <!--<a href="#tab4"-->
-                                                               <!--data-toggle="tab"/>-->
-                                                        <!--</li>-->
-
-                                                        <!--<li>-->
-                                                            <!--<a href="#tab9"-->
-                                                               <!--data-toggle="tab"/>-->
-                                                        <!--</li>-->
-                                                    <!--</ul>-->
-													<!--<div class="tab-content">-->
-                                                        <!--<t t-call="saas_portal_start_wizard.page_plan"/>-->
-                                                        <!--<t t-if="terms">-->
-                                                            <!--<t t-call="saas_portal_start_wizard.page_terms" />-->
-                                                        <!--</t>-->
-                                                        <!--<t t-call="saas_portal_start_wizard.page_payment" />-->
-                                                        <!--<t t-call="saas_portal_start_wizard.page_addons" />-->
-
-                                                        <!--<t t-call="saas_portal_start_wizard.page_summary" />-->
-                                                    <!--</div>-->
-												<!--</div>-->
-											<!--</div>-->
-
-                                            <!--<input id="upstream-app"-->
-                                                   <!--t-att-value="app"-->
-                                                   <!--type="hidden" name="app"/>-->
-                                            <!--<input id="upstream-lang"-->
-                                                   <!--t-att-value="lang"-->
-                                                   <!--type="hidden" name="lang"/>-->
-                                            <!--<input id="upstream-tz"-->
-                                                   <!--t-att-value="tz"-->
-                                                   <!--type="hidden" name="tz"/>-->
-                                            <!--<input id="upstream-dbname"-->
-                                                   <!--t-att-value="dbname"-->
-                                                   <!--type="hidden" name="dbname"/>-->
-                                            <!--<input id="upstream-hosting"-->
-                                                   <!--t-att-value="hosting"-->
-                                                   <!--type="hidden"-->
-                                                   <!--name="hosting"/>-->
-
-                                            <!--<input id="plan-id-hidden" value=""-->
-                                                   <!--type="hidden" name="plan_id"-->
-                                                   <!--data-plan_name=""/>-->
-                                            <!--<input id="addons-hidden" value=""-->
-                                                   <!--type="hidden" name="addons"/>-->
-
-                                        <!--</form>-->
-									<!--</div>-->
-
-								<!--</div>-->
-							<!--</div>-->
-						<!--</div>-->
-					<!--</section>-->
-
-				<!--</div>-->
-			<!--</t>-->
-		<!--</template>-->
-
 	 </data>
 </openerp>

@@ -5,7 +5,7 @@
 			<field name="name">saas_server.config.settings.inherit</field>
 			<field name="model">saas_server.config.settings</field>
 			<field name="inherit_id"
-				ref="saas_server_config.view_saas_server_config_settings" />
+				ref="saas_server.view_saas_server_config_settings" />
 			<field name="arch" type="xml">
 				<header position="after">
 					<div>

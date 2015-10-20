@@ -14,10 +14,10 @@
 		</template>
 
         <template id="page_tpl">
-            <div class="tab-pane row">
+            <div class="tab-pane">
                 <h3 class="page-header mt16"><t t-esc="tab_title"/></h3>
 
-                <div class="tab-body row">
+                <div class="tab-body">
                     <t t-raw="0"/>
                 </div>
 
@@ -181,126 +181,34 @@
             </t>
         </template>
 
-        <template id="page_summary">
-            <t t-set="tab_id" t-value="'tab9'"/>
-            <t t-set="prev_page" t-value="'#tab4'"/>
-            <t t-set="tab_title" t-value="'Summary'"/>
-            <t t-set="hide_next" t-value="True"/>
-            <t t-set="show_submit" t-value="True"/>
-
-            <t t-call="saas_portal_start_wizard.page_tpl">
-                <div class="col-md-6 text-right">
-                    <h3 class="text-center">Technical data</h3>
-                    <div class="form-group">
-                        <label class="control-label col-xs-3">
-                            Plan:
-                        </label>
-                        <div class="col-xs-9 text-left">
-                            <p id="summary-plan_name"
-                               class="form-control-static"></p>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="control-label col-xs-3">
-                            Addons:
-                        </label>
-                        <div class="col-xs-9 text-left">
-                            <p id="summary-addons_list"
-                               class="form-control-static"></p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-6 text-right">
-                    <h3 class="text-center">Legal data</h3>
-                    <!--<div class="form-group">-->
-                        <!--<label class="control-label col-xs-3">-->
-                            <!--Name:-->
-                        <!--</label>-->
-                        <!--<div class="col-xs-9 text-left">-->
-                            <!--<p id="summary-name"-->
-                               <!--class="form-control-static"></p>-->
-                        <!--</div>-->
-                    <!--</div>-->
-
-                    <div class="form-group">
-                        <label class="control-label col-xs-3">
-                            Company:
-                        </label>
-                        <div class="col-xs-9 text-left">
-                            <p id="summary-company"
-                               class="form-control-static"></p>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="control-label col-xs-3">
-                            VAT:
-                        </label>
-                        <div class="col-xs-9 text-left">
-                            <p id="summary-vat"
-                               class="form-control-static"></p>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="control-label col-xs-3">
-                            Address:
-                        </label>
-                        <div class="col-xs-9 text-left">
-                            <p id="summary-address"
-                               class="form-control-static"></p>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="control-label col-xs-3">
-                            Phone:
-                        </label>
-                        <div class="col-xs-9 text-left">
-                            <p id="summary-phone"
-                               class="form-control-static"></p>
-                        </div>
-                    </div>
-                </div>
-            </t>
-        </template>
-
         <template id="wizard_tpl" name="New tenant Wizard" page="True"
                   priority="29">
             <t t-call="website.layout">
                 <div id="wrap">
                     <div class="container">
                         <ul class="wizard pull-right">
-                            <t t-set="previous" t-value="True" />
-                            <t t-foreach="meta" t-as="page">
+                            <t t-foreach="meta['crumbs']" t-as="page">
                                 <t t-if="page[0] == wizard_page">
                                     <li class="text-primary">
-                                        <t t-esc="page[1]['crumb']" />
+                                        <t t-esc="page[1]" />
                                         <span class="chevron"></span>
                                     </li>
-                                    <t t-set="previous" t-value="False" />
                                 </t>
                                 <t t-if="page[0] != wizard_page">
-                                    <!--<t t-if="previous">-->
-                                        <!--<li>-->
-                                            <!--<a class="text-primary" href="#">-->
-                                                <!--<t t-esc="page[1]['crumb']"/>-->
-                                                <!--<span class="chevron"></span>-->
-                                            <!--</a>-->
-                                        <!--</li>-->
-                                    <!--</t>-->
-                                    <!--<t t-if="not previous">-->
-                                        <li class="text-muted">
-                                            <t t-esc="page[1]['crumb']"/>
-                                            <span class="chevron"></span>
-                                        </li>
-                                    <!--</t>-->
+                                    <li class="text-muted">
+                                        <t t-esc="page[1]"/>
+                                        <span class="chevron"></span>
+                                    </li>
                                 </t>
                             </t>
                         </ul>
-                        <h1 class="mb32">New Tenant wizard</h1>
+                        <t t-foreach="meta['crumbs']" t-as="page">
+                            <t t-if="page[0] == wizard_page">
+                                <h1 class="mb32">
+                                    <t t-esc="page[1]"/>
+                                </h1>
+                            </t>
+                        </t>
                         <form role="form" id="wizard-form" method="get"
                               action="/page/start/wizard/submit"
                               t-att-class="wizard_page">
@@ -326,16 +234,28 @@
                                                t-att-value="item[1]"/>
                                     </t>
                                 </div>
-                                <!--<div class="col-sm-3 col-md-offset-1">-->
-                                    <!--<h3 class="page-header mt16">Summary</h3>-->
-                                    <!--<div class="row">-->
-                                        <!--<h4>General Info</h4>-->
-                                        <!--<ul class="list-unstyled mb32">-->
-                                            <!--<li>Option 1</li>-->
-                                            <!--<li>Option 2</li>-->
-                                        <!--</ul>-->
-                                    <!--</div>-->
-                                <!--</div>-->
+                                <div id="summary-bar" class="col-sm-3 col-md-offset-1">
+                                    <h3 class="page-header mt16">Summary</h3>
+                                    <div class="text-muted">
+                                        <t t-foreach="meta['summary']"
+                                           t-as="page">
+                                            <h4><t t-esc="page[0]" /></h4>
+                                            <ul class="list-unstyled mb32">
+                                                <t t-foreach="page[1]"
+                                                   t-as="datum">
+                                                    <li>
+                                                        <label>
+                                                            <t t-esc="datum[0]"/>:
+                                                        </label>
+                                                        <span>
+                                                            <t t-esc="datum[1]"/>
+                                                        </span>
+                                                    </li>
+                                                </t>
+                                            </ul>
+                                        </t>
+                                    </div>
+                                </div>
                             </div>
                         </form>
                     </div>

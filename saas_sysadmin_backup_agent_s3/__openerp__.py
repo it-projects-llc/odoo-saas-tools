@@ -9,7 +9,7 @@
             'boto',
         ],
     },
-    'depends': ['saas_sysadmin_backup_agent', 'saas_server_config'],
+    'depends': ['saas_sysadmin_backup_agent'],
     'data': [
         'views/res_config.xml',
         ],

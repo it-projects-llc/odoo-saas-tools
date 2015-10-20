@@ -114,20 +114,63 @@ class SaasPortalStartWizard(SaasPortalStart):
         return {"addons": addons}
 
     def __get_metadata(self, upstream={}):
-        data = [
-            (PAGE_PLAN_SELECT, {"crumb": "Plan selection"}),
-            (PAGE_TERMS_CONDS, {"crumb": "License agreement"}),
-            (PAGE_PLAN_CONFIRM, {"crumb": "Legal info"}),
-            (PAGE_ADDONS_SELECT, {"crumb": "Extra addons"}),
+        crumbs = [
+            (PAGE_PLAN_SELECT, "Plan selection"),
+            (PAGE_TERMS_CONDS, "License agreement"),
+            (PAGE_PLAN_CONFIRM, "Legal info"),
+            (PAGE_ADDONS_SELECT, "Extra addons"),
         ]
 
-        # plan_model = request.registry['saas_portal.plan']
+        summary = [
+            ("General", [
+                ("Tenant name", upstream.get("dbname"))
+            ])
+        ]
 
+        cr, uid = request.cr, SUPERUSER_ID
+
+        plan_id = upstream.get("plan_id", False)
+        if plan_id:
+            plan_model = request.registry['saas_portal.plan']
+            plan = plan_model.browse(cr, uid, int(plan_id))
+            summary[0][1].append(("Plan", plan.name))
+
+        name = upstream.get("name", False)
+        if name:
+            summary.append((
+                "Personal Information", [
+                    ("Name", upstream.get("name")),
+                    ("Phone", upstream.get("phone")),
+                ]
+            ))
+            address = "{}, Zip: {}.".format(upstream.get("city"),
+                                            upstream.get("zip_"))
+            state_id = upstream.get("state_id")
+            if state_id:
+                state_model = request.registry['res.country.state']
+                state = state_model.browse(cr, uid, int(state_id))
+                address = "{} {},".format(address, state.name)
+
+            country_model = request.registry['res.country']
+            country_id = upstream.get('country_id')
+            country = country_model.browse(cr, uid, int(country_id))
+            address = "{} {}.".format(address, country.name)
+
+            summary.append((
+                "Legal Information", [
+                    ("Company", upstream.get("company")),
+                    ("VAT", upstream.get("vat")),
+                    ("Address", address),
+                ]
+            ))
+
+        data = {"crumbs": crumbs, "summary": summary}
         return data
 
     @http.route(['/page/start/wizard'], type='http', auth="user", website=True)
     def start_wizard(self, **post):
         _logger.info("\n\nWIZARD START with :: %s\n", post)
+
         state = {"upstream": post.items()}
         state["upstream"].append(("plan_id", None))
 
@@ -160,6 +203,7 @@ class SaasPortalStartWizard(SaasPortalStart):
             )
 
         upstream = post.copy()
+        request.httpsession.update(upstream)
 
         data = {
             PAGE_PLAN_SELECT: self.__get_plans,
@@ -171,6 +215,7 @@ class SaasPortalStartWizard(SaasPortalStart):
         _logger.info("\n\nData for next page: %s\n", data)
 
         state = {"upstream": upstream.items()}
+        # state = {}
         state.update(data)
         state.update({"meta": self.__get_metadata(upstream)})
         state.update({"wizard_page": next_page})

@@ -3,6 +3,11 @@
     white-space: normal;
 }
 
+.addons-list>div {
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
 .addons-list .btn {
     padding: 6px;
     height: 120px;
@@ -14,13 +19,13 @@
 }
 
 .addons-list .btn .oe_module_icon {
-    width: 80px;
+    width: 70px;
     height: auto;
     vertical-align: top;
 }
 
 .addons-list .btn .oe_module_desc {
-    width: 150px;
+    width: 160px;
     padding-left: 6px;
     text-align: left;
 }
@@ -33,4 +38,14 @@
 
 .addons-list .btn .oe_module_name {
     font-size: 13px;
+}
+
+#summary-bar ul.list-unstyled li {
+    margin-left: 20px;
+    margin-bottom: 5px;
+}
+
+#summary-bar ul.list-unstyled li label {
+    margin-left: -10px;
+    margin-bottom: 0;
 }

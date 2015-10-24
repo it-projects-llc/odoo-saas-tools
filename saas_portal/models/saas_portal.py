@@ -307,7 +307,6 @@ URL - %s
     @api.multi
     def delete_template(self):
         res = self[0].template_id.delete_database()
-        self.unlink()
         return res
 
 

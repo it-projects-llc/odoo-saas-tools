@@ -290,6 +290,7 @@
                      <page string="Addons"  attrs="{'invisible': [('action', '!=', 'upgrade')]}">
                          <p>Comma-separated list of addons to Update, Install or Uninstall</p>
                          <group>
+                            <field name="update_addons_list"/>
                              <field name="update_addons"/>
                              <field name="install_addons"/>
                              <field name="uninstall_addons"/>

@@ -306,7 +306,8 @@ URL - %s
 
     @api.multi
     def delete_template(self):
-        return self[0].template_id.delete_database()
+        res = self[0].template_id.delete_database()
+        return res
 
 
 class OauthApplication(models.Model):

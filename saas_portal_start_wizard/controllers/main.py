@@ -63,14 +63,13 @@ class SaasPortalStartWizard(SaasPortalStart):
 
         orm_user = registry.get('res.users')
         orm_country = registry.get('res.country')
-        state_orm = registry.get('res.country.state')
+        orm_state = registry.get('res.country.state')
 
         country_ids = orm_country.search(cr, SUPERUSER_ID, [], context=context)
         countries = orm_country.browse(cr, SUPERUSER_ID, country_ids, context)
-        states_ids = state_orm.search(cr, SUPERUSER_ID, [], context=context)
-        states = state_orm.browse(cr, SUPERUSER_ID, states_ids, context)
-        partner = orm_user.browse(cr, SUPERUSER_ID, request.uid,
-                                  context).partner_id
+        states_ids = orm_state.search(cr, SUPERUSER_ID, [], context=context)
+        states = orm_state.browse(cr, SUPERUSER_ID, states_ids, context)
+        partner = orm_user.browse(cr, SUPERUSER_ID, uid, context).partner_id
 
         values = {
             'name': upstream.pop('name', False) or partner.name or '',
@@ -93,6 +92,15 @@ class SaasPortalStartWizard(SaasPortalStart):
             'countries': countries,
             'states': states,
         }
+
+        orm_plan = registry.get('saas_portal.plan')
+
+        plan = orm_plan.browse(cr, uid, int(upstream['plan_id']))
+        order = plan.get_sale_order(partner.id, upstream.get('dbname'), True,
+                                    True)
+
+        _logger.info("\n\nObtained order: %s\n", order)
+
         return values
 
     def __get_terms(self, upstream={}):
@@ -133,7 +141,29 @@ class SaasPortalStartWizard(SaasPortalStart):
         if plan_id:
             plan_model = request.registry['saas_portal.plan']
             plan = plan_model.browse(cr, uid, int(plan_id))
-            summary[0][1].append(("Plan", plan.name))
+            summary.append(
+                ("Plan", [
+                    ("Name", plan.name)
+                ])
+            )
+            if hasattr(plan, "pricing"):
+                BILLING = {
+                    "pre": "Pre-paid",
+                    "post": "Post-paid",
+                }
+                PRICING_LABEL = {
+                    "fixed": "Price",
+                    "variable": "Starting at"
+                }
+
+                summary[-1][1].extend([
+                    ("Billing", BILLING[plan.pricing.billing]),
+                    ("Pricing", plan.pricing.pricing.capitalize()),
+                    (PRICING_LABEL[plan.pricing.pricing], plan.pricing.price),
+                    ("To be paid", plan.pricing.period.capitalize()),
+                ])
+            else:
+                summary[-1][1].append(("Pricing", "Free"))
 
         name = upstream.get("name", False)
         if name:
@@ -167,6 +197,29 @@ class SaasPortalStartWizard(SaasPortalStart):
         data = {"crumbs": crumbs, "summary": summary}
         return data
 
+    def __validate_data(self, upstream):
+        cr, uid = request.cr, SUPERUSER_ID
+        plan_model = request.registry['saas_portal.plan']
+        user_model = request.registry['res.users']
+
+        errors = {}
+
+        plan_id = upstream.get("plan_id", False)
+        if plan_id:
+            plan = plan_model.browse(cr, uid, int(plan_id))
+
+            if hasattr(plan, 'pricing'):
+                partner = user_model.browse(cr, uid, request.uid).partner_id
+                # partner = partner_model.browse(cr, uid, partner_id)
+                _logger.info("\n\nPARTNER: %s\n", partner)
+                if not partner.customer:
+                    errors["general"] = []
+                    errors["general"].append(
+                        "User must be costumer to purchase this plan.")
+                    errors['plan_id'] = 'has-error'
+
+        return errors
+
     @http.route(['/page/start/wizard'], type='http', auth="user", website=True)
     def start_wizard(self, **post):
         _logger.info("\n\nWIZARD START with :: %s\n", post)
@@ -190,7 +243,16 @@ class SaasPortalStartWizard(SaasPortalStart):
         action = "next" if post.pop("page_next", False) is not False else "prev"
         post.pop("page_prev", False)
 
-        next_page = WIZARD_FLOW[current_page][action]
+        upstream = post.copy()
+        state = {"upstream": upstream.items()}
+
+        errors = self.__validate_data(upstream)
+        if errors:
+            _logger.info("\n\nErrors: %s\n", errors)
+            state.update({"errors": errors})
+            next_page = current_page
+        else:
+            next_page = WIZARD_FLOW[current_page][action]
 
         if (not next_page) and (action == "prev"):
             return werkzeug.utils.redirect('/page/start/')
@@ -202,9 +264,6 @@ class SaasPortalStartWizard(SaasPortalStart):
                 )
             )
 
-        upstream = post.copy()
-        request.httpsession.update(upstream)
-
         data = {
             PAGE_PLAN_SELECT: self.__get_plans,
             PAGE_TERMS_CONDS: self.__get_terms,
@@ -212,13 +271,12 @@ class SaasPortalStartWizard(SaasPortalStart):
             PAGE_ADDONS_SELECT: self.__get_addons,
         }[next_page](upstream)
 
-        _logger.info("\n\nData for next page: %s\n", data)
-
-        state = {"upstream": upstream.items()}
-        # state = {}
+        # state = {"upstream": upstream.items()}
         state.update(data)
         state.update({"meta": self.__get_metadata(upstream)})
         state.update({"wizard_page": next_page})
+
+        _logger.info("\n\nSTATE: %s\n", state)
 
         return request.website.render("saas_portal_start_wizard.wizard_tpl",
                                       state)

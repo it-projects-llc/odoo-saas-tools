@@ -4,7 +4,7 @@
     'author': 'D.H. Bahr',
     'category': 'SaaS',
     'website': 'https://it-projects.info',
-    'depends': ['website', 'saas_portal'],
+    'depends': ['website', 'saas_portal', 'website_sale'],
     'data': [
         'views/extends.xml',
         'views/website.xml',

@@ -1,15 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data  noupdate="1">
-    	
-	<record id="not_admin_tenant_rule" model="ir.rule">
-	        <field name="name">Only admin can edit admin</field>
-	        <field name="model_id" ref="base.model_res_users"/>
-			<field name="global" eval="1" />
-	        <field name="domain_force">[('id', '!=', 1)]</field>
-            <field name="perm_read" eval="False" />
-	    </record>
-
 		<record id="slave_module_domain_rule" model="ir.rule">
             <field name="name">Addons Domain</field>
             <field name="model_id" ref="base.model_ir_module_module"/>

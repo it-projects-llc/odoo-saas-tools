@@ -142,10 +142,10 @@ Client database customization
 ==============================
 
 The key question of client database customization is how to restrict
-administration rights. For example, client users should not able to
+administration rights. For example, client users should not be able to
 uninstall **saas_client** module, edit ir.confir_parameter records
 etc. The simplest solution is don't give to customer access to
-administration. To make more flexible configuration, you could intall
+administration. To make more flexible configuration, you could install
 following modules on SaaS Client databases:
 
 * [ir_rule_protected](https://github.com/yelizariev/addons-yelizariev/tree/9.0/ir_rule_protected) - makes impossible for non-superuser admin edit\delete protected ir.rule

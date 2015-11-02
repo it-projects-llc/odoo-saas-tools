@@ -4,11 +4,10 @@ from openerp.addons.web.http import request
 from openerp import SUPERUSER_ID, exceptions
 from openerp.addons.saas_portal_start.controllers.main import SaasPortalStart
 
-
-
 import werkzeug
 import logging
 import simplejson
+
 
 _logger = logging.getLogger(__name__)
 
@@ -64,6 +63,8 @@ class SaasPortalStartWizard(SaasPortalStart):
         orm_user = registry.get('res.users')
         orm_country = registry.get('res.country')
         orm_state = registry.get('res.country.state')
+        payment_obj = request.registry.get('payment.acquirer')
+        sale_order_obj = request.registry.get('sale.order')
 
         country_ids = orm_country.search(cr, SUPERUSER_ID, [], context=context)
         countries = orm_country.browse(cr, SUPERUSER_ID, country_ids, context)
@@ -96,10 +97,43 @@ class SaasPortalStartWizard(SaasPortalStart):
         orm_plan = registry.get('saas_portal.plan')
 
         plan = orm_plan.browse(cr, uid, int(upstream['plan_id']))
-        order = plan.get_sale_order(partner.id, upstream.get('dbname'), True,
-                                    True)
+        if hasattr(plan, "pricing"):
+            order = plan.get_sale_order(partner.id, upstream.get('dbname'),
+                                        True, True)[0]
+            _logger.info("\n\nObtained order: %s\n", order)
+            shipping_partner_id = False
+            if order:
+                if order.partner_shipping_id.id:
+                    shipping_partner_id = order.partner_shipping_id.id
+                else:
+                    shipping_partner_id = order.partner_invoice_id.id
+                values.update({"order": order})
+                errors = sale_order_obj._get_errors(cr, uid, order,
+                                                    context=context)
+                values.update({'errors': errors})
+                web_data = sale_order_obj._get_website_data(cr, uid, order,
+                                                            context)
+                values.update(web_data)
 
-        _logger.info("\n\nObtained order: %s\n", order)
+                acquirer_ids = payment_obj.search(cr, SUPERUSER_ID, [
+                    ('website_published', '=', True),
+                    ('company_id', '=', order.company_id.id)], context=context)
+                values['acquirers'] = list(
+                    payment_obj.browse(cr, uid, acquirer_ids, context=context))
+                render_ctx = dict(context, submit_class='btn btn-primary',
+                                  submit_txt="Pay Now")
+                for acquirer in values['acquirers']:
+                    acquirer.button = payment_obj.render(
+                        cr, SUPERUSER_ID, acquirer.id,
+                        order.name,
+                        order.amount_total,
+                        order.pricelist_id.currency_id.id,
+                        partner_id=shipping_partner_id,
+                        tx_values={
+                            'return_url': '/page/start/wizard/submit?{}'.format(
+                                werkzeug.url_encode(upstream)),
+                        },
+                        context=render_ctx)
 
         return values
 
@@ -203,6 +237,7 @@ class SaasPortalStartWizard(SaasPortalStart):
         user_model = request.registry['res.users']
 
         errors = {}
+        errors["general"] = []
 
         plan_id = upstream.get("plan_id", False)
         if plan_id:
@@ -210,10 +245,7 @@ class SaasPortalStartWizard(SaasPortalStart):
 
             if hasattr(plan, 'pricing'):
                 partner = user_model.browse(cr, uid, request.uid).partner_id
-                # partner = partner_model.browse(cr, uid, partner_id)
-                _logger.info("\n\nPARTNER: %s\n", partner)
                 if not partner.customer:
-                    errors["general"] = []
                     errors["general"].append(
                         "User must be costumer to purchase this plan.")
                     errors['plan_id'] = 'has-error'
@@ -239,15 +271,15 @@ class SaasPortalStartWizard(SaasPortalStart):
     def wizard_submit(self, **post):
         _logger.info("\n\nWIZARD SUBMIT with :: %s\n", post)
 
-        current_page = post.pop("wizard_page")
-        action = "next" if post.pop("page_next", False) is not False else "prev"
-        post.pop("page_prev", False)
+        current_page = post.get("wizard_page")
+        action = "next" if post.get("page_next", False) is not False else "prev"
+        # post.pop("page_prev", False)
 
         upstream = post.copy()
         state = {"upstream": upstream.items()}
 
         errors = self.__validate_data(upstream)
-        if errors:
+        if errors and errors.get('general', []):
             _logger.info("\n\nErrors: %s\n", errors)
             state.update({"errors": errors})
             next_page = current_page

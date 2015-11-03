@@ -262,7 +262,7 @@ class SaasServerClient(models.Model):
         for obj in params:
             groups = []
             if obj.get('hidden'):
-                groups = ['saas_client.group_no_client']
+                groups = ['saas_client.group_saas_support']
             client_env['ir.config_parameter'].set_param(obj['key'], obj['value'], groups=groups)
         return 'OK'
 

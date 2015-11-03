@@ -2,8 +2,8 @@
 <openerp>
     <data>
 
-        <record id="group_no_client" model="res.groups">
-            <field name="name">Non-client</field>
+        <record id="group_saas_support" model="res.groups">
+            <field name="name">SaaS Support</field>
             <field name="users" eval="[(4, ref('base.user_root'))]"/>
             <field name="comment">Special group for superuser. Should not be used for client users</field>
         </record>

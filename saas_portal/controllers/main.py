@@ -24,7 +24,7 @@ class SaasPortal(http.Controller):
     @http.route(['/saas_portal/add_new_client'], type='http', auth='public', website=True)
     def add_new_client(self, **post):
         dbname = self.get_full_dbname(post.get('dbname'))
-        plan = self.get_plan(post.get('plan_id'))
+        plan = self.get_plan(int(post.get('plan_id', 0)))
         url = plan.create_new_database(dbname)[0]
         return werkzeug.utils.redirect(url)
 

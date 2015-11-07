@@ -147,8 +147,6 @@ etc. The simplest solution is don't give to customer access to
 administration. To make more flexible configuration, you could install
 following modules on SaaS Client databases:
 
-*(some modules are not ported for 8.0. Contribution is welcome)*
-
 * [ir_rule_protected](https://github.com/yelizariev/addons-yelizariev/tree/9.0/ir_rule_protected) - makes impossible for non-superuser admin edit\delete protected ir.rule
 * [access_restricted](https://github.com/yelizariev/addons-yelizariev/tree/9.0/access_restricted) - makes impossible for administrator set (and see) more access rights (groups) than he already have. (follow the link for more description)
 * [hidden_admin](https://github.com/yelizariev/addons-yelizariev/tree/9.0/hidden_admin) - makes admin (user and partner) invisible

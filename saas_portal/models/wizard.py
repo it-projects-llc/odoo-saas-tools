@@ -50,7 +50,7 @@ class SaasConfig(models.TransientModel):
             'install_addons': (obj.install_addons or '').split(','),
             'uninstall_addons': (obj.uninstall_addons or '').split(','),
             'fixes': [[x.model, x.method] for x in obj.fix_ids],
-            'params': [[x.key, x.value] for x in obj.param_ids],
+            'params': [{'key': x.key, 'value': x.value, 'hidden': x.hidden} for x in obj.param_ids],
         }
         state = {
             'data': payload,
@@ -96,6 +96,7 @@ class SaasConfigParam(models.TransientModel):
     key = fields.Selection(selection=_get_keys, string='Key', required=1, size=64)
     value = fields.Char('Value', required=1, size=64)
     config_id = fields.Many2one('saas.config', 'Config')
+    hidden = fields.Boolean('Hidden parameter', default=True)
 
 class SaasPortalCreateClient(models.TransientModel):
     _name = 'saas_portal.create_client'

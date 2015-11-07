@@ -25,8 +25,8 @@ class SaasPortal(http.Controller):
     def add_new_client(self, **post):
         dbname = self.get_full_dbname(post.get('dbname'))
         plan = self.get_plan(int(post.get('plan_id', 0)))
-        url = plan.create_new_database(dbname)[0]
-        return werkzeug.utils.redirect(url)
+        res = plan.create_new_database(dbname)
+        return werkzeug.utils.redirect(res.get('url'))
 
     def get_config_parameter(self, param):
         config = request.registry['ir.config_parameter']

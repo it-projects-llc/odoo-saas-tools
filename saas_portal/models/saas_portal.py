@@ -188,8 +188,9 @@ class SaasPortalPlan(models.Model):
             vals['expiration_datetime'] = (now + delta).strftime(DEFAULT_SERVER_DATETIME_FORMAT)
         return vals
 
-    @api.one
+    @api.multi
     def create_new_database(self, dbname=None, client_id=None, partner_id=None):
+        self.ensure_one()
         server = self.server_id
         if not server:
             server = self.env['saas_portal.server'].get_saas_server()
@@ -224,13 +225,18 @@ class SaasPortalPlan(models.Model):
         if self.template_id:
             state.update({'db_template': self.template_id.name})
         scope = ['userinfo', 'force_login', 'trial', 'skiptheuse']
-        url = server._request(path='/saas_server/new_database',
+        url = server._request_server(path='/saas_server/new_database',
                               scheme=scheme,
                               port=port,
                               state=state,
                               client_id=client_id,
                               scope=scope,)[0]
-        return url
+        res = requests.get(url, verify=(self.server_id.request_scheme == 'https' and self.server_id.verify_ssl))
+        if res.status_code != 200:
+            # TODO /saas_server/new_database should return json data instead of html so we will be able to show error details here
+            raise exceptions.Warning('Error %s' % res.status_code)
+
+        return {'url': res.url, 'id': client.id, 'client_id': client_id}
 
     @api.one
     def generate_dbname(self, raise_error=True):

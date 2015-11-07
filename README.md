@@ -155,3 +155,62 @@ following modules on SaaS Client databases:
 * [hidden_admin](https://github.com/yelizariev/addons-yelizariev/tree/9.0/hidden_admin) - makes admin (user and partner) invisible
 * [access_apps](https://github.com/yelizariev/addons-yelizariev/tree/9.0/access_apps) - allows to have administrators which don't have access to Apps
 * [access_settings_menu](https://github.com/yelizariev/addons-yelizariev/tree/9.0/access_settings_menu) - allows to show settings menu for non-admin
+
+API integration
+===============
+
+To control SaaS via external tool [built-in XML-RPC](https://www.odoo.com/documentation/8.0/api_integration.html) can be used.
+
+Example for python language:
+
+    # Import libs
+    import json
+    import xmlrpclib
+    import requests
+
+    # Define credentials
+    main_url = 'http://odoo.local'
+    main_db = 'odoo.local'
+    admin_username = 'admin'
+    admin_password = 'admin'
+
+    # Authenticate
+    common = xmlrpclib.ServerProxy('{}/xmlrpc/2/common'.format(main_url))
+    admin_uid = common.authenticate(main_db, admin_username, admin_password, {})
+    models = xmlrpclib.ServerProxy('{}/xmlrpc/2/object'.format(main_url))
+
+    # Signup a user
+    # (would raise error, if user already exists)
+    client_username = 'client-email@example.com'
+    client_name = 'Client Name'
+    client_password = 'Client Password'
+    models.execute_kw(main_db, admin_uid, admin_password, 'res.users', 'signup', [{
+        'login': client_username,
+        'name': client_name,
+        'password': client_password,
+    }])
+
+    # Authenticate the user at Main Database
+    client_uid = common.authenticate(main_db, client_username, client_password, {})
+    params = {'db': main_db, 'login': client_username, 'password': client_password}
+    r = requests.post('%s/web/session/authenticate' % main_url,
+                      data=json.dumps({'jsonrpc': '2.0', 'method': 'call', 'params': params}),
+                      headers={'Content-Type':'application/json'})
+    if not r.json()['result']['uid']:
+        raise Exception('Authenticaion failed')
+    client_session_id = r.json()['result']['session_id']
+
+
+    # Create new Client database
+    plan_id = 1  # specify plan you need
+    client_db = 'client.odoo.local'
+    url = models.execute_kw(main_db, admin_uid, admin_password, 'saas_portal.plan', 'create_new_database', [plan_id], {'dbname': client_db})[0]
+
+    r = requests.get(main_url + url, cookies={'session_id':client_session_id})
+
+Notes abouts API integration
+
+* Be sure, that Portal module is installed at Main Database
+* Be sure, that "Allow external users to sign up" option from "Settings/General Settings" is enabled
+* To find new signuped user open "Settings/Users" at Main Database and delete filter "Regular users only"
+* don't use trailing slash at main_url

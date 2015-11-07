@@ -8,6 +8,7 @@
     'data': [
         'views/saas_client.xml',
         'security/rules.xml',
+        'security/groups.xml',
         'data/ir_cron.xml',
         'data/auth_oauth_data.xml',
     ],

@@ -163,15 +163,6 @@ class SaasPortalPlan(models.Model):
     state = fields.Selection([('draft', 'Draft'), ('confirmed', 'Confirmed')],
                              'State', compute='_get_state', store=True)
     expiration = fields.Integer('Expiration (hours)', help='time to delete database. Use for demo')
-    required_addons_ids = fields.Many2many('ir.module.module',
-                                           relation='plan_required_addons_rel',
-                                           column1='plan_id', column2='module_id',
-                                           string='Required Addons')
-    optional_addons_ids = fields.Many2many('ir.module.module',
-                                           relation='plan_optional_addons_rel',
-                                           column1='plan_id', column2='module_id',
-                                           string='Optional Addons')
-
     _order = 'sequence'
 
     dbname_template = fields.Char('DB Names', help='Template for db name. Use %i for numbering. Ignore if you use manually created db names', placeholder='crm-%i.odoo.com')

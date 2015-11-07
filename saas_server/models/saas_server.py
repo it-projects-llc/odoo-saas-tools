@@ -259,9 +259,11 @@ class SaasServerClient(models.Model):
 
         # 5. update parameters
         params = post.get('params', [])
-        for key, value in params:
-            client_env['ir.config_parameter'].set_param(key, value)
-
+        for obj in params:
+            groups = []
+            if obj.get('hidden'):
+                groups = ['saas_client.group_saas_support']
+            client_env['ir.config_parameter'].set_param(obj['key'], obj['value'], groups=groups)
         return 'OK'
 
     @api.model

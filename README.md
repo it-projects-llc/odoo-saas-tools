@@ -204,7 +204,9 @@ Example for python language:
     # Create new Client database
     plan_id = 1  # specify plan you need
     client_db = 'client.odoo.local'
-    url = models.execute_kw(main_db, admin_uid, admin_password, 'saas_portal.plan', 'create_new_database', [plan_id], {'dbname': client_db})[0]
+    url = models.execute_kw(main_db, admin_uid, admin_password,
+                            'saas_portal.plan', 'create_new_database',
+                            [plan_id], {'dbname': client_db})[0]
 
     r = requests.get(main_url + url, cookies={'session_id':client_session_id})
 

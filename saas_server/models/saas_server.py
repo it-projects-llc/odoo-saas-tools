@@ -131,7 +131,7 @@ class SaasServerClient(models.Model):
         oauth_provider = None
         if is_template_db and not client_env.ref('saas_server.saas_oauth_provider', raise_if_not_found=False):
             oauth_provider_data = {'enabled': False, 'client_id': client_id}
-            for attr in ['name', 'auth_endpoint', 'scope', 'validation_endpoint', 'data_endpoint', 'css_class', 'body']:
+            for attr in ['name', 'auth_endpoint', 'scope', 'validation_endpoint', 'data_endpoint', 'css_class', 'body', 'enabled']:
                 oauth_provider_data[attr] = getattr(saas_oauth_provider, attr)
             oauth_provider = client_env['auth.oauth.provider'].create(oauth_provider_data)
             client_env['ir.model.data'].create({

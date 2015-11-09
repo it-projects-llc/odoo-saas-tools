@@ -73,18 +73,17 @@ class SaasServer(http.Controller):
             oauth_provider_id = client_env.ref('saas_server.saas_oauth_provider').id
             action_id = client_env.ref(action).id
 
-        params = {
-            'access_token': post['access_token'],
+        port = self._get_port()
+        scheme = request.httprequest.scheme
+        url = '{scheme}://{domain}:{port}/saas_client/new_database'.format(scheme=scheme, domain=new_db, port=port)
+        return simplejson.dumps({
+            'url': url,
             'state': simplejson.dumps({
                 'd': new_db,
                 'p': oauth_provider_id,
                 'a': action_id
                 }),
-            'action': action
-            }
-        scheme = request.httprequest.scheme
-        port = self._get_port()
-        return werkzeug.utils.redirect('{scheme}://{domain}:{port}/saas_client/new_database?{params}'.format(scheme=scheme, domain=new_db, port=port, params=werkzeug.url_encode(params)))
+        })
 
     @http.route('/saas_server/edit_database', type='http', auth='public', website=True)
     @fragment_to_query_string

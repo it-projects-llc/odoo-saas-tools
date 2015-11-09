@@ -7,6 +7,7 @@
     'depends': ['saas_server', 'saas_utils', 'saas_portal'],
     'data': [
         'views/saas_pricing.xml',
+        'data.xml',
         ],
     'installable': True,
 

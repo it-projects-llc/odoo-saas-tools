@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="1">
+        <record id="plan_supplier_partner" model="res.partner">
+            <field name="name">SaaS Plan Supplier</field>
+            <field name="supplier" eval="True"/>
+            <field name="costumer" eval="False"/>
+            <field name="company_id" ref="base.main_company" />
+        </record>
+    </data>
+</openerp>

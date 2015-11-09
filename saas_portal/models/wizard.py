@@ -22,7 +22,7 @@ class SaasConfig(models.TransientModel):
                                 'Action')
     database_id = fields.Many2one('saas_portal.client', string='Database', default=_default_database_id)
     server_id = fields.Many2one('saas_portal.server', string='Server', related='database_id.server_id', readonly=True)
-    update_addons_list = fields.Boolean('Update Addon List')
+    update_addons_list = fields.Boolean('Update Addon List', default=True)
     update_addons = fields.Char('Update Addons', size=256)
     install_addons = fields.Char('Install Addons', size=256)
     uninstall_addons = fields.Char('Uninstall Addons', size=256)

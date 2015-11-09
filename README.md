@@ -161,7 +161,7 @@ API integration
 
 To control SaaS via external tool [built-in XML-RPC](https://www.odoo.com/documentation/8.0/api_integration.html) can be used.
 
-Example for python language:
+Example in python language:
 
     # Import libs
     import json
@@ -204,11 +204,11 @@ Example for python language:
     # Create new Client database
     plan_id = 1  # specify plan you need
     client_db = 'client.odoo.local'
-    url = models.execute_kw(main_db, admin_uid, admin_password,
+    res = models.execute_kw(main_db, admin_uid, admin_password,
                             'saas_portal.plan', 'create_new_database',
-                            [plan_id], {'dbname': client_db})[0]
+                            [plan_id], {'dbname': client_db, 'user_id':client_uid})
 
-    r = requests.get(main_url + url, cookies={'session_id':client_session_id})
+    res['url']  # contains url for new database with client's access token.
 
 Notes abouts API integration
 
@@ -216,3 +216,5 @@ Notes abouts API integration
 * Be sure, that "Allow external users to sign up" option from "Settings/General Settings" is enabled
 * To find new signuped user open "Settings/Users" at Main Database and delete filter "Regular users only"
 * don't use trailing slash at main_url
+* Access token is expired in one hour
+* In case of log out, client has to click "Log in via SaaS Portal". Client will be navigated to Portal database and can use client_username and client_password. After that the client will be returned back to his database. Importannt thing here, that the client is not able to use client_password at login page of his datbase.

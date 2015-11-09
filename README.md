@@ -217,4 +217,4 @@ Notes abouts API integration
 * To find new signuped user open "Settings/Users" at Main Database and delete filter "Regular users only"
 * don't use trailing slash at main_url
 * Access token is expired in one hour
-* In case of log out, client has to click "Log in via SaaS Portal". Client will be navigated to Portal database and can use client_username and client_password. After that the client will be returned back to his database. Importannt thing here, that the client is not able to use client_password at login page of his datbase.
+* In case of log out, client has to click "Log in via SaaS Portal". Client will be navigated to Portal database and can use client_username and client_password. After that the client will be returned back to his database. Important thing here, is that the client is not able to use client_password at login page of his database.

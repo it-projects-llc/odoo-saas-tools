@@ -246,10 +246,7 @@ class SaasServerClient(models.Model):
         # 1. Update addons
         update_addons = post.get('update_addons', [])
         if update_addons:
-            if 'all' in update_addons:
-                module.search([('state', 'in', ('installed', 'to upgrade'))]).button_immediate_upgrade()
-            else:
-                module.search([('name', 'in', update_addons)]).button_immediate_upgrade()
+            module.search([('name', 'in', update_addons)]).button_immediate_upgrade()
 
         # 2. Install addons
         install_addons = post.get('install_addons', [])

@@ -1,5 +1,6 @@
 $(document).ready(function() {
     $('input,select').not("[type=submit]").jqBootstrapValidation();
+
     function init_page_plan_select() {
         var selected_class = 'btn-info';
         if ($('.plans-list').hasClass('has-error'))
@@ -18,6 +19,19 @@ $(document).ready(function() {
             $('#wizard-form.page_plan_select .tab-next').attr('disabled', 'disabled');
     }
     init_page_plan_select();
+
+    $('.tab-actions #wizard-goback').click(function(event){
+        event.preventDefault();
+        var $form = $("#wizard-form");
+        var action = $("input[name='wizard_action']", $form);
+        action.val('prev');
+        $form.submit();
+    });
+//    $('.tab-actions #wizard-submit').click(function(event){
+//        event.preventDefault();
+//        var $form = $("#wizard-form");
+//        $form.submit();
+//    });
 
     $('.plans-list .btn').click(function(event){
         event.preventDefault();
@@ -51,35 +65,6 @@ $(document).ready(function() {
         $('input[name="addons"]').val(list);
     });
 
-//    function check_page_plan_confirm() {
-//        var valid = true;
-//
-//        $('#wizard-form.page_plan_confirm .form-group').not('.optional').each(function(){
-//            valid = valid && (!$(this).hasClass('has-error'));
-//            valid = valid && ($('.form-control', this).val() != "");
-//        });
-//
-//        if (valid)
-//            $('#wizard-form.page_plan_confirm .tab-next').removeAttr("disabled");
-//        else
-//            $('#wizard-form.page_plan_confirm .tab-next').attr("disabled", "disabled");
-//    }
-//    check_page_plan_confirm();
-//
-//    $('#wizard-form.page_plan_confirm input.form-control').not('.optional').on('input', function(event){
-//        var input = $(this);
-//        var parent = input.parent();
-//        var value = input.val();
-//
-//        if (value) {
-//            parent.removeClass('has-error');
-//        } else {
-//            parent.addClass('has-error');
-//        }
-//
-//        check_page_plan_confirm();
-//    });
-
     $('#wizard-form.page_plan_confirm').on('change', "select[name='country_id']", function () {
         var $select = $("select[name='state_id']");
         $select.find("option:not(:first)").hide();
@@ -87,4 +72,28 @@ $(document).ready(function() {
         $select.parent().toggle(nb>=1);
     });
     $('#wizard-form.page_plan_confirm').find("select[name='country_id']").change();
+
+    var $payment = $("#payment_methods");
+    $payment.on("click", "input[name='acquirer']", function (ev) {
+            var payment_id = $(ev.currentTarget).val();
+            $("div.oe_sale_acquirer_button[data-id]", $payment).addClass("hidden");
+            $("div.oe_sale_acquirer_button[data-id='"+payment_id+"']", $payment).removeClass("hidden");
+        })
+        .find("input[name='acquirer']:checked").click();
+
+    // When clicking on payment button: create the tx using json then continue to the acquirer
+    $payment.on("click", 'button[type="submit"],button[name="submit"]', function (ev) {
+      console.log("SaaS Start Wizard processing")
+      ev.preventDefault();
+      ev.stopPropagation();
+      var $form = $(ev.currentTarget).parents('form');
+      var acquirer_id = $(ev.currentTarget).parents('div.oe_sale_acquirer_button').first().data('id');
+      var order_name = $('input[name="item_number"]', $form).val();
+      if (! acquirer_id) {
+        return false;
+      }
+      openerp.jsonRpc('/saas/pricing/payment/transaction/' + acquirer_id + '/' + order_name, 'call', {}).then(function (data) {
+        $form.submit();
+      });
+   });
 });

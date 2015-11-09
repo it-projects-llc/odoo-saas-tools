@@ -141,7 +141,8 @@ class SaasPricingPlan(models.Model):
     pricing = fields.Many2one('saas_pricing.price', "Pricing")
 
     @api.one
-    def get_sale_order(self, partner_id, tenant_name, force_create=True, tenant_creation=False):
+    def get_sale_order(self, partner_id, tenant_name, force_create=True,
+                       tenant_creation=False):
         so_model = self.env['sale.order']
         product_model = self.env['product.product']
 
@@ -149,7 +150,8 @@ class SaasPricingPlan(models.Model):
 
         domain = [
             ("client_order_ref", "=", tenant_name),
-            ("partner_id", "=", partner_id)
+            ("partner_id", "=", partner_id),
+            ("state", "!=", "cancel"),
         ]
 
         d = {
@@ -162,7 +164,6 @@ class SaasPricingPlan(models.Model):
         }
 
         max_period_start = today - relativedelta(**d[self.pricing.period])
-        _logger.info("\n\nMax Period Start: %s\n", max_period_start)
 
         # if self.pricing.billing == "pre":
         domain.append(

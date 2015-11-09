@@ -25,6 +25,7 @@ class SaasServer(http.Controller):
         _logger.info('new_database post: %s', post)
 
         state = simplejson.loads(post.get('state'))
+        owner_user = state.get('owner_user')
         new_db = state.get('d')
         expiration_db = state.get('e')
         template_db = state.get('db_template')
@@ -56,7 +57,7 @@ class SaasServer(http.Controller):
         client.update_registry()
         client.prepare_database(
             tz=tz,
-            saas_portal_user = saas_portal_user,
+            owner_user = owner_user,
             is_template_db = is_template_db,
             access_token = access_token)
 

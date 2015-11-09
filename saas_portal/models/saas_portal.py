@@ -203,10 +203,21 @@ class SaasPortalPlan(models.Model):
 
         scheme = server.request_scheme
         port = server.request_port
+        if user_id:
+            owner_user = self.env['res.users'].browse(user_id)
+        else:
+            owner_user = self.env.user
+        owner_user_data = {
+            'user_id': owner_user.id,
+            'login': owner_user.login,
+            'name': owner_user.name,
+            'email': owner_user.email,
+        }
         state = {
             'd': client.name,
             'e': client.expiration_datetime,
             'r': '%s://%s:%s/web' % (scheme, client.name, port),
+            'owner_user': owner_user_data,
         }
         if self.template_id:
             state.update({'db_template': self.template_id.name})

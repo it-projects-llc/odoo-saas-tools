@@ -106,7 +106,7 @@ class SaasServerClient(models.Model):
         return ['saas_client.ab_location', 'saas_client.ab_register']
 
     @api.one
-    def _prepare_database(self, client_env, saas_portal_user=None, is_template_db=False, addons=[], access_token=None, tz=None):
+    def _prepare_database(self, client_env, owner_user=None, is_template_db=False, addons=[], access_token=None, tz=None):
         client_id = self.client_id
 
         # update saas_server.client state
@@ -167,18 +167,18 @@ class SaasServerClient(models.Model):
             res = client_env['res.users'].search(domain)
             if res:
                 user = res[0]
-            res = client_env['res.users'].search([('oauth_uid', '=', saas_portal_user['user_id'])])
+            res = client_env['res.users'].search([('oauth_uid', '=', owner_user['user_id'])])
             if res:
                 # user already exists (e.g. administrator)
                 user = res[0]
             if not user:
                 user = client_env['res.users'].browse(SUPERUSER_ID)
             user.write({
-                'login': saas_portal_user['email'],
-                'name': saas_portal_user['name'],
-                'email': saas_portal_user['email'],
+                'login': owner_user['login'],
+                'name': owner_user['name'],
+                'email': owner_user['email'],
                 'oauth_provider_id': oauth_provider.id,
-                'oauth_uid': saas_portal_user['user_id'],
+                'oauth_uid': owner_user['user_id'],
                 'oauth_access_token': access_token
             })
 

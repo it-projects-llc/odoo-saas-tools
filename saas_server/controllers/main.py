@@ -37,14 +37,13 @@ class SaasServer(http.Controller):
         action = 'base.open_module_tree'
         access_token = post['access_token']
 
+        client_id = post['client_id']
         if is_template_db:
             # TODO: check access right to create template db
-            client_id = post['client_id']
             saas_portal_user = None
         else:
             saas_oauth_provider = request.registry['ir.model.data'].xmlid_to_object(request.cr, SUPERUSER_ID, 'saas_server.saas_oauth_provider')
             saas_portal_user = request.registry['res.users']._auth_oauth_rpc(request.cr, SUPERUSER_ID, saas_oauth_provider.validation_endpoint, access_token)
-            client_id = saas_portal_user.get('client_id')
             if saas_portal_user.get("error"):
                 raise Exception(saas_portal_user['error'])
 

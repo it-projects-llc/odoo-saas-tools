@@ -9,7 +9,6 @@ from openerp.addons.base.res.res_partner import _tz_get
 import time
 from datetime import datetime, timedelta
 from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
-from oauthlib import common as oauthlib_common
 import urllib2
 import simplejson
 import werkzeug
@@ -40,20 +39,8 @@ class SaasPortalServer(models.Model):
     @api.model
     def create(self, vals):
         self = super(SaasPortalServer, self).create(vals)
-        self.create_access_token(self.oauth_application_id.id)
+        self.oauth_application_id._get_access_token(create=True)
         return self
-
-    @api.model
-    def create_access_token(self, oauth_application_id):
-        expires = datetime.now() + timedelta(seconds=60*60)
-        vals = {
-            'user_id': self.env.user.id,
-            'scope': 'userinfo',
-            'expires': expires.strftime(DEFAULT_SERVER_DATETIME_FORMAT),
-            'token': oauthlib_common.generate_token(),
-            'application_id': oauth_application_id
-        }
-        return self.env['oauth.access_token'].create(vals)
 
     @api.one
     def _request_params(self, path='/web', scheme=None, port=None, state={}, scope=None, client_id=None):
@@ -82,8 +69,7 @@ class SaasPortalServer(models.Model):
         scheme = scheme or self.request_scheme
         port = port or self.request_port
         params = self._request_params(**kwargs)[0]
-        access_token = self.env['oauth.access_token'].sudo().search([('application_id', '=', self.oauth_application_id.id)], order='id DESC', limit=1)
-        access_token = access_token[0].token
+        access_token = self.oauth_application_id._get_access_token(create=True)
         params.update({
             'token_type': 'Bearer',
             'access_token': access_token,
@@ -188,8 +174,9 @@ class SaasPortalPlan(models.Model):
             vals['expiration_datetime'] = (now + delta).strftime(DEFAULT_SERVER_DATETIME_FORMAT)
         return vals
 
-    @api.one
-    def create_new_database(self, dbname=None, client_id=None, partner_id=None):
+    @api.multi
+    def create_new_database(self, dbname=None, client_id=None, partner_id=None, user_id=None):
+        self.ensure_one()
         server = self.server_id
         if not server:
             server = self.env['saas_portal.server'].get_saas_server()
@@ -216,21 +203,43 @@ class SaasPortalPlan(models.Model):
 
         scheme = server.request_scheme
         port = server.request_port
+        if user_id:
+            owner_user = self.env['res.users'].browse(user_id)
+        else:
+            owner_user = self.env.user
+        owner_user_data = {
+            'user_id': owner_user.id,
+            'login': owner_user.login,
+            'name': owner_user.name,
+            'email': owner_user.email,
+        }
         state = {
             'd': client.name,
             'e': client.expiration_datetime,
             'r': '%s://%s:%s/web' % (scheme, client.name, port),
+            'owner_user': owner_user_data,
         }
         if self.template_id:
             state.update({'db_template': self.template_id.name})
         scope = ['userinfo', 'force_login', 'trial', 'skiptheuse']
-        url = server._request(path='/saas_server/new_database',
+        url = server._request_server(path='/saas_server/new_database',
                               scheme=scheme,
                               port=port,
                               state=state,
                               client_id=client_id,
                               scope=scope,)[0]
-        return url
+        res = requests.get(url, verify=(self.server_id.request_scheme == 'https' and self.server_id.verify_ssl))
+        if res.status_code != 200:
+            # TODO /saas_server/new_database show more details here
+            raise exceptions.Warning('Error %s' % res.status_code)
+        data = simplejson.loads(res.text)
+        params = {
+            'state': data.get('state'),
+            'access_token': client.oauth_application_id._get_access_token(user_id, create=True),
+        }
+        url = '{url}?{params}'.format(url=data.get('url'), params=werkzeug.url_encode(params))
+
+        return {'url': url, 'id': client.id, 'client_id': client_id}
 
     @api.one
     def generate_dbname(self, raise_error=True):
@@ -465,6 +474,7 @@ class SaasPortalClient(models.Model):
         state.update({'db_template': self.name,
                       'disable_mail_server' : True})
         scope = ['userinfo', 'force_login', 'trial', 'skiptheuse']
+        # TODO use _request_server
         url = server._request(path='/saas_server/new_database',
                               scheme=scheme,
                               port=port,

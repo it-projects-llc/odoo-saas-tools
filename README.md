@@ -189,9 +189,12 @@ Example in python language:
 
     # Authenticate the user at Main Database
     client_uid = common.authenticate(main_db, client_username, client_password, {})
+
+    # Get user session at Main Database if needed
     params = {'db': main_db, 'login': client_username, 'password': client_password}
+    data = json.dumps({'jsonrpc': '2.0', 'method': 'call', 'params': params})
     r = requests.post('%s/web/session/authenticate' % main_url,
-                      data=json.dumps({'jsonrpc': '2.0', 'method': 'call', 'params': params}),
+                      data=data,
                       headers={'Content-Type':'application/json'})
     if not r.json()['result']['uid']:
         raise Exception('Authenticaion failed')
@@ -201,7 +204,11 @@ Example in python language:
     # Create new Client database
     plan_id = 1  # specify plan you need
     client_db = 'client.odoo.local'
-    client_db = False # keep it empty to generate client_db automatically from "DB Names" parameter in Plan's form
+
+    # you can keep client_db empty to generate it automatically
+    # from "DB Names" parameter in Plan's form
+
+    client_db = False
     res = models.execute_kw(main_db, admin_uid, admin_password,
                             'saas_portal.plan', 'create_new_database',
                             [plan_id], {'dbname': client_db, 'user_id':client_uid})

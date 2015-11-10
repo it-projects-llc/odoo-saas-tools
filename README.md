@@ -201,6 +201,7 @@ Example in python language:
     # Create new Client database
     plan_id = 1  # specify plan you need
     client_db = 'client.odoo.local'
+    client_db = False # keep it empty to generate client_db automatically from "DB Names" parameter in Plan's form
     res = models.execute_kw(main_db, admin_uid, admin_password,
                             'saas_portal.plan', 'create_new_database',
                             [plan_id], {'dbname': client_db, 'user_id':client_uid})
@@ -210,10 +211,9 @@ Example in python language:
 
     # Configure system
     data = {
-        # comma-separated list of addons:
-        'update_addons': '',
-        'install_addons': '',
-        'uninstall_addons': '',
+        'update_addons': [],
+        'install_addons': ['sale', 'point_of_sale'],
+        'uninstall_addons': [],
 
         'params': [
              {'key': 'saas_client.max_users', 'value': 10, 'hidden': True}

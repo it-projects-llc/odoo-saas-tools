@@ -209,6 +209,22 @@ Example in python language:
                             [plan_id], {'dbname': client_db, 'user_id':client_uid})
 
     res['url']  # contains url for new database with client's access token.
+    saas_portal_client_id = res['id']
+
+    # Configure system
+    data = {
+        # comma-separated list of addons:
+        'update_addons': '',
+        'install_addons': '',
+        'uninstall_addons': '',
+
+        'params': [
+             {'key': 'saas_client.max_users', 'value': 10, 'hidden': True}
+        ],
+    }
+    res = models.execute_kw(main_db, admin_uid, admin_password,
+                            'saas.config', 'do_upgrade_database',
+                            [data, saas_portal_client_id])
 
 Notes abouts API integration
 

@@ -67,7 +67,10 @@ Usage
      > proxy_set_header X-Forwarded-Proto $scheme;
 
    * install dependencies:
-     * pip install oauthlib
+     * oauthlib:
+       * pip install oauthlib
+     * requests
+       * pip install requests --upgrade
 
 2. Create two databases (via /web/database/manager):
 

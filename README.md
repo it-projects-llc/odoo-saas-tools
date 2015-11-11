@@ -112,7 +112,7 @@ Usage
 	 * click [Sync server]
 
 7. Prepare Template Database for Plan
-   * open template db, e.g. **t1.odoo.local**
+   * click "Log in to template DB" and Plan's form
    * install modules that will be used for Plan, e.g. *point_of_sale*, *website_sale*
    * make any other changes in database if needed. E.g. configure
      chart of accounts.

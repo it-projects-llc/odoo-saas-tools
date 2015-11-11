@@ -117,6 +117,7 @@ Usage
 
 7. Prepare Template Database for Plan
    * click [Log in to template DB] at Plan's form
+     * be sure that you allow pop-ups in your browser
    * install modules that will be used for Plan, e.g. *point_of_sale*, *website_sale*
    * make any other changes in database if needed. E.g. configure
      chart of accounts.

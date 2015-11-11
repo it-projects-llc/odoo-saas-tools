@@ -113,7 +113,7 @@ Usage
 	 * click [Sync server]
 
 7. Prepare Template Database for Plan
-   * click "Log in to template DB" and Plan's form
+   * click [Log in to template DB] at Plan's form
    * install modules that will be used for Plan, e.g. *point_of_sale*, *website_sale*
    * make any other changes in database if needed. E.g. configure
      chart of accounts.

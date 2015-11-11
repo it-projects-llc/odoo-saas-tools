@@ -253,6 +253,7 @@ class SaasPortalPlan(models.Model):
     @api.multi
     def create_template(self):
         assert len(self)==1, 'This method is applied only for single record'
+        # TODO use create_new_database function
         plan = self[0]
         state = {
             'd': plan.template_id.name,
@@ -266,13 +267,7 @@ class SaasPortalPlan(models.Model):
         plan.template_id.server_id = plan.server_id
         params = plan.server_id._request_params(path='/saas_server/new_database', state=state, client_id=client_id)[0]
 
-        domain = [('application_id', '=', plan.template_id.oauth_application_id.id)]
-        access_token = self.env['oauth.access_token'].sudo().search(domain, order='id DESC', limit=1)
-        if access_token:
-            access_token = access_token[0].token
-        else:
-            token_obj = plan.server_id.create_access_token(plan.template_id.oauth_application_id.id)
-            access_token = token_obj.token
+        access_token = plan.template_id.oauth_application_id._get_access_token(create=True)
         params.update({
             'token_type': 'Bearer',
             'access_token': access_token,

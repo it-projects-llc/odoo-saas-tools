@@ -25,6 +25,7 @@ class SaasServer(http.Controller):
         _logger.info('new_database post: %s', post)
 
         state = simplejson.loads(post.get('state'))
+        owner_user = state.get('owner_user')
         new_db = state.get('d')
         expiration_db = state.get('e')
         template_db = state.get('db_template')
@@ -37,14 +38,13 @@ class SaasServer(http.Controller):
         action = 'base.open_module_tree'
         access_token = post['access_token']
 
+        client_id = post['client_id']
         if is_template_db:
             # TODO: check access right to create template db
-            client_id = post['client_id']
             saas_portal_user = None
         else:
             saas_oauth_provider = request.registry['ir.model.data'].xmlid_to_object(request.cr, SUPERUSER_ID, 'saas_server.saas_oauth_provider')
             saas_portal_user = request.registry['res.users']._auth_oauth_rpc(request.cr, SUPERUSER_ID, saas_oauth_provider.validation_endpoint, access_token)
-            client_id = saas_portal_user.get('client_id')
             if saas_portal_user.get("error"):
                 raise Exception(saas_portal_user['error'])
 
@@ -57,7 +57,7 @@ class SaasServer(http.Controller):
         client.update_registry()
         client.prepare_database(
             tz=tz,
-            saas_portal_user = saas_portal_user,
+            owner_user = owner_user,
             is_template_db = is_template_db,
             access_token = access_token)
 
@@ -74,18 +74,17 @@ class SaasServer(http.Controller):
             oauth_provider_id = client_env.ref('saas_server.saas_oauth_provider').id
             action_id = client_env.ref(action).id
 
-        params = {
-            'access_token': post['access_token'],
+        port = self._get_port()
+        scheme = request.httprequest.scheme
+        url = '{scheme}://{domain}:{port}/saas_client/new_database'.format(scheme=scheme, domain=new_db, port=port)
+        return simplejson.dumps({
+            'url': url,
             'state': simplejson.dumps({
                 'd': new_db,
                 'p': oauth_provider_id,
                 'a': action_id
                 }),
-            'action': action
-            }
-        scheme = request.httprequest.scheme
-        port = self._get_port()
-        return werkzeug.utils.redirect('{scheme}://{domain}:{port}/saas_client/new_database?{params}'.format(scheme=scheme, domain=new_db, port=port, params=werkzeug.url_encode(params)))
+        })
 
     @http.route('/saas_server/edit_database', type='http', auth='public', website=True)
     @fragment_to_query_string

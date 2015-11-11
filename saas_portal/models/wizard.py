@@ -44,6 +44,7 @@ class SaasConfig(models.TransientModel):
 
     @api.multi
     def upgrade_database(self):
+        self.ensure_one()
         obj = self[0]
         scheme = request.httprequest.scheme
         payload = {
@@ -54,22 +55,8 @@ class SaasConfig(models.TransientModel):
             'fixes': [[x.model, x.method] for x in obj.fix_ids],
             'params': [{'key': x.key, 'value': x.value, 'hidden': x.hidden} for x in obj.param_ids],
         }
-        state = {
-            'data': payload,
-        }
-        url = self.server_id._request_server(
-            path='/saas_server/upgrade_database',
-            client_id=self.database_id.client_id,
-            state=state,
-        )[0]
-        res = requests.get(url, verify=(self.server_id.request_scheme == 'https' and self.server_id.verify_ssl))
-        if res.ok != True:
-            msg = """Status Code - %s
-Reason - %s
-URL - %s
-            """ % (res.status_code, res.reason, res.url)
-            raise Warning(msg)
-        obj.write({'description': res.text})
+        res_text = self.do_upgrade_database(payload, self.database_id.id)
+        obj.write({'description': res_text})
         return {
             'type': 'ir.actions.act_window',
             'view_type': 'form',
@@ -79,6 +66,25 @@ URL - %s
             'target': 'new'
         }
 
+    @api.model
+    def do_upgrade_database(self, payload, saas_portal_client_id):
+        client = self.env['saas_portal.client'].browse(saas_portal_client_id)
+        state = {
+            'data': payload,
+        }
+        url = client.server_id._request_server(
+            path='/saas_server/upgrade_database',
+            client_id=client.client_id,
+            state=state,
+        )[0]
+        res = requests.get(url, verify=(self.server_id.request_scheme == 'https' and self.server_id.verify_ssl))
+        if res.ok != True:
+            msg = """Status Code - %s
+Reason - %s
+URL - %s
+            """ % (res.status_code, res.reason, res.url)
+            raise Warning(msg)
+        return res.text
 
 class SaasConfigFix(models.TransientModel):
     _name = 'saas.config.fix'
@@ -120,12 +126,16 @@ class SaasPortalCreateClient(models.TransientModel):
     @api.multi
     def apply(self):
         wizard = self[0]
-        url = wizard.plan_id.create_new_database(dbname=wizard.name, partner_id=wizard.partner_id.id)
+        res = wizard.plan_id.create_new_database(dbname=wizard.name, partner_id=wizard.partner_id.id)
+        client = self.env['saas_portal.client'].browse(res.get('id'))
+        client.server_id.action_sync_server()
         return {
-            'type': 'ir.actions.act_url',
-            'target': 'new',
-            'name': 'Create Client',
-            'url': url
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'saas_portal.client',
+            'res_id': client.id,
+            'target': 'current',
         }
 
 

@@ -67,7 +67,10 @@ Usage
      > proxy_set_header X-Forwarded-Proto $scheme;
 
    * install dependencies:
-     * pip install oauthlib
+     * oauthlib:
+       * pip install oauthlib
+     * requests
+       * pip install requests --upgrade
 
 2. Create two databases (via /web/database/manager):
 
@@ -113,6 +116,7 @@ Usage
 
 7. Prepare Template Database for Plan
    * click [Log in to template DB] at Plan's form
+     * be sure that you allow pop-ups in your browser
    * install modules that will be used for Plan, e.g. *point_of_sale*, *website_sale*
    * make any other changes in database if needed. E.g. configure
      chart of accounts.

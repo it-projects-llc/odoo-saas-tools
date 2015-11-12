@@ -16,6 +16,7 @@
                            <field name="name" />
                            <field name="state" />
                            <field name="client_id" readonly="1" />
+                           <field name="server_id" readonly="1"/>
                         </group>
                     </sheet>
                 </form>

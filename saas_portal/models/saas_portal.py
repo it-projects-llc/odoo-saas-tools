@@ -153,6 +153,7 @@ class SaasPortalPlan(models.Model):
 
     dbname_template = fields.Char('DB Names', help='Template for db name. Use %i for numbering. Ignore if you use manually created db names', placeholder='crm-%i.odoo.com')
     server_id = fields.Many2one('saas_portal.server', string='SaaS Server',
+                                ondelete='restrict',
                                 help='User this saas server or choose random')
     
     website_description = fields.Text('Website description')
@@ -330,7 +331,7 @@ class SaasPortalDatabase(models.Model):
 
     name = fields.Char('Database name', readonly=False)
     oauth_application_id = fields.Many2one('oauth.application', 'OAuth Application', required=True, ondelete='cascade')
-    server_id = fields.Many2one('saas_portal.server', string='Server', readonly=True)
+    server_id = fields.Many2one('saas_portal.server', ondelete='restrict', string='Server', readonly=True)
     state = fields.Selection([('draft','New'),
                               ('open','In Progress'),
                               ('cancelled', 'Cancelled'),

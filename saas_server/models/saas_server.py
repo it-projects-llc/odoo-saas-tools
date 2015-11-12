@@ -240,6 +240,12 @@ class SaasServerClient(models.Model):
         module = client_env['ir.module.module']
         print '_upgrade_database', data
         res = {}
+
+        # 0. Update module list
+        update_list = post.get('update_addons_list', False)
+        if update_list:
+            module.update_list()
+
         # 1. Update addons
         update_addons = post.get('update_addons', [])
         if update_addons:

@@ -22,6 +22,7 @@ class SaasConfig(models.TransientModel):
                                 'Action')
     database_id = fields.Many2one('saas_portal.client', string='Database', default=_default_database_id)
     server_id = fields.Many2one('saas_portal.server', string='Server', related='database_id.server_id', readonly=True)
+    update_addons_list = fields.Boolean('Update Addon List', default=True)
     update_addons = fields.Char('Update Addons', size=256)
     install_addons = fields.Char('Install Addons', size=256)
     uninstall_addons = fields.Char('Uninstall Addons', size=256)
@@ -49,6 +50,7 @@ class SaasConfig(models.TransientModel):
         obj = self[0]
         scheme = request.httprequest.scheme
         payload = {
+            'update_addons_list': (obj.update_addons_list or ''),
             'update_addons': obj.update_addons.split(',') if obj.update_addons else [],
             'install_addons': obj.install_addons.split(',') if obj.install_addons else [],
             'uninstall_addons': obj.uninstall_addons.split(',') if obj.uninstall_addons else [],

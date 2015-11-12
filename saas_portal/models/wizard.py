@@ -25,6 +25,8 @@ class SaasConfig(models.TransientModel):
     update_addons = fields.Char('Update Addons', size=256)
     install_addons = fields.Char('Install Addons', size=256)
     uninstall_addons = fields.Char('Uninstall Addons', size=256)
+    access_owner_add = fields.Char('Grant access to Owner')
+    access_remove = fields.Char('Restrict access', help='Restrict access for all users except super-user.\nNote, that ')
     fix_ids = fields.One2many('saas.config.fix', 'config_id', 'Fixes')
     param_ids = fields.One2many('saas.config.param', 'config_id', 'Parameters')
     description = fields.Text('Result')
@@ -47,9 +49,11 @@ class SaasConfig(models.TransientModel):
         obj = self[0]
         scheme = request.httprequest.scheme
         payload = {
-            'update_addons': (obj.update_addons or '').split(','),
-            'install_addons': (obj.install_addons or '').split(','),
-            'uninstall_addons': (obj.uninstall_addons or '').split(','),
+            'update_addons': obj.update_addons.split(',') if obj.update_addons else [],
+            'install_addons': obj.install_addons.split(',') if obj.install_addons else [],
+            'uninstall_addons': obj.uninstall_addons.split(',') if obj.uninstall_addons else [],
+            'access_owner_add': obj.access_owner_add.split(',') if obj.access_owner_add else [],
+            'access_remove': obj.access_remove.split(',') if obj.access_remove else [],
             'fixes': [[x.model, x.method] for x in obj.fix_ids],
             'params': [{'key': x.key, 'value': x.value, 'hidden': x.hidden} for x in obj.param_ids],
         }

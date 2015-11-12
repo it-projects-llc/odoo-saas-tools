@@ -167,6 +167,8 @@ class SaasServerClient(models.Model):
             res = client_env['res.users'].search(domain)
             if res:
                 user = res[0]
+                client_env['ir.config_parameter'].set_param('res.users.owner', user.id, groups=['saas_client.group_saas_support'])
+
             res = client_env['res.users'].search([('oauth_uid', '=', owner_user['user_id'])])
             if res:
                 # user already exists (e.g. administrator)
@@ -237,6 +239,7 @@ class SaasServerClient(models.Model):
         post = data
         module = client_env['ir.module.module']
         print '_upgrade_database', data
+        res = {}
         # 1. Update addons
         update_addons = post.get('update_addons', [])
         if update_addons:
@@ -264,7 +267,36 @@ class SaasServerClient(models.Model):
             if obj.get('hidden'):
                 groups = ['saas_client.group_saas_support']
             client_env['ir.config_parameter'].set_param(obj['key'], obj['value'], groups=groups)
-        return 'OK'
+
+        # 6. Access rights
+        access_owner_add = post.get('access_owner_add', [])
+        owner_id = client_env['ir.config_parameter'].get_param('res.users.owner', 0)
+        owner_id = int(owner_id)
+        if not owner_id:
+            res['owner_id'] = "Owner's user is not found"
+        if access_owner_add and owner_id:
+            res['access_owner_add'] = []
+            for g_ref in access_owner_add:
+                g = client_env.ref(g_ref, raise_if_not_found=False)
+                if not g:
+                    res['access_owner_add'].append('group not found: %s' % g_ref)
+                    continue
+                g.write({'users': [(4, owner_id, 0)]})
+        access_remove = post.get('access_remove', [])
+        if access_remove:
+            res['access_remove'] = []
+            for g_ref in access_remove:
+                g = client_env.ref(g_ref, raise_if_not_found=False)
+                if not g:
+                    res['access_remove'].append('group not found: %s' % g_ref)
+                    continue
+                users = []
+                for u in g.users:
+                    if u.id != SUPERUSER_ID:
+                        users.append((3, u.id, 0))
+                g.write({'users': users})
+
+        return res
 
     @api.model
     def delete_expired_databases(self):

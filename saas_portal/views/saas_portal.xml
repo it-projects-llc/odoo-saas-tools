@@ -289,7 +289,7 @@
                      </page>
 
                      <page string="Addons"  attrs="{'invisible': [('action', '!=', 'upgrade')]}">
-                         <p>Comma-separated list of addons to Update, Install or Uninstall</p>
+                         <p>Comma-separated list of addons to Update, Install or Uninstall, e.g. <em>point_of_sale,website_sale</em></p>
                          <group>
                              <field name="update_addons"/>
                              <field name="install_addons"/>
@@ -303,6 +303,13 @@
                                  <field name="value" />
                              </tree>
                          </field>
+                     </page>
+                     <page string="Access rights">
+                         <p>Comma-separated list of references to res.groups, e.g. <em>base.group_sale_manager,stock.group_stock_manager</em>.</p>
+                         <group>
+                             <field name="access_owner_add"/>
+                             <field name="access_remove"/>
+                         </group>
                      </page>
                      <page string="Commands" attrs="{'invisible': [('action', '!=', 'upgrade')]}">
                          <p>This sections allows execute special commands on client. Ask developers for instructions.</p>

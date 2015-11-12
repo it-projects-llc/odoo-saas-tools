@@ -120,11 +120,17 @@ class SaasPortalCreateClient(models.TransientModel):
     name = fields.Char('Database name', required=True, default=_default_name)
     plan_id = fields.Many2one('saas_portal.plan', string='Plan', readonly=True, default=_default_plan_id)
     partner_id = fields.Many2one('res.partner', string='Partner')
+    user_id = fields.Many2one('res.users', string='User')
+
+    @api.onchange('user_id')
+    def update_parter(self):
+        if self.user_id:
+            self.partner_id = self.user_id.partner_id
 
     @api.multi
     def apply(self):
         wizard = self[0]
-        res = wizard.plan_id.create_new_database(dbname=wizard.name, partner_id=wizard.partner_id.id)
+        res = wizard.plan_id.create_new_database(dbname=wizard.name, partner_id=wizard.partner_id.id, user_id=self.user_id.id)
         client = self.env['saas_portal.client'].browse(res.get('id'))
         client.server_id.action_sync_server()
         return {

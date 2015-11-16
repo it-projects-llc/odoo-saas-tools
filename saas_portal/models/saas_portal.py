@@ -438,8 +438,9 @@ class SaasPortalClient(models.Model):
             #openerp.service.db.exp_drop(obj.name)
         return super(SaasPortalClient, self).unlink(cr, uid, ids, context)
 
-    @api.one
-    def duplicate_database(self, dbname=None, partner_id=None, expiration=None):
+    @api.multi
+    def duplicate_database(self, dbname=None, partner_id=None, expiration=None, user_id=None):
+        self.ensure_one()
         server = self.server_id
         if not server:
             server = self.env['saas_portal.server'].get_saas_server()
@@ -461,19 +462,40 @@ class SaasPortalClient(models.Model):
 
         scheme = server.request_scheme
         port = server.request_port
+        if user_id:
+            owner_user = self.env['res.users'].browse(user_id)
+        else:
+            owner_user = self.env.user
+        owner_user_data = {
+            'user_id': owner_user.id,
+            'login': owner_user.login,
+            'name': owner_user.name,
+            'email': owner_user.email,
+        }
         state = {
             'd': client.name,
             'e': client.expiration_datetime,
-            'r': '%s://%s:%s/web' % (scheme, port, client.name),
+            'r': '%s://%s:%s/web' % (scheme, client.name, port),
+            'owner_user': owner_user_data,
+            'db_template': self.name,
+            'disable_mail_server' : True
         }
-        state.update({'db_template': self.name,
-                      'disable_mail_server' : True})
         scope = ['userinfo', 'force_login', 'trial', 'skiptheuse']
-        # TODO use _request_server
-        url = server._request(path='/saas_server/new_database',
+
+        url = server._request_server(path='/saas_server/new_database',
                               scheme=scheme,
                               port=port,
                               state=state,
                               client_id=client_id,
                               scope=scope,)[0]
-        return url
+        res = requests.get(url, verify=(self.server_id.request_scheme == 'https' and self.server_id.verify_ssl))
+        if res.status_code != 200:
+            raise exceptions.Warning('Error %s' % res.status_code)
+        data = simplejson.loads(res.text)
+        params = {
+            'state': data.get('state'),
+            'access_token': client.oauth_application_id._get_access_token(user_id, create=True),
+        }
+        url = '{url}?{params}'.format(url=data.get('url'), params=werkzeug.url_encode(params))
+
+        return {'url': url, 'id': client.id, 'client_id': client_id}

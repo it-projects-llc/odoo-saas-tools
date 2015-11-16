@@ -166,11 +166,16 @@ class SaasPortalDuplicateClient(models.TransientModel):
 
     @api.multi
     def apply(self):
-        wizard = self[0]
-        url = wizard.client_id.duplicate_database(dbname=wizard.name, partner_id=wizard.partner_id.id, expiration=None)
+        self.ensure_one()
+        res = self.client_id.duplicate_database(
+            dbname=self.name, partner_id=self.partner_id.id, expiration=None)
+        client = self.env['saas_portal.client'].browse(res.get('id'))
+        client.server_id.action_sync_server()
         return {
-            'type': 'ir.actions.act_url',
-            'target': 'new',
-            'name': 'Duplicate Client',
-            'url': url
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'saas_portal.client',
+            'res_id': client.id,
+            'target': 'current',
         }

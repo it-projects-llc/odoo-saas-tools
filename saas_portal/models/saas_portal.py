@@ -493,9 +493,3 @@ class SaasPortalClient(models.Model):
                               client_id=client_id,
                               scope=scope,)[0]
         return url
-
-
-class ProductTemplateSaaS(models.Model):
-    _inherit = 'product.template'
-
-    plan_id = fields.Many2one('saas_portal.plan', string='Plan')

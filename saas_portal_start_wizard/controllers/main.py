@@ -207,7 +207,7 @@ class SaasPortalStartWizard(SaasPortalStart):
                     ("Name", plan.name)
                 ])
             )
-            if hasattr(plan, "pricing"):
+            if getattr(plan, "pricing", False):
                 crumbs.insert(3, (PAGE_PAYMENT, "Payment methods"))
                 WIZARD_FLOW.update({
                 })
@@ -236,7 +236,9 @@ class SaasPortalStartWizard(SaasPortalStart):
                     ("Phone", wz.legal_phone),
                 ]
             ))
-            address = "{}, Zip: {}.".format(wz.legal_city, wz.legal_zip)
+            address = wz.legal_city or ""
+            if wz.legal_zip:
+                address += ", Zip: {}.".format(wz.legal_zip)
             if wz.legal_state_id:
                 state_model = request.registry['res.country.state']
                 state = state_model.browse(cr, uid, wz.legal_state_id)

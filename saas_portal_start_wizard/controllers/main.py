@@ -242,12 +242,12 @@ class SaasPortalStartWizard(SaasPortalStart):
             if wz.legal_state_id:
                 state_model = request.registry['res.country.state']
                 state = state_model.browse(cr, uid, wz.legal_state_id)
-                address = "{} {},".format(address, state.name)
+                address += " {}".format(state.name)
 
             country_model = request.registry['res.country']
             country = country_model.browse(cr, uid, wz.legal_country_id)
             if country:
-                address += " {}.".format(country.name)
+                address += ", {}.".format(country.name)
 
             summary.append((
                 "Legal Information", [

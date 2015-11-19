@@ -246,7 +246,8 @@ class SaasPortalStartWizard(SaasPortalStart):
 
             country_model = request.registry['res.country']
             country = country_model.browse(cr, uid, wz.legal_country_id)
-            address = "{} {}.".format(address, country.name)
+            if country:
+                address += " {}.".format(country.name)
 
             summary.append((
                 "Legal Information", [
@@ -301,7 +302,7 @@ class SaasPortalStartWizard(SaasPortalStart):
             wz.plan_id = int(post["plan_id"])
             plan = plan_model.browse(cr, SUPERUSER_ID, wz.plan_id)
 
-            if hasattr(plan, 'pricing'):
+            if getattr(plan, 'pricing', False):
                 if not partner.customer:
                     errors["general"].append(
                         "User must be costumer to purchase this plan.")

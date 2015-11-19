@@ -104,7 +104,7 @@ class SaasPortalStartWizard(SaasPortalStart):
 
         plan = orm_plan.browse(cr, SUPERUSER_ID, wz.plan_id)
         values = {}
-        if hasattr(plan, "pricing"):
+        if getattr(plan, "pricing", False):
             order = None
             if wz.order_id:
                 order_ = sale_order_obj.browse(cr, SUPERUSER_ID, wz.order_id)

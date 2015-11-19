@@ -10,6 +10,8 @@
         'views/wizard.xml',
         'views/saas_portal.xml',
         'views/res_config.xml',
+        'views/product_template.xml',
+        'templates.xml',
         ],
     'installable': True,
 }

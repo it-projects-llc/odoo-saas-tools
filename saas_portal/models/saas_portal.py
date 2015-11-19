@@ -176,7 +176,7 @@ class SaasPortalPlan(models.Model):
         return vals
 
     @api.multi
-    def create_new_database(self, dbname=None, client_id=None, partner_id=None, user_id=None):
+    def create_new_database(self, dbname=None, client_id=None, partner_id=None, user_id=None, notify_user=False):
         self.ensure_one()
         server = self.server_id
         if not server:
@@ -239,6 +239,20 @@ class SaasPortalPlan(models.Model):
             'access_token': client.oauth_application_id._get_access_token(user_id, create=True),
         }
         url = '{url}?{params}'.format(url=data.get('url'), params=werkzeug.url_encode(params))
+
+        # send email
+        if notify_user:
+            template = self.env.ref('saas_portal.email_template_create_saas')
+            email_ctx = {
+                'default_model': 'saas_portal.client',
+                'default_res_id': client.id,
+                'default_use_template': bool(template),
+                'default_template_id': template.id,
+                'default_composition_mode': 'comment',
+
+            }
+            composer = self.env['mail.compose.message'].with_context(email_ctx).create({})
+            composer.send_mail()
 
         return {'url': url, 'id': client.id, 'client_id': client_id}
 
@@ -417,6 +431,7 @@ class SaasPortalClient(models.Model):
     partner_id = fields.Many2one('res.partner', string='Partner', track_visibility='onchange')
     plan_id = fields.Many2one('saas_portal.plan', string='Plan', track_visibility='onchange')
     expired = fields.Boolean('Expiration', compute='_get_expired')
+    user_id = fields.Many2one('res.users', default=lambda self: self.env.user, string='Salesperson')
 
     @api.one
     def _get_expired(self):
@@ -478,3 +493,9 @@ class SaasPortalClient(models.Model):
                               client_id=client_id,
                               scope=scope,)[0]
         return url
+
+
+class ProductTemplateSaaS(models.Model):
+    _inherit = 'product.template'
+
+    plan_id = fields.Many2one('saas_portal.plan', string='Plan')

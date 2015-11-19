@@ -395,5 +395,15 @@
 
         <menuitem action="action_templates" id="menu_templates" parent="menu_saas" sequence="40" groups="base.group_no_one"/>
 
+        <record id="oauth_applications" model="ir.actions.act_window">
+            <field name="name">OAuth Applications</field>
+            <field name="res_model">oauth.application</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem action="oauth_applications" id="menu_oauth_applications" parent="menu_saas" sequence="100"/>
+
+
     </data>
 </openerp>

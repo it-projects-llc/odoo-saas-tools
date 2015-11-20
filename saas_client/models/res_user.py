@@ -43,5 +43,5 @@ class ResUsers(models.Model):
         res = super(ResUsers, self).check(db, uid, passwd)
         suspended = self.pool['ir.config_parameter'].get_saas_client_parameters(db)
         if suspended == "1" and uid != SI:
-            raise Exception('hyperdrive overload')
+            raise Exception('this client was suspended')
         return res

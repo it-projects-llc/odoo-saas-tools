@@ -239,6 +239,7 @@ class SaasServer(http.Controller):
                 'client_id': client.client_id,
                 'users_len': client.users_len,
                 'max_users': client.max_users,
+                'state': client.state,
                 'file_storage': client.file_storage,
                 'db_storage': client.db_storage,
             })

@@ -38,3 +38,10 @@ class ResUsers(models.Model):
             if cur_users >= max_users:
                 raise exceptions.Warning(_('Maximimum allowed users is %(max_users)s, while you already have %(cur_users)s') % {'max_users':max_users, 'cur_users': cur_users})
         return super(ResUsers, self).create(vals)
+
+    def check(self, db, uid, passwd):
+        res = super(ResUsers, self).check(db, uid, passwd)
+        suspended = self.pool['ir.config_parameter'].get_saas_client_parameters(db)
+        if suspended == "1" and uid != SI:
+            raise Exception('hyperdrive overload')
+        return res

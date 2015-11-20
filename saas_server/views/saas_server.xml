@@ -17,6 +17,7 @@
                     <field name="name"/>
                     <field name="state"/>
                     <field name="users_len"/>
+                    <field name="max_users"/>
                     <field name="file_storage"/>
                     <field name="db_storage"/>
                 </tree>
@@ -38,6 +39,7 @@
                                 <field name="client_id"/>
                                 <field name="name"/>
                                 <field name="users_len"/>
+                                <field name="max_users"/>
                                 <field name="file_storage"/>
                                 <field name="db_storage"/>
                             </group>

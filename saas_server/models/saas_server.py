@@ -208,6 +208,7 @@ class SaasServerClient(models.Model):
         if check_client_id != client_id:
             return {'state': 'deleted'}
         users = client_env['res.users'].search([('share', '=', False)])
+        max_users = client_env['ir.config_parameter'].get_param('saas_client.max_users', '_')
         users_len = len(users)
         data_dir = openerp.tools.config['data_dir']
 
@@ -221,6 +222,7 @@ class SaasServerClient(models.Model):
         data = {
             'client_id': client_id,
             'users_len': users_len,
+            'max_users': max_users,
             'file_storage': file_storage,
             'db_storage': db_storage,
         }

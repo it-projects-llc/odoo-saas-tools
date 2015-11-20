@@ -35,6 +35,7 @@
                     <field name="state"/>
                     <field name="last_connection"/>
                     <field name="users_len"/>
+                    <field name="max_users"/>
                     <field name="file_storage"/>
                     <field name="db_storage"/>
                     <field name="expiration_datetime"/>
@@ -69,6 +70,7 @@
                             <field name="plan_id"/>
                             <field name="partner_id"/>
                             <field name="users_len"/>
+                            <field name="max_users"/>
                             <field name="file_storage"/>
                             <field name="db_storage"/>
                             <field name="server_id"/>

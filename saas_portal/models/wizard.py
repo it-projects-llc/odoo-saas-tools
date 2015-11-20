@@ -103,6 +103,7 @@ class SaasConfigParam(models.TransientModel):
     def _get_keys(self):
         return [
             ('saas_client.max_users', 'Max Users'),
+            ('saas_client.suspended', 'Suspended'),
         ]
 
     key = fields.Selection(selection=_get_keys, string='Key', required=1, size=64)

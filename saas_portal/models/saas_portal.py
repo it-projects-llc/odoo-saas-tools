@@ -437,7 +437,7 @@ class SaasPortalClient(models.Model):
     expired = fields.Boolean('Expiration', default=False, readonly=True)
     user_id = fields.Many2one('res.users', default=lambda self: self.env.user, string='Salesperson')
     trial = fields.Boolean('Trial', help='indication of trial clients', default=False, readonly=True)
-    notification_sent = fields.Boolean(default=False, readonly=True, help='notification about expiration sent')
+    notification_sent = fields.Boolean(default=False, readonly=True, help='notification about expiration was sent')
     support_team_id = fields.Many2one('saas_portal.support_team', 'Support Team')
 
     _track = {
@@ -543,3 +543,16 @@ class SaasPortalSupportTeams(models.Model):
     _inherit = ['mail.thread']
 
     name = fields.Char('Team name')
+
+
+class ResUsersSaaS(models.Model):
+    _inherit = 'res.users'
+
+    support_team_id = fields.Many2one('saas_portal.support_team', 'Support Team', help='Support team for SaaS')
+
+    def __init__(self, pool, cr):
+        init_res = super(ResUsersSaaS, self).__init__(pool, cr)
+        # duplicate list to avoid modifying the original reference
+        self.SELF_WRITEABLE_FIELDS = list(self.SELF_WRITEABLE_FIELDS)
+        self.SELF_WRITEABLE_FIELDS.extend(['support_team_id'])
+        return init_res

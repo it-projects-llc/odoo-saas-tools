@@ -129,7 +129,7 @@ class SaasPortalCreateClient(models.TransientModel):
     partner_id = fields.Many2one('res.partner', string='Partner')
     user_id = fields.Many2one('res.users', string='User')
     notify_user = fields.Boolean(help='Notify user by email when database will have been created', default=False)
-    support_team_id = fields.Many2one('saas_portal.support_team', 'Support Team')
+    support_team_id = fields.Many2one('saas_portal.support_team', 'Support Team', default=lambda self: self.env.user.support_team_id)
 
     @api.onchange('user_id')
     def update_parter(self):

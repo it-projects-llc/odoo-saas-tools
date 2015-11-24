@@ -246,9 +246,12 @@ class SaasServerClient(models.Model):
             oauth_provider.write({'enabled': True})
 
             # company_data = self._preprocess_company_data(company_data, client_env)[0]
-            company = client_env['ir.model.data'].xmlid_to_object("base.main_company")
-            company.write({"name": company_data['company']})
-            company.partner_id.write(company_data)
+            if isinstance(company_data, dict) and \
+                    company_data.get("name", False):
+                company = client_env['ir.model.data'].xmlid_to_object(
+                    "base.main_company")
+                company.write({"name": company_data['company']})
+                company.partner_id.write(company_data)
 
     @api.model
     def update_all(self):

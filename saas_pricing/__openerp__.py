@@ -4,7 +4,7 @@
     'author': 'OpenJaf',
     'category': 'SaaS',
     'website': '',
-    'depends': ['saas_server', 'saas_utils', 'saas_portal'],
+    'depends': ['saas_utils', 'saas_portal'],
     'data': [
         'views/saas_pricing.xml',
         'data.xml',

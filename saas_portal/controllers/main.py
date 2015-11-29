@@ -74,7 +74,8 @@ class SaasPortalSale(http.Controller):
 
         plan_id = int(kw.get('plan_id'))
         trial_plan = request.env['saas_portal.plan'].sudo().browse(plan_id)
-        res = trial_plan.create_new_database(partner_id=partner.id, user_id=uid, notify_user=True, trial=True)
+        support_team = request.env.ref('saas_portal.main_support_team')
+        res = trial_plan.create_new_database(partner_id=partner.id, user_id=uid, notify_user=True, trial=True, support_team_id=support_team.id)
         client = request.env['saas_portal.client'].sudo().browse(res.get('id'))
         client.server_id.action_sync_server()
 

@@ -10,6 +10,7 @@
                     <page string="SaaS">
                         <group>
                             <field name="plan_id"/>
+                            <field name="period"/>
                         </group>
                     </page>
                 </xpath>

@@ -11,7 +11,6 @@
         'views/wizard.xml',
         'views/saas_portal.xml',
         'views/res_config.xml',
-        'views/product_template.xml',
         'data/ir_config_parameter.xml',
         'data/subtype.xml',
         'data/support_team.xml',

@@ -62,6 +62,7 @@
                         <button string="Delete" name="delete_database_server" type="object" attrs="{'invisible':['|',('state', 'not in', ['pending'])]}" icon="gtk-delete" 
                         confirm="Are you sure to delete this database?"/>
                         <button string="Sync server" type="object" name="action_sync_server" icon="gtk-refresh"/>
+                        <button name="change_domain" string="Change domain"/>
                         <field name="state" widget="statusbar" statusbar_visible="open,pending,deleted" clickable="False"/>
                     </header>
                     <sheet>
@@ -76,10 +77,13 @@
                             <field name="file_storage"/>
                             <field name="db_storage"/>
                             <field name="server_id"/>
-                            <field name="trial"/>
                             <field name="notification_sent"/>
-                            <field name="expiration_datetime"/>
                             <field name="support_team_id"/>
+                        </group>
+                        <group name="subscription">
+                            <field name="trial"/>
+                            <field name="expiration_datetime"/>
+                            <field name="expired"/>
                         </group>
                     </group>
                     <notebook>

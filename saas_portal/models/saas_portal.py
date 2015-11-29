@@ -257,7 +257,7 @@ class SaasPortalPlan(models.Model):
             composer = self.env['mail.compose.message'].with_context(email_ctx).create({})
             composer.send_mail()
 
-        client.write({'trial': trial, 'support_team_id': support_team_id.id})
+        client.write({'trial': trial, 'support_team_id': support_team_id})
         return {'url': url, 'id': client.id, 'client_id': client_id}
 
     @api.one
@@ -434,7 +434,7 @@ class SaasPortalClient(models.Model):
     name = fields.Char(required=True)
     partner_id = fields.Many2one('res.partner', string='Partner', track_visibility='onchange')
     plan_id = fields.Many2one('saas_portal.plan', string='Plan', track_visibility='onchange')
-    expired = fields.Boolean('Expiration', default=False, readonly=True)
+    expired = fields.Boolean('Expired', default=False, readonly=True)
     user_id = fields.Many2one('res.users', default=lambda self: self.env.user, string='Salesperson')
     trial = fields.Boolean('Trial', help='indication of trial clients', default=False, readonly=True)
     notification_sent = fields.Boolean(default=False, readonly=True, help='notification about expiration was sent')

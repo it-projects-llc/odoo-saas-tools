@@ -61,7 +61,7 @@
                             </field>
                         </page>
                     </xpath>
-                    <xpath expr="//header/button[@name='change_domain']" position="after">
+                    <xpath expr="//field[@name='state']" position="before">
                         <button name="%(saas_portal_find_payments_action)d" type="action" string="Find the payments"/>
                     </xpath>
                 </data>

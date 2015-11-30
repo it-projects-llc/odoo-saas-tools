@@ -189,3 +189,21 @@ class SaasPortalDuplicateClient(models.TransientModel):
             'name': 'Duplicate Client',
             'url': url
         }
+
+
+class SaasPortalRenameDatabase(models.TransientModel):
+    _name = 'saas_portal.rename_database'
+
+    def _default_client_id(self):
+        return self._context.get('active_id')
+
+    name = fields.Char('New Name', required=True)
+    client_id = fields.Many2one('saas_portal.client', string='Base Client', readonly=True, default=_default_client_id)
+
+    @api.multi
+    def apply(self):
+        self.ensure_one()
+        self.client_id.rename_database(new_dbname=self.name)
+        return {
+            'type': 'ir.actions.act_window_close',
+        }

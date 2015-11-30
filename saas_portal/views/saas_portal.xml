@@ -62,7 +62,7 @@
                         <button string="Delete" name="delete_database_server" type="object" attrs="{'invisible':['|',('state', 'not in', ['pending'])]}" icon="gtk-delete" 
                         confirm="Are you sure to delete this database?"/>
                         <button string="Sync server" type="object" name="action_sync_server" icon="gtk-refresh"/>
-                        <button name="change_domain" string="Change domain"/>
+                        <button name="%(saas_portal.action_rename_database)d" string="Rename Database" type="action"/>
                         <field name="state" widget="statusbar" statusbar_visible="open,pending,deleted" clickable="False"/>
                     </header>
                     <sheet>

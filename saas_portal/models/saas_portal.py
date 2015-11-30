@@ -72,7 +72,7 @@ class SaasPortalServer(models.Model):
         scheme = scheme or self.request_scheme
         port = port or self.request_port
         params = self._request_params(**kwargs)[0]
-        access_token = self.oauth_application_id._get_access_token(create=True)
+        access_token = self.oauth_application_id.sudo()._get_access_token(create=True)
         params.update({
             'token_type': 'Bearer',
             'access_token': access_token,
@@ -286,7 +286,7 @@ class SaasPortalPlan(models.Model):
         plan.template_id.server_id = plan.server_id
         params = plan.server_id._request_params(path='/saas_server/new_database', state=state, client_id=client_id)[0]
 
-        access_token = plan.template_id.oauth_application_id._get_access_token(create=True)
+        access_token = plan.template_id.oauth_application_id.sudo()._get_access_token(create=True)
         params.update({
             'token_type': 'Bearer',
             'access_token': access_token,
@@ -495,6 +495,21 @@ class SaasPortalClient(models.Model):
             #    user_model.unlink(cr, uid, user_ids)
             #openerp.service.db.exp_drop(obj.name)
         return super(SaasPortalClient, self).unlink(cr, uid, ids, context)
+
+    @api.multi
+    def rename_database(self, new_dbname):
+        self.ensure_one()
+        # TODO async
+        state = {
+            'd': self.name,
+            'client_id': self.client_id,
+            'new_dbname': new_dbname,
+        }
+        url = self.server_id._request_server(path='/saas_server/rename_database', state=state, client_id=self.client_id)[0]
+        res = requests.get(url, verify=(self.server_id.request_scheme == 'https' and self.server_id.verify_ssl))
+        _logger.info('delete database: %s', res.text)
+        if res.status_code != 500:
+            self.name = new_dbname
 
     @api.one
     def duplicate_database(self, dbname=None, partner_id=None, expiration=None):

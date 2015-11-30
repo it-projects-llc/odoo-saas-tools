@@ -250,7 +250,7 @@ Example in python language:
 Notes abouts API integration
 
 * Be sure, that Portal module is installed at Main Database
-* Be sure, that "Allow external users to sign up" option from "Settings/General Settings" is enabled
+* Be sure, that "Allow external users to sign up" option from "Settings/General Settings" is enabled (this option is only available in Debug mode)
 * To find new signuped user open "Settings/Users" at Main Database and delete filter "Regular users only"
 * don't use trailing slash at main_url
 * Access token is expired in one hour

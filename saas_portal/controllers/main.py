@@ -5,7 +5,6 @@ from openerp import SUPERUSER_ID, exceptions
 from openerp.tools.translate import _
 from openerp.addons.web import http
 from openerp.addons.web.http import request
-from openerp.addons.web.controllers.main import login_and_redirect
 import werkzeug
 import simplejson
 
@@ -68,7 +67,8 @@ class SaasPortalSale(http.Controller):
     def index(self, **kw):
         uid = request.session.uid
         if not uid:
-            return login_redirect()
+            plan_id = int(kw.get('plan_id'))
+            return http.local_redirect('/web/login?redirect=/trial'+'?plan_id='+str(plan_id))
 
         partner = request.env['res.users'].browse(uid).partner_id
 

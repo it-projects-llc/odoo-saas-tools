@@ -15,22 +15,19 @@ class ProductTemplateSaaS(models.Model):
 class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
 
-    saas_portal_client_id = fields.Many2one('saas_portal.client', string='The SaaS client')
+    saas_portal_client_id = fields.Many2one('saas_portal.client', string='SaaS client', help='reference to the SaaS client if this invoice line is created for a SaaS product')
     plan_id = fields.Many2one('saas_portal.plan', related='product_id.plan_id', readonly=True)
     period = fields.Integer(string='Subscription period', help='subsciption period in days', related="product_id.period", readonly=True)
-    state = fields.Selection([('draft', 'Draft'),
-                              ('proforma', 'Pro-forma'),
-                              ('proforma2', 'Pro-forma'),
-                              ('open', 'Open'),
-                              ('paid', 'Paid'),
-                              ('cancel', 'Cancelled')], string='Status', related='invoice_id.state', readonly=True)
+    state = fields.Selection(related='invoice_id.state', readonly=True)
 
 
 class SaasPortalClient(models.Model):
     _inherit = 'saas_portal.client'
 
     subscription_start = fields.Datetime(string="Subscription start", track_visibility='onchange')
-    expiration_datetime = fields.Datetime(string="Expiration", compute='_compute_expiration', store=True, track_visibility='onchange')
+    expiration_datetime = fields.Datetime(string="Expiration", compute='_compute_expiration',
+                                          store=True, track_visibility='onchange',
+                                          help='Subscription start plus all paid days from related invoices')
     invoice_lines = fields.One2many('account.invoice.line', 'saas_portal_client_id')
 
     @api.multi
@@ -65,3 +62,15 @@ class FindPaymentsWizard(models.TransientModel):
     def apply_invoice_lines(self):
         client_obj = self.env['saas_portal.client'].browse(self._context.get('active_id'))
         self.invoice_lines.write({'saas_portal_client_id': client_obj.id})
+
+
+class AccountInvoice(models.Model):
+    _inherit = 'account.line'
+
+    @api.multi
+    def invoice_validate(self):
+        res = super(AccountInvoice, self).invoice_validate()
+        client_obj = self.env['saas_portal.client'].search([('partner_id', '=', self.partner_id.id)])
+        if len(client_obj) == 1:
+            self.invoice_line.write({'saas_portal_client_id': client_obj.id})
+        return res

@@ -72,7 +72,7 @@ class SaasPortalServer(models.Model):
         scheme = scheme or self.request_scheme
         port = port or self.request_port
         params = self._request_params(**kwargs)[0]
-        access_token = self.oauth_application_id._get_access_token(create=True)
+        access_token = self.oauth_application_id.sudo()._get_access_token(create=True)
         params.update({
             'token_type': 'Bearer',
             'access_token': access_token,
@@ -286,7 +286,7 @@ class SaasPortalPlan(models.Model):
         plan.template_id.server_id = plan.server_id
         params = plan.server_id._request_params(path='/saas_server/new_database', state=state, client_id=client_id)[0]
 
-        access_token = plan.template_id.oauth_application_id._get_access_token(create=True)
+        access_token = plan.template_id.oauth_application_id.sudo()._get_access_token(create=True)
         params.update({
             'token_type': 'Bearer',
             'access_token': access_token,

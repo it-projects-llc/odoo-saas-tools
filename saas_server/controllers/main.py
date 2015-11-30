@@ -39,14 +39,12 @@ class SaasServer(http.Controller):
         access_token = post['access_token']
 
         client_id = post['client_id']
-        if is_template_db:
-            # TODO: check access right to create template db
-            saas_portal_user = None
-        else:
-            saas_oauth_provider = request.registry['ir.model.data'].xmlid_to_object(request.cr, SUPERUSER_ID, 'saas_server.saas_oauth_provider')
-            saas_portal_user = request.registry['res.users']._auth_oauth_rpc(request.cr, SUPERUSER_ID, saas_oauth_provider.validation_endpoint, access_token)
-            if saas_portal_user.get("error"):
-                raise Exception(saas_portal_user['error'])
+        saas_oauth_provider = request.registry['ir.model.data'].xmlid_to_object(request.cr, SUPERUSER_ID, 'saas_server.saas_oauth_provider')
+        saas_portal_user = request.registry['res.users']._auth_oauth_rpc(request.cr, SUPERUSER_ID, saas_oauth_provider.validation_endpoint, access_token)
+        if saas_portal_user.get('user_id') != 1:
+            raise Exception('auth error')
+        if saas_portal_user.get("error"):
+            raise Exception(saas_portal_user['error'])
 
         client_data = {'name':new_db, 'client_id': client_id, 'expiration_datetime': expiration_db}
         client = request.env['saas_server.client'].sudo().create(client_data)
@@ -113,6 +111,8 @@ class SaasServer(http.Controller):
         saas_oauth_provider = request.registry['ir.model.data'].xmlid_to_object(request.cr, SUPERUSER_ID, 'saas_server.saas_oauth_provider')
 
         saas_portal_user = request.registry['res.users']._auth_oauth_rpc(request.cr, SUPERUSER_ID, saas_oauth_provider.validation_endpoint, access_token)
+        if saas_portal_user.get('user_id') != 1:
+            raise Exception('auth error')
         if saas_portal_user.get("error"):
             raise Exception(saas_portal_user['error'])
 
@@ -133,6 +133,8 @@ class SaasServer(http.Controller):
 
         access_token = post['access_token']
         user_data = request.registry['res.users']._auth_oauth_rpc(request.cr, SUPERUSER_ID, saas_oauth_provider.validation_endpoint, access_token)
+        if user_data.get('user_id') != 1:
+            raise Exception('auth error')
         if user_data.get("error"):
             raise Exception(user_data['error'])
 
@@ -151,6 +153,8 @@ class SaasServer(http.Controller):
         saas_oauth_provider = request.registry['ir.model.data'].xmlid_to_object(request.cr, SUPERUSER_ID, 'saas_server.saas_oauth_provider')
 
         user_data = request.registry['res.users']._auth_oauth_rpc(request.cr, SUPERUSER_ID, saas_oauth_provider.validation_endpoint, access_token)
+        if user_data.get('user_id') != 1:
+            raise Exception('auth error')
         if user_data.get("error"):
             raise Exception(user_data['error'])
 

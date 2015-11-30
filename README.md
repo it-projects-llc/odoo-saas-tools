@@ -67,7 +67,10 @@ Usage
      > proxy_set_header X-Forwarded-Proto $scheme;
 
    * install dependencies:
-     * pip install oauthlib
+     * oauthlib:
+       * pip install oauthlib
+     * requests
+       * pip install requests --upgrade
 
 2. Create two databases (via /web/database/manager):
 
@@ -112,7 +115,8 @@ Usage
 	 * click [Sync server]
 
 7. Prepare Template Database for Plan
-   * click "Log in to template DB" and Plan's form
+   * click [Log in to template DB] at Plan's form
+     * be sure that you allow pop-ups in your browser
    * install modules that will be used for Plan, e.g. *point_of_sale*, *website_sale*
    * make any other changes in database if needed. E.g. configure
      chart of accounts.
@@ -219,10 +223,14 @@ Example in python language:
 
     # Configure system
     data = {
+        # configure addons
         'update_addons': [],
-        'install_addons': ['sale', 'point_of_sale'],
+        'install_addons': ['sale', 'point_of_sale', 'stock', 'access_settings_menu', access_apps'],
         'uninstall_addons': [],
-
+        # grant access to owner
+        'access_owner_add': ['base.group_sale_manager', 'stock.group_stock_manager', 'access_settings_menu.group_show_settings_menu'],
+        # restrict access for all users
+        'access_remove': ['access_apps.group_show_modules_menu'],
         'params': [
              {'key': 'saas_client.max_users', 'value': 10, 'hidden': True}
         ],

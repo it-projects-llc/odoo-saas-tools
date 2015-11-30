@@ -1,0 +1,9 @@
+ <openerp>
+    <data>
+        <template id="product.saas" inherit_id="website_sale.product">
+            <xpath expr="//a[@id='add_to_cart']" position="after">
+                <a id="try_trial" style="margin-left: 8px" class="btn btn-default btn-lg mt8" t-attf-href="/trial?plan_id=#{product.plan_id.id}&amp;product_id=#{product.id}">Try trial</a>
+            </xpath>
+        </template>
+    </data>
+</openerp>

@@ -208,6 +208,9 @@ class SaasServerClient(models.Model):
         if check_client_id != client_id:
             return {'state': 'deleted'}
         users = client_env['res.users'].search([('share', '=', False)])
+        param_obj = client_env['ir.config_parameter']
+        max_users = param_obj.get_param('saas_client.max_users', '_')
+        suspended = param_obj.get_param('saas_client.suspended', '0')
         users_len = len(users)
         data_dir = openerp.tools.config['data_dir']
 
@@ -221,9 +224,14 @@ class SaasServerClient(models.Model):
         data = {
             'client_id': client_id,
             'users_len': users_len,
+            'max_users': max_users,
             'file_storage': file_storage,
             'db_storage': db_storage,
         }
+        if suspended == '0' and self.state == 'pending':
+            data.update({'state': 'open'})
+        if suspended == '1' and self.state == 'open':
+            data.update({'state': 'pending'})
         return data
 
     @api.one

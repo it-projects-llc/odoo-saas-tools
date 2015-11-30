@@ -15,6 +15,9 @@ import werkzeug
 import requests
 import random
 
+from datetime import datetime, timedelta
+from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
+
 import logging
 _logger = logging.getLogger(__name__)
 
@@ -176,7 +179,7 @@ class SaasPortalPlan(models.Model):
         return vals
 
     @api.multi
-    def create_new_database(self, dbname=None, client_id=None, partner_id=None, user_id=None):
+    def create_new_database(self, dbname=None, client_id=None, partner_id=None, user_id=None, notify_user=False, trial=False, support_team_id=None):
         self.ensure_one()
         server = self.server_id
         if not server:
@@ -240,6 +243,21 @@ class SaasPortalPlan(models.Model):
         }
         url = '{url}?{params}'.format(url=data.get('url'), params=werkzeug.url_encode(params))
 
+        # send email
+        if notify_user:
+            template = self.env.ref('saas_portal.email_template_create_saas')
+            email_ctx = {
+                'default_model': 'saas_portal.client',
+                'default_res_id': client.id,
+                'default_use_template': bool(template),
+                'default_template_id': template.id,
+                'default_composition_mode': 'comment',
+
+            }
+            composer = self.env['mail.compose.message'].with_context(email_ctx).create({})
+            composer.send_mail()
+
+        client.write({'trial': trial, 'support_team_id': support_team_id})
         return {'url': url, 'id': client.id, 'client_id': client_id}
 
     @api.one
@@ -416,12 +434,51 @@ class SaasPortalClient(models.Model):
     name = fields.Char(required=True)
     partner_id = fields.Many2one('res.partner', string='Partner', track_visibility='onchange')
     plan_id = fields.Many2one('saas_portal.plan', string='Plan', track_visibility='onchange')
-    expired = fields.Boolean('Expiration', compute='_get_expired')
+    expired = fields.Boolean('Expired', default=False, readonly=True)
+    user_id = fields.Many2one('res.users', default=lambda self: self.env.user, string='Salesperson')
+    trial = fields.Boolean('Trial', help='indication of trial clients', default=False, readonly=True)
+    notification_sent = fields.Boolean(default=False, readonly=True, help='notification about expiration was sent')
+    support_team_id = fields.Many2one('saas_portal.support_team', 'Support Team')
 
-    @api.one
-    def _get_expired(self):
+    _track = {
+        'expired': {
+            'saas_portal.mt_expired':
+            lambda self, cr, uid, obj, ctx=None: obj.expired
+        }
+    }
+
+    @api.model
+    def _cron_suspend_expired_clients(self):
+        payload = {
+            'params': [{'key': 'saas_client.suspended', 'value': '1', 'hidden': True}],
+        }
         now = fields.Datetime.now()
-        self.expired = self.expiration_datetime and self.expiration_datetime < now
+        expired = self.search([('expiration_datetime', '<', now)])
+        expired.write({'expired': True})
+        for record in expired:
+            if record.trial:
+                self.env['saas.config'].do_upgrade_database(payload, record.id)
+
+    @api.model
+    def _cron_notify_expired_clients(self):
+        # send notification about expiration by email
+        notification_delta = int(self.env['ir.config_parameter'].get_param('saas.expiration_notify_in_advance', '0'))
+        if notification_delta > 0:
+            records = self.search([('expiration_datetime', '<', (datetime.now() + timedelta(days=notification_delta)).strftime(DEFAULT_SERVER_DATETIME_FORMAT)),
+                                   ('notification_sent', '=', False)])
+            records.write({'notification_sent': True})
+            for record in records:
+                template = self.env.ref('saas_portal.email_template_expiration_notify')
+                email_ctx = {
+                    'default_model': 'saas_portal.client',
+                    'default_res_id': record.id,
+                    'default_use_template': bool(template),
+                    'default_template_id': template.id,
+                    'default_composition_mode': 'comment',
+                }
+                composer = self.env['mail.compose.message'].with_context(email_ctx).create({})
+                composer.send_mail()
+
 
     def unlink(self, cr, uid, ids, context=None):
         user_model = self.pool.get('res.users')
@@ -478,3 +535,24 @@ class SaasPortalClient(models.Model):
                               client_id=client_id,
                               scope=scope,)[0]
         return url
+
+
+class SaasPortalSupportTeams(models.Model):
+    _name = 'saas_portal.support_team'
+
+    _inherit = ['mail.thread']
+
+    name = fields.Char('Team name')
+
+
+class ResUsersSaaS(models.Model):
+    _inherit = 'res.users'
+
+    support_team_id = fields.Many2one('saas_portal.support_team', 'Support Team', help='Support team for SaaS')
+
+    def __init__(self, pool, cr):
+        init_res = super(ResUsersSaaS, self).__init__(pool, cr)
+        # duplicate list to avoid modifying the original reference
+        self.SELF_WRITEABLE_FIELDS = list(self.SELF_WRITEABLE_FIELDS)
+        self.SELF_WRITEABLE_FIELDS.extend(['support_team_id'])
+        return init_res

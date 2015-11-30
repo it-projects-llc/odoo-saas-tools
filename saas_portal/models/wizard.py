@@ -103,6 +103,7 @@ class SaasConfigParam(models.TransientModel):
     def _get_keys(self):
         return [
             ('saas_client.max_users', 'Max Users'),
+            ('saas_client.suspended', 'Suspended'),
         ]
 
     key = fields.Selection(selection=_get_keys, string='Key', required=1, size=64)
@@ -127,6 +128,8 @@ class SaasPortalCreateClient(models.TransientModel):
     plan_id = fields.Many2one('saas_portal.plan', string='Plan', readonly=True, default=_default_plan_id)
     partner_id = fields.Many2one('res.partner', string='Partner')
     user_id = fields.Many2one('res.users', string='User')
+    notify_user = fields.Boolean(help='Notify user by email when database will have been created', default=False)
+    support_team_id = fields.Many2one('saas_portal.support_team', 'Support Team', default=lambda self: self.env.user.support_team_id)
 
     @api.onchange('user_id')
     def update_parter(self):
@@ -136,7 +139,9 @@ class SaasPortalCreateClient(models.TransientModel):
     @api.multi
     def apply(self):
         wizard = self[0]
-        res = wizard.plan_id.create_new_database(dbname=wizard.name, partner_id=wizard.partner_id.id, user_id=self.user_id.id)
+        res = wizard.plan_id.create_new_database(dbname=wizard.name, partner_id=wizard.partner_id.id, user_id=self.user_id.id,
+                                                 notify_user=self.notify_user,
+                                                 support_team_id=self.support_team_id)
         client = self.env['saas_portal.client'].browse(res.get('id'))
         client.server_id.action_sync_server()
         return {

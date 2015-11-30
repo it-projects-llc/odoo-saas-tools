@@ -11,6 +11,8 @@
                         <field name="plan_id"/>
                         <field name="user_id" class="oe_inline"/>
                         <field name="partner_id" class="oe_inline"/>
+                        <field name="notify_user" class="oe_inline"/>
+                        <field name="support_team_id" class="oe_inline"/>
                      </group>
                      <footer>
                         <button name="apply" string="Create" type="object" class="oe_highlight"/>

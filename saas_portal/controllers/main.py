@@ -5,7 +5,7 @@ from openerp import SUPERUSER_ID, exceptions
 from openerp.tools.translate import _
 from openerp.addons.web import http
 from openerp.addons.web.http import request
-from openerp.addons.web.controllers.main import login_redirect
+from openerp.addons.web.controllers.main import login_and_redirect
 import werkzeug
 import simplejson
 

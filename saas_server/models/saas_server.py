@@ -323,3 +323,8 @@ class SaasServerClient(models.Model):
     def delete_database(self):
         openerp.service.db.exp_drop(self.name)
         self.write({'state': 'deleted'})
+
+    @api.one
+    def rename_database(self, new_dbname):
+        openerp.service.db.exp_rename(self.name, new_dbname)
+        self.name = new_dbname

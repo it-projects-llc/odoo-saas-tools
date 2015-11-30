@@ -23,6 +23,7 @@ Features
   * install, update, delete addons
   * configure parameters (e.g. Max Allowed Users)
   * block database (users will be logged out immediately and will not able to log in back until unblocking)
+  * rename database (e.g. to change domain name)
   * delete database
 * collect information from client databases (count of users, disk space usage, etc.)
 * sale subscription (saas_portal_sale, saas_portal_sale_online)

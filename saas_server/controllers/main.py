@@ -121,6 +121,24 @@ class SaasServer(http.Controller):
         result = client.upgrade_database(data=state.get('data'))[0]
         return simplejson.dumps({client.name: result})
 
+    @http.route('/saas_server/rename_database', type='http', website=True, auth='public')
+    @fragment_to_query_string
+    def rename_database(self, **post):
+        _logger.info('delete_database post: %s', post)
+        state = simplejson.loads(post.get('state'))
+        client_id = state.get('client_id')
+        db = state.get('d')
+        new_dbname = state.get('new_dbname')
+        saas_oauth_provider = request.registry['ir.model.data'].xmlid_to_object(request.cr, SUPERUSER_ID, 'saas_server.saas_oauth_provider')
+
+        access_token = post['access_token']
+        user_data = request.registry['res.users']._auth_oauth_rpc(request.cr, SUPERUSER_ID, saas_oauth_provider.validation_endpoint, access_token)
+        if user_data.get("error"):
+            raise Exception(user_data['error'])
+
+        client = request.env['saas_server.client'].sudo().search([('client_id', '=', client_id)])
+        client.rename_database(new_dbname)
+
     @http.route('/saas_server/delete_database', type='http', website=True, auth='public')
     @fragment_to_query_string
     def delete_database(self, **post):

@@ -496,6 +496,21 @@ class SaasPortalClient(models.Model):
             #openerp.service.db.exp_drop(obj.name)
         return super(SaasPortalClient, self).unlink(cr, uid, ids, context)
 
+    @api.multi
+    def rename_database(self, new_dbname):
+        self.ensure_one()
+        # TODO async
+        state = {
+            'd': self.name,
+            'client_id': self.client_id,
+            'new_dbname': new_dbname,
+        }
+        url = self.server_id._request_server(path='/saas_server/rename_database', state=state, client_id=self.client_id)[0]
+        res = requests.get(url, verify=(self.server_id.request_scheme == 'https' and self.server_id.verify_ssl))
+        _logger.info('delete database: %s', res.text)
+        if res.status_code != 500:
+            self.name = new_dbname
+
     @api.one
     def duplicate_database(self, dbname=None, partner_id=None, expiration=None):
         server = self.server_id

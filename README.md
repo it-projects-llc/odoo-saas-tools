@@ -22,6 +22,7 @@ Features
 * control SaaS Client database from SaaS Portal backend:
   * install, update, delete addons
   * configure parameters (e.g. Max Allowed Users)
+  * grant or remove access rights for database users
   * block database (users will be logged out immediately and will not able to log in back until unblocking)
   * rename database (e.g. to change domain name)
   * delete database

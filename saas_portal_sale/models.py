@@ -65,7 +65,7 @@ class FindPaymentsWizard(models.TransientModel):
 
 
 class AccountInvoice(models.Model):
-    _inherit = 'account.line'
+    _inherit = 'account.invoice'
 
     @api.multi
     def invoice_validate(self):

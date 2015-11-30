@@ -10,10 +10,12 @@
                         <field name="invoice_lines">
                             <tree>
                                 <field name="create_date"/>
+                                <field name="write_date"/>
                                 <field name="product_id"/>
                                 <field name="plan_id"/>
                                 <field name="period"/>
                                 <field name="price_unit"/>
+                                <field name="state"/>
                             </tree>
                         </field>
                         <footer>
@@ -48,10 +50,13 @@
                         <page string='Invoice Lines'>
                             <field name="invoice_lines">
                                 <tree>
+                                    <field name="create_date"/>
+                                    <field name="write_date"/>
                                     <field name="product_id"/>
                                     <field name="plan_id"/>
                                     <field name="period"/>
                                     <field name="price_unit"/>
+                                    <field name="state"/>
                                 </tree>
                             </field>
                         </page>

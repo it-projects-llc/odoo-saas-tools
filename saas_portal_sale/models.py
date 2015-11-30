@@ -15,28 +15,33 @@ class ProductTemplateSaaS(models.Model):
 class AccountInvoiceLine(models.Model):
     _inherit = 'account.invoice.line'
 
-    saas_portal_client_id = fields.Many2one('saas_portal.client', string='The SaaS client this invoice was paid for')
+    saas_portal_client_id = fields.Many2one('saas_portal.client', string='The SaaS client')
     plan_id = fields.Many2one('saas_portal.plan', related='product_id.plan_id', readonly=True)
     period = fields.Integer(string='Subscription period', help='subsciption period in days', related="product_id.period", readonly=True)
+    state = fields.Selection([('draft', 'Draft'),
+                              ('proforma', 'Pro-forma'),
+                              ('proforma2', 'Pro-forma'),
+                              ('open', 'Open'),
+                              ('paid', 'Paid'),
+                              ('cancel', 'Cancelled')], string='Status', related='invoice_id.state', readonly=True)
 
 
 class SaasPortalClient(models.Model):
     _inherit = 'saas_portal.client'
 
-    subscription_start = fields.Datetime(string="Subscription start")
-    expiration_datetime = fields.Datetime(string="Expiration", compute='_compute_expiration', store=True)
+    subscription_start = fields.Datetime(string="Subscription start", track_visibility='onchange')
+    expiration_datetime = fields.Datetime(string="Expiration", compute='_compute_expiration', store=True, track_visibility='onchange')
     invoice_lines = fields.One2many('account.invoice.line', 'saas_portal_client_id')
 
     @api.multi
-    @api.depends('invoice_lines')
+    @api.depends('invoice_lines.invoice_id.state')
     def _compute_expiration(self):
         for client_obj in self:
             if client_obj.subscription_start:
-                for line in client_obj.invoice_lines:
-                    if not client_obj.expiration_datetime:
-                        client_obj.expiration_datetime = datetime.strptime(client_obj.subscription_start, DEFAULT_SERVER_DATETIME_FORMAT) + timedelta(days=line.product_id.period)
-                    else:
-                        client_obj.expiration_datetime = datetime.strptime(client_obj.expiration_datetime, DEFAULT_SERVER_DATETIME_FORMAT) + timedelta(days=line.product_id.period)
+                days = 0
+                for line in client_obj.invoice_lines.search([('invoice_id.state', '=', 'paid')]):
+                    days += line.product_id.period
+                client_obj.expiration_datetime = datetime.strptime(client_obj.subscription_start, DEFAULT_SERVER_DATETIME_FORMAT) + timedelta(days=days)
 
 
 class FindPaymentsWizard(models.TransientModel):

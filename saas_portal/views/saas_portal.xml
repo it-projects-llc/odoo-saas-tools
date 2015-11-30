@@ -30,7 +30,7 @@
             <field name="model">saas_portal.client</field>
             <field name="priority">4</field>
             <field name="arch" type="xml">
-                <tree string="Clients">
+                <tree string="Clients" colors="red:expired">
                     <field name="name"/>
                     <field name="state"/>
                     <field name="last_connection"/>
@@ -38,7 +38,9 @@
                     <field name="max_users"/>
                     <field name="file_storage"/>
                     <field name="db_storage"/>
+                    <field name="trial"/>
                     <field name="expiration_datetime"/>
+                    <field name="expired" invisible="1"/>
                     <button name="edit_database" type="object" icon="gtk-connect" attrs="{'invisible':[('state', 'in', ['deleted', 'draft'])]}"/>
                     <button name="upgrade_database" attrs="{'invisible':[('state', 'in', ['deleted'])]}" type="object" icon="gtk-execute" />
                     <button name="delete_database_server" type="object" attrs="{'invisible':[('state', 'not in', ['pending'])]}" icon="gtk-delete"
@@ -60,6 +62,7 @@
                         <button string="Delete" name="delete_database_server" type="object" attrs="{'invisible':['|',('state', 'not in', ['pending'])]}" icon="gtk-delete" 
                         confirm="Are you sure to delete this database?"/>
                         <button string="Sync server" type="object" name="action_sync_server" icon="gtk-refresh"/>
+                        <button name="change_domain" string="Change domain"/>
                         <field name="state" widget="statusbar" statusbar_visible="open,pending,deleted" clickable="False"/>
                     </header>
                     <sheet>
@@ -74,7 +77,13 @@
                             <field name="file_storage"/>
                             <field name="db_storage"/>
                             <field name="server_id"/>
+                            <field name="notification_sent"/>
+                            <field name="support_team_id"/>
+                        </group>
+                        <group name="subscription">
+                            <field name="trial"/>
                             <field name="expiration_datetime"/>
+                            <field name="expired"/>
                         </group>
                     </group>
                     <notebook>
@@ -404,8 +413,42 @@
             <field name="view_mode">tree,form</field>
         </record>
 
-        <menuitem action="oauth_applications" id="menu_oauth_applications" parent="menu_saas" sequence="100"/>
+        <menuitem action="oauth_applications" id="menu_oauth_applications" parent="menu_saas" sequence="99"/>
+
+        <record id="view_support_team_tree" model="ir.ui.view">
+            <field name="name">saas_portal.support_team.tree</field>
+            <field name="model">saas_portal.support_team</field>
+            <field name="arch" type="xml">
+                <tree string="Support Teams">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_support_team_form" model="ir.ui.view">
+            <field name="name">saas_portal.support_team.form</field>
+            <field name="model">saas_portal.support_team</field>
+            <field name="arch" type="xml">
+                <form string="Support Team">
+                    <sheet>
+                        <field name="name"/>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
 
 
+        <record id="saas_portal_support_teams" model="ir.actions.act_window">
+            <field name="name">Support</field>
+            <field name="res_model">saas_portal.support_team</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem action="saas_portal_support_teams" id="menu_saas_portal_support_teams" parent="menu_saas" sequence="100"/>
     </data>
 </openerp>

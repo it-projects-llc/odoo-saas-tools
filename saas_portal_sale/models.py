@@ -72,5 +72,5 @@ class AccountInvoice(models.Model):
         res = super(AccountInvoice, self).invoice_validate()
         client_obj = self.env['saas_portal.client'].search([('partner_id', '=', self.partner_id.id)])
         if len(client_obj) == 1:
-            self.invoice_line.write({'saas_portal_client_id': client_obj.id})
+            self.invoice_line.search([('plan_id', '=', client_obj.plan_id.id)]).write({'saas_portal_client_id': client_obj.id})
         return res

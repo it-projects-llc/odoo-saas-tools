@@ -246,16 +246,7 @@ class SaasPortalPlan(models.Model):
         # send email
         if notify_user:
             template = self.env.ref('saas_portal.email_template_create_saas')
-            email_ctx = {
-                'default_model': 'saas_portal.client',
-                'default_res_id': client.id,
-                'default_use_template': bool(template),
-                'default_template_id': template.id,
-                'default_composition_mode': 'comment',
-
-            }
-            composer = self.env['mail.compose.message'].with_context(email_ctx).create({})
-            composer.send_mail()
+            client.message_post_with_template(template.id, compositon_mode='comment')
 
         client.write({'trial': trial, 'support_team_id': support_team_id})
         return {'url': url, 'id': client.id, 'client_id': client_id}
@@ -439,6 +430,13 @@ class SaasPortalClient(models.Model):
     trial = fields.Boolean('Trial', help='indication of trial clients', default=False, readonly=True)
     notification_sent = fields.Boolean(default=False, readonly=True, help='notification about expiration was sent')
     support_team_id = fields.Many2one('saas_portal.support_team', 'Support Team')
+    expiration_datetime_sent = fields.Datetime(help='updates every time send_expiration_info_to_client_db is executed')
+    expiration_changed = fields.Boolean(default=False, help='indicates that expiration_datetime has been changed', compute='_compute_expiration_changed', store=True)
+
+    @api.model
+    @api.depends('expiration_datetime')
+    def _compute_expiration_changed(self):
+        self.expiration_changed = self.expiration_datetime != self.expiration_datetime_sent
 
     _track = {
         'expired': {
@@ -550,6 +548,22 @@ class SaasPortalClient(models.Model):
                               client_id=client_id,
                               scope=scope,)[0]
         return url
+
+    @api.multi
+    def send_expiration_info_to_client_db(self):
+        for record in self:
+            record.expiration_datetime_sent = record.expiration_datetime
+            payload = {
+                'params': [{'key': 'saas_client.expiration_datetime', 'value': record.expiration_datetime, 'hidden': True}],
+            }
+            record.env['saas.config'].do_upgrade_database(payload, record.id)
+
+    @api.one
+    def write(self, vals):
+        if 'expiration_datetime' in vals:
+            self.send_expiration_info_to_client_db()
+        result = super(SaasPortalClient, self).write(vals)
+        return result
 
 
 class SaasPortalSupportTeams(models.Model):

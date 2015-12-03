@@ -34,12 +34,10 @@ class SaasPortalClient(models.Model):
     @api.depends('invoice_lines.invoice_id.state')
     def _compute_expiration(self):
         for client_obj in self:
-            if client_obj.subscription_start:
-                self.subscription_start = fields.Datetime.now()
             days = 0
-            for line in client_obj.invoice_lines.search([('invoice_id.state', '=', 'paid')]):
+            for line in self.env['account.invoice.line'].search([('saas_portal_client_id', '=', client_obj.id), ('invoice_id.state', '=', 'paid')]):
                 days += line.product_id.period
-            if client_obj.subscription_start:
+            if days != 0:
                 client_obj.expiration_datetime = datetime.strptime(client_obj.subscription_start, DEFAULT_SERVER_DATETIME_FORMAT) + timedelta(days=days)
 
 

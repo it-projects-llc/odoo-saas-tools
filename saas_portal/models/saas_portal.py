@@ -436,10 +436,7 @@ class SaasPortalClient(models.Model):
     @api.model
     @api.depends('expiration_datetime')
     def _compute_expiration_changed(self):
-        if self.expiration_datetime != self.expiration_datetime_sent:
-            self.expiration_changed = True
-        else:
-            self.expiration_changed = False
+        self.expiration_changed = self.expiration_datetime != self.expiration_datetime_sent
 
     _track = {
         'expired': {
@@ -554,9 +551,6 @@ class SaasPortalClient(models.Model):
 
     @api.multi
     def send_expiration_info_to_client_db(self):
-        print '\n\n\n'
-        print 'in send_expiration_info_to_client_db'
-        print '\n\n\n'
         for record in self:
             record.expiration_datetime_sent = record.expiration_datetime
             payload = {

@@ -40,7 +40,6 @@
                     <field name="db_storage"/>
                     <field name="trial"/>
                     <field name="expiration_datetime"/>
-                    <field name="expiration_datetime_sent"/>
                     <field name="expired" invisible="1"/>
                     <button name="edit_database" type="object" icon="gtk-connect" attrs="{'invisible':[('state', 'in', ['deleted', 'draft'])]}"/>
                     <button name="upgrade_database" attrs="{'invisible':[('state', 'in', ['deleted'])]}" type="object" icon="gtk-execute" />
@@ -115,7 +114,6 @@
                 <search string="Search Client">
                     <field name="name" string="Database Name"/>
                     <filter string="In Progress" name="current" domain="[('state', '=','open')]"/>
-                    <filter name="expiration_changed" string="Expiration changed" domain="[('expiration_changed', '=', True)]"/>
                     <separator/>
                     <field name="partner_id" string="Contact" filter_domain="[('partner_id', 'child_of', self)]"/>
                 </search>

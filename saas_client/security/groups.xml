@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <record id="group_saas_support" model="res.groups">
+            <field name="name">SaaS Support</field>
+            <field name="users" eval="[(4, ref('base.user_root'))]"/>
+            <field name="comment">Special group for superuser. Should not be used for client users</field>
+        </record>
+
+    </data>
+</openerp>

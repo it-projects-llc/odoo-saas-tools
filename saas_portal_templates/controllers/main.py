@@ -28,4 +28,5 @@ class SaasPortalTemplates(saas_portal_controller):
             return login_redirect()
         plan_id = int(post.get('plan_id'))
 
-        return self.create_new_database(plan_id)
+        res = self.create_new_database(plan_id)
+        return request.redirect(res.get('url'))

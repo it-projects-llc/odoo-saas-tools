@@ -7,9 +7,16 @@
     'depends': ['oauth_provider', 'website', 'auth_signup', 'saas_base', 'saas_utils'],
     'data': [
         'data/plan_sequence.xml',
+        'data/cron.xml',
         'views/wizard.xml',
         'views/saas_portal.xml',
         'views/res_config.xml',
+        'data/ir_config_parameter.xml',
+        'data/subtype.xml',
+        'data/support_team.xml',
+        'views/res_users.xml',
+        'data/res_users.xml',
+        'templates.xml',
         ],
     'installable': True,
 }

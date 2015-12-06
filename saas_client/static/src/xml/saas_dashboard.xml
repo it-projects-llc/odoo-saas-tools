@@ -37,10 +37,10 @@
                     <p>Database storage: <t t-esc="db_storage"></t> Mb</p>
                 </t>
             </div>
-            <t t-set="subscription_url_defined" t-value="widget.data.subscription_url_defined"/>
-            <t t-if="subscription_url_defined">
+            <t t-set="pay_subscription_url" t-value="widget.data.pay_subscription_url"/>
+            <t t-if="pay_subscription_url">
                 <div>
-                    <a href="http://9_0-saassale.local/shop" target="_blank"
+                    <a t-att-href="pay_subscription_url" target="_blank"
                        class="btn btn-primary btn-block o_pay_subscription" role="button"><strong>Pay subscription</strong></a>
                 </div>
             </t>

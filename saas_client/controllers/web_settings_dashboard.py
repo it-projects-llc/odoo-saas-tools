@@ -16,9 +16,7 @@ class SaaSWebSettingsDashboard(WebSettingsDashboard):
         cur_users = request.env['res.users'].search_count([('share', '=', False)])
         max_users = request.env['ir.config_parameter'].get_param('saas_client.max_users', default='')
         expiration_datetime = request.env['ir.config_parameter'].get_param('saas_client.expiration_datetime', default='')
-        pay_subscription_url = request.env['ir.config_parameter'].get_param('saas_client.pay_subscription_url', default='')
-
-        subscription_url_defined = bool(pay_subscription_url.strip())
+        pay_subscription_url = request.env['ir.config_parameter'].get_param('saas_client.pay_subscription_url', default='').strip()
 
         data_dir = openerp.tools.config['data_dir']
 
@@ -34,6 +32,6 @@ class SaaSWebSettingsDashboard(WebSettingsDashboard):
                                 'expiration_datetime': expiration_datetime,
                                 'file_storage': file_storage,
                                 'db_storage': db_storage,
-                                'subscription_url_defined': subscription_url_defined}})
+                                'pay_subscription_url': pay_subscription_url}})
 
         return result

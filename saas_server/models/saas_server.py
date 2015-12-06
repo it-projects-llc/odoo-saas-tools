@@ -1,4 +1,4 @@
-import os
+from openerp.addons.saas_base.tools import get_size
 import time
 import openerp
 from openerp import api, models, fields, SUPERUSER_ID, exceptions
@@ -9,15 +9,6 @@ import string
 
 import logging
 _logger = logging.getLogger(__name__)
-
-
-def get_size(start_path='.'):
-    total_size = 0
-    for dirpath, dirnames, filenames in os.walk(start_path):
-        for f in filenames:
-            fp = os.path.join(dirpath, f)
-            total_size += os.path.getsize(fp)
-    return total_size
 
 
 class SaasServerClient(models.Model):

@@ -7,7 +7,7 @@
                     <div class="container" style="text-align: center">
                         <h2>Plan: <t t-esc="plan.name"/></h2>
                         <p>The database is creating...</p>
-                        <p>Email with further instructions will soon be sent to you</p>
+                        <p>it takes only a few minutes. Please check your email now for further instructions on how to login.</p>
                     </div>
                 </div>
             </t>

@@ -18,9 +18,9 @@ var DashboardSaaS = Widget.extend({
 
     template: 'DashboardSaaS',
 
-    events: {
-        'click .o_pay_subscription': 'on_pay_subscription',
-    },
+    // events: {
+    //     'click .o_pay_subscription': 'on_pay_subscription',
+    // },
 
     init: function(parent, data){
         this.data = data;
@@ -28,9 +28,9 @@ var DashboardSaaS = Widget.extend({
         return this._super.apply(this, arguments);
     },
 
-    on_pay_subscription: function(){
-//
-    },
+    // on_pay_subscription: function(){
+
+    // },
 });
 
 });

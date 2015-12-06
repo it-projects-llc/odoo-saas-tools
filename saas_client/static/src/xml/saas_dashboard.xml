@@ -30,17 +30,20 @@
                 <hr/>
                 <t t-set="file_storage" t-value="widget.data.file_storage"/>
                 <t t-if="file_storage">
-                    <p>File storage: <t t-esc="file_storage"></t>Mb</p>
+                    <p>File storage: <t t-esc="file_storage"></t> Mb</p>
                 </t>
                 <t t-set="db_storage" t-value="widget.data.db_storage"/>
                 <t t-if="db_storage">
-                    <p>Database storage: <t t-esc="db_storage"></t>Mb</p>
+                    <p>Database storage: <t t-esc="db_storage"></t> Mb</p>
                 </t>
             </div>
-            <div>
-                <a href="http://9_0-saassale.local/shop" target="_blank"
-                   class="btn btn-primary btn-block o_pay_subscription" role="button"><strong>Pay subscription</strong></a>
-            </div>
+            <t t-set="subscription_url_defined" t-value="widget.data.subscription_url_defined"/>
+            <t t-if="subscription_url_defined">
+                <div>
+                    <a href="http://9_0-saassale.local/shop" target="_blank"
+                       class="btn btn-primary btn-block o_pay_subscription" role="button"><strong>Pay subscription</strong></a>
+                </div>
+            </t>
         </div>
     </t>
 </templates>

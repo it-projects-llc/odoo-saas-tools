@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
-    <data>
-        <record id="shop_link_confifguration" model="ir.config_parameter">
-            <field name="key">saas_client.shop</field>
-            <field name="value">' '</field>
+    <data noupdate="1">
+        <record id="saas_pay_subscription_url" model="ir.config_parameter">
+            <field name="key">saas_client.pay_subscription_url</field>
+            <field name="value"> </field>
         </record>
     </data>
 </openerp>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-extend="DashboardMain">
+        <t t-jquery="div.row" t-operation="append">
+            <div class="col-md-3 col-sm-6 col-xs-12 o_web_settings_dashboard_col">
+                <div class="text-center o_web_settings_dashboard_saas"><p>Hello!</p></div>
+            </div>
+        </t>
+    </t>
+
+    <t t-name="DashboardSaaS">
+        <div class="text-center o_web_settings_dashboard_saas">
+            <i class="fa fa-cloud fa-4x text-muted"></i>
+            <div class="o_web_settings_dashboard_header">
+                <p>SaaS</p>
+            </div>
+            <div>
+                <t t-set="max_users" t-value="widget.data.max_users"/>
+                <t t-if="max_users">
+                   <p>Max users allowed: <t t-esc="max_users"></t></p>
+                </t>
+                <t t-set="cur_users" t-value="widget.data.cur_users"/>
+                <t t-if="cur_users">
+                   <p>Users count: <t t-esc="cur_users"></t></p>
+                </t>
+                <t t-set="expiration_datetime" t-value="widget.data.expiration_datetime"/>
+                <t t-if="expiration_datetime">
+                   <p>Expiration date: <t t-esc="expiration_datetime"></t></p>
+                </t>
+            </div>
+            <div>
+                <a href="http://9_0-saassale.local/shop" target="_blank"
+                   class="btn btn-primary btn-block o_pay_subscription" role="button"><strong>Pay subscription</strong></a>
+            </div>
+        </div>
+    </t>
+</templates>

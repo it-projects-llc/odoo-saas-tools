@@ -18,6 +18,8 @@ import random
 from datetime import datetime, timedelta
 from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
 
+from openerp.addons.saas_base.exceptions import MaximumDBException
+
 import logging
 _logger = logging.getLogger(__name__)
 
@@ -102,8 +104,10 @@ class SaasPortalServer(models.Model):
             'd': self.name,
             'client_id': self.client_id,
         }
+
         url = self._request_server(path='/saas_server/sync_server', state=state, client_id=self.client_id)[0]
         res = requests.get(url, verify=(self.request_scheme == 'https' and self.verify_ssl))
+
         if res.ok != True:
             msg = """Status Code - %s
 Reason - %s
@@ -111,6 +115,7 @@ URL - %s
             """ % (res.status_code, res.reason, res.url)            
             raise Warning(msg)
         data = simplejson.loads(res.text)
+
         for r in data:
             r['server_id'] = self.id
             client = self.env['saas_portal.client'].search([
@@ -139,6 +144,7 @@ class SaasPortalPlan(models.Model):
     summary = fields.Char('Summary')
     template_id = fields.Many2one('saas_portal.database', 'Template')
     demo = fields.Boolean('Install Demo Data')
+    maximum_allowed_db_per_partner = fields.Integer(help='maximum allowed databases per customer', default=0)
 
     def _get_default_lang(self):
         return self.env.lang
@@ -181,6 +187,12 @@ class SaasPortalPlan(models.Model):
     @api.multi
     def create_new_database(self, dbname=None, client_id=None, partner_id=None, user_id=None, notify_user=False, trial=False, support_team_id=None):
         self.ensure_one()
+        db_count = self.env['saas_portal.client'].search_count([('partner_id', '=', partner_id),
+                                                                ('state', '=', 'open'),
+                                                                ('plan_id', '=', self.id)])
+        if self.maximum_allowed_db_per_partner != 0 and db_count >= self.maximum_allowed_db_per_partner:
+            raise MaximumDBException
+
         server = self.server_id
         if not server:
             server = self.env['saas_portal.server'].get_saas_server()

@@ -5,9 +5,14 @@
                 <t t-set="title">Try trial</t>
                 <div class="oe_structure">
                     <div class="container" style="text-align: center">
-                        <h2>Plan: <t t-esc="plan.name"/></h2>
-                        <p>The database is creating...</p>
-                        <p>it takes only a few minutes. Please check your email now for further instructions on how to login.</p>
+                        <t t-if="db_creation_allowed">
+                            <h2>Plan: <t t-esc="plan.name"/></h2>
+                            <p>The database is creating...</p>
+                            <p>it takes only a few minutes. Please check your email now for further instructions on how to login.</p>
+                        </t>
+                        <t t-if="not db_creation_allowed">
+                            <p>Sorry, you have an active client database with this username/email address</p>
+                        </t>
                     </div>
                 </div>
             </t>

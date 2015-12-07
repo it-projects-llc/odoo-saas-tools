@@ -48,3 +48,22 @@ class StartWizard(models.Model):
         }
         self.write(vals)
 
+    @api.one
+    def to_dict(self):
+        return {
+            "dbname": self.dbname,
+            "lang": self.lang,
+            "tz": self.tz,
+            "hosting": self.hosting,
+            "user_id": self.user_id,
+            "plan_id": self.plan_id,
+            "name": self.legal_name,
+            "company": self.legal_company,
+            "vat": self.legal_vat,
+            "phone": self.legal_phone,
+            "city": self.legal_city,
+            "state_id": self.legal_state_id,
+            "country_id": self.legal_country_id,
+            "zip": self.legal_zip,
+            "addons": self.addons,
+        }

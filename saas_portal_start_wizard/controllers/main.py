@@ -97,10 +97,8 @@ class SaasPortalStartWizard(SaasPortalStart):
         payment_obj = request.registry.get('payment.acquirer')
         sale_order_obj = request.registry.get('sale.order')
 
-        _logger.info("\n\nFetching partner for [user: %s]\n", wz.user_id)
         partner = orm_user.browse(cr, SUPERUSER_ID, wz.user_id,
                                   context).partner_id
-        _logger.info("\n\nCreating order for [partner: %s]\n", partner)
 
         plan = orm_plan.browse(cr, SUPERUSER_ID, wz.plan_id)
         values = {}
@@ -113,8 +111,6 @@ class SaasPortalStartWizard(SaasPortalStart):
             if not order:
                 order = plan.get_sale_order(partner.id, wz.dbname,
                                             True, True)[0]
-
-            _logger.info("\n\nObtained order: %s with status: %s\n", order, order.state)
 
             if order and not (order.invoiced or order.state in (
                     "manual", "shipping_except", "invoice_except", "done")):
@@ -138,15 +134,16 @@ class SaasPortalStartWizard(SaasPortalStart):
                 errors = sale_order_obj._get_errors(cr, SUPERUSER_ID, order,
                                                     context=context)
                 values.update({'errors': errors})
-                web_data = sale_order_obj._get_website_data(cr, SUPERUSER_ID, order,
-                                                            context)
+                web_data = sale_order_obj._get_website_data(cr, SUPERUSER_ID,
+                                                            order, context)
                 values.update(web_data)
 
                 acquirer_ids = payment_obj.search(cr, SUPERUSER_ID, [
                     ('website_published', '=', True),
                     ('company_id', '=', order.company_id.id)], context=context)
                 values['acquirers'] = list(
-                    payment_obj.browse(cr, SUPERUSER_ID, acquirer_ids, context=context))
+                    payment_obj.browse(cr, SUPERUSER_ID, acquirer_ids,
+                                       context=context))
                 render_ctx = dict(context, submit_class='btn btn-primary',
                                   submit_txt="Pay Now")
                 for acquirer in values['acquirers']:
@@ -157,8 +154,9 @@ class SaasPortalStartWizard(SaasPortalStart):
                         order.pricelist_id.currency_id.id,
                         partner_id=shipping_partner_id,
                         tx_values={
-                            'return_url': '/page/start/wizard/payment_cb?{}'.format(
-                                werkzeug.url_encode(payload)),
+                            'return_url':
+                                '/page/start/wizard/payment_cb?{}'.format(
+                                    werkzeug.url_encode(payload)),
                         },
                         context=render_ctx)
 
@@ -357,9 +355,11 @@ class SaasPortalStartWizard(SaasPortalStart):
             return werkzeug.utils.redirect('/page/start/')
 
         if (not next_page) and (action == "next"):
+            payload = wz.to_dict()[0]
+            _logger.info("\n\nPOSTing %s\n", payload)
             return werkzeug.utils.redirect(
                 '/saas_portal/add_new_client?{}'.format(
-                    werkzeug.url_encode(post)
+                    werkzeug.url_encode(payload)
                 )
             )
         data = False
@@ -406,7 +406,8 @@ class SaasPortalStartWizard(SaasPortalStart):
         }))
 
         sp = SaasPricing()
-        return sp.payment_validate(order.id, **{"r": redirect, "plan_id": wz.plan_id})
+        return sp.payment_validate(order.id,
+                                   **{"r": redirect, "plan_id": wz.plan_id})
 
     @http.route(['/saas_portal/add_new_client'], type='http', auth='user',
                 website=True)
@@ -419,7 +420,14 @@ class SaasPortalStartWizard(SaasPortalStart):
 
         dbname = self.get_full_dbname(post.get('dbname'))
         plan = self.get_plan(post.get('plan_id'))
-        url = plan.create_new_database(dbname)[0]
+
+        user_model = request.registry['res.users']
+        partner = user_model.browse(request.cr, SUPERUSER_ID,
+                                    request.uid).partner_id
+        res = plan.create_new_database(dbname, partner_id=partner.id)
+        _logger.info("\n\nCreation responded %s\n", res)
+
+        url = res["url"]
 
         base, params = url.split("?")
         params = werkzeug.url_decode(params)

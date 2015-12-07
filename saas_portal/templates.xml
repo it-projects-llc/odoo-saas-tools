@@ -11,7 +11,7 @@
                             <p>it takes only a few minutes. Please check your email now for further instructions on how to login.</p>
                         </t>
                         <t t-if="not db_creation_allowed">
-                            <p>Sorry, you have an active client database with this username/email address</p>
+                            <p>Sorry, you already have active database(s). The maximum number of databases are exceeded</p>
                         </t>
                     </div>
                 </div>

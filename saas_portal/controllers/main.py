@@ -7,6 +7,7 @@ from openerp.addons.web import http
 from openerp.addons.web.http import request
 import werkzeug
 import simplejson
+from openerp.addons.saas_base.exceptions import MaximumDBException
 
 
 class SignupError(Exception):
@@ -75,13 +76,17 @@ class SaasPortalSale(http.Controller):
         plan_id = int(kw.get('plan_id'))
         trial_plan = request.env['saas_portal.plan'].sudo().browse(plan_id)
         support_team = request.env.ref('saas_portal.main_support_team')
-        res = trial_plan.create_new_database(partner_id=partner.id, user_id=uid, notify_user=True, trial=True, support_team_id=support_team.id)
-        client = request.env['saas_portal.client'].sudo().browse(res.get('id'))
-        client.server_id.action_sync_server()
+        db_creation_allowed = True
+        try:
+            res = trial_plan.create_new_database(partner_id=partner.id, user_id=uid, notify_user=True, trial=True, support_team_id=support_team.id)
+            client = request.env['saas_portal.client'].sudo().browse(res.get('id'))
+            client.server_id.action_sync_server()
+        except MaximumDBException:
+            db_creation_allowed = False
 
         values = {
             'plan': trial_plan,
-            'client': client,
+            'db_creation_allowed': db_creation_allowed,
         }
 
         return request.render('saas_portal.try_trial', values)

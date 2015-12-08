@@ -31,7 +31,7 @@ class SaasPortalClient(models.Model):
     invoice_lines = fields.One2many('account.invoice.line', 'saas_portal_client_id')
 
     @api.multi
-    @api.depends('invoice_lines.invoice_id.state')
+    @api.depends('invoice_lines.invoice_id.state', 'subscription_start')
     def _compute_expiration(self):
         for client_obj in self:
             days = 0
@@ -70,6 +70,7 @@ class AccountInvoice(models.Model):
     @api.multi
     def invoice_validate(self):
         res = super(AccountInvoice, self).invoice_validate()
+
         for line in self.invoice_line_ids:
             client_obj = self.env['saas_portal.client'].search([('partner_id', '=', self.partner_id.id),
                                                                 ('plan_id', '=', line.plan_id.id)])

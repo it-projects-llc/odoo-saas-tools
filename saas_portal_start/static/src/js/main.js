@@ -1,5 +1,19 @@
 $(document).ready(function () {
+    // check that we are on /page/start page
+    if (!$('.odoo_call_action_bg').length)
+        return;
+
+    var height = $(window).innerHeight();
+    var headerHeight = $('header').innerHeight();
+    if ($('#oe_main_menu_navbar').length)
+        headerHeight += $('#oe_main_menu_navbar').innerHeight()
+    $('.odoo_secondary_A').css('height', height);
+    window.scrollTo(0, headerHeight);
+
+
     /* ======== START TRIAL WIDGET ======== */
+    var plan_id = $("input[name='plan_id']").attr('value')
+    var base_saas_domain = $("input[name='base_saas_domain']").attr('value')
 
     var db_sel = 'input.odoo_db_name';
     var getUrlVars= function() {
@@ -77,12 +91,12 @@ $(document).ready(function () {
                         browser_offset += _.str.sprintf("%02d", Math.abs(offset / 60));
                         browser_offset += _.str.sprintf("%02d", Math.abs(offset % 60));
 
-                        var new_url = _.str.sprintf('/saas_portal/add_new_client?lang=%s&dbname=%s&tz=%s&hosting=%s&app=%s',
-                                                    lang, db_name, browser_offset, hosting, app);
+                        var new_url = _.str.sprintf('/saas_portal/add_new_client?lang=%s&dbname=%s&tz=%s&hosting=%s&app=%s&plan_id=%s',
+                                                    lang, db_name, browser_offset, hosting, app, plan_id);
                         window.location = new_url;
                     }
                     else {
-                        var db_url = 'https://'+db_name+'.odoo.com/web';
+                        var db_url = 'https://'+db_name+'.'+base_saas_domain+'/web';
                         $input.attr('data-content', 'This name is already taken, sorry.<br/>If you are the owner, please <a href="'+db_url+'">sign in</a>.');
                         $input.popover('show');
                     }

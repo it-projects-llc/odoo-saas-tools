@@ -34,14 +34,15 @@
 						<div class="container">
 							<div class="row">
 								<div class="text-center mt64 mb92">
-									<h2>Subscribe and test Odoo apps now!</h2>
-									
+									<h2>Get your own Database!</h2>
 									<div class="odoo_call_action mt16">
 										<div class="odoo_call_action_bg">
 											<form role="form" class="form-inline">
+                                                <input type="hidden" name="plan_id" t-att-value="plan_id"/>
+                                                <input type="hidden" name="base_saas_domain" t-att-value="base_saas_domain"/>
 												<div class="pull-right">
 													<button type="submit" id="create_instance" class="btn btn-info">
-														<strong>Try Now!</strong> <span class="hidden-xs">It's Free</span>.
+														<strong>Create!</strong> <span class="hidden-xs"></span>
 													</button>
 												</div>
 												
@@ -52,8 +53,7 @@
 													</div>                
 												</form>
 											</div>
-											<p class="mt4 text-muted" id="cta_footer">No credit card required. Instant Access. Open Source.
-											</p>
+											<p class="mt4 text-muted" id="cta_footer"></p>
 										</div>
 
 									</div>

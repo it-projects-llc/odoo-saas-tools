@@ -4,11 +4,9 @@ from openerp.addons.web.http import request
 from openerp import SUPERUSER_ID, exceptions
 from openerp.addons.saas_portal_start.controllers.main import SaasPortalStart
 from openerp.addons.saas_pricing.controllers.main import SaasPricing
-
 import werkzeug
 import logging
 import simplejson
-
 
 _logger = logging.getLogger(__name__)
 
@@ -42,8 +40,8 @@ WIZARD_FLOW = {
     },
 }
 
-class SaasPortalStartWizard(SaasPortalStart):
 
+class SaasPortalStartWizard(SaasPortalStart):
     @http.route(['/page/website.start', '/page/start'], type='http',
                 auth="user", website=True)
     def start(self, **post):
@@ -171,14 +169,23 @@ class SaasPortalStartWizard(SaasPortalStart):
         return {"terms": company.terms_n_conds or False}
 
     def __get_addons(self, wz):
+        cr = request.cr
         addon_model = request.registry['ir.module.module']
-        domain = [('application', '=', True)]
-        ids = addon_model.search(request.cr, SUPERUSER_ID, domain)
-        addons = addon_model.browse(request.cr, SUPERUSER_ID, ids)
+        plan_model = request.registry['saas_portal.plan']
+        plan = plan_model.browse(cr, SUPERUSER_ID, wz.plan_id)
 
-        # upstream.update({"addons": None})
+        addons = None
+        if plan.post_install_addons == 'apps':
+            domain = [('application', '=', True)]
+            ids = addon_model.search(request.cr, SUPERUSER_ID, domain)
+            addons = addon_model.browse(request.cr, SUPERUSER_ID, ids)
+        elif plan.post_install_addons == 'custom':
+            addons = plan.custom_addons
 
-        return {"addons": addons}
+        if addons:
+            return {"addons": addons}
+        else:
+            return False
 
     def __get_metadata(self, wz):
         crumbs = [
@@ -186,7 +193,7 @@ class SaasPortalStartWizard(SaasPortalStart):
             (PAGE_TERMS_CONDS, "License agreement"),
             (PAGE_PLAN_CONFIRM, "Billing"),
             # (PAGE_PAYMENT, "Payment methods"),
-            (PAGE_ADDONS_SELECT, "Extra addons"),
+            # (PAGE_ADDONS_SELECT, "Extra addons"),
         ]
 
         summary = [
@@ -207,8 +214,6 @@ class SaasPortalStartWizard(SaasPortalStart):
             )
             if getattr(plan, "pricing", False):
                 crumbs.insert(3, (PAGE_PAYMENT, "Payment methods"))
-                WIZARD_FLOW.update({
-                })
                 BILLING = {
                     "pre": "Pre-paid",
                     "post": "Post-paid",
@@ -226,6 +231,9 @@ class SaasPortalStartWizard(SaasPortalStart):
                 ])
             else:
                 summary[-1][1].append(("Pricing", "Free"))
+
+            if plan.post_install_addons != 'none':
+                crumbs.insert(4, (PAGE_ADDONS_SELECT, "Extra addons"))
 
         if wz.legal_name:
             summary.append((
@@ -273,8 +281,8 @@ class SaasPortalStartWizard(SaasPortalStart):
         else:
             wz = wizard_obj.browse(cr, SUPERUSER_ID, wz_id)
 
-        if wz.done:
-            raise ValueError("DB name not valid")
+        if wz.done or (wz.user_id != uid):
+            return werkzeug.utils.redirect('/page/start/')
 
         state = {
             "wz": wz,
@@ -340,12 +348,10 @@ class SaasPortalStartWizard(SaasPortalStart):
         action = post.get("wizard_action", "next")
 
         upstream = post.copy()
-        # state = {"upstream": upstream.items()}
         state = {}
 
         errors = self.__process_submit(wz, upstream)
         if errors and errors.get('general', []):
-            _logger.info("\n\nErrors: %s\n", errors)
             state.update({"errors": errors})
             next_page = current_page
         else:
@@ -356,7 +362,7 @@ class SaasPortalStartWizard(SaasPortalStart):
 
         if (not next_page) and (action == "next"):
             payload = wz.to_dict()[0]
-            _logger.info("\n\nPOSTing %s\n", payload)
+            wz.unlink()
             return werkzeug.utils.redirect(
                 '/saas_portal/add_new_client?{}'.format(
                     werkzeug.url_encode(payload)
@@ -364,7 +370,6 @@ class SaasPortalStartWizard(SaasPortalStart):
             )
         data = False
         while not data:
-            _logger.info("\n\nObtaining data for [page: %s]\n", next_page)
             data = {
                 PAGE_PLAN_SELECT: self.__get_plans,
                 PAGE_TERMS_CONDS: self.__get_terms,
@@ -374,12 +379,22 @@ class SaasPortalStartWizard(SaasPortalStart):
             }[next_page](wz)
             if not data:
                 next_page = WIZARD_FLOW[next_page][action]
+                if not next_page:
+                    payload = wz.to_dict()[0]
+                    wz.unlink()
+                    return werkzeug.utils.redirect(
+                        '/saas_portal/add_new_client?{}'.format(
+                            werkzeug.url_encode(payload)
+                        )
+                    )
 
-        # state = {"upstream": upstream.items()}
+        meta_data = self.__get_metadata(wz)
+        last = WIZARD_FLOW[next_page]['next'] not in [x[0] for x in
+                                                      meta_data['crumbs']]
+
         state.update(data)
-        state.update({"meta": self.__get_metadata(wz), "wizard_page": next_page,
-                      "wz": wz})
-        _logger.info("\n\nState:: %s\n", state)
+        state.update({"meta": meta_data, "wizard_page": next_page,
+                      "wz": wz, "last_page": last})
         return request.website.render("saas_portal_start_wizard.wizard_tpl",
                                       state)
 
@@ -424,9 +439,8 @@ class SaasPortalStartWizard(SaasPortalStart):
         user_model = request.registry['res.users']
         partner = user_model.browse(request.cr, SUPERUSER_ID,
                                     request.uid).partner_id
-        res = plan.create_new_database(dbname, partner_id=partner.id)
-        _logger.info("\n\nCreation responded %s\n", res)
-
+        res = plan.create_new_database(dbname, partner_id=partner.id,
+                                       user_id=request.uid)
         url = res["url"]
 
         base, params = url.split("?")
@@ -454,7 +468,24 @@ class SaasPortalStartWizard(SaasPortalStart):
 
         url = "{base}?{params}".format(base=base,
                                        params=werkzeug.url_encode(params))
-        _logger.info("\n\nFinal URL: %s\n", url)
 
         return werkzeug.utils.redirect(url)
 
+    @http.route(['/saas_portal/trial_check'], type='json', auth='user',
+                website=True)
+    def trial_check(self, **post):
+        if self.exists_database(post['dbname']):
+            return {"error": {"msg": "database already taken"}}
+
+        cr, uid = request.cr, request.uid
+        wizard_obj = request.registry['saas_portal.start_wizard']
+        candidates = wizard_obj.search(cr, SUPERUSER_ID,
+                                       [("dbname", "=", post["dbname"])])
+        wz_id = candidates and candidates[0]
+        if wz_id:
+            wz = wizard_obj.browse(cr, SUPERUSER_ID, wz_id)
+            _logger.info("Wizard: <%s: %s> and UID: %s", wz.id, wz.user_id, uid)
+            if wz.user_id != uid:
+                return {"error": {"msg": "database already taken"}}
+
+        return {"ok": 1}

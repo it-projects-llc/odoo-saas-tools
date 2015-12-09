@@ -245,7 +245,49 @@ class SaasServer(http.Controller):
                 'db_storage': client.db_storage,
             })
         return simplejson.dumps(res)
-    
+
+    @http.route(['/saas_server/disable_database'], type='http', auth='public')
+    @fragment_to_query_string
+    def disable_database(self, **post):
+        state = simplejson.loads(post.get('state'))
+        data = state.get('data')
+        access_token = post.get('access_token')
+        saas_oauth_provider = request.registry['ir.model.data'].xmlid_to_object(
+            request.cr, SUPERUSER_ID, 'saas_server.saas_oauth_provider')
+
+        saas_portal_user = request.registry['res.users']._auth_oauth_rpc(
+            request.cr, SUPERUSER_ID, saas_oauth_provider.validation_endpoint,
+            access_token)
+        if saas_portal_user.get("error"):
+            raise Exception(saas_portal_user['error'])
+
+        client_id = post.get('client_id')
+        client = request.env['saas_server.client'].sudo().search(
+            [('client_id', '=', client_id)])
+        result = client.disable_database()[0]
+        return simplejson.dumps({client.name: result})
+
+    @http.route(['/saas_server/enable_database'], type='http', auth='public')
+    @fragment_to_query_string
+    def enable_database(self, **post):
+        state = simplejson.loads(post.get('state'))
+        data = state.get('data')
+        access_token = post.get('access_token')
+        saas_oauth_provider = request.registry['ir.model.data'].xmlid_to_object(
+            request.cr, SUPERUSER_ID, 'saas_server.saas_oauth_provider')
+
+        saas_portal_user = request.registry['res.users']._auth_oauth_rpc(
+            request.cr, SUPERUSER_ID, saas_oauth_provider.validation_endpoint,
+            access_token)
+        if saas_portal_user.get("error"):
+            raise Exception(saas_portal_user['error'])
+
+        client_id = post.get('client_id')
+        client = request.env['saas_server.client'].sudo().search(
+            [('client_id', '=', client_id)])
+        result = client.enable_database()[0]
+        return simplejson.dumps({client.name: result})
+
     def _get_port(self):
         host_parts = request.httprequest.host.split(':')
         return len(host_parts) > 1 and host_parts[1] or 80
@@ -260,3 +302,4 @@ class SaasServer(http.Controller):
             plural = hours_remaining > 1 and 's' or ''
             message = _("'You use a live preview. The database will be destroyed after %s hour%s.'") % (str(hours_remaining), plural)
         return message
+

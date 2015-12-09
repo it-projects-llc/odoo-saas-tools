@@ -294,3 +294,98 @@ class SaasServerClient(models.Model):
     def delete_database(self):
         openerp.service.db.exp_drop(self.name)
         self.write({'state': 'deleted'})
+
+    @api.one
+    def disable_database(self):
+        with self.registry()[0].cursor() as cr:
+            env = api.Environment(cr, SUPERUSER_ID, self._context)
+            return self._disable_database(env)[0]
+
+    @api.one
+    def _disable_database(self, client_env):
+        icp = client_env['ir.config_parameter']
+        users_model = client_env['res.users']
+
+        # First we save the current state
+        state_model = self.env['saas_server.client.state']
+        domain = [('client_id', '=', self.client_id)]
+        state = state_model.search(domain)
+        if not state:
+            state = state_model.create({'client_id': self.client_id})
+        else:
+            if state.disabled:
+                return 'Already disabled'
+        state.signup = bool(icp.get_param('auth_signup.allow_uninvited',
+                                          default='False'))
+
+        users = users_model.search([])
+        to_disable = [x.id for x in users if x.id != SUPERUSER_ID]
+        _logger.info("\n\nUsers to disable: %s\n", to_disable)
+        state.set_users(to_disable)
+
+        # Then we disable signup and login
+        icp.set_param('auth_signup.allow_uninvited', 'False')
+        users = users_model.search([('id', 'in', to_disable)])
+        for user in users:
+            _logger.info("Disabling user <%s: %s>", user.id, user.login)
+            user.active = False
+
+        state.disabled = True
+        return 'OK'
+
+    @api.one
+    def enable_database(self):
+        with self.registry()[0].cursor() as cr:
+            env = api.Environment(cr, SUPERUSER_ID, self._context)
+            return self._enable_database(env)[0]
+
+    @api.one
+    def _enable_database(self, client_env):
+        icp = client_env['ir.config_parameter']
+        users_model = client_env['res.users']
+
+        state_model = self.env['saas_server.client.state']
+        domain = [('client_id', '=', self.client_id)]
+        state = state_model.search(domain)
+        if not state.disabled:
+            return 'Not disabled'
+
+        icp.set_param('auth_signup.allow_uninvited', str(state.signup))
+
+        disabled = state.get_users()
+        if isinstance(disabled, list) and \
+                disabled[0] and \
+                isinstance(disabled[0], list):
+            disabled = disabled[0]
+
+        domain = [('id', 'in', disabled)]
+        users = users_model.search(domain)
+        for user in users:
+            _logger.info("Enabling user <%s: %s>", user.id, user.login)
+            user.active = True
+
+        state.disabled = False
+        return 'OK'
+
+
+class SaasServerClientState(models.Model):
+    _name = 'saas_server.client.state'
+
+    client_id = fields.Char()
+    disabled = fields.Boolean(default=False)
+    signup = fields.Boolean()
+    users = fields.Char()
+
+    _sql_constraints = [
+        ('client_id_uniq', 'unique (client_id)', 'client_id should be unique!'),
+    ]
+
+    @api.one
+    def set_users(self, ids):
+        if not isinstance(ids, list):
+            ids = [ids]
+        self.users = ",".join([str(i) for i in ids])
+
+    @api.one
+    def get_users(self):
+        return [int(x) for x in self.users.split(",")]

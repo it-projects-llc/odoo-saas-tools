@@ -7,7 +7,6 @@ import psycopg2
 import random
 import string
 
-# from openerp.addons.saas_portal_start_wizard.utils import _levenshtein, acronym
 
 import logging
 _logger = logging.getLogger(__name__)
@@ -107,67 +106,10 @@ class SaasServerClient(models.Model):
     def _config_parameters_to_copy(self):
         return ['saas_client.ab_location', 'saas_client.ab_register']
 
-    # @api.one
-    # def _preprocess_company_data(self, data, env=None):
-    #     if not env:
-    #         env = self.env
-    #     country_model = env['res.country']
-    #     # country_name = data.get("country")
-    #     # domain = [("name", "=", country_name)]
-    #     # rc = country_model.search(domain)
-    #     # if not rc:
-    #     #     recordset = country_model.search([])
-    #     #     rc = recordset.sorted(
-    #     #         key=lambda r: _levenshtein(country_name.lower(), r.name.lower()))
-    #     #     candidate = rc and rc[0]
-    #     #     if candidate:
-    #     #         d = _levenshtein(country_name.lower(), candidate.name.lower())
-    #     #         if d > len(country_name) * 0.33:
-    #     #             candidate = None
-    #     #     if not candidate:
-    #     #         rc = [country_model.create({"name": country_name})]
-    #     # rc = rc and rc[0]
-    #     # country = rc
-    #     # data.update({"country_id": country.id})
-    #
-    #     state_model = env['res.country.state']
-    #     state_name = data.get("state")
-    #     domain = [("country_id", "=", country.id)]
-    #     recordset = state_model.search(domain)
-    #     if not recordset:
-    #         state = state_model.create({
-    #             "country_id": country.id,
-    #             "name": state_name,
-    #             "code": acronym(state_name)[:3]
-    #         })
-    #     else:
-    #         domain = [("name", "=", state_name)]
-    #         rc = recordset.search(domain)
-    #         if not rc:
-    #             rc = recordset.sorted(
-    #                 key=lambda r: _levenshtein(state_name.lower(), r.name.lower()))
-    #         candidate = rc and rc[0]
-    #         if candidate:
-    #             d = _levenshtein(state_name.lower(), candidate.name.lower())
-    #             if d > len(state_name) * 0.33:
-    #                 candidate = None
-    #         if not candidate:
-    #             rc = [state_model.create({
-    #                 "country_id": country.id,
-    #                 "name": state_name,
-    #                 "code": acronym(state_name)[:3]
-    #             })]
-    #         rc = rc and rc[0]
-    #         state = rc
-    #     data.update({"state_id": state.id})
-    #
-    #     data.pop("state", False)
-    #     data.pop("country", False)
-    #
-    #     return data
-
     @api.one
-    def _prepare_database(self, client_env, saas_portal_user=None, is_template_db=False, addons=[], access_token=None, tz=None, company_data={}):
+    def _prepare_database(self, client_env, owner_user=None,
+                          is_template_db=False, addons=[], access_token=None,
+                          tz=None, company_data={}):
         client_id = self.client_id
 
         # update saas_server.client state
@@ -192,7 +134,7 @@ class SaasServerClient(models.Model):
         oauth_provider = None
         if is_template_db and not client_env.ref('saas_server.saas_oauth_provider', raise_if_not_found=False):
             oauth_provider_data = {'enabled': False, 'client_id': client_id}
-            for attr in ['name', 'auth_endpoint', 'scope', 'validation_endpoint', 'data_endpoint', 'css_class', 'body']:
+            for attr in ['name', 'auth_endpoint', 'scope', 'validation_endpoint', 'data_endpoint', 'css_class', 'body', 'enabled']:
                 oauth_provider_data[attr] = getattr(saas_oauth_provider, attr)
             oauth_provider = client_env['auth.oauth.provider'].create(oauth_provider_data)
             client_env['ir.model.data'].create({
@@ -228,24 +170,23 @@ class SaasServerClient(models.Model):
             res = client_env['res.users'].search(domain)
             if res:
                 user = res[0]
-            res = client_env['res.users'].search([('oauth_uid', '=', saas_portal_user['user_id'])])
+            res = client_env['res.users'].search([('oauth_uid', '=', owner_user['user_id'])])
             if res:
                 # user already exists (e.g. administrator)
                 user = res[0]
             if not user:
                 user = client_env['res.users'].browse(SUPERUSER_ID)
             user.write({
-                'login': saas_portal_user['email'],
-                'name': saas_portal_user['name'],
-                'email': saas_portal_user['email'],
+                'login': owner_user['login'],
+                'name': owner_user['name'],
+                'email': owner_user['email'],
                 'oauth_provider_id': oauth_provider.id,
-                'oauth_uid': saas_portal_user['user_id'],
+                'oauth_uid': owner_user['user_id'],
                 'oauth_access_token': access_token
             })
 
             oauth_provider.write({'enabled': True})
 
-            # company_data = self._preprocess_company_data(company_data, client_env)[0]
             if isinstance(company_data, dict) and \
                     company_data.get("name", False):
                 company = client_env['ir.model.data'].xmlid_to_object(
@@ -307,6 +248,12 @@ class SaasServerClient(models.Model):
         post = data
         module = client_env['ir.module.module']
         print '_upgrade_database', data
+        
+        # 0. Update module list
+        update_list = post.get('update_addons_list', False)
+        if update_list:
+            module.update_list()
+            
         # 1. Update addons
         update_addons = post.get('update_addons', [])
         if update_addons:
@@ -329,9 +276,11 @@ class SaasServerClient(models.Model):
 
         # 5. update parameters
         params = post.get('params', [])
-        for key, value in params:
-            client_env['ir.config_parameter'].set_param(key, value)
-
+        for obj in params:
+            groups = []
+            if obj.get('hidden'):
+                groups = ['saas_client.group_saas_support']
+            client_env['ir.config_parameter'].set_param(obj['key'], obj['value'], groups=groups)
         return 'OK'
 
     @api.model
@@ -345,3 +294,98 @@ class SaasServerClient(models.Model):
     def delete_database(self):
         openerp.service.db.exp_drop(self.name)
         self.write({'state': 'deleted'})
+
+    @api.one
+    def disable_database(self):
+        with self.registry()[0].cursor() as cr:
+            env = api.Environment(cr, SUPERUSER_ID, self._context)
+            return self._disable_database(env)[0]
+
+    @api.one
+    def _disable_database(self, client_env):
+        icp = client_env['ir.config_parameter']
+        users_model = client_env['res.users']
+
+        # First we save the current state
+        state_model = self.env['saas_server.client.state']
+        domain = [('client_id', '=', self.client_id)]
+        state = state_model.search(domain)
+        if not state:
+            state = state_model.create({'client_id': self.client_id})
+        else:
+            if state.disabled:
+                return 'Already disabled'
+        state.signup = bool(icp.get_param('auth_signup.allow_uninvited',
+                                          default='False'))
+
+        users = users_model.search([])
+        to_disable = [x.id for x in users if x.id != SUPERUSER_ID]
+        _logger.info("\n\nUsers to disable: %s\n", to_disable)
+        state.set_users(to_disable)
+
+        # Then we disable signup and login
+        icp.set_param('auth_signup.allow_uninvited', 'False')
+        users = users_model.search([('id', 'in', to_disable)])
+        for user in users:
+            _logger.info("Disabling user <%s: %s>", user.id, user.login)
+            user.active = False
+
+        state.disabled = True
+        return 'OK'
+
+    @api.one
+    def enable_database(self):
+        with self.registry()[0].cursor() as cr:
+            env = api.Environment(cr, SUPERUSER_ID, self._context)
+            return self._enable_database(env)[0]
+
+    @api.one
+    def _enable_database(self, client_env):
+        icp = client_env['ir.config_parameter']
+        users_model = client_env['res.users']
+
+        state_model = self.env['saas_server.client.state']
+        domain = [('client_id', '=', self.client_id)]
+        state = state_model.search(domain)
+        if not state.disabled:
+            return 'Not disabled'
+
+        icp.set_param('auth_signup.allow_uninvited', str(state.signup))
+
+        disabled = state.get_users()
+        if isinstance(disabled, list) and \
+                disabled[0] and \
+                isinstance(disabled[0], list):
+            disabled = disabled[0]
+
+        domain = [('id', 'in', disabled)]
+        users = users_model.search(domain)
+        for user in users:
+            _logger.info("Enabling user <%s: %s>", user.id, user.login)
+            user.active = True
+
+        state.disabled = False
+        return 'OK'
+
+
+class SaasServerClientState(models.Model):
+    _name = 'saas_server.client.state'
+
+    client_id = fields.Char()
+    disabled = fields.Boolean(default=False)
+    signup = fields.Boolean()
+    users = fields.Char()
+
+    _sql_constraints = [
+        ('client_id_uniq', 'unique (client_id)', 'client_id should be unique!'),
+    ]
+
+    @api.one
+    def set_users(self, ids):
+        if not isinstance(ids, list):
+            ids = [ids]
+        self.users = ",".join([str(i) for i in ids])
+
+    @api.one
+    def get_users(self):
+        return [int(x) for x in self.users.split(",")]

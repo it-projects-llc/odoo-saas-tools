@@ -9,7 +9,7 @@
         'views/saas_pricing.xml',
         'data.xml',
         ],
-    'installable': True,
+    'installable': False,
 
     'description': '''
         Module to define plans pricing

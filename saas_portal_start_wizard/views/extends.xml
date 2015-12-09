@@ -17,5 +17,22 @@
             </field>
         </record>
 
+        <record model="ir.ui.view" id="view_plans_form">
+            <field name="name">saas_portal.plans.form.inherit</field>
+            <field name="model">saas_portal.plan</field>
+            <field name="inherit_id" ref="saas_portal.view_plans_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//form[@string='plans']/sheet/notebook/page[@string='Extra Settings']"
+                       position="after">
+                    <page string="Wizard Settings">
+                        <label for="post_install_addons"/>
+                        <field name="post_install_addons"/>
+                        <field name="custom_addons"
+                               attrs="{'invisible':[('post_install_addons', '!=', 'custom')], 'required':[('post_install_addons', '=', 'custom')]}"/>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+
     </data>
 </openerp>

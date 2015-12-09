@@ -35,8 +35,8 @@
                 <div class="tab-actions clearfix mt16 mb32">
                     <t t-set="prev_label" t-value="'Back'"/>
                     <t t-set="next_label" t-value="'Continue'"/>
-                    <t t-if="custom_next">
-                        <t t-set="next_label" t-value="custom_next"/>
+                    <t t-if="last_page">
+                        <t t-set="next_label" t-value="'Launch'"/>
                     </t>
 
                     <a id="wizard-goback" class="btn btn-default tab-prev">
@@ -264,7 +264,7 @@
 
         <template id="page_addons">
             <t t-set="tab_title" t-value="'Choose apps to install'"/>
-            <t t-set="custom_next" t-value="'Launch'"/>
+            <!--<t t-set="custom_next" t-value="'Launch'"/>-->
 
             <t t-call="saas_portal_start_wizard.page_tpl">
                 <div class="addons-list list row">

@@ -67,3 +67,14 @@ class StartWizard(models.Model):
             "zip": self.legal_zip,
             "addons": self.addons,
         }
+
+
+class SaasPortalWizardPlan(models.Model):
+    _inherit = 'saas_portal.plan'
+
+    post_install_addons = fields.Selection([
+        ('none', 'None'),
+        ('apps', 'Applications'),
+        ('custom', 'Custom'),
+    ], string="Available addons", default='none', required=True)
+    custom_addons = fields.Many2many('ir.module.module')

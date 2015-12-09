@@ -7,5 +7,14 @@
             <field name="costumer" eval="False"/>
             <field name="company_id" ref="base.main_company" />
         </record>
+
+        <record id="tenants_status_cron" model="ir.cron">
+            <field name="name">SaaS Pricing | Check tenants status</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="model">saas_portal.plan</field>
+            <field name="function">action_check_tenants_status</field>
+        </record>
     </data>
 </openerp>

@@ -1,21 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
-         <!--<record id="view_pricing_tree" model="ir.ui.view">-->
-            <!--<field name="name">saas_pricing.price.tree</field>-->
-            <!--<field name="model">saas_pricing.price</field>-->
-            <!--<field name="priority">4</field>-->
-            <!--<field name="arch" type="xml">-->
-                <!--<tree string="Plans">-->
-					<!--<field name="name"/>-->
-					<!--<field name="interval"/>-->
-					<!--<field name="price"/>-->
-					<!--<field name="stripe_planid"/>-->
-					<!--<field name="stripe_currency"/>-->
-					<!--<field name="trial_period_days"/>-->
-                <!--</tree>-->
-            <!--</field>-->
-       	 <!--</record>-->
     	 <record id="view_pricing_form" model="ir.ui.view">
             <field name="name">saas_pricing.price.form</field>
             <field name="model">saas_pricing.price</field>

@@ -24,7 +24,7 @@ class SaasServerClient(models.Model):
     _name = 'saas_server.client'
     _inherit = ['mail.thread', 'saas_base.client']
 
-    name = fields.Char('Database name', readonly=True)
+    name = fields.Char('Database name', readonly=True, required=True)
     client_id = fields.Char('Database UUID', readonly=True, select=True)
     state = fields.Selection([('template', 'Template'),
                               ('draft','New'),

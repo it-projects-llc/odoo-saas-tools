@@ -67,13 +67,11 @@ class SaasPortalSale(http.Controller):
     @http.route('/trial', auth='public', type='http', website=True)
     def index(self, **kw):
         uid = request.session.uid
+        plan_id = int(kw.get('plan_id'))
         if not uid:
-            plan_id = int(kw.get('plan_id'))
             return http.local_redirect('/web/login?redirect=/trial'+'?plan_id='+str(plan_id))
 
         partner = request.env['res.users'].browse(uid).partner_id
-
-        plan_id = int(kw.get('plan_id'))
         trial_plan = request.env['saas_portal.plan'].sudo().browse(plan_id)
         support_team = request.env.ref('saas_portal.main_support_team')
         db_creation_allowed = True

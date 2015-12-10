@@ -5,7 +5,7 @@ from openerp import SUPERUSER_ID, exceptions
 from openerp.tools.translate import _
 from openerp.addons.web import http
 from openerp.addons.web.http import request
-from openerp.addons.web.controllers.main import login_redirect
+from openerp.addons.saas_base.exceptions import MaximumDBException
 import werkzeug
 import simplejson
 
@@ -72,21 +72,24 @@ class SaasPortalSale(http.Controller):
     @http.route('/trial', auth='public', type='http', website=True)
     def index(self, **kw):
         uid = request.session.uid
+        plan_id = int(kw.get('plan_id'))
         if not uid:
-            return login_redirect()
+            return http.local_redirect('/web/login?redirect=/trial'+'?plan_id='+str(plan_id))
 
         partner = request.env['res.users'].browse(uid).partner_id
-
-        plan_id = int(kw.get('plan_id'))
         trial_plan = request.env['saas_portal.plan'].sudo().browse(plan_id)
         support_team = request.env.ref('saas_portal.main_support_team')
-        res = trial_plan.create_new_database(partner_id=partner.id, user_id=uid, notify_user=True, trial=True, support_team_id=support_team.id)
-        client = request.env['saas_portal.client'].sudo().browse(res.get('id'))
-        client.server_id.action_sync_server()
+        db_creation_allowed = True
+        try:
+            res = trial_plan.create_new_database(partner_id=partner.id, user_id=uid, notify_user=True, trial=True, support_team_id=support_team.id)
+            client = request.env['saas_portal.client'].sudo().browse(res.get('id'))
+            client.server_id.action_sync_server()
+        except MaximumDBException:
+            db_creation_allowed = False
 
         values = {
             'plan': trial_plan,
-            'client': client,
+            'db_creation_allowed': db_creation_allowed,
         }
 
         return request.render('saas_portal.try_trial', values)

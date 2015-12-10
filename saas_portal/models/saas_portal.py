@@ -17,6 +17,7 @@ import random
 
 from datetime import datetime, timedelta
 from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
+from openerp.addons.saas_base.exceptions import MaximumDBException
 
 import logging
 _logger = logging.getLogger(__name__)
@@ -139,6 +140,7 @@ class SaasPortalPlan(models.Model):
     summary = fields.Char('Summary')
     template_id = fields.Many2one('saas_portal.database', 'Template')
     demo = fields.Boolean('Install Demo Data')
+    maximum_allowed_db_per_partner = fields.Integer(help='maximum allowed databases per customer', default=0)
 
     def _get_default_lang(self):
         return self.env.lang
@@ -181,6 +183,12 @@ class SaasPortalPlan(models.Model):
     @api.multi
     def create_new_database(self, dbname=None, client_id=None, partner_id=None, user_id=None, notify_user=False, trial=False, support_team_id=None):
         self.ensure_one()
+        db_count = self.env['saas_portal.client'].search_count([('partner_id', '=', partner_id),
+                                                                ('state', '=', 'open'),
+                                                                ('plan_id', '=', self.id)])
+        if self.maximum_allowed_db_per_partner != 0 and db_count >= self.maximum_allowed_db_per_partner:
+            raise MaximumDBException
+
         server = self.server_id
         if not server:
             server = self.env['saas_portal.server'].get_saas_server()
@@ -439,6 +447,7 @@ class SaasPortalClient(models.Model):
     trial = fields.Boolean('Trial', help='indication of trial clients', default=False, readonly=True)
     notification_sent = fields.Boolean(default=False, readonly=True, help='notification about expiration was sent')
     support_team_id = fields.Many2one('saas_portal.support_team', 'Support Team')
+    expiration_datetime_sent = fields.Datetime(help='updates every time send_expiration_info_to_client_db is executed')
 
     _track = {
         'expired': {
@@ -550,6 +559,38 @@ class SaasPortalClient(models.Model):
                               client_id=client_id,
                               scope=scope,)[0]
         return url
+
+    @api.multi
+    def send_expiration_info_to_client_db(self):
+        for record in self:
+            if record.expiration_datetime_sent != record.expiration_datetime:
+                payload = {
+                    'params': [{'key': 'saas_client.expiration_datetime', 'value': record.expiration_datetime, 'hidden': True}],
+                }
+                record.env['saas.config'].do_upgrade_database(payload, record.id)
+                record.expiration_datetime_sent = record.expiration_datetime
+
+    @api.multi
+    def send_expiration_info_to_partner(self):
+        for record in self:
+            template = self.env.ref('saas_portal.email_template_expiration_datetime_updated')
+            email_ctx = {
+                'default_model': 'saas_portal.client',
+                'default_res_id': record.id,
+                'default_use_template': bool(template),
+                'default_template_id': template.id,
+                'default_composition_mode': 'comment',
+
+            }
+            composer = self.env['mail.compose.message'].with_context(email_ctx).create({})
+            composer.send_mail()
+
+    @api.one
+    def write(self, vals):
+        if 'expiration_datetime' in vals:
+            self.send_expiration_info_to_client_db()
+        result = super(SaasPortalClient, self).write(vals)
+        return result
 
 
 class SaasPortalSupportTeams(models.Model):

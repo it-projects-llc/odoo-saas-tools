@@ -1,0 +1,2 @@
+class MaximumDBException(Exception):
+    pass

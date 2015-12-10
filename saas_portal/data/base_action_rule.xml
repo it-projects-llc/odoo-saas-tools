@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="send_expiration_info_to_client_db" model="ir.actions.server">
+            <field name="name">Send expiration info to SaaS client</field>
+            <field name="condition">True</field>
+            <field name="type">ir.actions.server</field>
+            <field name="model_id" ref="saas_portal.model_saas_portal_client"/>
+            <field name="state">code</field>
+            <field name="code">
+                obj.send_expiration_info_to_client_db()
+            </field>
+        </record>
+
+        <record id="saas_send_expiration" model="base.action.rule">
+            <field name="name">SaaS send expiration to client db</field>
+            <field eval="True" name="active" />
+            <field name="model_id" ref="saas_portal.model_saas_portal_client"/>
+            <field name="kind">on_write</field>
+            <field name="server_action_ids"
+                   eval="[(4, ref('saas_portal.send_expiration_info_to_client_db'))]"/>
+        </record>
+
+    </data>
+</openerp>

@@ -254,6 +254,7 @@
                             <group string="Plan Settings">
                                 <field name="dbname_template"/>
                                 <field name="expiration"/>
+                                <field name="maximum_allowed_db_per_partner"/>
                             </group>
                         </group>
                         <separator string="Odoo DB Settings"/>

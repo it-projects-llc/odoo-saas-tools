@@ -31,16 +31,14 @@ class SaasPortalClient(models.Model):
     invoice_lines = fields.One2many('account.invoice.line', 'saas_portal_client_id')
 
     @api.multi
-    @api.depends('invoice_lines.invoice_id.state')
+    @api.depends('invoice_lines.invoice_id.state', 'subscription_start')
     def _compute_expiration(self):
         for client_obj in self:
-            if client_obj.subscription_start:
-                self.subscription_start = fields.Datetime.now()
             days = 0
-            for line in client_obj.invoice_lines.search([('invoice_id.state', '=', 'paid')]):
+            for line in self.env['account.invoice.line'].search([('saas_portal_client_id', '=', client_obj.id), ('invoice_id.state', '=', 'paid')]):
                 days += line.product_id.period
-            if client_obj.subscription_start:
-                client_obj.expiration_datetime = datetime.strptime(client_obj.subscription_start, DEFAULT_SERVER_DATETIME_FORMAT) + timedelta(days=days)
+            if days != 0:
+                client_obj.expiration_datetime = datetime.strptime(client_obj.subscription_start or client_obj.create_date, DEFAULT_SERVER_DATETIME_FORMAT) + timedelta(days=days)
 
 
 class FindPaymentsWizard(models.TransientModel):
@@ -72,7 +70,7 @@ class AccountInvoice(models.Model):
     @api.multi
     def invoice_validate(self):
         res = super(AccountInvoice, self).invoice_validate()
-        for line in self.invoice_line_ids:
+        for line in self.invoice_line:
             client_obj = self.env['saas_portal.client'].search([('partner_id', '=', self.partner_id.id),
                                                                 ('plan_id', '=', line.plan_id.id)])
             if len(client_obj) == 1:

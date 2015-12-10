@@ -5,9 +5,14 @@
                 <t t-set="title">Try trial</t>
                 <div class="oe_structure">
                     <div class="container" style="text-align: center">
-                        <h2>Plan: <t t-esc="plan.name"/></h2>
-                        <p>The database is creating...</p>
-                        <p>Email with further instructions will soon be sent to you</p>
+                        <t t-if="db_creation_allowed">
+                            <h2>Plan: <t t-esc="plan.name"/></h2>
+                            <p>The database is creating...</p>
+                            <p>it takes only a few minutes. Please check your email now for further instructions on how to login.</p>
+                        </t>
+                        <t t-if="not db_creation_allowed">
+                            <p>Sorry, you already have active database(s). The maximum number of databases are exceeded</p>
+                        </t>
                     </div>
                 </div>
             </t>
@@ -36,6 +41,21 @@
 
             ]]></field>
         </record>
+
+        <record id="email_template_expiration_datetime_updated" model="email.template">
+            <field name="name">Send information about expiration date update to partner</field>
+            <field name="email_from">${(object.user_id.email or '')|safe}</field>
+            <field name="subject">Expiration updated</field>
+            <field name="partner_to">${object.partner_id and object.partner_id.id or ''}</field>
+            <field name="lang">${object.partner_id and object.partner_id.lang or ''}</field>
+            <field name="model_id" ref="saas_portal.model_saas_portal_client"/>
+            <field name="body_html"><![CDATA[
+
+            <p>You expiration date is now:${object.expiration_datetime}"></p>
+
+            ]]></field>
+        </record>
+
         <record id="email_template_expiration_notify" model="email.template">
             <field name="name">Notify clients about expiration</field>
             <field name="email_from">${(object.user_id.email or '')|safe}</field>

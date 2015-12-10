@@ -4,7 +4,7 @@
     'author': 'Ivan Yelizariev',
     'category': 'SaaS',
     'website': 'https://it-projects.info',
-    'depends': ['oauth_provider', 'website', 'auth_signup', 'saas_base', 'saas_utils'],
+    'depends': ['oauth_provider', 'website', 'auth_signup', 'saas_base', 'saas_utils', 'base_action_rule'],
     'data': [
         'data/plan_sequence.xml',
         'data/cron.xml',
@@ -16,6 +16,7 @@
         'data/support_team.xml',
         'views/res_users.xml',
         'data/res_users.xml',
+        'data/base_action_rule.xml',
         'templates.xml',
         ],
     'installable': True,

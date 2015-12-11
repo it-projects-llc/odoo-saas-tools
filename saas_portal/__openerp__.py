@@ -17,6 +17,7 @@
         'data/support_team.xml',
         'views/res_users.xml',
         'data/res_users.xml',
+        'data/base_action_rule.xml',
         'templates.xml',
         ],
     'installable': True,

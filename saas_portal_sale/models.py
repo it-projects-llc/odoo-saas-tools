@@ -26,7 +26,7 @@ class SaasPortalClient(models.Model):
 
     subscription_start = fields.Datetime(string="Subscription start", track_visibility='onchange')
     expiration_datetime = fields.Datetime(string="Expiration", compute='_compute_expiration',
-                                          store=True, track_visibility='onchange',
+                                          store=True,
                                           help='Subscription start plus all paid days from related invoices')
     invoice_lines = fields.One2many('account.invoice.line', 'saas_portal_client_id')
 
@@ -50,13 +50,17 @@ class FindPaymentsWizard(models.TransientModel):
     def default_get(self, fields):
         res = super(FindPaymentsWizard, self).default_get(fields)
         client_obj = self.env['saas_portal.client'].browse(self._context.get('active_id'))
-        lines = self.env['account.invoice.line'].search([('partner_id', '=', client_obj.partner_id.id),
-                                                         ('product_id.plan_id', '=', client_obj.plan_id.id),
-                                                         ('product_id.period', '!=', False),
-                                                         ('saas_portal_client_id', '=', False)])
-
+        lines = self.find_partner_payments(client_obj.partner_id.id, client_obj.plan_id.id)
         res.update({'invoice_lines': [(6, 0, lines.ids)]})
         return res
+
+    @api.model
+    def find_partner_payments(self, partner_id, plan_id):
+        lines = self.env['account.invoice.line'].search([('partner_id', '=', partner_id),
+                                                         ('product_id.plan_id', '=', plan_id),
+                                                         ('product_id.period', '!=', False),
+                                                         ('saas_portal_client_id', '=', False)])
+        return lines
 
     @api.multi
     def apply_invoice_lines(self):
@@ -78,4 +82,35 @@ class AccountInvoice(models.Model):
                 if not client_obj.subscription_start:
                     client_obj.subscription_start = fields.Datetime.now()
                 line.saas_portal_client_id = client_obj.id
+        return res
+
+    @api.multi
+    def confirm_paid(self):
+        client_plan_id_list = self.env['saas_portal.client'].search([('partner_id', '=', self.partner_id.id)]).mapped(lambda r: r.plan_id.id)
+        invoice_plan_id_list = [line.plan_id.id for line in self.invoice_line_ids]
+        plans = [plan for plan in invoice_plan_id_list if plan not in client_plan_id_list]
+
+        if plans:
+            template = self.env.ref('saas_portal_sale.email_template_create_saas')
+            self.with_context(saas_domain=self.env['ir.config_parameter'].get_param('saas_portal.base_saas_domain'),
+                              plans=plans).message_post_with_template(template.id, compositon_mode='comment')
+        return super(AccountInvoice, self).confirm_paid()
+
+
+class SaasPortalPlan(models.Model):
+    _inherit = 'saas_portal.plan'
+
+    @api.multi
+    def create_new_database(self, dbname=None, client_id=None, partner_id=None, user_id=None, notify_user=False, trial=False, support_team_id=None):
+        res = super(SaasPortalPlan, self).create_new_database(dbname=dbname,
+                                                              client_id=client_id,
+                                                              partner_id=partner_id,
+                                                              user_id=user_id,
+                                                              notify_user=notify_user,
+                                                              trial=trial,
+                                                              support_team_id=support_team_id)
+        lines = self.env['saas_portal.find_payments_wizard'].find_partner_payments(partner_id=partner_id, plan_id=self.id)
+        client_obj = self.env['saas_portal.client'].browse(res.get('id'))
+        client_obj.subscription_start = client_obj.create_date
+        lines.write({'saas_portal_client_id': client_obj.id})
         return res

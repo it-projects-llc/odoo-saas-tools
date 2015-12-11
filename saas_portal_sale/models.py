@@ -26,7 +26,7 @@ class SaasPortalClient(models.Model):
 
     subscription_start = fields.Datetime(string="Subscription start", track_visibility='onchange')
     expiration_datetime = fields.Datetime(string="Expiration", compute='_compute_expiration',
-                                          store=True, track_visibility='onchange',
+                                          store=True,
                                           help='Subscription start plus all paid days from related invoices')
     invoice_lines = fields.One2many('account.invoice.line', 'saas_portal_client_id')
 
@@ -83,6 +83,29 @@ class AccountInvoice(models.Model):
                 line.saas_portal_client_id = client_obj.id
         return res
 
+    @api.multi
+    def confirm_paid(self):
+        client_plan_id_list = self.env['saas_portal.client'].search([('partner_id', '=', self.partner_id.id)]).mapped(lambda r: r.plan_id.id)
+        invoice_plan_id_list = [line.plan_id.id for line in self.invoice_line]
+        plans = [plan for plan in invoice_plan_id_list if plan not in client_plan_id_list]
+
+        if self.env['saas_portal.client'].search_count([('partner_id', '=', self.partner_id.id),
+                                                        ('plan_id', 'in', [line.plan_id.id for line in self.invoice_line])]) == 0:
+            template = self.env.ref('saas_portal_sale.email_template_create_saas')
+            email_ctx = {
+                'default_model': 'account.invoice',
+                'default_res_id': self.id,
+                'default_use_template': bool(template),
+                'default_template_id': template.id,
+                'default_composition_mode': 'comment',
+                'saas_domain': self.env['ir.config_parameter'].get_param('saas_portal.base_saas_domain'),
+                'plans': plans,
+             }
+            composer = self.env['mail.compose.message'].with_context(email_ctx).create({})
+            composer.send_mail()
+
+        return super(AccountInvoice, self).confirm_paid()
+
 
 class SaasPortalPlan(models.Model):
     _inherit = 'saas_portal.plan'
@@ -98,5 +121,6 @@ class SaasPortalPlan(models.Model):
                                                               support_team_id=support_team_id)
         lines = self.env['saas_portal.find_payments_wizard'].find_partner_payments(partner_id=partner_id, plan_id=self.id)
         client_obj = self.env['saas_portal.client'].browse(res.get('id'))
+        client_obj.subscription_start = client_obj.create_date
         lines.write({'saas_portal_client_id': client_obj.id})
         return res

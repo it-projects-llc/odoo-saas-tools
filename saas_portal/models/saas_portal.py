@@ -561,14 +561,20 @@ class SaasPortalClient(models.Model):
         return url
 
     @api.multi
-    def send_expiration_info_to_client_db(self):
+    def send_expiration_info(self):
         for record in self:
             if record.expiration_datetime_sent != record.expiration_datetime:
-                payload = {
-                    'params': [{'key': 'saas_client.expiration_datetime', 'value': record.expiration_datetime, 'hidden': True}],
-                }
-                record.env['saas.config'].do_upgrade_database(payload, record.id)
                 record.expiration_datetime_sent = record.expiration_datetime
+                record.send_expiration_info_to_client_db()
+                record.send_expiration_info_to_partner()
+
+    @api.multi
+    def send_expiration_info_to_client_db(self):
+        for record in self:
+            payload = {
+                'params': [{'key': 'saas_client.expiration_datetime', 'value': record.expiration_datetime, 'hidden': True}],
+            }
+            self.env['saas.config'].do_upgrade_database(payload, record.id)
 
     @api.multi
     def send_expiration_info_to_partner(self):
@@ -580,7 +586,6 @@ class SaasPortalClient(models.Model):
                 'default_use_template': bool(template),
                 'default_template_id': template.id,
                 'default_composition_mode': 'comment',
-
             }
             composer = self.env['mail.compose.message'].with_context(email_ctx).create({})
             composer.send_mail()

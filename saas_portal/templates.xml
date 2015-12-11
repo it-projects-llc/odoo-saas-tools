@@ -51,7 +51,7 @@
             <field name="model_id" ref="saas_portal.model_saas_portal_client"/>
             <field name="body_html"><![CDATA[
 
-            <p>You expiration date is now:${object.expiration_datetime}"></p>
+            <p>You expiration date is now: ${object.expiration_datetime}</p>
 
             ]]></field>
         </record>

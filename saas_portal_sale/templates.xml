@@ -1,7 +1,4 @@
 <openerp>
-    <data>
-        <delete id="email_template_create_saas" model="email.template"/>
-    </data>
     <data noupdate="1">
         <record id="email_template_create_saas" model="email.template">
             <field name="name">Send SaaS creation page to partner</field>

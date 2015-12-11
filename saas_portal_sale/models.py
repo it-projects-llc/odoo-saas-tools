@@ -89,8 +89,7 @@ class AccountInvoice(models.Model):
         invoice_plan_id_list = [line.plan_id.id for line in self.invoice_line]
         plans = [plan for plan in invoice_plan_id_list if plan not in client_plan_id_list]
 
-        if self.env['saas_portal.client'].search_count([('partner_id', '=', self.partner_id.id),
-                                                        ('plan_id', 'in', [line.plan_id.id for line in self.invoice_line])]) == 0:
+        if plans:
             template = self.env.ref('saas_portal_sale.email_template_create_saas')
             email_ctx = {
                 'default_model': 'account.invoice',

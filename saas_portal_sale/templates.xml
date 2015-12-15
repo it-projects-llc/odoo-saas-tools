@@ -16,7 +16,7 @@
         <p>
         % for plan in ctx['plans']:
         <br/>
-        <a href="http://${ctx['saas_domain']}/page/start?plan_id=${plan}">http://${ctx['saas_domain']}/page/start?plan_id=${plan}</a>
+        http://${ctx['saas_domain']}/page/start?plan_id=${plan}
         % endfor
         </p>
             ]]></field>

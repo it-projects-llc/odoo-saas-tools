@@ -256,6 +256,8 @@ class SaasPortalPlan(models.Model):
         }
         url = '{url}?{params}'.format(url=data.get('url'), params=werkzeug.url_encode(params))
 
+        client.server_id.action_sync_server()
+
         # send email
         if notify_user:
             template = self.env.ref('saas_portal.email_template_create_saas')
@@ -469,21 +471,12 @@ class SaasPortalClient(models.Model):
         # send notification about expiration by email
         notification_delta = int(self.env['ir.config_parameter'].get_param('saas.expiration_notify_in_advance', '0'))
         if notification_delta > 0:
-            records = self.search([('expiration_datetime', '<', (datetime.now() + timedelta(days=notification_delta)).strftime(DEFAULT_SERVER_DATETIME_FORMAT)),
+            records = self.search([('expiration_datetime', '<=', (datetime.now() + timedelta(days=notification_delta)).strftime(DEFAULT_SERVER_DATETIME_FORMAT)),
                                    ('notification_sent', '=', False)])
             records.write({'notification_sent': True})
             for record in records:
                 template = self.env.ref('saas_portal.email_template_expiration_notify')
-                email_ctx = {
-                    'default_model': 'saas_portal.client',
-                    'default_res_id': record.id,
-                    'default_use_template': bool(template),
-                    'default_template_id': template.id,
-                    'default_composition_mode': 'comment',
-                }
-                composer = self.env['mail.compose.message'].with_context(email_ctx).create({})
-                composer.send_mail()
-
+                record.message_post_with_template(template.id, compositon_mode='comment')
 
     def unlink(self, cr, uid, ids, context=None):
         user_model = self.pool.get('res.users')
@@ -563,6 +556,8 @@ class SaasPortalClient(models.Model):
                 record.expiration_datetime_sent = record.expiration_datetime
                 record.send_expiration_info_to_client_db()
                 record.send_expiration_info_to_partner()
+                # expiration date has been changed, flush expiration notification flag
+                record.notification_sent = False
 
     @api.multi
     def send_expiration_info_to_client_db(self):

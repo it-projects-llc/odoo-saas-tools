@@ -1,6 +1,6 @@
 <openerp>
     <data noupdate="1">
-        <record id="email_template_create_saas" model="email.template">
+        <record id="email_template_create_saas" model="mail.template">
             <field name="name">Send SaaS credentials to the buyer of the SaaS</field>
             <field name="email_from">${(object.user_id.email or '')|safe}</field>
             <field name="subject">Credentials:</field>
@@ -17,7 +17,7 @@
             ]]></field>
         </record>
 
-        <record id="email_template_expiration_datetime_updated" model="email.template">
+        <record id="email_template_expiration_datetime_updated" model="mail.template">
             <field name="name">Send information about expiration date update to partner</field>
             <field name="email_from">${(object.user_id.email or '')|safe}</field>
             <field name="subject">Expiration updated</field>

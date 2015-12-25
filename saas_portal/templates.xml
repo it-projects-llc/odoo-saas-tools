@@ -41,7 +41,7 @@
 
             ]]></field>
         </record>
-
+        <!-- <delete id="email_template_expiration_datetime_updated" model="mail.template"/> -->
         <record id="email_template_expiration_datetime_updated" model="mail.template">
             <field name="name">Send information about expiration date update to partner</field>
             <field name="email_from">${(object.user_id.email or '')|safe}</field>
@@ -51,8 +51,8 @@
             <field name="model_id" ref="saas_portal.model_saas_portal_client"/>
             <field name="body_html"><![CDATA[
 
-            <p>You expiration date is now: ${object.expiration_datetime}</p>
-
+            <p>You expiration date is now:</p>
+            <p>${format_tz(object.expiration_datetime, tz=object.partner_id.tz, context={'lang':object.partner_id.lang})}</p>
             ]]></field>
         </record>
 

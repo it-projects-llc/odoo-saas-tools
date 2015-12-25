@@ -25,20 +25,23 @@ class SaasPortalClient(models.Model):
     _inherit = 'saas_portal.client'
 
     subscription_start = fields.Datetime(string="Subscription start", track_visibility='onchange')
-    expiration_datetime = fields.Datetime(string="Expiration", compute='_compute_expiration',
+    expiration_datetime = fields.Datetime(string="Expiration", compute='_handle_paid_invoices',
                                           store=True,
                                           help='Subscription start plus all paid days from related invoices')
     invoice_lines = fields.One2many('account.invoice.line', 'saas_portal_client_id')
+    trial = fields.Boolean('Trial', help='indication of trial clients', default=False, store=True, readonly=True, compute='_handle_paid_invoices')
 
     @api.multi
-    @api.depends('invoice_lines.invoice_id.state', 'subscription_start')
-    def _compute_expiration(self):
+    @api.depends('invoice_lines.invoice_id.state')
+    def _handle_paid_invoices(self):
         for client_obj in self:
+            client_obj.expiration_datetime = datetime.strptime(client_obj.create_date, DEFAULT_SERVER_DATETIME_FORMAT) + timedelta(hours=client_obj.plan_id.expiration)  # for trial
             days = 0
             for line in self.env['account.invoice.line'].search([('saas_portal_client_id', '=', client_obj.id), ('invoice_id.state', '=', 'paid')]):
                 days += line.product_id.period
             if days != 0:
                 client_obj.expiration_datetime = datetime.strptime(client_obj.subscription_start or client_obj.create_date, DEFAULT_SERVER_DATETIME_FORMAT) + timedelta(days=days)
+            client_obj.trial = not bool(days)
 
 
 class FindPaymentsWizard(models.TransientModel):
@@ -79,9 +82,8 @@ class AccountInvoice(models.Model):
             client_obj = self.env['saas_portal.client'].search([('partner_id', '=', self.partner_id.id),
                                                                 ('plan_id', '=', line.plan_id.id)])
             if len(client_obj) == 1:
-                if not client_obj.subscription_start:
-                    client_obj.subscription_start = fields.Datetime.now()
                 line.saas_portal_client_id = client_obj.id
+                client_obj.subscription_start = client_obj.subscription_start or fields.Datetime.now()
         return res
 
     @api.multi
@@ -93,7 +95,7 @@ class AccountInvoice(models.Model):
         if plans:
             template = self.env.ref('saas_portal_sale.email_template_create_saas')
             self.with_context(saas_domain=self.env['ir.config_parameter'].get_param('saas_portal.base_saas_domain'),
-                              plans=plans).message_post_with_template(template.id, compositon_mode='comment')
+                              plans=plans).message_post_with_template(template.id, composition_mode='comment')
         return super(AccountInvoice, self).confirm_paid()
 
 
@@ -111,6 +113,7 @@ class SaasPortalPlan(models.Model):
                                                               support_team_id=support_team_id)
         lines = self.env['saas_portal.find_payments_wizard'].find_partner_payments(partner_id=partner_id, plan_id=self.id)
         client_obj = self.env['saas_portal.client'].browse(res.get('id'))
-        client_obj.subscription_start = client_obj.create_date
+        if not trial:
+            client_obj.subscription_start = client_obj.create_date
         lines.write({'saas_portal_client_id': client_obj.id})
         return res

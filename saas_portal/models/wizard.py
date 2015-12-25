@@ -104,6 +104,7 @@ class SaasConfigParam(models.TransientModel):
         return [
             ('saas_client.max_users', 'Max Users'),
             ('saas_client.suspended', 'Suspended'),
+            ('saas_client.total_storage_limit', 'Total storage limit'),
         ]
 
     key = fields.Selection(selection=_get_keys, string='Key', required=1, size=64)

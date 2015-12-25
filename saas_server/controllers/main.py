@@ -264,6 +264,7 @@ class SaasServer(http.Controller):
                 'state': client.state,
                 'file_storage': client.file_storage,
                 'db_storage': client.db_storage,
+                'total_storage_limit': client.total_storage_limit,
             })
         return simplejson.dumps(res)
     

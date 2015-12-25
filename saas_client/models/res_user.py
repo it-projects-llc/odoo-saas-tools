@@ -20,6 +20,7 @@
 ##############################################################################
 from openerp import models, fields, api, SUPERUSER_ID as SI, exceptions
 from openerp.tools.translate import _
+from openerp.addons.saas_base.exceptions import SuspendedDBException
 
 
 class ResUsers(models.Model):
@@ -43,5 +44,5 @@ class ResUsers(models.Model):
         res = super(ResUsers, self).check(db, uid, passwd)
         suspended = self.pool['ir.config_parameter'].get_saas_client_parameters(db)
         if suspended == "1" and uid != SI:
-            raise Exception('this client was suspended')
+            raise SuspendedDBException
         return res

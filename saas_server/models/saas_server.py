@@ -202,6 +202,7 @@ class SaasServerClient(models.Model):
         param_obj = client_env['ir.config_parameter']
         max_users = param_obj.get_param('saas_client.max_users', '_')
         suspended = param_obj.get_param('saas_client.suspended', '0')
+        total_storage_limit = param_obj.get_param('saas_client.total_storage_limit', '0')
         users_len = len(users)
         data_dir = openerp.tools.config['data_dir']
 
@@ -218,6 +219,7 @@ class SaasServerClient(models.Model):
             'max_users': max_users,
             'file_storage': file_storage,
             'db_storage': db_storage,
+            'total_storage_limit': total_storage_limit,
         }
         if suspended == '0' and self.state == 'pending':
             data.update({'state': 'open'})

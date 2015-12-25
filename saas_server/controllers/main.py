@@ -118,6 +118,7 @@ class SaasServer(http.Controller):
 
         client_id = post.get('client_id')
         client = request.env['saas_server.client'].sudo().search([('client_id', '=', client_id)])
+
         result = client.upgrade_database(data=state.get('data'))[0]
         return simplejson.dumps({client.name: result})
 
@@ -264,6 +265,7 @@ class SaasServer(http.Controller):
                 'state': client.state,
                 'file_storage': client.file_storage,
                 'db_storage': client.db_storage,
+                'total_storage_limit': client.total_storage_limit,
             })
         return simplejson.dumps(res)
     

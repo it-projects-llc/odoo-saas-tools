@@ -8,6 +8,8 @@ from openerp.addons.web.http import request
 import werkzeug
 import simplejson
 from openerp.addons.saas_base.exceptions import MaximumDBException
+from datetime import datetime, timedelta
+from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
 
 
 class SignupError(Exception):
@@ -40,6 +42,8 @@ class SaasPortal(http.Controller):
         return config.get_param(request.cr, SUPERUSER_ID, full_param)
 
     def get_full_dbname(self, dbname):
+        if not dbname:
+            return None
         full_dbname = '%s.%s' % (dbname, self.get_config_parameter('base_saas_domain'))
         return full_dbname.replace('www.', '')
 
@@ -74,14 +78,16 @@ class SaasPortalSale(http.Controller):
         uid = request.session.uid
         plan_id = int(kw.get('plan_id'))
         if not uid:
-            return http.local_redirect('/web/login?redirect=/trial'+'?plan_id='+str(plan_id))
+            url = '/web/login?redirect=/trial'
+            query = {'plan_id': str(plan_id)}
+            return http.local_redirect(path=url, query=query)
 
         partner = request.env['res.users'].browse(uid).partner_id
         trial_plan = request.env['saas_portal.plan'].sudo().browse(plan_id)
         support_team = request.env.ref('saas_portal.main_support_team')
         db_creation_allowed = True
         try:
-            res = trial_plan.create_new_database(partner_id=partner.id, user_id=uid, notify_user=True, trial=True, support_team_id=support_team.id)
+            trial_plan.create_new_database(partner_id=partner.id, user_id=uid, notify_user=True, trial=True, support_team_id=support_team.id)
         except MaximumDBException:
             db_creation_allowed = False
 

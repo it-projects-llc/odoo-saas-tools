@@ -4,6 +4,10 @@ from openerp import http
 from openerp.http import request
 from openerp.addons.web_settings_dashboard.controllers.main import WebSettingsDashboard
 from openerp.addons.saas_base.tools import get_size
+import pytz
+from pytz import timezone
+from datetime import datetime
+from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
 
 
 class SaaSWebSettingsDashboard(WebSettingsDashboard):
@@ -13,11 +17,17 @@ class SaaSWebSettingsDashboard(WebSettingsDashboard):
 
         result = super(SaaSWebSettingsDashboard, self).web_settings_dashboard_data(**kw)
 
+        uid = request.session.uid
+        user_obj = request.env['res.users'].sudo().browse(uid)
         cur_users = request.env['res.users'].search_count([('share', '=', False)])
         max_users = request.env['ir.config_parameter'].sudo().get_param('saas_client.max_users', default='')
         expiration_datetime = request.env['ir.config_parameter'].sudo().get_param('saas_client.expiration_datetime', default='')
+        datetime_obj = datetime.strptime(expiration_datetime, DEFAULT_SERVER_DATETIME_FORMAT)
         pay_subscription_url = request.env['ir.config_parameter'].sudo().get_param('saas_client.pay_subscription_url', default='').strip()
-
+        if user_obj.tz:
+            user_timezone = timezone(user_obj.tz)
+            datetime_obj = pytz.utc.localize(datetime_obj)
+            datetime_obj = datetime_obj.astimezone(user_timezone)
         data_dir = openerp.tools.config['data_dir']
 
         file_storage = get_size('%s/filestore/%s' % (data_dir, request.env.cr.dbname))
@@ -29,7 +39,7 @@ class SaaSWebSettingsDashboard(WebSettingsDashboard):
 
         result.update({'saas': {'cur_users': cur_users,
                                 'max_users': max_users,
-                                'expiration_datetime': expiration_datetime,
+                                'expiration_datetime': datetime_obj.strftime(DEFAULT_SERVER_DATETIME_FORMAT),
                                 'file_storage': file_storage,
                                 'db_storage': db_storage,
                                 'pay_subscription_url': pay_subscription_url}})

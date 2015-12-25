@@ -31,7 +31,7 @@
             ]]></field>
         </record>
 
-        <record id="email_template_expiration_notify" model="email.template">
+        <record id="email_template_expiration_notify" model="mail.template">
             <field name="name">Notify clients about expiration</field>
             <field name="email_from">${(object.user_id.email or '')|safe}</field>
             <field name="subject">Notification</field>

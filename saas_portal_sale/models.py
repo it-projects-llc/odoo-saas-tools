@@ -88,15 +88,16 @@ class AccountInvoice(models.Model):
 
     @api.multi
     def confirm_paid(self):
-        client_plan_id_list = self.env['saas_portal.client'].search([('partner_id', '=', self.partner_id.id)]).mapped(lambda r: r.plan_id.id)
-        invoice_plan_id_list = [line.plan_id.id for line in self.invoice_line_ids]
-        plans = [plan for plan in invoice_plan_id_list if plan not in client_plan_id_list]
+        for record in self:
+            client_plan_id_list = [client.plan_id.id for client in self.env['saas_portal.client'].search([('partner_id', '=', record.partner_id.id)])]
+            invoice_plan_id_list = [line.plan_id.id for line in record.invoice_line]
+            plans = set(invoice_plan_id_list) - set(client_plan_id_list)
 
-        if plans:
-            template = self.env.ref('saas_portal_sale.email_template_create_saas')
-            self.with_context(saas_domain=self.env['ir.config_parameter'].get_param('saas_portal.base_saas_domain'),
-                              plans=plans).message_post_with_template(template.id, composition_mode='comment')
-        return super(AccountInvoice, self).confirm_paid()
+            if plans:
+                template = self.env.ref('saas_portal_sale.email_template_create_saas')
+                self.with_context(saas_domain=self.env['ir.config_parameter'].get_param('saas_portal.base_saas_domain'),
+                                  plans=plans).message_post_with_template(template.id, compositon_mode='comment')
+            return super(AccountInvoice, self).confirm_paid()
 
 
 class SaasPortalPlan(models.Model):

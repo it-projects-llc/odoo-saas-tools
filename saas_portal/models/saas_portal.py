@@ -182,14 +182,6 @@ class SaasPortalPlan(models.Model):
         else:
             self.state = 'draft'
 
-    # @api.one
-    # def _new_database_vals(self, vals):
-    #     if self.expiration:
-    #         now = datetime.now()
-    #         delta = timedelta(hours=self.expiration)
-    #         vals['expiration_datetime'] = (now + delta).strftime(DEFAULT_SERVER_DATETIME_FORMAT)
-    #     return vals
-
     @api.multi
     def create_new_database(self, dbname=None, client_id=None, partner_id=None, user_id=None, notify_user=False, trial=False, support_team_id=None):
         self.ensure_one()
@@ -220,8 +212,6 @@ class SaasPortalPlan(models.Model):
         if client_id:
             vals['client_id'] = client_id
             client = self.env['saas_portal.client'].search([('client_id', '=', client_id)])
-
-#        vals = self._new_database_vals(vals)[0]
 
         if client:
             client.write(vals)
@@ -603,8 +593,8 @@ class SaasPortalClient(models.Model):
 
     @api.one
     def write(self, vals):
-        # if 'expiration_datetime' in vals:
-        #     self.send_expiration_info_to_client_db()
+        if 'expiration_datetime' in vals and vals['expiration_datetime']:
+            self.send_expiration_info_to_client_db()
         result = super(SaasPortalClient, self).write(vals)
         return result
 

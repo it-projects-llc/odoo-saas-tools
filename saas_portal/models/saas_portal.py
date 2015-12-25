@@ -142,6 +142,11 @@ class SaasPortalPlan(models.Model):
     demo = fields.Boolean('Install Demo Data')
     maximum_allowed_db_per_partner = fields.Integer(help='maximum allowed databases per customer', default=0)
 
+    max_users = fields.Char('Max users allowed')
+    total_storage_limit = fields.Integer('Total storage limit (MB)')
+    block_on_expiration = fields.Boolean('Block clients on expiration', default=False)
+    block_on_storage_exceed = fields.Boolean('Block clients on storage exceed', default=False)
+
     def _get_default_lang(self):
         return self.env.lang
 
@@ -172,14 +177,6 @@ class SaasPortalPlan(models.Model):
         else:
             self.state = 'draft'
 
-    @api.one
-    def _new_database_vals(self, vals):
-        if self.expiration:
-            now = datetime.now()
-            delta = timedelta(hours=self.expiration)
-            vals['expiration_datetime'] = (now + delta).strftime(DEFAULT_SERVER_DATETIME_FORMAT)
-        return vals
-
     @api.multi
     def create_new_database(self, dbname=None, client_id=None, partner_id=None, user_id=None, notify_user=False, trial=False, support_team_id=None):
         self.ensure_one()
@@ -199,13 +196,17 @@ class SaasPortalPlan(models.Model):
                 'server_id': server.id,
                 'plan_id': self.id,
                 'partner_id': partner_id,
+                'trial': trial,
+                'support_team_id': support_team_id,
+                'max_users': self.max_users,
+                'total_storage_limit': self.total_storage_limit,
+                'block_on_expiration': self.block_on_expiration,
+                'block_on_storage_exceed': self.block_on_storage_exceed
                 }
         client = None
         if client_id:
             vals['client_id'] = client_id
             client = self.env['saas_portal.client'].search([('client_id', '=', client_id)])
-
-        vals = self._new_database_vals(vals)[0]
 
         if client:
             client.write(vals)
@@ -265,7 +266,9 @@ class SaasPortalPlan(models.Model):
             composer = self.env['mail.compose.message'].with_context(email_ctx).create({})
             composer.send_mail()
 
-        client.write({'trial': trial, 'support_team_id': support_team_id})
+        client.send_params_to_client_db()
+        client.server_id.action_sync_server()
+
         return {'url': url, 'id': client.id, 'client_id': client_id}
 
     @api.one
@@ -449,6 +452,9 @@ class SaasPortalClient(models.Model):
     support_team_id = fields.Many2one('saas_portal.support_team', 'Support Team')
     expiration_datetime_sent = fields.Datetime(help='updates every time send_expiration_info_to_client_db is executed')
 
+    block_on_expiration = fields.Boolean('Block clients on expiration', default=False)
+    block_on_storage_exceed = fields.Boolean('Block clients on storage exceed', default=False)
+
     _track = {
         'expired': {
             'saas_portal.mt_expired':
@@ -465,7 +471,7 @@ class SaasPortalClient(models.Model):
         expired = self.search([('expiration_datetime', '<', now)])
         expired.write({'expired': True})
         for record in expired:
-            if record.trial:
+            if record.trial or record.block_on_expiration:
                 self.env['saas.config'].do_upgrade_database(payload, record.id)
 
     @api.model
@@ -473,7 +479,7 @@ class SaasPortalClient(models.Model):
         # send notification about expiration by email
         notification_delta = int(self.env['ir.config_parameter'].get_param('saas.expiration_notify_in_advance', '0'))
         if notification_delta > 0:
-            records = self.search([('expiration_datetime', '<', (datetime.now() + timedelta(days=notification_delta)).strftime(DEFAULT_SERVER_DATETIME_FORMAT)),
+            records = self.search([('expiration_datetime', '<=', (datetime.now() + timedelta(days=notification_delta)).strftime(DEFAULT_SERVER_DATETIME_FORMAT)),
                                    ('notification_sent', '=', False)])
             records.write({'notification_sent': True})
             for record in records:
@@ -563,36 +569,52 @@ class SaasPortalClient(models.Model):
     @api.multi
     def send_expiration_info(self):
         for record in self:
-            if record.expiration_datetime_sent != record.expiration_datetime:
+            if record.expiration_datetime_sent and record.expiration_datetime and record.expiration_datetime_sent != record.expiration_datetime:
                 record.expiration_datetime_sent = record.expiration_datetime
                 record.send_expiration_info_to_client_db()
                 record.send_expiration_info_to_partner()
+                # expiration date has been changed, flush expiration notification flag
+                record.notification_sent = False
+            else:
+                record.expiration_datetime_sent = record.expiration_datetime
 
     @api.multi
     def send_expiration_info_to_client_db(self):
         for record in self:
+            if record.expiration_datetime:
+                payload = {
+                    'params': [{'key': 'saas_client.expiration_datetime', 'value': record.expiration_datetime, 'hidden': True}],
+                }
+                self.env['saas.config'].do_upgrade_database(payload, record.id)
+
+    @api.multi
+    def send_params_to_client_db(self):
+        for record in self:
             payload = {
-                'params': [{'key': 'saas_client.expiration_datetime', 'value': record.expiration_datetime, 'hidden': True}],
+                'params': [{'key': 'saas_client.max_users', 'value': record.max_users, 'hidden': True},
+                           {'key': 'saas_client.expiration_datetime', 'value': record.expiration_datetime, 'hidden': True},
+                           {'key': 'saas_client.total_storage_limit', 'value': record.total_storage_limit, 'hidden': True}],
             }
             self.env['saas.config'].do_upgrade_database(payload, record.id)
 
     @api.multi
     def send_expiration_info_to_partner(self):
         for record in self:
-            template = self.env.ref('saas_portal.email_template_expiration_datetime_updated')
-            email_ctx = {
-                'default_model': 'saas_portal.client',
-                'default_res_id': record.id,
-                'default_use_template': bool(template),
-                'default_template_id': template.id,
-                'default_composition_mode': 'comment',
-            }
-            composer = self.env['mail.compose.message'].with_context(email_ctx).create({})
-            composer.send_mail()
+            if record.expiration_datetime:
+                template = self.env.ref('saas_portal.email_template_expiration_datetime_updated')
+                email_ctx = {
+                    'default_model': 'saas_portal.client',
+                    'default_res_id': record.id,
+                    'default_use_template': bool(template),
+                    'default_template_id': template.id,
+                    'default_composition_mode': 'comment',
+                }
+                composer = self.env['mail.compose.message'].with_context(email_ctx).create({})
+                composer.send_mail()
 
     @api.one
     def write(self, vals):
-        if 'expiration_datetime' in vals:
+        if 'expiration_datetime' in vals and vals['expiration_datetime']:
             self.send_expiration_info_to_client_db()
         result = super(SaasPortalClient, self).write(vals)
         return result

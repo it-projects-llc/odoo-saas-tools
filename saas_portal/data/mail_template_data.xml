@@ -1,29 +1,4 @@
 <openerp>
-    <data>
-        <template id="try_trial">
-            <t t-call="website.layout">
-                <t t-set="title">Try trial</t>
-                <div class="oe_structure">
-                    <div class="container" style="text-align: center">
-                        <t t-if="db_creation_allowed">
-                            <h2>Plan: <t t-esc="plan.name"/></h2>
-                            <p>The database is creating...</p>
-                            <p>it takes only a few minutes. Please check your email now for further instructions on how to login.</p>
-                        </t>
-                        <t t-if="not db_creation_allowed">
-                            <p>Sorry, you already have active database(s). The maximum number of databases are exceeded</p>
-                        </t>
-                    </div>
-                </div>
-            </t>
-            <script>
-                $(document).ready(function() {
-                $('div.oe_structure div.container').css('height', $(window).innerHeight());
-                });
-            </script>
-        </template>
-    </data>
-
     <data noupdate="1">
         <record id="email_template_create_saas" model="email.template">
             <field name="name">Send SaaS credentials to the buyer of the SaaS</field>
@@ -52,7 +27,7 @@
             <field name="body_html"><![CDATA[
 
             <p>You expiration date is now: ${object.expiration_datetime}</p>
-
+            <p>${format_tz(object.expiration_datetime, tz=object.partner_id.tz, context={'lang':object.partner_id.lang})}</p>
             ]]></field>
         </record>
 

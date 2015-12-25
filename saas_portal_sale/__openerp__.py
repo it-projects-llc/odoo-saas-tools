@@ -11,6 +11,6 @@
         'views/product_template.xml',
         'views/saas_portal_client.xml',
         'views/account_invoice.xml',
-        'templates.xml',
+        'data/mail_template_data.xml',
     ],
 }

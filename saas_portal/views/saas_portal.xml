@@ -76,6 +76,7 @@
                             <field name="max_users"/>
                             <field name="file_storage"/>
                             <field name="db_storage"/>
+                            <field name="total_storage_limit"/>
                             <field name="server_id"/>
                             <field name="notification_sent"/>
                             <field name="support_team_id"/>
@@ -85,6 +86,10 @@
                             <field name="expiration_datetime"/>
                             <field name="expired"/>
                         </group>
+                    </group>
+                    <group string="Settings">
+                        <field name="block_on_expiration" class="oe_inline"/>
+                        <field name="block_on_storage_exceed" class="oe_inline"/>
                     </group>
                     <notebook>
                         <!--
@@ -256,6 +261,12 @@
                                 <field name="expiration"/>
                                 <field name="maximum_allowed_db_per_partner"/>
                             </group>
+                        </group>
+                        <group string="Client Settings">
+                            <field name="max_users" class="oe_inline"/>
+                            <field name="total_storage_limit" class="oe_inline"/>
+                            <field name="block_on_expiration" class="oe_inline"/>
+                            <field name="block_on_storage_exceed" class="oe_inline"/>
                         </group>
                         <separator string="Odoo DB Settings"/>
                         <group col="4">

@@ -10,6 +10,7 @@
         'data/base_action_rule.xml',
         'data/cron.xml',
         'views/wizard.xml',
+        'views/try_trial_template.xml',
         'views/saas_portal.xml',
         'views/res_config.xml',
         'data/ir_config_parameter.xml',
@@ -18,7 +19,7 @@
         'views/res_users.xml',
         'data/res_users.xml',
         'data/base_action_rule.xml',
-        'templates.xml',
+        'data/mail_template_data.xml',
         ],
     'installable': True,
 }

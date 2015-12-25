@@ -8,6 +8,6 @@
     'version': '1.0.0',
     'depends': ['website_sale', 'saas_portal', 'saas_portal_sale', 'website_sale_require_login', 'saas_portal_start'],
     'data': [
-        'templates.xml',
+        'views/templates.xml',
     ],
 }

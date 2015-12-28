@@ -236,6 +236,7 @@ class SaasPortalPlan(models.Model):
             'e': client.expiration_datetime,
             'r': '%s://%s:%s/web' % (scheme, client.name, port),
             'owner_user': owner_user_data,
+            't': client.trial,
         }
         if self.template_id:
             state.update({'db_template': self.template_id.name})
@@ -443,7 +444,6 @@ class SaasPortalClient(models.Model):
     plan_id = fields.Many2one('saas_portal.plan', string='Plan', track_visibility='onchange')
     expired = fields.Boolean('Expired', default=False, readonly=True)
     user_id = fields.Many2one('res.users', default=lambda self: self.env.user, string='Salesperson')
-    trial = fields.Boolean('Trial', help='indication of trial clients', default=False, readonly=True)
     notification_sent = fields.Boolean(default=False, readonly=True, help='notification about expiration was sent')
     support_team_id = fields.Many2one('saas_portal.support_team', 'Support Team')
     expiration_datetime_sent = fields.Datetime(help='updates every time send_expiration_info_to_client_db is executed')

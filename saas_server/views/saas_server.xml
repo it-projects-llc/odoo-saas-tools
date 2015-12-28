@@ -20,6 +20,8 @@
                     <field name="max_users"/>
                     <field name="file_storage"/>
                     <field name="db_storage"/>
+                    <field name="trial"/>
+                    <field name="expiration_datetime"/>
                 </tree>
             </field>
         </record>
@@ -42,6 +44,8 @@
                                 <field name="max_users"/>
                                 <field name="file_storage"/>
                                 <field name="db_storage"/>
+                                <field name="trial"/>
+                                <field name="expiration_datetime"/>
                             </group>
                         </group>
                     </sheet>

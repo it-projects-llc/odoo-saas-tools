@@ -509,7 +509,7 @@ class SaasPortalClient(models.Model):
             #if user_ids:
             #    user_model.unlink(cr, uid, user_ids)
             #openerp.service.db.exp_drop(obj.name)
-        return super(SaasPortalClient, self).unlink(cr, uid, ids, context)
+        return super(SaasPortalClient, self).unlink(cr, uid, ids, context)\
 
     @api.multi
     def rename_database(self, new_dbname):

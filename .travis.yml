@@ -11,8 +11,8 @@ python:
 addons:
   apt:
 # only add the two lines below if you need wkhtmltopdf for your tests
-#    sources:
-#      - pov-wkhtmltopdf
+    sources:
+      - pov-wkhtmltopdf
 #    Search your sources alias here:
 #      https://github.com/travis-ci/apt-source-whitelist/blob/master/ubuntu.json
     packages:
@@ -23,12 +23,12 @@ addons:
       - python-yaml
 #     Search your packages here:
 #       https://github.com/travis-ci/apt-package-whitelist/blob/master/ubuntu-precise
-#      - wkhtmltopdf  # only add if needed and check the before_install section below
+      - wkhtmltopdf  # only add if needed and check the before_install section below
 
 # set up an X server to run wkhtmltopdf.
-#before_install:
-#  - "export DISPLAY=:99.0"
-#  - "sh -e /etc/init.d/xvfb start"
+before_install:
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"
 
 env:
   global:

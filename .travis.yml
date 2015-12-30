@@ -21,7 +21,6 @@ addons:
       - python-simplejson
       - python-serial
       - python-yaml
-      - python-oauth
 #     Search your packages here:
 #       https://github.com/travis-ci/apt-package-whitelist/blob/master/ubuntu-precise
 #      - wkhtmltopdf  # only add if needed and check the before_install section below
@@ -68,6 +67,7 @@ virtualenv:
   system_site_packages: true
 
 install:
+  - pip install oauthlib
   - git clone --depth=1 https://github.com/OCA/maintainer-quality-tools.git ${HOME}/maintainer-quality-tools
   - export PATH=${HOME}/maintainer-quality-tools/travis:${PATH}
   - travis_install_nightly

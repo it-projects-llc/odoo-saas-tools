@@ -68,6 +68,7 @@ virtualenv:
 
 install:
   - pip install oauthlib
+  - pip install boto
   - git clone --depth=1 https://github.com/OCA/maintainer-quality-tools.git ${HOME}/maintainer-quality-tools
   - export PATH=${HOME}/maintainer-quality-tools/travis:${PATH}
   - travis_install_nightly

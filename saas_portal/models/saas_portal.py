@@ -94,31 +94,9 @@ class SaasPortalServer(models.Model):
         }
 
     @api.model
-    def storage_limit(self):
-        payload = {
-            'params': [{'key': 'saas_client.suspended', 'value': '1', 'hidden': True}],
-        }
-        client_obj = self.env['saas_portal.client'].search([('total_storage_limit', '!=', 0)])
-        for r in client_obj:
-            if r.total_storage_limit < r.file_storage + r.db_storage:
-                template = self.env.ref('saas_portal.email_template_storage_exceed')
-                email_ctx = {
-                    'default_model': 'saas_portal.client',
-                    'default_res_id': r.id,
-                    'default_use_template': bool(template),
-                    'default_template_id': template.id,
-                    'default_composition_mode': 'comment',
-                }
-                composer = self.env['mail.compose.message'].with_context(email_ctx).create({})
-                composer.send_mail()
-
-                if r.block_on_storage_exceed:
-                    self.env['saas.config'].do_upgrade_database(payload, r.id)
-
-    @api.model
     def action_sync_server_all(self):
         self.search([]).action_sync_server()
-        self.storage_limit()
+        self.env['saas_portal.client'].search([]).storage_usage_monitoring()
 
     @api.one
     def action_sync_server(self):
@@ -475,6 +453,7 @@ class SaasPortalClient(models.Model):
     active = fields.Boolean(default=True, compute='_compute_active', store=True)
     block_on_expiration = fields.Boolean('Block clients on expiration', default=False)
     block_on_storage_exceed = fields.Boolean('Block clients on storage exceed', default=False)
+    storage_exceed = fields.Boolean('Storage limit has been exceed', default=False)
 
     _track = {
         'expired': {
@@ -660,6 +639,28 @@ class SaasPortalClient(models.Model):
             self.send_expiration_info_to_client_db()
         result = super(SaasPortalClient, self).write(vals)
         return result
+
+    @api.multi
+    def storage_usage_monitoring(self):
+        payload = {
+            'params': [{'key': 'saas_client.suspended', 'value': '1', 'hidden': True}],
+        }
+        for r in self:
+            if r.total_storage_limit < r.file_storage + r.db_storage and r.storage_exceed is False:
+                r.write({'storage_exceed': True})
+                template = self.env.ref('saas_portal.email_template_storage_exceed')
+                email_ctx = {
+                    'default_model': 'saas_portal.client',
+                    'default_res_id': r.id,
+                    'default_use_template': bool(template),
+                    'default_template_id': template.id,
+                    'default_composition_mode': 'comment',
+                }
+                composer = self.env['mail.compose.message'].with_context(email_ctx).create({})
+                composer.send_mail()
+
+                if r.block_on_storage_exceed:
+                    self.env['saas.config'].do_upgrade_database(payload, r.id)
 
 
 class SaasPortalSupportTeams(models.Model):

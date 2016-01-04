@@ -119,9 +119,7 @@ URL - %s
 
         for r in data:
             r['server_id'] = self.id
-            client = self.env['saas_portal.client'].search([
-                ('client_id', '=', r.get('client_id')),
-            ])
+            client = self.env['saas_portal.client'].with_context(active_test=False).search([('client_id', '=', r.get('client_id'))])
             if not client:
                 database = self.env['saas_portal.database'].search([('client_id', '=', r.get('client_id'))])
                 if database:
@@ -447,7 +445,7 @@ class SaasPortalClient(models.Model):
     notification_sent = fields.Boolean(default=False, readonly=True, help='notification about expiration was sent')
     support_team_id = fields.Many2one('saas_portal.support_team', 'Support Team')
     expiration_datetime_sent = fields.Datetime(help='updates every time send_expiration_info_to_client_db is executed')
-
+    active = fields.Boolean(default=True, compute='_compute_active', store=True)
     block_on_expiration = fields.Boolean('Block clients on expiration', default=False)
     block_on_storage_exceed = fields.Boolean('Block clients on storage exceed', default=False)
 
@@ -457,6 +455,12 @@ class SaasPortalClient(models.Model):
             lambda self, cr, uid, obj, ctx=None: obj.expired
         }
     }
+
+    @api.multi
+    @api.depends('state')
+    def _compute_active(self):
+        for record in self:
+            record.active = record.state != 'deleted'
 
     @api.model
     def _cron_suspend_expired_clients(self):

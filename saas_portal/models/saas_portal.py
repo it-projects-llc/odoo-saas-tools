@@ -98,6 +98,7 @@ class SaasPortalServer(models.Model):
     @api.model
     def action_sync_server_all(self):
         self.search([]).action_sync_server()
+        self.env['saas_portal.client'].search([]).storage_usage_monitoring()
 
     @api.one
     def action_sync_server(self):
@@ -442,12 +443,13 @@ class SaasPortalClient(models.Model):
     plan_id = fields.Many2one('saas_portal.plan', string='Plan', track_visibility='onchange')
     expired = fields.Boolean('Expired', default=False, readonly=True)
     user_id = fields.Many2one('res.users', default=lambda self: self.env.user, string='Salesperson')
-    notification_sent = fields.Boolean(default=False, readonly=True, help='notification about expiration was sent')
+    notification_sent = fields.Boolean(default=False, readonly=True, help='notification about oncoming expiration has sent')
     support_team_id = fields.Many2one('saas_portal.support_team', 'Support Team')
     expiration_datetime_sent = fields.Datetime(help='updates every time send_expiration_info_to_client_db is executed')
     active = fields.Boolean(default=True, compute='_compute_active', store=True)
     block_on_expiration = fields.Boolean('Block clients on expiration', default=False)
     block_on_storage_exceed = fields.Boolean('Block clients on storage exceed', default=False)
+    storage_exceed = fields.Boolean('Storage limit has been exceed', default=False)
 
     _track = {
         'expired': {
@@ -468,10 +470,24 @@ class SaasPortalClient(models.Model):
             'params': [{'key': 'saas_client.suspended', 'value': '1', 'hidden': True}],
         }
         now = fields.Datetime.now()
-        expired = self.search([('expiration_datetime', '<', now)])
+        expired = self.search([
+            ('expiration_datetime', '<', now),
+            ('expired', '=', False)
+        ])
         expired.write({'expired': True})
         for record in expired:
             if record.trial or record.block_on_expiration:
+                template = self.env.ref('saas_portal.email_template_has_expired_notify')
+                email_ctx = {
+                    'default_model': 'saas_portal.client',
+                    'default_res_id': record.id,
+                    'default_use_template': bool(template),
+                    'default_template_id': template.id,
+                    'default_composition_mode': 'comment',
+                }
+                composer = self.env['mail.compose.message'].with_context(email_ctx).create({})
+                composer.send_mail()
+
                 self.env['saas.config'].do_upgrade_database(payload, record.id)
 
     @api.model
@@ -601,6 +617,20 @@ class SaasPortalClient(models.Model):
             self.send_expiration_info_to_client_db()
         result = super(SaasPortalClient, self).write(vals)
         return result
+
+    @api.multi
+    def storage_usage_monitoring(self):
+        payload = {
+            'params': [{'key': 'saas_client.suspended', 'value': '1', 'hidden': True}],
+        }
+        for r in self:
+            if r.total_storage_limit < r.file_storage + r.db_storage and r.storage_exceed is False:
+                r.write({'storage_exceed': True})
+                template = self.env.ref('saas_portal.email_template_storage_exceed')
+                r.message_post_with_template(template.id, composition_mode='comment')
+
+                if r.block_on_storage_exceed:
+                    self.env['saas.config'].do_upgrade_database(payload, r.id)
 
 
 class SaasPortalSupportTeams(models.Model):

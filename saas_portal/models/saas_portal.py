@@ -480,7 +480,6 @@ class SaasPortalClient(models.Model):
         ])
         expired.write({'expired': True})
         for record in expired:
-            print record
             if record.trial or record.block_on_expiration:
                 template = self.env.ref('saas_portal.email_template_has_expired_notify')
                 email_ctx = {

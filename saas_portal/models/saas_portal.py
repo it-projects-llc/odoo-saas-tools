@@ -119,13 +119,7 @@ URL - %s
 
         for r in data:
             r['server_id'] = self.id
-            client = self.env['saas_portal.client'].search([
-                '|',
-                ('client_id', '=', r.get('client_id')),
-                '&',
-                ('client_id', '=', r.get('client_id')),
-                ('active', '=', False),
-            ])
+            client = self.env['saas_portal.client'].with_context(active_test=False).search([('client_id', '=', r.get('client_id'))])
             if not client:
                 database = self.env['saas_portal.database'].search([('client_id', '=', r.get('client_id'))])
                 if database:

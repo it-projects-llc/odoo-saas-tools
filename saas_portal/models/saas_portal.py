@@ -478,15 +478,7 @@ class SaasPortalClient(models.Model):
         for record in expired:
             if record.trial or record.block_on_expiration:
                 template = self.env.ref('saas_portal.email_template_has_expired_notify')
-                email_ctx = {
-                    'default_model': 'saas_portal.client',
-                    'default_res_id': record.id,
-                    'default_use_template': bool(template),
-                    'default_template_id': template.id,
-                    'default_composition_mode': 'comment',
-                }
-                composer = self.env['mail.compose.message'].with_context(email_ctx).create({})
-                composer.send_mail()
+                record.message_post_with_template(template.id, composition_mode='comment')
 
                 self.env['saas.config'].do_upgrade_database(payload, record.id)
 

@@ -23,6 +23,7 @@
     'name': 'SaaS Utils',
     'version': '0.1',
     'author': 'OpenJAF',
+    'license': 'GPL-3',
     'website': 'http://www.openjaf.com',
     'category': 'Base',
     'description': """

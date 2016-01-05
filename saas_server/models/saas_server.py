@@ -17,7 +17,7 @@ class SaasServerClient(models.Model):
 
     name = fields.Char('Database name', readonly=True, required=True)
     client_id = fields.Char('Database UUID', readonly=True, select=True)
-    expiration_datetime = fields.Datetime('Expiration', track_visibility='onchange', readonly=True)
+    expiration_datetime = fields.Datetime(readonly=True)
     state = fields.Selection([('template', 'Template'),
                               ('draft','New'),
                               ('open','In Progress'),

@@ -4,7 +4,7 @@
     'author': 'Ivan Yelizariev',
     'category': 'SaaS',
     'website': 'https://it-projects.info',
-    'depends': ['auth_oauth', 'auth_oauth_check_client_id', 'saas_utils', 'mail'],
+    'depends': ['auth_oauth', 'auth_oauth_check_client_id', 'saas_utils', 'mail', 'web_settings_dashboard'],
     'data': [
         'views/saas_client.xml',
         'security/rules.xml',
@@ -14,4 +14,7 @@
         'data/ir_config_parameter.xml',
     ],
     'installable': True,
+    'qweb': [
+        'static/src/xml/saas_dashboard.xml',
+    ],
 }

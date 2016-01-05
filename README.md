@@ -88,8 +88,7 @@ Usage
      * install saas_server
 
 3. Configure **Server Database**
-   * Tick "Technical Features" for admin at Settings/Users/Users - Administrator
-     * Refresh page
+   * Activate the developer mode via "(?)/About" menu at the top right-hand corner
    * Open Settings/Users/OAuth Providers - SaaS
      * click [Edit]
      * update domain name at "Authentication URL" and "Validation URL", change http to https if needed. E.g.
@@ -101,7 +100,7 @@ Usage
    
 
 4. Configure **Main Database**:
-   * open Settings/Configuration/SaaS Portal Settings
+   * open Settings/SaaS Portal Settings
      * set *Base SaaS domain*, e.g. **odoo.local**
      * click Apply (do it even if you didn't make changes)
 
@@ -160,8 +159,6 @@ uninstall **saas_client** module, edit ir.confir_parameter records
 etc. The simplest solution is don't give to customer access to
 administration. To make more flexible configuration, you could install
 following modules on SaaS Client databases:
-
-*(some modules are not ported for 8.0. Contribution is welcome)*
 
 * [ir_rule_protected](https://github.com/yelizariev/addons-yelizariev/tree/9.0/ir_rule_protected) - makes impossible for non-superuser admin edit\delete protected ir.rule
 * [access_restricted](https://github.com/yelizariev/addons-yelizariev/tree/9.0/access_restricted) - makes impossible for administrator set (and see) more access rights (groups) than he already have. (follow the link for more description)

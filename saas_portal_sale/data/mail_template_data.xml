@@ -1,6 +1,6 @@
 <openerp>
     <data noupdate="1">
-        <record id="email_template_create_saas" model="email.template">
+        <record id="email_template_create_saas" model="mail.template">
             <field name="name">Send SaaS creation page to partner</field>
             <field name="email_from">${(object.user_id.email or '')|safe}</field>
             <field name="subject">To</field>
@@ -16,7 +16,7 @@
         <p>
         % for plan in ctx['plans']:
         <br/>
-        <a href="http://${ctx['saas_domain']}/page/start?plan_id=${plan}">http://${ctx['saas_domain']}/page/start?plan_id=${plan}</a>
+        http://${ctx['saas_domain']}/page/start?plan_id=${plan}
         % endfor
         </p>
             ]]></field>

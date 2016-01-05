@@ -20,6 +20,5 @@
             <field name="server_action_ids"
                    eval="[(4, ref('send_saas_expiration_info_action'))]"/>
         </record>
-
     </data>
 </openerp>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-extend="DashboardMain">
+        <t t-jquery="div.row" t-operation="append">
+            <div class="col-md-3 col-sm-6 col-xs-12 o_web_settings_dashboard_col">
+                <div class="text-center o_web_settings_dashboard_saas"></div>
+            </div>
+        </t>
+    </t>
+
+    <t t-name="DashboardSaaS">
+        <div class="text-center o_web_settings_dashboard_saas">
+            <i class="fa fa-cloud fa-4x text-muted"></i>
+            <div class="o_web_settings_dashboard_header">
+                <p>SaaS</p>
+            </div>
+            <div>
+                <t t-set="max_users" t-value="widget.data.max_users"/>
+                <t t-if="max_users">
+                   <p>Max users allowed: <t t-esc="max_users"></t></p>
+                </t>
+                <t t-set="cur_users" t-value="widget.data.cur_users"/>
+                <t t-if="cur_users">
+                   <p>Users count: <t t-esc="cur_users"></t></p>
+                </t>
+                <t t-set="expiration_datetime" t-value="widget.data.expiration_datetime"/>
+                <t t-if="expiration_datetime">
+                   <p>Expiration date: <t t-esc="expiration_datetime"></t></p>
+                </t>
+                <hr/>
+                <t t-set="file_storage" t-value="widget.data.file_storage"/>
+                <t t-if="file_storage">
+                    <p>File storage: <t t-esc="file_storage"></t> Mb</p>
+                </t>
+                <t t-set="db_storage" t-value="widget.data.db_storage"/>
+                <t t-if="db_storage">
+                    <p>Database storage: <t t-esc="db_storage"></t> Mb</p>
+                </t>
+            </div>
+            <t t-set="pay_subscription_url" t-value="widget.data.pay_subscription_url"/>
+            <t t-if="pay_subscription_url">
+                <div>
+                    <a t-att-href="pay_subscription_url" target="_blank"
+                       class="btn btn-primary btn-block o_pay_subscription" role="button"><strong>Pay subscription</strong></a>
+                </div>
+            </t>
+        </div>
+    </t>
+</templates>

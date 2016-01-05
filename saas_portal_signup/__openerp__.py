@@ -2,6 +2,7 @@
     'name': 'SaaS Portal Sign Up',
     'version': '1.0.0',
     'author': 'Cesar Lage',
+    'license': 'LGPL-3',
     'category': 'SaaS',
     'website': 'https://it-projects.info',
     'depends': ['auth_signup', 'saas_portal'],

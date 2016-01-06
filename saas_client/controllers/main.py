@@ -27,7 +27,7 @@ class SaaSClientLogin(Home):
         ensure_db()
         param_model = request.env['ir.config_parameter']
         suspended = param_model.sudo().get_param('saas_client.suspended', '0')
-        page_for_suspended = param_model.sudo().get_param('saas_client.page_for_suspended', '0')
+        page_for_suspended = param_model.sudo().get_param('saas_client.page_for_suspended', '/')
         if suspended == '1':
             return werkzeug.utils.redirect(page_for_suspended, 303)
         return super(SaaSClientLogin, self).web_login(redirect, **kw)

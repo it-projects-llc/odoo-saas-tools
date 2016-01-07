@@ -623,6 +623,8 @@ class SaasPortalClient(models.Model):
 
                 if r.block_on_storage_exceed:
                     self.env['saas.config'].do_upgrade_database(payload, r.id)
+            if r.total_storage_limit >= r.file_storage + r.db_storage and r.storage_exceed is True:
+                r.write({'storage_exceed': False})
 
 
 class SaasPortalSupportTeams(models.Model):

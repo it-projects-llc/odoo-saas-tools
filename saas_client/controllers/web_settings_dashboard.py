@@ -22,9 +22,9 @@ class SaaSWebSettingsDashboard(WebSettingsDashboard):
         cur_users = request.env['res.users'].search_count([('share', '=', False)])
         max_users = request.env['ir.config_parameter'].sudo().get_param('saas_client.max_users', default='')
         expiration_datetime = request.env['ir.config_parameter'].sudo().get_param('saas_client.expiration_datetime', default='')
-        datetime_obj = datetime.strptime(expiration_datetime, DEFAULT_SERVER_DATETIME_FORMAT)
+        datetime_obj = expiration_datetime and datetime.strptime(expiration_datetime, DEFAULT_SERVER_DATETIME_FORMAT)
         pay_subscription_url = request.env['ir.config_parameter'].sudo().get_param('saas_client.pay_subscription_url', default='').strip()
-        if user_obj.tz:
+        if datetime_obj and user_obj.tz:
             user_timezone = timezone(user_obj.tz)
             datetime_obj = pytz.utc.localize(datetime_obj)
             datetime_obj = datetime_obj.astimezone(user_timezone)
@@ -39,7 +39,7 @@ class SaaSWebSettingsDashboard(WebSettingsDashboard):
 
         result.update({'saas': {'cur_users': cur_users,
                                 'max_users': max_users,
-                                'expiration_datetime': datetime_obj.strftime(DEFAULT_SERVER_DATETIME_FORMAT),
+                                'expiration_datetime': datetime_obj and datetime_obj.strftime(DEFAULT_SERVER_DATETIME_FORMAT),
                                 'file_storage': file_storage,
                                 'db_storage': db_storage,
                                 'pay_subscription_url': pay_subscription_url}})

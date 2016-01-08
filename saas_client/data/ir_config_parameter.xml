@@ -7,7 +7,7 @@
         </record>
         <record id="saas_page_for_suspended" model="ir.config_parameter">
             <field name="key">saas_client.page_for_suspended</field>
-            <field name="value">'/'</field>
+            <field name="value">/</field>
         </record>
     </data>
 </openerp>

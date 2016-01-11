@@ -2,6 +2,7 @@
     'name': 'SaaS Pricing',
     'version': '1.0.0',
     'author': 'OpenJaf',
+    'license': 'GPL-3',
     'category': 'SaaS',
     'website': '',
     'depends': ['saas_server', 'saas_utils', 'saas_portal'],

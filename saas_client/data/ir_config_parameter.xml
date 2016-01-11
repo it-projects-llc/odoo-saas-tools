@@ -5,5 +5,9 @@
             <field name="key">saas_client.pay_subscription_url</field>
             <field name="value"> </field>
         </record>
+        <record id="saas_page_for_suspended" model="ir.config_parameter">
+            <field name="key">saas_client.page_for_suspended</field>
+            <field name="value">/</field>
+        </record>
     </data>
 </openerp>

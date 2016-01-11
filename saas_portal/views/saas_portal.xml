@@ -30,7 +30,7 @@
             <field name="model">saas_portal.client</field>
             <field name="priority">4</field>
             <field name="arch" type="xml">
-                <tree string="Clients" colors="red:expired">
+                <tree string="Clients" colors="red:expired" create="false" delete="false" edit="false">
                     <field name="name"/>
                     <field name="state"/>
                     <field name="last_connection"/>
@@ -68,8 +68,8 @@
                     <sheet>
                     <group>
                         <group>
-                            <field name="client_id"/>
-                            <field name="name"/>
+                            <field name="client_id" readonly="1"/>
+                            <field name="name" readonly="1"/>
                             <field name="plan_id"/>
                             <field name="partner_id"/>
                             <field name="users_len"/>
@@ -219,10 +219,6 @@
                     <field name="name"/>
                     <field name="template_id"/>
                     <field name="state" />
-                    <button name="create_template" type="object" states="draft" icon="gtk-apply" />
-                    <button name="edit_template" type="object" states="confirmed" icon="gtk-edit" />
-                    <!--<button name="upgrade_template" type="object" states="confirmed" icon="gtk-execute" />-->
-                    <button name="delete_template" type="object" states="confirmed" icon="gtk-cancel" />
                 </tree>
             </field>
         </record>
@@ -248,6 +244,7 @@
                             <div class="oe_title" style="width: 390px;">
                                 <label class="oe_edit_only" for="name" string="Name"/>
                                 <h1><field name="name" class="oe_inline"/></h1>
+                                <label class="oe_edit_only" for="summary" string="Summary"/>
 								<field name="summary"/>
                             </div>
                         </div>

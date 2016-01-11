@@ -337,7 +337,7 @@ URL - %s
 class OauthApplication(models.Model):
     _inherit = 'oauth.application'
 
-    client_id = fields.Char('Database UUID')
+    client_id = fields.Char('Database UUID', default=False)
     last_connection = fields.Char(compute='_get_last_connection',
                                   string='Last Connection', size=64)
 

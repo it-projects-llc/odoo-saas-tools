@@ -264,7 +264,6 @@
 
         <template id="page_addons">
             <t t-set="tab_title" t-value="'Choose apps to install'"/>
-            <!--<t t-set="custom_next" t-value="'Launch'"/>-->
 
             <t t-call="saas_portal_start_wizard.page_tpl">
                 <div class="addons-list list row">
@@ -273,6 +272,14 @@
                     </t>
                 </div>
                 <input type="hidden" name="addons" />
+            </t>
+        </template>
+
+        <template id="page_launch">
+            <t t-set="tab_title" t-value="'All set'"/>
+
+            <t t-call="saas_portal_start_wizard.page_tpl">
+                <h4 class="text-center">Whenever you're ready click 'Launch'</h4>
             </t>
         </template>
 
@@ -345,6 +352,9 @@
                                 </t>
                                 <t t-if="wizard_page=='page_addons_select'">
                                     <t t-call="saas_portal_start_wizard.page_addons"/>
+                                </t>
+                                <t t-if="wizard_page=='page_launch'">
+                                    <t t-call="saas_portal_start_wizard.page_launch"/>
                                 </t>
                             </div>
                             <div id="summary-bar" class="col-sm-3 col-md-offset-1">

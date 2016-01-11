@@ -15,7 +15,7 @@ PAGE_PLAN_CONFIRM = "page_plan_confirm"
 PAGE_TERMS_CONDS = "page_terms_conds"
 PAGE_PAYMENT = "page_payment"
 PAGE_ADDONS_SELECT = "page_addons_select"
-PAGE_SUMMARY = "page_summary"
+PAGE_LAUNCH = "page_launch"
 
 WIZARD_FLOW = {
     PAGE_PLAN_SELECT: {
@@ -35,6 +35,10 @@ WIZARD_FLOW = {
         "next": PAGE_ADDONS_SELECT,
     },
     PAGE_ADDONS_SELECT: {
+        "prev": PAGE_PAYMENT,
+        "next": PAGE_LAUNCH,
+    },
+    PAGE_LAUNCH: {
         "prev": PAGE_PAYMENT,
         "next": None,
     },
@@ -194,6 +198,7 @@ class SaasPortalStartWizard(SaasPortalStart):
             (PAGE_PLAN_CONFIRM, "Billing"),
             # (PAGE_PAYMENT, "Payment methods"),
             # (PAGE_ADDONS_SELECT, "Extra addons"),
+            (PAGE_LAUNCH, "Launch"),
         ]
 
         summary = [
@@ -376,6 +381,7 @@ class SaasPortalStartWizard(SaasPortalStart):
                 PAGE_PLAN_CONFIRM: self.__get_legal,
                 PAGE_PAYMENT: self.__get_payment_methods,
                 PAGE_ADDONS_SELECT: self.__get_addons,
+                PAGE_LAUNCH: lambda arg: {'dummy': None},
             }[next_page](wz)
             if not data:
                 next_page = WIZARD_FLOW[next_page][action]
@@ -389,8 +395,7 @@ class SaasPortalStartWizard(SaasPortalStart):
                     )
 
         meta_data = self.__get_metadata(wz)
-        last = WIZARD_FLOW[next_page]['next'] not in [x[0] for x in
-                                                      meta_data['crumbs']]
+        last = next_page == PAGE_LAUNCH
 
         state.update(data)
         state.update({"meta": meta_data, "wizard_page": next_page,

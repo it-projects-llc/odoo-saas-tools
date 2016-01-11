@@ -343,7 +343,7 @@ class OauthApplication(models.Model):
                                   string='Last Connection', size=64)
     server_db_ids = fields.One2many('saas_portal.server', 'oauth_application_id', string='Server Database')
     template_db_ids = fields.One2many('saas_portal.database', 'oauth_application_id', string='Template Database')
-    client_db_ids = fields.One2many('saas_portal.database', 'oauth_application_id', string='Client Database')
+    client_db_ids = fields.One2many('saas_portal.client', 'oauth_application_id', string='Client Database')
 
     @api.one
     def _get_last_connection(self):

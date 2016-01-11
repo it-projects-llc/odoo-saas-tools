@@ -510,6 +510,7 @@ class SaasPortalClient(models.Model):
                     'default_use_template': bool(template),
                     'default_template_id': template.id,
                     'default_composition_mode': 'comment',
+                    'days': notification_delta,
                 }
                 composer = self.env['mail.compose.message'].with_context(email_ctx).create({})
                 composer.send_mail()

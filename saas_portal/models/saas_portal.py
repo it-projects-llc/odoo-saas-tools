@@ -338,7 +338,7 @@ URL - %s
 class OauthApplication(models.Model):
     _inherit = 'oauth.application'
 
-    client_id = fields.Char('Database UUID', default=False)
+    client_id = fields.Char('Database UUID')
     last_connection = fields.Char(compute='_get_last_connection',
                                   string='Last Connection', size=64)
     server_db_ids = fields.One2many('saas_portal.server', 'oauth_application_id', string='Server Database')
@@ -532,7 +532,7 @@ class SaasPortalClient(models.Model):
             #if user_ids:
             #    user_model.unlink(cr, uid, user_ids)
             #openerp.service.db.exp_drop(obj.name)
-        return super(SaasPortalClient, self).unlink(cr, uid, ids, context)\
+        return super(SaasPortalClient, self).unlink(cr, uid, ids, context)
 
     @api.multi
     def rename_database(self, new_dbname):

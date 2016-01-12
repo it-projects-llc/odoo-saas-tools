@@ -16,7 +16,7 @@ def signup_redirect():
 
 class SaasPortalDemo(SaasPortal):
 
-    @http.route(['/demo/<string:version>/<string:plan_url>'], type='http', auth='public', website=True)
+    @http.route(['/demo/<string:version>/<string:plan_url>/'], type='http', auth='public', website=True)
     def show_plan(self, version, plan_url, **post):
         domain = [('odoo_version', '=', version), ('page_url', '=', plan_url),
                   ('state', '=', 'confirmed')]
@@ -27,9 +27,11 @@ class SaasPortalDemo(SaasPortal):
         values = {'plan': plan[0]}
         return request.website.render("saas_portal_demo.show_plan", values)
 
-    @http.route('/demo/new_database', type='http', auth='public', website=True)
+    @http.route(['/trial/add_new_client1/'], type='http', auth='public', website=True)
     def new_demo_database(self, **post):
+        print 'plan_id', post.get('plan_id')
         if not request.session.uid:
+            print 'ahaha'
             return signup_redirect()
         plan_id = int(post.get('plan_id'))
 

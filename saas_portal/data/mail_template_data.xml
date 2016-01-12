@@ -42,7 +42,7 @@
             <field name="body_html"><![CDATA[
 
             <p>
-            Two days left before expiration.
+            Less than ${ctx["days"]} day(s) left before expiration.
             </p>
 
             ]]></field>

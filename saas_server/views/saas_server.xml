@@ -13,7 +13,7 @@
             <field name="model">saas_server.client</field>
             <field name="priority">4</field>
             <field name="arch" type="xml">
-                <tree string="Databases">
+                <tree string="Databases" create="false" edit="false" delete="false">
                     <field name="name"/>
                     <field name="state"/>
                     <field name="users_len"/>
@@ -31,7 +31,7 @@
             <field name="name">saas_server.clients.form</field>
             <field name="model">saas_server.client</field>
             <field name="arch" type="xml">
-                <form string="Database">
+                <form string="Database" create="false" edit="false" delete="false">
                     <header>
                         <field name="state" widget="statusbar" statusbar_visible="open,pending,deleted" readonly="1"/>
                     </header>

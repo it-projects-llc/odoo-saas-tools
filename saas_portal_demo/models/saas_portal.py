@@ -6,7 +6,7 @@ class SaasPortalPlan(models.Model):
     _name = 'saas_portal.plan'
     _inherit = 'saas_portal.plan'
     
-    page_url = fields.Char('Page URL', placeholder='some-name')
+    page_url = fields.Char('Plan URL', placeholder='some-name')
     odoo_version = fields.Char('Odoo Version', placeholder='8.0')
     app_store_module_ids = fields.Many2many('saas_portal.module',
                                             'saas_portal_plan_module',

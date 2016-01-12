@@ -9,4 +9,3 @@ Parameters <odoo_version> and <plan_url> are specified in SaaS/SaaS/Plans/Websit
 
 
 In description page 'Live Preview' button creates a demo database with plan modules.
-This database will be deleted after a specified time.

@@ -26,14 +26,3 @@ class SaasPortalDemo(SaasPortal):
             return request.website.render("saas_portal_demo.unavailable_plan")
         values = {'plan': plan[0]}
         return request.website.render("saas_portal_demo.show_plan", values)
-
-    @http.route(['/trial/add_new_client1/'], type='http', auth='public', website=True)
-    def new_demo_database(self, **post):
-        print 'plan_id', post.get('plan_id')
-        if not request.session.uid:
-            print 'ahaha'
-            return signup_redirect()
-        plan_id = int(post.get('plan_id'))
-
-        res = self.create_new_database(plan_id)
-        return request.redirect(res.get('url'))

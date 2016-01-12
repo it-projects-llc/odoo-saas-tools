@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="1">
+        <record id="_configuration" model="ir.config_parameter">
+            <field name="key">saas.expiration_notify_in_advance</field>
+            <field name="value">2</field>
+        </record>
+    </data>
+</openerp>

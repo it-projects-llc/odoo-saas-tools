@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="view_invoice_line_saas_form" model="ir.ui.view">
+            <field name="name">account.invoice.line.saas.form</field>
+            <field name="model">account.invoice.line</field>
+            <field name="inherit_id" ref="account.view_invoice_line_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//group/group[2]" position="after">
+                    <group>
+                        <field name="partner_id" invisible="1"/>
+                        <field name="saas_portal_client_id" domain="[('partner_id', '=', partner_id)]"/>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</openerp>

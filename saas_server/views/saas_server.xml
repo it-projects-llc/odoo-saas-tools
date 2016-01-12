@@ -17,8 +17,11 @@
                     <field name="name"/>
                     <field name="state"/>
                     <field name="users_len"/>
+                    <field name="max_users"/>
                     <field name="file_storage"/>
                     <field name="db_storage"/>
+                    <field name="trial"/>
+                    <field name="expiration_datetime"/>
                 </tree>
             </field>
         </record>
@@ -38,8 +41,11 @@
                                 <field name="client_id"/>
                                 <field name="name"/>
                                 <field name="users_len"/>
+                                <field name="max_users"/>
                                 <field name="file_storage"/>
                                 <field name="db_storage"/>
+                                <field name="trial"/>
+                                <field name="expiration_datetime"/>
                             </group>
                         </group>
                     </sheet>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="1">
+        <!-- Cron job for suspend expired clients -->
+        <record forcecreate="True" id="saas_portal_suspend_expired" model="ir.cron">
+            <field name="name">Saas portal - suspend expired clients</field>
+            <field eval="True" name="active" />
+            <field name="user_id" ref="base.user_root"/>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False"/>
+            <field name="model">saas_portal.client</field>
+            <field name="function">_cron_suspend_expired_clients</field>
+            <field name="args">()</field>
+        </record>
+        <record forcecreate="True" id="saas_portal_notify_before_expiration" model="ir.cron">
+            <field name="name">Saas portal - notify expired clients</field>
+            <field eval="True" name="active" />
+            <field name="user_id" ref="base.user_root"/>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False"/>
+            <field name="model">saas_portal.client</field>
+            <field name="function">_cron_notify_expired_clients</field>
+            <field name="args">()</field>
+        </record>
+        <record forcecreate="True" id="saas_portal_sync_server" model="ir.cron">
+            <field name="name">SaaS Portal sync server</field>
+            <field eval="True" name="active" />
+            <field name="user_id" ref="base.user_root"/>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False"/>
+            <field name="model">saas_portal.server</field>
+            <field name="function">action_sync_server_all</field>
+            <field name="args">()</field>
+        </record>
+    </data>
+</openerp>

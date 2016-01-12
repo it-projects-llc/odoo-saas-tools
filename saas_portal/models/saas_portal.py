@@ -165,7 +165,7 @@ class SaasPortalPlan(models.Model):
                                 ondelete='restrict',
                                 help='User this saas server or choose random')
     
-    website_description = fields.Text('Website description')
+    website_description = fields.Html('Website description')
     logo = fields.Binary('Logo')
 
     @api.one
@@ -212,6 +212,9 @@ class SaasPortalPlan(models.Model):
         else:
             client = self.env['saas_portal.client'].create(vals)
         client_id = client.client_id
+
+        if client.trial:
+            client.expiration_datetime = datetime.strptime(client.create_date, DEFAULT_SERVER_DATETIME_FORMAT) + timedelta(hours=self.expiration)  # for trial
 
         scheme = server.request_scheme
         port = server.request_port

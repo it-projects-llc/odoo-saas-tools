@@ -88,7 +88,7 @@ Usage
      * install saas_server
 
 3. Configure **Server Database**
-   * Activate the developer mode via "(?)/About" menu
+   * Activate the developer mode via "(?)/About" menu at the top right-hand corner
    * Open Settings/Users/OAuth Providers - SaaS
      * click [Edit]
      * update domain name at "Authentication URL" and "Validation URL", change http to https if needed. E.g.

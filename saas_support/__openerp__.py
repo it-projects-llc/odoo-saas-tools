@@ -23,7 +23,7 @@
     'name': 'Saas Support',
     'version': '0.1',
     'author': 'OpenJAF',
-    'license': 'GPL-3',
+    'license': 'LGPL-3',
     'website': 'http://www.openjaf.com',
     'category': 'Integration',
     'description': """

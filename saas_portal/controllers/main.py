@@ -5,9 +5,11 @@ from openerp import SUPERUSER_ID, exceptions
 from openerp.tools.translate import _
 from openerp.addons.web import http
 from openerp.addons.web.http import request
-from openerp.addons.saas_base.exceptions import MaximumDBException
 import werkzeug
 import simplejson
+from openerp.addons.saas_base.exceptions import MaximumDBException
+from datetime import datetime, timedelta
+from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
 
 
 class SignupError(Exception):

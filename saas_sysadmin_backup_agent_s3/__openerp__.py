@@ -2,7 +2,7 @@
     'name': 'SaaS Sysadmin Backup Agent S3',
     'version': '1.0.0',
     'author': 'Salton Massally<smassally@idtlabs.sl>',
-    'license': 'GPL-3',
+    'license': 'LGPL-3',
     'category': 'SaaS',
     'website': 'http://idtlabs.sl',
     'external_dependencies': {

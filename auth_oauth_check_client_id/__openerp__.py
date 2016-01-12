@@ -2,7 +2,7 @@
     'name' : 'auth_oauth - check client_id',
     'version' : '1.0.0',
     'author' : 'Ivan Yelizariev',
-    'license': 'GPL-3',
+    'license': 'LGPL-3',
     'category' : 'SaaS',
     'website' : 'https://it-projects.info',
 

@@ -19,6 +19,8 @@ from datetime import datetime, timedelta
 from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
 from openerp.addons.saas_base.exceptions import MaximumDBException
 
+from openerp.addons.saas_base.exceptions import MaximumDBException
+
 import logging
 _logger = logging.getLogger(__name__)
 
@@ -104,8 +106,10 @@ class SaasPortalServer(models.Model):
             'd': self.name,
             'client_id': self.client_id,
         }
+
         url = self._request_server(path='/saas_server/sync_server', state=state, client_id=self.client_id)[0]
         res = requests.get(url, verify=(self.request_scheme == 'https' and self.verify_ssl))
+
         if res.ok != True:
             msg = """Status Code - %s
 Reason - %s
@@ -113,6 +117,7 @@ URL - %s
             """ % (res.status_code, res.reason, res.url)            
             raise Warning(msg)
         data = simplejson.loads(res.text)
+
         for r in data:
             r['server_id'] = self.id
             client = self.env['saas_portal.client'].with_context(active_test=False).search([('client_id', '=', r.get('client_id'))])
@@ -255,16 +260,7 @@ class SaasPortalPlan(models.Model):
         # send email
         if notify_user:
             template = self.env.ref('saas_portal.email_template_create_saas')
-            email_ctx = {
-                'default_model': 'saas_portal.client',
-                'default_res_id': client.id,
-                'default_use_template': bool(template),
-                'default_template_id': template.id,
-                'default_composition_mode': 'comment',
-
-            }
-            composer = self.env['mail.compose.message'].with_context(email_ctx).create({})
-            composer.send_mail()
+            client.message_post_with_template(template.id, composition_mode='comment')
 
         client.send_params_to_client_db()
         client.server_id.action_sync_server()
@@ -482,15 +478,7 @@ class SaasPortalClient(models.Model):
         for record in expired:
             if record.trial or record.block_on_expiration:
                 template = self.env.ref('saas_portal.email_template_has_expired_notify')
-                email_ctx = {
-                    'default_model': 'saas_portal.client',
-                    'default_res_id': record.id,
-                    'default_use_template': bool(template),
-                    'default_template_id': template.id,
-                    'default_composition_mode': 'comment',
-                }
-                composer = self.env['mail.compose.message'].with_context(email_ctx).create({})
-                composer.send_mail()
+                record.message_post_with_template(template.id, composition_mode='comment')
 
                 self.env['saas.config'].do_upgrade_database(payload, record.id)
 
@@ -504,16 +492,7 @@ class SaasPortalClient(models.Model):
             records.write({'notification_sent': True})
             for record in records:
                 template = self.env.ref('saas_portal.email_template_expiration_notify')
-                email_ctx = {
-                    'default_model': 'saas_portal.client',
-                    'default_res_id': record.id,
-                    'default_use_template': bool(template),
-                    'default_template_id': template.id,
-                    'default_composition_mode': 'comment',
-                }
-                composer = self.env['mail.compose.message'].with_context(email_ctx).create({})
-                composer.send_mail()
-
+                record.message_post_with_template(template.id, composition_mode='comment')
 
     def unlink(self, cr, uid, ids, context=None):
         user_model = self.pool.get('res.users')
@@ -622,15 +601,7 @@ class SaasPortalClient(models.Model):
         for record in self:
             if record.expiration_datetime:
                 template = self.env.ref('saas_portal.email_template_expiration_datetime_updated')
-                email_ctx = {
-                    'default_model': 'saas_portal.client',
-                    'default_res_id': record.id,
-                    'default_use_template': bool(template),
-                    'default_template_id': template.id,
-                    'default_composition_mode': 'comment',
-                }
-                composer = self.env['mail.compose.message'].with_context(email_ctx).create({})
-                composer.send_mail()
+                record.message_post_with_template(template.id, composition_mode='comment')
 
     @api.one
     def write(self, vals):
@@ -648,15 +619,7 @@ class SaasPortalClient(models.Model):
             if r.total_storage_limit < r.file_storage + r.db_storage and r.storage_exceed is False:
                 r.write({'storage_exceed': True})
                 template = self.env.ref('saas_portal.email_template_storage_exceed')
-                email_ctx = {
-                    'default_model': 'saas_portal.client',
-                    'default_res_id': r.id,
-                    'default_use_template': bool(template),
-                    'default_template_id': template.id,
-                    'default_composition_mode': 'comment',
-                }
-                composer = self.env['mail.compose.message'].with_context(email_ctx).create({})
-                composer.send_mail()
+                r.message_post_with_template(template.id, composition_mode='comment')
 
                 if r.block_on_storage_exceed:
                     self.env['saas.config'].do_upgrade_database(payload, r.id)

@@ -271,6 +271,10 @@ class SaasServerClient(models.Model):
         # 5. update parameters
         params = post.get('params', [])
         for obj in params:
+            if obj['key'] == 'saas_client.expiration_datetime':
+                self.expiration_datetime = obj['value']
+            if obj['key'] == 'saas_client.trial' and obj['value'] == 'False':
+                self.trial = False
             groups = []
             if obj.get('hidden'):
                 groups = ['saas_client.group_saas_support']

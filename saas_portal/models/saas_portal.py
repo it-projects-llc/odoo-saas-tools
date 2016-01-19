@@ -176,6 +176,10 @@ class SaasPortalPlan(models.Model):
         else:
             self.state = 'draft'
 
+    @api.one
+    def _new_database_vals(self, vals):
+        return vals
+
     @api.multi
     def create_new_database(self, dbname=None, client_id=None, partner_id=None, user_id=None, notify_user=False, trial=False, support_team_id=None):
         self.ensure_one()
@@ -206,6 +210,8 @@ class SaasPortalPlan(models.Model):
         if client_id:
             vals['client_id'] = client_id
             client = self.env['saas_portal.client'].search([('client_id', '=', client_id)])
+
+        vals = self._new_database_vals(vals)[0]
 
         if client:
             client.write(vals)
@@ -604,7 +610,8 @@ class SaasPortalClient(models.Model):
         for record in self:
             if record.expiration_datetime:
                 payload = {
-                    'params': [{'key': 'saas_client.expiration_datetime', 'value': record.expiration_datetime, 'hidden': True}],
+                    'params': [{'key': 'saas_client.expiration_datetime', 'value': record.expiration_datetime, 'hidden': True},
+                               {'key': 'saas_client.trial', 'value': 'False', 'hidden': True}],
                 }
                 self.env['saas.config'].do_upgrade_database(payload, record.id)
 

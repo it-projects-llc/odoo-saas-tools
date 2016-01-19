@@ -1,108 +1,139 @@
 # -*- coding: utf-8 -*-
-import openerp
+# import openerp
 from openerp import SUPERUSER_ID
 from openerp.addons.web import http
 from openerp.addons.web.http import request
-from openerp.addons.auth_oauth.controllers import main as oauth
-from openerp.addons.auth_signup.controllers import main as signup
-import werkzeug
-import simplejson
-import uuid
-import random
+
+# import werkzeug
+# import simplejson
+# import uuid
+# import random
+import logging
 
 
-class SignupError(Exception):
-    pass
+_logger = logging.getLogger(__name__)
 
 
-class SaasPortal(http.Controller):
+class SaasPricing(http.Controller):
 
-    @http.route('/saas_portal/signup', type='http', auth="none", website=True)
-    def web_portal_signup(self, redirect="/saas_portal/book_then_signup", **kw):
-        dbname = request.params['dbname']
-        if self.exists_database(dbname):
-            full_dbname = self.get_full_dbname(dbname)
-            params = {'db': full_dbname, 'login': 'admin', 'key': 'admin'}
-            redirect = 'http://%s/login' % full_dbname.replace('_', '.')
+    @http.route('/saas/pricing/payment/validate', type='http', auth="public",
+                website=True)
+    def payment_validate(self, sale_order_id=None, **post):
+        redirect = post.get("r", False)
+
+        _logger.info(
+            "\n\nReceived Payment Feedback with [sale_id: %s] and [post: %s]\n",
+            sale_order_id, post)
+
+        cr, uid, context = request.cr, request.uid, request.context
+        email_act = None
+        sale_order_obj = request.registry['sale.order']
+        # transaction_obj = request.registry.get('payment.transaction')
+        saas_plan_obj = request.registry['saas_portal.plan']
+        plan = saas_plan_obj.browse(cr, uid, int(post['plan_id']))
+
+        if sale_order_id is None:
+            order = plan.get_sale_order(int(post['p']), post['d'], False)
         else:
-            params = request.params
-            auth_signup = signup.AuthSignupHome()
-            qcontext = auth_signup.get_auth_signup_qcontext()
-            auth_signup.do_signup(qcontext)
-            params['uid'] = request.uid
-        return request.redirect('%s?%s' % (redirect, werkzeug.url_encode(params)))
+            order = request.registry['sale.order'].browse(cr, SUPERUSER_ID,
+                                                          sale_order_id,
+                                                          context=context)
 
-    @http.route(['/saas_portal/trial_check'], type='json', auth='public', website=True)
-    def trial_check(self, **post):
-        if self.exists_database(post['dbname']):
-            return {"error": {"msg": "database already taken"}}
-        return {"ok": 1}
+        tx = order.payment_tx_id
+        _logger.info("\n\nOrder Tx: %s\n", tx)
 
-    @http.route(['/saas_portal/book_then_signup'], type='http', auth='public', website=True)
-    def book_then_signup(self, **post):
-        saas_server = self.get_saas_server()
-        scheme = request.httprequest.scheme
-        full_dbname = self.get_full_dbname(post.get('dbname'))
-        dbtemplate = self.get_config_parameter('dbtemplate')
-        client_id = self.get_new_client_id(full_dbname)
-        request.registry['oauth.application'].create(request.cr, SUPERUSER_ID, {'client_id': client_id, 'name':full_dbname})
-        params = {
-            'scope': 'userinfo force_login trial skiptheuse',
-            'state': simplejson.dumps({
-                'd': full_dbname,
-                'u': '%s://%s' % (scheme, full_dbname.replace('_', '.')),
-                'db_template': dbtemplate,
-            }),
-            'redirect_uri': '{scheme}://{saas_server}/saas_server/new_database'.format(scheme=scheme, saas_server=saas_server),
-            'response_type': 'token',
-            'organization': post.get('organization'),
-            'client_id': client_id,
-        }
-        return request.redirect('/oauth2/auth?%s' % werkzeug.url_encode(params))
+        # if not order or (order.amount_total and not tx):
+        #     return request.redirect(redirect)
 
-    def get_provider(self):
-        imd = request.registry['ir.model.data']
-        return imd.xmlid_to_object(request.cr, SUPERUSER_ID,
-                                   'saas_server.saas_oauth_provider')
+        if (not order.amount_total and not tx) or tx.state in ['pending',
+                                                               'done']:
+            if not order.amount_total and not tx:
+                # Orders are confirmed by payment transactions,
+                # but there is none for free orders,
+                # (e.g. free events), so confirm immediately
+                order.action_button_confirm()
+            # send by email
+            email_act = sale_order_obj.action_quotation_send(cr, SUPERUSER_ID,
+                                                             [order.id],
+                                                             context=context)
+        elif tx and tx.state == 'cancel':
+            # cancel the quotation
+            sale_order_obj.action_cancel(cr, SUPERUSER_ID, [order.id],
+                                         context=context)
 
-    def get_new_client_id(self, name):
-        return str(uuid.uuid1())
+        # send the email
+        if email_act and email_act.get('context'):
+            composer_obj = request.registry['mail.compose.message']
+            composer_values = {}
+            email_ctx = email_act['context']
+            template_values = [
+                email_ctx.get('default_template_id'),
+                email_ctx.get('default_composition_mode'),
+                email_ctx.get('default_model'),
+                email_ctx.get('default_res_id'),
+            ]
+            composer_values.update(
+                composer_obj.onchange_template_id(cr, SUPERUSER_ID, None,
+                                                  *template_values,
+                                                  context=context).get('value',
+                                                                       {}))
+            if not composer_values.get(
+                    'email_from') and uid == request.website.user_id.id:
+                composer_values[
+                    'email_from'] = request.website.user_id.company_id.email
+            composer_id = composer_obj.create(cr, SUPERUSER_ID, composer_values,
+                                              context=email_ctx)
+            composer_obj.send_mail(cr, SUPERUSER_ID, [composer_id],
+                                   context=email_ctx)
 
-    def get_config_parameter(self, param):
-        config = request.registry['ir.config_parameter']
-        full_param = 'saas_portal.%s' % param
-        return config.get_param(request.cr, SUPERUSER_ID, full_param)
+        # clean context and session, then redirect to the confirmation page
+        # request.website.sale_reset(context=context)
 
-    def get_full_dbname(self, dbname):
-        full_dbname = '%s.%s' % (dbname, self.get_config_parameter('base_saas_domain'))
-        return full_dbname.replace('www.', '').replace('.', '_')
+        if redirect:
+            return request.redirect(redirect)
 
-    def get_saas_server(self):
-        saas_server_list = self.get_config_parameter('saas_server_list')
-        saas_server_list = saas_server_list.split(',')
-        return saas_server_list[random.randint(0, len(saas_server_list) - 1)]
+    @http.route([
+        '/saas/pricing/payment/transaction/<int:acquirer_id>/<string:order_name>'],
+        type='json', auth="public", website=True)
+    def payment_transaction(self, acquirer_id, order_name):
+        cr, uid, context = request.cr, request.uid, request.context
+        transaction_obj = request.registry.get('payment.transaction')
+        order_obj = request.registry.get('sale.order')
 
-    def exists_database(self, dbname):
-        full_dbname = self.get_full_dbname(dbname)
-        return openerp.service.db.exp_db_exist(full_dbname)
+        order_domain = [('name', '=', order_name)]
+        candidates = order_obj.search(cr, SUPERUSER_ID, order_domain, context=context)
+        order_id = candidates and candidates[0]
+        order = order_obj.browse(cr, SUPERUSER_ID, order_id, context=context)
 
+        tx_domain = [('sale_order_id', '=', order_id),
+                     ('state', 'not in', ['cancel', 'done'])]
+        candidates = transaction_obj.search(cr, SUPERUSER_ID, tx_domain, context=context)
+        tx_id = candidates and candidates[0]
 
-class OAuthLogin(oauth.OAuthLogin):
+        if tx_id:
+            tx = transaction_obj.browse(cr, SUPERUSER_ID, tx_id, context=context)
+            if tx.state == 'draft':
+                tx.write({
+                    'acquirer_id': acquirer_id,
+                })
+            tx_id = tx.id
+        else:
+            tx_id = transaction_obj.create(cr, SUPERUSER_ID, {
+                'acquirer_id': acquirer_id,
+                'type': 'form',
+                'amount': order.amount_total,
+                'currency_id': order.pricelist_id.currency_id.id,
+                'partner_id': order.partner_id.id,
+                'partner_country_id': order.partner_id.country_id.id,
+                'reference': order.name,
+                'sale_order_id': order.id,
+            }, context=context)
 
-    @http.route()
-    def web_login(self, *args, **kw):
-        if kw.get('login', False):
-            user = request.registry.get('res.users')
-            domain = [('login', '=', kw['login'])]
-            fields = ['share', 'database']
-            data = user.search_read(request.cr, SUPERUSER_ID, domain, fields)
-            if data and data[0]['share'] and data[0]['database']:
-                kw['redirect'] = '/saas_server/tenant'
-        return super(OAuthLogin, self).web_login(*args, **kw)
+        # update quotation
+        request.registry['sale.order'].write(
+            cr, SUPERUSER_ID, [order.id], {
+                'payment_acquirer_id': acquirer_id,
+                'payment_tx_id': tx_id
+            }, context=context)
 
-    @http.route()
-    def web_auth_signup(self, *args, **kw):
-        if kw.get('dbname', False):
-            redirect = '/saas_portal/book_then_signup'
-            kw['redirect'] = '%s?dbname=%s' % (redirect, kw['dbname'])
-        return super(OAuthLogin, self).web_auth_signup(*args, **kw)
+        return tx_id

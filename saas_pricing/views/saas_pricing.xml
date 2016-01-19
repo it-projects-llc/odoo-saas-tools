@@ -1,36 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
-         <record id="view_pricing_tree" model="ir.ui.view">
-            <field name="name">saas_pricing.price.tree</field>
-            <field name="model">saas_pricing.price</field>
-            <field name="priority">4</field>
-            <field name="arch" type="xml">
-                <tree string="Plans">
-					<field name="name"/>
-					<field name="interval"/>
-					<field name="price"/>
-					<field name="stripe_planid"/>
-					<field name="stripe_currency"/>
-					<field name="trial_period_days"/>
-                </tree>
-            </field>
-       	 </record>
     	 <record id="view_pricing_form" model="ir.ui.view">
             <field name="name">saas_pricing.price.form</field>
             <field name="model">saas_pricing.price</field>
             <field name="arch" type="xml">
 				<form string="Pricing">
-				<sheet>
-					<group>
-						<field name="name"/>
-						<field name="interval"/>
-						<field name="price"/>
-						<field name="stripe_planid"/>
-						<field name="stripe_currency"/>
-						<field name="trial_period_days"/>
-					</group>
-				</sheet>
+                    <sheet>
+                        <group>
+                            <group string="Payment Options">
+                                <field name="billing"/>
+                                <field name="price" />
+                                <field name="pricing"/>
+                                <field name="variable_mode"
+                                       attrs="{'invisible':[('pricing','!=','variable')], 'required':[('pricing','=','variable')]}"/>
+                                <field name="period"/>
+                                <field name="custom_period"
+                                       attrs="{'invisible':[('period','!=','custom')], 'required':[('period','=','custom')]}"/>
+                            </group>
+                            <group string="Period terms">
+                                <field name="trial_days"/>
+                                <field name="grace_days"/>
+                                <field name="payment_due_days"/>
+                                <field name="purge_due_days"/>
+                            </group>
+                        </group>
+
+                        <group string="Associated services">
+                            <field name="services" nolabel="1">
+                                <tree>
+                                    <field name="name_template" />
+                                    <field name="lst_price" />
+                                </tree>
+                            </field>
+                        </group>
+                    </sheet>
 				</form>
             </field>
         </record>
@@ -40,9 +44,12 @@
 		    <field name="model">saas_portal.plan</field>
 		    <field name="inherit_id" ref="saas_portal.view_plans_form"/>
 		    <field name="arch" type="xml">
-		        <field name="expiration" position="after">
-	                <field name="pricing_ids" colspan="4" nolabel="1"/>
-		        </field>
+				<xpath expr="//form[@string='plans']/sheet/notebook/page[@string='Extra Settings']"
+					   position="after">
+	                <page string="Pricing Settings">
+                        <field name="pricing" />
+					</page>
+		        </xpath>
 		    </field>
 		</record>
     </data>

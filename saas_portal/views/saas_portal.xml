@@ -244,16 +244,20 @@
                                 <field name="expiration"/>
                             </group>
                         </group>
-                        <separator string="Odoo DB Settings"/>
-                        <group col="4">
-                            <field name="demo"/>
-                            <field name="lang"/>
-                            <field name="tz"/>
-                        </group>
-                        <separator string="Website Settings"/>
-                        <group>
-                            <field name="website_description" col="4"/>
-                        </group>
+                        <notebook>
+                            <page string="Extra Settings">
+                                <separator string="Odoo DB Settings"/>
+                                <group col="4">
+                                    <field name="demo"/>
+                                    <field name="lang"/>
+                                    <field name="tz"/>
+                                </group>
+                                <separator string="Website Settings"/>
+                                <group>
+                                    <field name="website_description" col="4"/>
+                                </group>
+                            </page>
+                        </notebook>
                     </sheet>
                 </form>
             </field>

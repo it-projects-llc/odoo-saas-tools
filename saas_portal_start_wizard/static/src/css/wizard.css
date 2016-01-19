@@ -1,0 +1,135 @@
+
+.img-responsive {
+    margin: auto;
+}
+
+.tab-body .list .btn {
+    width: 100%;
+    white-space: normal;
+}
+
+.legal-checkbox {
+    margin-left: 20px;
+    margin-top: 20px;
+}
+
+.addons-list>div {
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.addons-list .btn {
+    padding: 6px;
+    height: 120px;
+}
+
+.addons-list .btn .oe_module_icon,
+.addons-list .btn .oe_module_desc {
+    display: inline-block;
+}
+
+.addons-list .btn .oe_module_icon {
+    width: 70px;
+    height: auto;
+    vertical-align: top;
+}
+
+.addons-list .btn .oe_module_desc {
+    width: 160px;
+    padding-left: 6px;
+    text-align: left;
+}
+
+.addons-list .btn .oe_module_desc h4 {
+    font-size: 14px;
+    font-weight: bold;
+    margin-top: 0;
+}
+
+.addons-list .btn .oe_module_name {
+    font-size: 13px;
+}
+
+#summary-bar ul.list-unstyled li {
+    margin-left: 20px;
+    margin-bottom: 5px;
+}
+
+#summary-bar ul.list-unstyled li label {
+    margin-left: -10px;
+    margin-bottom: 0;
+}
+
+
+/* Wizard */
+ul.saas_wizard {
+  padding: 0;
+  margin-top: 20px;
+  list-style: none outside none;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.065);
+  -moz-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.065);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.065);
+}
+
+ul.saas_wizard li {
+  border: 1px solid #d4d4d4;
+  border-right-width: 0;
+  position: relative;
+  float: left;
+  padding: 0 10px 0 20px;
+  margin: 0;
+  line-height: 38px;
+  background: #fbfbfb;
+}
+
+ul.saas_wizard li .chevron {
+  position: absolute;
+  top: 0;
+  right: -10px;
+  z-index: 1;
+  display: block;
+  border: 20px solid transparent;
+  border-right: 0;
+  border-left: 10px solid #d4d4d4;
+}
+
+ul.saas_wizard li .chevron:before {
+  position: absolute;
+  top: -20px;
+  right: 1px;
+  display: block;
+  border: 20px solid transparent;
+  border-right: 0;
+  border-left: 10px solid #fbfbfb;
+  content: "";
+}
+
+ul.saas_wizard li.text-success {
+  background: #f3f4f5;
+}
+
+ul.wizard li.text-success .chevron:before {
+  border-left: 10px solid whitesmoke;
+}
+
+ul.saas_wizard li.text-primary {
+  background: #f1f6fc;
+}
+
+ul.saas_wizard li.text-primary .chevron:before {
+  border-left: 10px solid #f1f6fc;
+}
+
+ul.saas_wizard li:first-child {
+  padding-left: 15px;
+  border-radius: 4px 0 0 4px;
+}
+
+ul.saas_wizard li:last-child {
+  padding-right: 15px;
+  border-right-width: 1px;
+  border-radius: 0 4px 4px 0;
+}

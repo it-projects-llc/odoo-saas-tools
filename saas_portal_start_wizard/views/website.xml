@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <template id="assets_frontend" inherit_id="website.assets_frontend"
+                  name="saas portal assets">
+            <xpath expr="." position="inside">
+                <link rel='stylesheet'
+                      href='/saas_portal_start_wizard/static/src/css/wizard.css'
+                      t-ignore="true"/>
+                <script type='text/javascript'
+                        src='/saas_portal_start_wizard/static/src/js/jqBootstrapValidation-1.3.7.min.js'/>
+                <script type='text/javascript'
+                        src='/saas_portal_start_wizard/static/src/js/wizard.js'/>
+            </xpath>
+		</template>
+
+        <template id="page_tpl">
+            <form role="form" id="wizard-form" method="get"
+                  action="/page/start/wizard/submit" t-if="not acquirers"
+                  t-att-class="wizard_page">
+
+                <div class="tab-pane clerfix">
+                    <h3 class="page-header mt16"><t t-esc="tab_title"/></h3>
+
+                    <div class="tab-body clearfix">
+                        <t t-raw="0"/>
+                    </div>
+
+                    <input type="hidden" name="wizard_page"
+                           t-att-value="wizard_page"/>
+                    <input type="hidden" name="wizard_action" value="next"/>
+                    <input type="hidden" name="wizard_id" t-att-value="wz.id"/>
+                </div>
+                <div class="tab-actions clearfix mt16 mb32">
+                    <t t-set="prev_label" t-value="'Back'"/>
+                    <t t-set="next_label" t-value="'Continue'"/>
+                    <t t-if="last_page">
+                        <t t-set="next_label" t-value="'Launch'"/>
+                    </t>
+
+                    <a id="wizard-goback" class="btn btn-default tab-prev">
+                        <t t-esc="prev_label"/>
+                    </a>
+                    <button type="submit" id="wizard-submit"
+                       class="btn btn-primary tab-next pull-right">
+                        <t t-esc="next_label"/>
+                    </button>
+                </div>
+            </form>
+            <div class="js_payment clearfix" t-if="acquirers"
+                 id="payment_methods">
+
+                <div t-if="message" role="alert"
+                     class="alert alert-info alert-dismissible row">
+                    <button type="button" class="close"
+                            data-dismiss="alert"
+                            aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                    <span>
+                        <t t-esc="message"/>
+                    </span>
+                </div>
+
+                <div class="col-sm-9">
+
+                    <h4>Payment Methods:</h4>
+
+                    <ul class="list-unstyled">
+                        <li t-foreach="acquirers or []"
+                            t-as="acquirer">
+                            <label t-if="acquirer.button">
+                                <input t-att-value="acquirer.id"
+                                       type="radio"
+                                       name="acquirer"
+                                       t-att-checked="acquirers[0] == acquirer"/>
+                                <img class="media-object"
+                                     style="width: 60px; display: inline-block;"
+                                     t-att-title="acquirer.name"
+                                     t-att-src="'/payment_%s/static/src/img/%s_icon.png' % (acquirer.provider, acquirer.provider)"/>
+                                <span t-field="acquirer.name"/>
+                            </label>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-sm-3">
+                    <t t-foreach="acquirers or []"
+                       t-as="acquirer">
+                        <div t-att-data-id="acquirer.id"
+                             class="oe_sale_acquirer_button hidden pull-right">
+                            <div t-raw="acquirer.button"/>
+                            <div t-field="acquirer.pre_msg"/>
+                        </div>
+                    </t>
+                </div>
+                <form role="form" id="wizard-form" method="get"
+                      action="/page/start/wizard/submit">
+                    <input type="hidden" name="wizard_page"
+                           t-att-value="wizard_page"/>
+                    <input type="hidden" name="wizard_action" value="next"/>
+                    <input type="hidden" name="wizard_id" t-att-value="wz.id"/>
+                    <div class="tab-actions clearfix mt16 mb32">
+                        <t t-set="prev_label" t-value="'Back'"/>
+
+                        <a id="wizard-goback" class="btn btn-default tab-prev">
+                            <t t-esc="prev_label"/>
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </template>
+
+		<template id="plan_tpl">
+            <div class="col-sm-6 col-lg-4 mb16">
+                <a class="btn btn-default" href="#"
+                   t-att-data-planid="plan.id">
+                    <div class="plan_inner">
+                        <div class="plan-logo">
+                            <span itemprop="image" t-field="plan.logo"
+                                  t-field-options='{"widget": "image", "class": "product_detail_img"}'/>
+                        </div>
+                        <div class="plan-data">
+                            <h3 class="plan-name">
+                                <t t-esc="plan.name"/>
+                            </h3>
+                            <p class="mt4 text-muted">
+                                <t t-esc="plan.summary"/>
+                            </p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+		</template>
+
+        <template id="page_plan">
+            <t t-set="tab_title" t-value="'Choose a Plan'"/>
+
+            <t t-call="saas_portal_start_wizard.page_tpl">
+                <div t-attf-class="plans-list list row #{errors and errors.get('plan_id', False)}">
+                    <t t-foreach="plans" t-as="plan">
+                        <t t-call="saas_portal_start_wizard.plan_tpl"/>
+                    </t>
+                </div>
+                <input type="hidden" name="plan_id"
+                       t-att-value="wz.plan_id or ''"/>
+            </t>
+        </template>
+
+        <template id="page_terms">
+            <t t-set="tab_title" t-value="'Terms &amp; Conditions'"/>
+            <!--<t t-set="custom_next" t-value="'I agree'"/>-->
+
+            <t t-call="saas_portal_start_wizard.page_tpl">
+                <div class="text-raw">
+                    <t t-raw="terms"/>
+                </div>
+                <div class="legal-checkbox">
+                    <label class="checkbox">
+                        <input type="checkbox" id="agree" name="agree"
+                               required="required"
+                               data-validation-required-message="You must agree to the terms and conditions"/>
+                        I agree to the terms and conditions
+                    </label>
+                </div>
+            </t>
+        </template>
+
+        <template id="page_legal">
+            <t t-set="tab_title" t-value="'Personal information'"/>
+
+            <t t-call="saas_portal_start_wizard.page_tpl">
+                <div class="col-lg-6 form-group has-feedback">
+                    <label class="control-label" for="name">Name:</label>
+                    <input type="text" class="form-control" id="name"
+                           name="name" placeholder="Enter name"
+                           required="required" t-att-value="name"
+                           data-validation-required-message="This field is required" />
+                </div>
+                <div class="col-lg-6 form-group has-feedback">
+                    <label class="control-label" for="phone">Phone:</label>
+                    <input type="text" class="form-control" id="phone"
+                           name="phone" placeholder="Enter phone"
+                           required="required" t-att-value="phone"
+                           data-validation-required-message="This field is required" />
+                </div>
+                <div class="col-lg-6 form-group has-feedback">
+                    <label class="control-label" for="company">Company:</label>
+                    <input type="text" class="form-control" id="company"
+                           name="company" placeholder="Enter company"
+                           required="required" t-att-value="company"
+                           data-validation-required-message="This field is required" />
+                </div>
+                <div class="col-lg-6 form-group has-feedback">
+                    <label class="control-label" for="vat">VAT:</label>
+                    <input type="text" class="form-control" id="vat"
+                           name="vat" placeholder="Enter VAT"
+                           required="required" t-att-value="vat"
+                           data-validation-required-message="This field is required" />
+                </div>
+                <div class="col-lg-6 form-group has-feedback">
+                    <label class="control-label" for="city">City:</label>
+                    <input type="text" class="form-control" id="city"
+                           name="city" placeholder="Enter city"
+                           required="required" t-att-value="city"
+                           data-validation-required-message="This field is required" />
+                </div>
+                <div class="col-lg-6 form-group has-feedback">
+                    <label class="control-label" for="zip">Zip:</label>
+                    <input type="text" class="form-control" id="zip_"
+                           name="zip_" placeholder="Enter zip"
+                           required="required" t-att-value="zip_"
+                           data-validation-required-message="This field is required" />
+                </div>
+                <div class="col-lg-6 form-group has-feedback">
+                    <label class="control-label" for="country_id">Country:</label>
+                    <select name="country_id" class="form-control"
+                            required="required"
+                            data-validation-required-message="This field is required">
+                        <option value="">Country...</option>
+                        <t t-foreach="countries or []" t-as="country">
+                            <option t-att-value="country.id"
+                                    t-att-selected="country.id == int(country_id)">
+                                <t t-esc="country.name"/>
+                            </option>
+                        </t>
+                    </select>
+                </div>
+                <div class="col-lg-6 form-group has-feedback optional">
+                    <label class="control-label" for="state">State:</label>
+                    <select name="state_id" class="form-control">
+                        <option value="">select...</option>
+                        <t t-foreach="states or []" t-as="state">
+                            <option t-att-value="state.id" style="display:none;"
+                                    t-att-data-country_id="state.country_id.id"
+                                    t-att-selected="state.id == int(state_id)">
+                                <t t-esc="state.name"/>
+                            </option>
+                        </t>
+                    </select>
+                </div>
+            </t>
+        </template>
+
+        <template id="addon_tpl">
+            <div class="col-xs-6 col-md-4 mb16">
+                <a class="btn btn-default" href="#"
+                   t-att-data-addon_name="addon.name">
+                    <img t-att-src="addon.icon" class="oe_module_icon"/>
+                    <div class="oe_module_desc">
+                        <h4><t t-esc="addon.shortdesc" /></h4>
+                        <p class="oe_module_name text-muted">
+                            <t t-esc="addon.summary" />
+                        </p>
+                    </div>
+                </a>
+            </div>
+        </template>
+
+        <template id="page_payment">
+            <t t-set="tab_title" t-value="'Payment options'"/>
+            <t t-call="saas_portal_start_wizard.page_tpl" />
+        </template>
+
+        <template id="page_addons">
+            <t t-set="tab_title" t-value="'Choose apps to install'"/>
+
+            <t t-call="saas_portal_start_wizard.page_tpl">
+                <div class="addons-list list row">
+                    <t t-foreach="addons" t-as="addon">
+                        <t t-call="saas_portal_start_wizard.addon_tpl"/>
+                    </t>
+                </div>
+                <input type="hidden" name="addons" />
+            </t>
+        </template>
+
+        <template id="page_launch">
+            <t t-set="tab_title" t-value="'All set'"/>
+
+            <t t-call="saas_portal_start_wizard.page_tpl">
+                <h4 class="text-center">Whenever you're ready click 'Launch'</h4>
+            </t>
+        </template>
+
+        <template id="wizard_tpl" name="New tenant Wizard" page="True"
+                  priority="29">
+            <t t-call="website.layout">
+                <div id="wrap">
+                    <div class="container">
+                        <ul class="saas_wizard pull-right">
+                            <t t-foreach="meta['crumbs']" t-as="page">
+                                <t t-if="page[0] == wizard_page">
+                                    <li class="text-primary">
+                                        <t t-esc="page[1]" />
+                                        <t t-if="not page_last">
+                                            <span class="chevron"></span>
+                                        </t>
+                                    </li>
+                                </t>
+                                <t t-if="page[0] != wizard_page">
+                                    <li class="text-muted">
+                                        <t t-esc="page[1]"/>
+                                        <t t-if="not page_last">
+                                            <span class="chevron"></span>
+                                        </t>
+                                    </li>
+                                </t>
+                            </t>
+                        </ul>
+                        <t t-foreach="meta['crumbs']" t-as="page">
+                            <t t-if="page[0] == wizard_page">
+                                <h1 class="mb32">
+                                    <t t-esc="page[1]"/>
+                                </h1>
+                            </t>
+                        </t>
+                        <div class="row">
+                            <t t-if="errors and errors.get('general', False)">
+                                <div class="alert alert-danger alert-dismissible row"
+                                     role="alert">
+                                    <button type="button" class="close"
+                                            data-dismiss="alert"
+                                            aria-label="Close">
+                                        <span aria-hidden="true">×</span>
+                                    </button>
+                                    <div class="col-xs-1">
+                                        <strong>Error(s)!</strong>
+                                    </div>
+                                    <div class="col-xs-10">
+                                        <t t-foreach="errors['general']"
+                                           t-as="error">
+                                            <p>
+                                                <t t-esc="error"/>
+                                            </p>
+                                        </t>
+                                    </div>
+                                </div>
+                            </t>
+                            <div class="col-md-8 col-sm-9">
+                                <t t-if="wizard_page=='page_plan_select'">
+                                    <t t-call="saas_portal_start_wizard.page_plan"/>
+                                </t>
+                                <t t-if="wizard_page=='page_terms_conds'">
+                                    <t t-call="saas_portal_start_wizard.page_terms"/>
+                                </t>
+                                <t t-if="wizard_page=='page_plan_confirm'">
+                                    <t t-call="saas_portal_start_wizard.page_legal"/>
+                                </t>
+                                <t t-if="wizard_page=='page_payment'">
+                                    <t t-call="saas_portal_start_wizard.page_payment"/>
+                                </t>
+                                <t t-if="wizard_page=='page_addons_select'">
+                                    <t t-call="saas_portal_start_wizard.page_addons"/>
+                                </t>
+                                <t t-if="wizard_page=='page_launch'">
+                                    <t t-call="saas_portal_start_wizard.page_launch"/>
+                                </t>
+                            </div>
+                            <div id="summary-bar" class="col-sm-3 col-md-offset-1">
+                                <h3 class="page-header mt16">Summary</h3>
+                                <div class="text-muted">
+                                    <t t-foreach="meta['summary']"
+                                       t-as="page">
+                                        <h4><t t-esc="page[0]" /></h4>
+                                        <ul class="list-unstyled mb32">
+                                            <t t-foreach="page[1]"
+                                               t-as="datum">
+                                                <li>
+                                                    <label>
+                                                        <t t-esc="datum[0]"/>:
+                                                    </label>
+                                                    <span>
+                                                        <t t-esc="datum[1]"/>
+                                                    </span>
+                                                </li>
+                                            </t>
+                                        </ul>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </template>
+	 </data>
+</openerp>

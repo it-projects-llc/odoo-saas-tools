@@ -31,7 +31,7 @@ class SaasPortalServer(models.Model):
     _inherit = ['mail.thread']
     _inherits = {'oauth.application': 'oauth_application_id'}
 
-    name = fields.Char('Database name')
+    name = fields.Char('Database name', required=True)
     oauth_application_id = fields.Many2one('oauth.application', 'OAuth Application', required=True, ondelete='cascade')
     sequence = fields.Integer('Sequence')
     active = fields.Boolean('Active', default=True)
@@ -137,7 +137,7 @@ class SaasPortalPlan(models.Model):
 
     name = fields.Char('Plan', required=True)
     summary = fields.Char('Summary')
-    template_id = fields.Many2one('saas_portal.database', 'Template')
+    template_id = fields.Many2one('saas_portal.database', 'Template', ondelete='restrict')
     demo = fields.Boolean('Install Demo Data')
     maximum_allowed_db_per_partner = fields.Integer(help='maximum allowed databases per customer', default=0)
 
@@ -160,12 +160,12 @@ class SaasPortalPlan(models.Model):
     expiration = fields.Integer('Expiration (hours)', help='time to delete database. Use for demo')
     _order = 'sequence'
 
-    dbname_template = fields.Char('DB Names', help='Template for db name. Use %i for numbering. Ignore if you use manually created db names', placeholder='crm-%i.odoo.com')
+    dbname_template = fields.Char('DB Names', help='Used for generating client database domain name. Use %i for numbering. Ignore if you use manually created db names', placeholder='crm-%i.odoo.com')
     server_id = fields.Many2one('saas_portal.server', string='SaaS Server',
                                 ondelete='restrict',
                                 help='User this saas server or choose random')
     
-    website_description = fields.Text('Website description')
+    website_description = fields.Html('Website description')
     logo = fields.Binary('Logo')
 
     @api.one
@@ -218,6 +218,9 @@ class SaasPortalPlan(models.Model):
         else:
             client = self.env['saas_portal.client'].create(vals)
         client_id = client.client_id
+
+        if client.trial:
+            client.expiration_datetime = datetime.strptime(client.create_date, DEFAULT_SERVER_DATETIME_FORMAT) + timedelta(hours=self.expiration)  # for trial
 
         scheme = server.request_scheme
         port = server.request_port
@@ -347,6 +350,9 @@ class OauthApplication(models.Model):
     client_id = fields.Char('Database UUID')
     last_connection = fields.Char(compute='_get_last_connection',
                                   string='Last Connection', size=64)
+    server_db_ids = fields.One2many('saas_portal.server', 'oauth_application_id', string='Server Database')
+    template_db_ids = fields.One2many('saas_portal.database', 'oauth_application_id', string='Template Database')
+    client_db_ids = fields.One2many('saas_portal.client', 'oauth_application_id', string='Client Database')
 
     @api.one
     def _get_last_connection(self):
@@ -450,7 +456,7 @@ class SaasPortalClient(models.Model):
 
     name = fields.Char(required=True)
     partner_id = fields.Many2one('res.partner', string='Partner', track_visibility='onchange')
-    plan_id = fields.Many2one('saas_portal.plan', string='Plan', track_visibility='onchange')
+    plan_id = fields.Many2one('saas_portal.plan', string='Plan', track_visibility='onchange', ondelete='restrict')
     expired = fields.Boolean('Expired', default=False, readonly=True)
     user_id = fields.Many2one('res.users', default=lambda self: self.env.user, string='Salesperson')
     notification_sent = fields.Boolean(default=False, readonly=True, help='notification about oncoming expiration has sent')

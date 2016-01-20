@@ -33,7 +33,7 @@ class SaasPortalServer(models.Model):
     _inherit = ['mail.thread']
     _inherits = {'oauth.application': 'oauth_application_id'}
 
-    name = fields.Char('Database name')
+    name = fields.Char('Database name', required=True)
     oauth_application_id = fields.Many2one('oauth.application', 'OAuth Application', required=True, ondelete='cascade')
     sequence = fields.Integer('Sequence')
     active = fields.Boolean('Active', default=True)
@@ -142,7 +142,7 @@ class SaasPortalPlan(models.Model):
 
     name = fields.Char('Plan', required=True)
     summary = fields.Char('Summary')
-    template_id = fields.Many2one('saas_portal.database', 'Template')
+    template_id = fields.Many2one('saas_portal.database', 'Template', ondelete='restrict')
     demo = fields.Boolean('Install Demo Data')
     maximum_allowed_db_per_partner = fields.Integer(help='maximum allowed databases per customer', default=0)
 
@@ -165,12 +165,12 @@ class SaasPortalPlan(models.Model):
     expiration = fields.Integer('Expiration (hours)', help='time to delete database. Use for demo')
     _order = 'sequence'
 
-    dbname_template = fields.Char('DB Names', help='Template for db name. Use %i for numbering. Ignore if you use manually created db names', placeholder='crm-%i.odoo.com')
+    dbname_template = fields.Char('DB Names', help='Used for generating client database domain name. Use %i for numbering. Ignore if you use manually created db names', placeholder='crm-%i.odoo.com')
     server_id = fields.Many2one('saas_portal.server', string='SaaS Server',
                                 ondelete='restrict',
                                 help='User this saas server or choose random')
     
-    website_description = fields.Text('Website description')
+    website_description = fields.Html('Website description')
     logo = fields.Binary('Logo')
 
     @api.one
@@ -180,6 +180,14 @@ class SaasPortalPlan(models.Model):
             self.state = 'confirmed'
         else:
             self.state = 'draft'
+
+    @api.one
+    def _new_database_vals(self, vals):
+        vals['max_users'] = self.max_users
+        vals['total_storage_limit'] = self.total_storage_limit,
+        vals['block_on_expiration'] = self.block_on_expiration,
+        vals['block_on_storage_exceed'] = self.block_on_storage_exceed
+        return vals
 
     @api.multi
     def create_new_database(self, dbname=None, client_id=None, partner_id=None, user_id=None, notify_user=False, trial=False, support_team_id=None):
@@ -202,21 +210,22 @@ class SaasPortalPlan(models.Model):
                 'partner_id': partner_id,
                 'trial': trial,
                 'support_team_id': support_team_id,
-                'max_users': self.max_users,
-                'total_storage_limit': self.total_storage_limit,
-                'block_on_expiration': self.block_on_expiration,
-                'block_on_storage_exceed': self.block_on_storage_exceed
                 }
         client = None
         if client_id:
             vals['client_id'] = client_id
             client = self.env['saas_portal.client'].search([('client_id', '=', client_id)])
 
+        vals = self._new_database_vals(vals)[0]
+
         if client:
             client.write(vals)
         else:
             client = self.env['saas_portal.client'].create(vals)
         client_id = client.client_id
+
+        if client.trial:
+            client.expiration_datetime = datetime.strptime(client.create_date, DEFAULT_SERVER_DATETIME_FORMAT) + timedelta(hours=self.expiration)  # for trial
 
         scheme = server.request_scheme
         port = server.request_port
@@ -337,6 +346,9 @@ class OauthApplication(models.Model):
     client_id = fields.Char('Database UUID')
     last_connection = fields.Char(compute='_get_last_connection',
                                   string='Last Connection', size=64)
+    server_db_ids = fields.One2many('saas_portal.server', 'oauth_application_id', string='Server Database')
+    template_db_ids = fields.One2many('saas_portal.database', 'oauth_application_id', string='Template Database')
+    client_db_ids = fields.One2many('saas_portal.client', 'oauth_application_id', string='Client Database')
 
     @api.one
     def _get_last_connection(self):
@@ -440,7 +452,7 @@ class SaasPortalClient(models.Model):
 
     name = fields.Char(required=True)
     partner_id = fields.Many2one('res.partner', string='Partner', track_visibility='onchange')
-    plan_id = fields.Many2one('saas_portal.plan', string='Plan', track_visibility='onchange')
+    plan_id = fields.Many2one('saas_portal.plan', string='Plan', track_visibility='onchange', ondelete='restrict')
     expired = fields.Boolean('Expired', default=False, readonly=True)
     user_id = fields.Many2one('res.users', default=lambda self: self.env.user, string='Salesperson')
     notification_sent = fields.Boolean(default=False, readonly=True, help='notification about oncoming expiration has sent')
@@ -492,7 +504,7 @@ class SaasPortalClient(models.Model):
             records.write({'notification_sent': True})
             for record in records:
                 template = self.env.ref('saas_portal.email_template_expiration_notify')
-                record.message_post_with_template(template.id, composition_mode='comment')
+                record.with_context(days=notification_delta).message_post_with_template(template.id, composition_mode='comment')
 
     def unlink(self, cr, uid, ids, context=None):
         user_model = self.pool.get('res.users')
@@ -582,7 +594,8 @@ class SaasPortalClient(models.Model):
         for record in self:
             if record.expiration_datetime:
                 payload = {
-                    'params': [{'key': 'saas_client.expiration_datetime', 'value': record.expiration_datetime, 'hidden': True}],
+                    'params': [{'key': 'saas_client.expiration_datetime', 'value': record.expiration_datetime, 'hidden': True},
+                               {'key': 'saas_client.trial', 'value': 'False', 'hidden': True}],
                 }
                 self.env['saas.config'].do_upgrade_database(payload, record.id)
 

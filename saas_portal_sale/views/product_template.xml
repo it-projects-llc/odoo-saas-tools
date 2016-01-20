@@ -11,6 +11,7 @@
                         <group>
                             <field name="plan_id"/>
                             <field name="period"/>
+                            <field name="subscription_per_user"/>
                         </group>
                     </page>
                 </xpath>

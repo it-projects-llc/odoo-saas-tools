@@ -17,7 +17,14 @@ class SaasPortalPlan(models.Model):
                                                               trial=trial,
                                                               support_team_id=support_team_id)
         lines = self.env['saas_portal.find_payments_wizard'].find_partner_payments(partner_id=partner_id, plan_id=self.id)
+
         client_obj = self.env['saas_portal.client'].browse(res.get('id'))
+        for l in lines.sorted(key=lambda r: r.create_date):
+            if l.product_id.subscription_per_user:
+                payload = {'params': [{'key': 'saas_client.max_users', 'value': l.quantity, 'hidden': True}]}
+                self.env['saas.config'].do_upgrade_database(payload, client_obj.id)
+                break
+
         if not trial:
             client_obj.subscription_start = client_obj.create_date
         lines.write({'saas_portal_client_id': client_obj.id})

@@ -31,7 +31,7 @@ Features
 * sale subscription (saas_portal_sale, saas_portal_sale_online)
 * notify customers about subscription expiration
 * control system via external tool (see section API Integration below)
-* users can see all SaaS status (Max users, Expiration date etc) at Settings->Dashboard
+* customer's users can see SaaS status (Max users, Expiration date etc) at Settings->Dashboard
 
 Usage
 =====

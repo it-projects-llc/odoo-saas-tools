@@ -1,0 +1,93 @@
+<openerp>
+    <data noupdate="1">
+        <record id="email_template_create_saas" model="mail.template">
+            <field name="name">Send SaaS credentials to the buyer of the SaaS</field>
+            <field name="email_from">${(object.user_id.email or '')|safe}</field>
+            <field name="subject">Credentials:</field>
+            <field name="partner_to">${object.partner_id.id}</field>
+            <field name="model_id" ref="saas_portal.model_saas_portal_client"/>
+            <field name="auto_delete" eval="True"/>
+            <field name="lang">${object.partner_id.lang}</field>
+            <field name="body_html"><![CDATA[
+
+            <p>Web:
+            <a href="http://${object.name}">http://${object.name}</a>
+            </p>
+
+            ]]></field>
+        </record>
+
+        <record id="email_template_expiration_datetime_updated" model="mail.template">
+            <field name="name">Send information about expiration date update to partner</field>
+            <field name="email_from">${(object.user_id.email or '')|safe}</field>
+            <field name="subject">Expiration updated</field>
+            <field name="partner_to">${object.partner_id and object.partner_id.id or ''}</field>
+            <field name="lang">${object.partner_id and object.partner_id.lang or ''}</field>
+            <field name="model_id" ref="saas_portal.model_saas_portal_client"/>
+            <field name="body_html"><![CDATA[
+
+            <p>You expiration date is now: ${object.expiration_datetime}</p>
+            <p>${format_tz(object.expiration_datetime, tz=object.partner_id.tz, context={'lang':object.partner_id.lang})}</p>
+            ]]></field>
+        </record>
+
+        <record id="email_template_expiration_notify" model="mail.template">
+            <field name="name">Notify clients about oncoming expiration</field>
+            <field name="email_from">${(object.user_id.email or '')|safe}</field>
+            <field name="subject">Notification</field>
+            <field name="partner_to">${object.partner_id.id}</field>
+            <field name="model_id" ref="saas_portal.model_saas_portal_client"/>
+            <field name="auto_delete" eval="True"/>
+            <field name="lang">${object.partner_id.lang}</field>
+            <field name="body_html"><![CDATA[
+
+            <p>
+            Less than ${ctx["days"]} day(s) left before expiration.
+            </p>
+
+            ]]></field>
+        </record>
+
+        <record id="email_template_has_expired_notify" model="mail.template">
+            <field name="name">Notify clients about expired service</field>
+            <field name="email_from">${(object.user_id.email or '')|safe}</field>
+            <field name="subject">Notification</field>
+            <field name="partner_to">${object.partner_id.id}</field>
+            <field name="model_id" ref="saas_portal.model_saas_portal_client"/>
+            <field name="auto_delete" eval="True"/>
+            <field name="lang">${object.partner_id.lang}</field>
+            <field name="body_html"><![CDATA[
+
+            <p>
+            % if object.trial:
+            Your trial service ${object.name} has expired
+            % endif
+            % if object.block_on_expiration:
+            and blocked!
+            % else:
+            you have to pay in order to continue using the service!
+            % endif
+            </p>
+
+            ]]></field>
+        </record>
+
+        <record id="email_template_storage_exceed" model="mail.template">
+            <field name="name">Notify clients about storage exceed</field>
+            <field name="email_from">${(object.user_id.email or '')|safe}</field>
+            <field name="subject">Notification</field>
+            <field name="partner_to">${object.partner_id.id}</field>
+            <field name="model_id" ref="saas_portal.model_saas_portal_client"/>
+            <field name="auto_delete" eval="True"/>
+            <field name="lang">${object.partner_id.lang}</field>
+            <field name="body_html"><![CDATA[
+
+            <p>
+            Storage limit ${object.total_storage_limit} of ${object.name} has been exceeded.
+            Contact your system administrator in order to resume using your service.
+            </p>
+
+            ]]></field>
+        </record>
+    </data>
+</openerp>

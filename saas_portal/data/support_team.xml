@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="main_support_team" model="saas_portal.support_team">
+            <field name="name">Main Support Team</field>
+        </record>
+    </data>
+</openerp>

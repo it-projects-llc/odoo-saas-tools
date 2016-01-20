@@ -9,7 +9,10 @@
                      <group>
                         <field name="name"/>
                         <field name="plan_id"/>
+                        <field name="user_id" class="oe_inline"/>
                         <field name="partner_id" class="oe_inline"/>
+                        <field name="notify_user" class="oe_inline"/>
+                        <field name="support_team_id" class="oe_inline"/>
                      </group>
                      <footer>
                         <button name="apply" string="Create" type="object" class="oe_highlight"/>
@@ -60,5 +63,31 @@
             view_mode="form"
             view_type="form"
             />
+
+        <record id="saas_portal_rename_database_view_form" model="ir.ui.view">
+            <field name="name">saas_portal.rename_database.form</field>
+            <field name="model">saas_portal.rename_database</field>
+            <field name="arch" type="xml">
+                <form string="Change Domain">
+                     <group>
+                        <field name="name"/>
+                     </group>
+                     <footer>
+                        <button name="apply" string="Rename" type="object" class="oe_highlight"/>
+                        or
+                        <button string="Close" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <act_window id="action_rename_database"
+            name="Rename Database"
+            res_model="saas_portal.rename_database"
+            view_type="form" view_mode="form"
+            target="new"
+            />
+
+
     </data>
 </openerp>

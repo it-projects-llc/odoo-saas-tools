@@ -1,0 +1,25 @@
+<openerp>
+    <data noupdate="1">
+        <record id="email_template_create_saas" model="mail.template">
+            <field name="name">Send SaaS creation page to partner</field>
+            <field name="email_from">${(object.user_id.email or '')|safe}</field>
+            <field name="subject">To</field>
+            <field name="partner_to">${object.partner_id.id}</field>
+            <field name="model_id" ref="account.model_account_invoice"/>
+            <field name="auto_delete" eval="True"/>
+            <field name="lang">${object.partner_id.lang}</field>
+            <field name="body_html"><![CDATA[
+        Your payment for service is accepted!
+
+        <p>Now you can choose domain name for your service and create database </p>
+        <p>open following link</p>
+        <p>
+        % for plan in ctx['plans']:
+        <br/>
+        http://${ctx['saas_domain']}/page/start?plan_id=${plan}
+        % endfor
+        </p>
+            ]]></field>
+        </record>
+    </data>
+</openerp>

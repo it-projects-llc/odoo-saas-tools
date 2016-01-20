@@ -2,6 +2,7 @@
     'name': 'SaaS Server',
     'version': '1.0.0',
     'author': 'Ivan Yelizariev',
+    'license': 'LGPL-3',
     'category': 'SaaS',
     'website': 'https://it-projects.info',
     'depends': ['auth_oauth', 'saas_base', 'saas_utils', 'website'],

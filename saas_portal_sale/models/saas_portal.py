@@ -21,8 +21,6 @@ class SaasPortalPlan(models.Model):
         client_obj = self.env['saas_portal.client'].browse(res.get('id'))
         for l in lines.sorted(key=lambda r: r.create_date):
             if l.product_id.subscription_per_user:
-                # TODO: don't actually know what to set in max_users for cases when several invoices with and without
-                # subscription_per_user were created before client db
                 payload = {'params': [{'key': 'saas_client.max_users', 'value': l.quantity, 'hidden': True}]}
                 self.env['saas.config'].do_upgrade_database(payload, client_obj.id)
                 break

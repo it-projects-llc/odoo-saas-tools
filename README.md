@@ -33,6 +33,7 @@ Features
 * notify customers about news by sending messages to Whole Company messaging group *(under development)*
 * show message at the top of a page (e.g. Your free trial will expire in about 4 hours  Register now to add 15 days for free!) *(under development)*
 * control system via external tool (see section API Integration below)
+* users can see all SaaS status (Max users, Expiration date etc) at Settings->Dashboard
 
 Usage
 =====

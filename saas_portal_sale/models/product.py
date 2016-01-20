@@ -7,3 +7,4 @@ class ProductTemplateSaaS(models.Model):
 
     plan_id = fields.Many2one('saas_portal.plan', string='Plan')
     period = fields.Integer(string='Subscription period')
+    subscription_per_user = fields.Boolean(default=False, help='product quantity serves as a max users allowed to the client')

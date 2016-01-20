@@ -30,8 +30,6 @@ Features
 * collect information from client databases (count of users, disk space usage, etc.)
 * sale subscription (saas_portal_sale, saas_portal_sale_online)
 * notify customers about subscription expiration
-* notify customers about news by sending messages to Whole Company messaging group
-* show message at the top of a page (e.g. Your free trial will expire in about 4 hours  Register now to add 15 days for free!)
 * control system via external tool (see section API Integration below)
 * users can see all SaaS status (Max users, Expiration date etc) at Settings->Dashboard
 

@@ -2,7 +2,7 @@
 <openerp>
     <data>
 
-        <template id="saas_portal.signup_fields" inherit_id="auth_signup.fields" >
+        <template id="signup_fields" inherit_id="auth_signup.fields" >
             <xpath expr="//div[@class='form-group field-name']" position="after">
 
                <t t-if="reset == false">

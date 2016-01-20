@@ -5,6 +5,7 @@ from openerp import SUPERUSER_ID, exceptions
 from openerp.tools.translate import _
 from openerp.addons.web import http
 from openerp.addons.web.http import request
+from openerp.addons.saas_base.exceptions import MaximumDBException
 import werkzeug
 import simplejson
 
@@ -21,11 +22,16 @@ class SaasPortal(http.Controller):
             return {"error": {"msg": "database already taken"}}
         return {"ok": 1}
 
-    @http.route(['/saas_portal/add_new_client'], type='http', auth='public', website=True)
+    @http.route(['/saas_portal/add_new_client'], type='http', auth='user', website=True)
     def add_new_client(self, **post):
         dbname = self.get_full_dbname(post.get('dbname'))
-        plan = self.get_plan(int(post.get('plan_id', 0)))
-        res = plan.create_new_database(dbname)
+        user_id = request.session.uid
+        partner_id = None
+        if user_id:
+            user = request.env['res.users'].browse(user_id)
+            partner_id = user.partner_id.id
+        plan = self.get_plan(int(post.get('plan_id', 0) or 0))
+        res = plan.create_new_database(dbname, user_id=user_id, partner_id=partner_id)
         return werkzeug.utils.redirect(res.get('url'))
 
     def get_config_parameter(self, param):
@@ -34,6 +40,8 @@ class SaasPortal(http.Controller):
         return config.get_param(request.cr, SUPERUSER_ID, full_param)
 
     def get_full_dbname(self, dbname):
+        if not dbname:
+            return None
         full_dbname = '%s.%s' % (dbname, self.get_config_parameter('base_saas_domain'))
         return full_dbname.replace('www.', '')
 
@@ -60,3 +68,30 @@ class SaasPortal(http.Controller):
             arg0 = literal_eval(arg0)
         messages = []
         return simplejson.dumps({'messages':messages})
+
+
+class SaasPortalSale(http.Controller):
+    @http.route('/trial', auth='public', type='http', website=True)
+    def index(self, **kw):
+        uid = request.session.uid
+        plan_id = int(kw.get('plan_id'))
+        if not uid:
+            url = '/web/login?redirect=/trial'
+            query = {'plan_id': str(plan_id)}
+            return http.local_redirect(path=url, query=query)
+
+        partner = request.env['res.users'].browse(uid).partner_id
+        trial_plan = request.env['saas_portal.plan'].sudo().browse(plan_id)
+        support_team = request.env.ref('saas_portal.main_support_team')
+        db_creation_allowed = True
+        try:
+            trial_plan.create_new_database(partner_id=partner.id, user_id=uid, notify_user=True, trial=True, support_team_id=support_team.id)
+        except MaximumDBException:
+            db_creation_allowed = False
+
+        values = {
+            'plan': trial_plan,
+            'db_creation_allowed': db_creation_allowed,
+        }
+
+        return request.render('saas_portal.try_trial', values)

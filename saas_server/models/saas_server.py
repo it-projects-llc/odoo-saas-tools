@@ -1,4 +1,4 @@
-import os
+from openerp.addons.saas_base.tools import get_size
 import time
 import openerp
 from openerp import api, models, fields, SUPERUSER_ID, exceptions
@@ -11,21 +11,13 @@ import logging
 _logger = logging.getLogger(__name__)
 
 
-def get_size(start_path='.'):
-    total_size = 0
-    for dirpath, dirnames, filenames in os.walk(start_path):
-        for f in filenames:
-            fp = os.path.join(dirpath, f)
-            total_size += os.path.getsize(fp)
-    return total_size
-
-
 class SaasServerClient(models.Model):
     _name = 'saas_server.client'
     _inherit = ['mail.thread', 'saas_base.client']
 
-    name = fields.Char('Database name', readonly=True)
+    name = fields.Char('Database name', readonly=True, required=True)
     client_id = fields.Char('Database UUID', readonly=True, select=True)
+    expiration_datetime = fields.Datetime(readonly=True)
     state = fields.Selection([('template', 'Template'),
                               ('draft','New'),
                               ('open','In Progress'),
@@ -167,6 +159,8 @@ class SaasServerClient(models.Model):
             res = client_env['res.users'].search(domain)
             if res:
                 user = res[0]
+                client_env['ir.config_parameter'].set_param('res.users.owner', user.id, groups=['saas_client.group_saas_support'])
+
             res = client_env['res.users'].search([('oauth_uid', '=', owner_user['user_id'])])
             if res:
                 # user already exists (e.g. administrator)
@@ -206,6 +200,10 @@ class SaasServerClient(models.Model):
         if check_client_id != client_id:
             return {'state': 'deleted'}
         users = client_env['res.users'].search([('share', '=', False)])
+        param_obj = client_env['ir.config_parameter']
+        max_users = param_obj.get_param('saas_client.max_users', '_')
+        suspended = param_obj.get_param('saas_client.suspended', '0')
+        total_storage_limit = param_obj.get_param('saas_client.total_storage_limit', '0')
         users_len = len(users)
         data_dir = openerp.tools.config['data_dir']
 
@@ -219,9 +217,15 @@ class SaasServerClient(models.Model):
         data = {
             'client_id': client_id,
             'users_len': users_len,
+            'max_users': max_users,
             'file_storage': file_storage,
             'db_storage': db_storage,
+            'total_storage_limit': total_storage_limit,
         }
+        if suspended == '0' and self.state == 'pending':
+            data.update({'state': 'open'})
+        if suspended == '1' and self.state == 'open':
+            data.update({'state': 'pending'})
         return data
 
     @api.one
@@ -237,12 +241,13 @@ class SaasServerClient(models.Model):
         post = data
         module = client_env['ir.module.module']
         print '_upgrade_database', data
-        
+        res = {}
+
         # 0. Update module list
         update_list = post.get('update_addons_list', False)
         if update_list:
             module.update_list()
-            
+
         # 1. Update addons
         update_addons = post.get('update_addons', [])
         if update_addons:
@@ -266,16 +271,50 @@ class SaasServerClient(models.Model):
         # 5. update parameters
         params = post.get('params', [])
         for obj in params:
+            if obj['key'] == 'saas_client.expiration_datetime':
+                self.expiration_datetime = obj['value']
+            if obj['key'] == 'saas_client.trial' and obj['value'] == 'False':
+                self.trial = False
             groups = []
             if obj.get('hidden'):
                 groups = ['saas_client.group_saas_support']
             client_env['ir.config_parameter'].set_param(obj['key'], obj['value'], groups=groups)
-        return 'OK'
+
+        # 6. Access rights
+        access_owner_add = post.get('access_owner_add', [])
+        owner_id = client_env['ir.config_parameter'].get_param('res.users.owner', 0)
+        owner_id = int(owner_id)
+        if not owner_id:
+            res['owner_id'] = "Owner's user is not found"
+        if access_owner_add and owner_id:
+            res['access_owner_add'] = []
+            for g_ref in access_owner_add:
+                g = client_env.ref(g_ref, raise_if_not_found=False)
+                if not g:
+                    res['access_owner_add'].append('group not found: %s' % g_ref)
+                    continue
+                g.write({'users': [(4, owner_id, 0)]})
+        access_remove = post.get('access_remove', [])
+        if access_remove:
+            res['access_remove'] = []
+            for g_ref in access_remove:
+                g = client_env.ref(g_ref, raise_if_not_found=False)
+                if not g:
+                    res['access_remove'].append('group not found: %s' % g_ref)
+                    continue
+                users = []
+                for u in g.users:
+                    if u.id != SUPERUSER_ID:
+                        users.append((3, u.id, 0))
+                g.write({'users': users})
+
+        return res
 
     @api.model
     def delete_expired_databases(self):
         now = time.strftime(DEFAULT_SERVER_DATETIME_FORMAT)
-        res = self.search([('state','not in', ['deleted']), ('expiration_datetime', '<=', now)])
+
+        res = self.search([('state', 'not in', ['deleted']), ('expiration_datetime', '<=', now), ('trial', '=', True)])
         _logger.info('delete_expired_databases %s', res)
         res.delete_database()
 
@@ -283,3 +322,8 @@ class SaasServerClient(models.Model):
     def delete_database(self):
         openerp.service.db.exp_drop(self.name)
         self.write({'state': 'deleted'})
+
+    @api.one
+    def rename_database(self, new_dbname):
+        openerp.service.db.exp_rename(self.name, new_dbname)
+        self.name = new_dbname

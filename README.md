@@ -3,8 +3,9 @@ odoo-saas-tools
 Odoo (OpenERP) addons to provide SaaS
 
 Structure of SaaS system:
+=========================
 
-* SaaS Portal - main database
+* SaaS Portal - main database for control servers and clients, manage client templates and plans.
 * SaaS Servers - technical databases to control client databases. SaaS server create, edit, delete databases. Each SaaS Server can be installed on a separate machine (e.g. VPS)
 * SaaS Clients - client database to be used by customers. Each SaaS Client is attached to a SaaS Server.
 
@@ -16,14 +17,20 @@ Features
   * by client after choosing subdomain (similar to https://www.odoo.com/page/start ) - module saas_portal_start
   * by client after choosing database template (e.g. template for POS, template for ECommerce etc) with auto-generated subdomain (e.g. demo-12345.odoo.com) - module saas_server_templates
   * by client after singing up - module saas_portal_signup
+  * by client via Trial button (saas_portal_sale_online)
 * prepare templates for new SaaS Client database. You are able to connect to template database, install modules you need, edit configuration, edit access rights for customer etc. Such template database will be exactly what a customer will see after database creating.
 * connect to existed SaaS Client database as administrator
 * control SaaS Client database from SaaS Portal backend:
   * install, update, delete addons
   * configure parameters (e.g. Max Allowed Users)
+  * grant or remove access rights for database users
+  * block database (users will be logged out immediately and will not able to log in back until unblocking)
+  * rename database (e.g. to change domain name)
+  * delete database
 * collect information from client databases (count of users, disk space usage, etc.)
-* notify customers about news by sending messages to Whole Company messaging group *(under development)*
-* show message at the top of a page (e.g. Your free trial will expire in about 4 hours  Register now to add 15 days for free!) *(under development)*
+* sale subscription (saas_portal_sale, saas_portal_sale_online)
+* notify customers about subscription expiration
+* control system via external tool (see section API Integration below)
 
 Usage
 =====
@@ -226,10 +233,14 @@ Example in python language:
 
     # Configure system
     data = {
+        # configure addons
         'update_addons': [],
-        'install_addons': ['sale', 'point_of_sale'],
+        'install_addons': ['sale', 'point_of_sale', 'stock', 'access_settings_menu', access_apps'],
         'uninstall_addons': [],
-
+        # grant access to owner
+        'access_owner_add': ['base.group_sale_manager', 'stock.group_stock_manager', 'access_settings_menu.group_show_settings_menu'],
+        # restrict access for all users
+        'access_remove': ['access_apps.group_show_modules_menu'],
         'params': [
              {'key': 'saas_client.max_users', 'value': 10, 'hidden': True}
         ],
@@ -241,7 +252,7 @@ Example in python language:
 Notes abouts API integration
 
 * Be sure, that Portal module is installed at Main Database
-* Be sure, that "Allow external users to sign up" option from "Settings/General Settings" is enabled
+* Be sure, that "Allow external users to sign up" option from "Settings/General Settings" is enabled (this option is only available in Debug mode)
 * To find new signuped user open "Settings/Users" at Main Database and delete filter "Regular users only"
 * don't use trailing slash at main_url
 * Access token is expired in one hour

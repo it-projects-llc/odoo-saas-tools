@@ -219,9 +219,6 @@ class SaasPortalPlan(models.Model):
             client = self.env['saas_portal.client'].create(vals)
         client_id = client.client_id
 
-        if client.trial:
-            client.expiration_datetime = datetime.strptime(client.create_date, DEFAULT_SERVER_DATETIME_FORMAT) + timedelta(hours=self.expiration)  # for trial
-
         scheme = server.request_scheme
         port = server.request_port
         if user_id:
@@ -236,7 +233,7 @@ class SaasPortalPlan(models.Model):
         }
         state = {
             'd': client.name,
-            'e': client.expiration_datetime,
+            'e': trial and datetime.strptime(client.create_date, DEFAULT_SERVER_DATETIME_FORMAT) + timedelta(hours=self.expiration) or client.create_date,
             'r': '%s://%s:%s/web' % (scheme, client.name, port),
             'owner_user': owner_user_data,
             't': client.trial,
@@ -274,6 +271,9 @@ class SaasPortalPlan(models.Model):
             }
             composer = self.env['mail.compose.message'].with_context(email_ctx).create({})
             composer.send_mail()
+
+        if client.trial:
+            client.expiration_datetime = datetime.strptime(client.create_date, DEFAULT_SERVER_DATETIME_FORMAT) + timedelta(hours=self.expiration)  # for trial
 
         client.send_params_to_client_db()
         client.server_id.action_sync_server()

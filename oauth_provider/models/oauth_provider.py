@@ -2,7 +2,11 @@
 from openerp import models, fields, api
 from datetime import datetime, timedelta
 from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
-from oauthlib import common as oauthlib_common
+
+try:
+    from oauthlib import common as oauthlib_common
+except:
+    pass
 
 import uuid
 

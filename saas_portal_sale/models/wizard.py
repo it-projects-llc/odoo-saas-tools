@@ -19,7 +19,7 @@ class FindPaymentsWizard(models.TransientModel):
     def find_partner_payments(self, partner_id, plan_id):
         lines = self.env['account.invoice.line'].search([('partner_id', '=', partner_id),
                                                          ('product_id.plan_id', '=', plan_id),
-                                                         ('product_id.period', '!=', False),
+                                                         ('period', '!=', False),
                                                          ('saas_portal_client_id', '=', False)])
         return lines
 

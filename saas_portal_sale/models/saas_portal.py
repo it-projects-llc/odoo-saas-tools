@@ -50,4 +50,4 @@ class SaasPortalClient(models.Model):
                 days += line.period
             if days != 0:
                 client_obj.expiration_datetime = datetime.strptime(client_obj.subscription_start or client_obj.create_date, DEFAULT_SERVER_DATETIME_FORMAT) + timedelta(days=days)
-            client_obj.trial = not bool(days)
+#            client_obj.trial = not bool(days)

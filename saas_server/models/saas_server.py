@@ -272,7 +272,8 @@ class SaasServerClient(models.Model):
         params = post.get('params', [])
         for obj in params:
             if obj['key'] == 'saas_client.expiration_datetime':
-                self.expiration_datetime = obj['value']
+                if obj['value']:
+                    self.expiration_datetime = obj['value']
             if obj['key'] == 'saas_client.trial' and obj['value'] == 'False':
                 self.trial = False
             groups = []

@@ -20,10 +20,9 @@ class SaasPortalPlan(models.Model):
 
         client_obj = self.env['saas_portal.client'].browse(res.get('id'))
         for l in lines.sorted(key=lambda r: r.create_date):
-            if l.product_id.subscription_per_user:
-                payload = {'params': [{'key': 'saas_client.max_users', 'value': l.quantity, 'hidden': True}]}
-                self.env['saas.config'].do_upgrade_database(payload, client_obj.id)
-                break
+            payload = {'params': [{'key': 'saas_client.max_users', 'value': l.max_users, 'hidden': True}]}
+            self.env['saas.config'].do_upgrade_database(payload, client_obj.id)
+            break
 
         if not trial:
             client_obj.subscription_start = client_obj.create_date
@@ -48,7 +47,7 @@ class SaasPortalClient(models.Model):
             client_obj.expiration_datetime = datetime.strptime(client_obj.create_date, DEFAULT_SERVER_DATETIME_FORMAT) + timedelta(hours=client_obj.plan_id.expiration)  # for trial
             days = 0
             for line in self.env['account.invoice.line'].search([('saas_portal_client_id', '=', client_obj.id), ('invoice_id.state', '=', 'paid')]):
-                days += line.product_id.period
+                days += line.period
             if days != 0:
                 client_obj.expiration_datetime = datetime.strptime(client_obj.subscription_start or client_obj.create_date, DEFAULT_SERVER_DATETIME_FORMAT) + timedelta(days=days)
-            client_obj.trial = not bool(days)
+#            client_obj.trial = not bool(days)

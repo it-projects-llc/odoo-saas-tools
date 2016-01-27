@@ -9,6 +9,7 @@
     'depends': ['sale', 'saas_portal'],
     'data': [
         'views/product_template.xml',
+        'views/product_view.xml',
         'views/saas_portal_client.xml',
         'views/account_invoice.xml',
         'data/mail_template_data.xml',

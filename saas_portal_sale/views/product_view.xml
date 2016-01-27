@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="saas_attribute_tree_view" model="ir.ui.view">
+            <field name="name">saas_product.attribute.tree</field>
+            <field name="model">product.attribute</field>
+            <field name="inherit_id" ref="product.attribute_tree_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='name']" position="after">
+                    <field name="saas_code"/>
+                </xpath>
+            </field>
+        </record>
+        <record id="saas_variants_template_tree_view" model="ir.ui.view">
+            <field name="name">saas_variants.template.tree</field>
+            <field name="model">product.attribute.value</field>
+            <field name="inherit_id" ref="product.variants_template_tree_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='name']" position="after">
+                    <field name="saas_code_value"/>
+                </xpath>
+            </field>
+        </record>
+        <record id="saas_variants_tree_view" model="ir.ui.view">
+            <field name="name">saas_product.attribute.value.tree</field>
+            <field name="model">product.attribute.value</field>
+            <field name="inherit_id" ref="product.variants_tree_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='name']" position="after">
+                    <field name="saas_code_value"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</openerp>

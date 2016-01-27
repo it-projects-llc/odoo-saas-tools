@@ -278,7 +278,7 @@ class SaasServerClient(models.Model):
             groups = []
             if obj.get('hidden'):
                 groups = ['saas_client.group_saas_support']
-            client_env['ir.config_parameter'].set_param(obj['key'], obj['value'], groups=groups)
+            client_env['ir.config_parameter'].set_param(obj['key'], obj['value'] or ' ', groups=groups)
 
         # 6. Access rights
         access_owner_add = post.get('access_owner_add', [])

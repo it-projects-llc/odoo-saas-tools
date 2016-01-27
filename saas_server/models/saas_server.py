@@ -201,7 +201,7 @@ class SaasServerClient(models.Model):
             return {'state': 'deleted'}
         users = client_env['res.users'].search([('share', '=', False)])
         param_obj = client_env['ir.config_parameter']
-        max_users = param_obj.get_param('saas_client.max_users', '_')
+        max_users = param_obj.get_param('saas_client.max_users', '0')
         suspended = param_obj.get_param('saas_client.suspended', '0')
         total_storage_limit = param_obj.get_param('saas_client.total_storage_limit', '0')
         users_len = len(users)

@@ -21,7 +21,7 @@ class SaaSWebSettingsDashboard(WebSettingsDashboard):
         user_obj = request.env['res.users'].sudo().browse(uid)
         cur_users = request.env['res.users'].search_count([('share', '=', False)])
         max_users = request.env['ir.config_parameter'].sudo().get_param('saas_client.max_users', default='')
-        expiration_datetime = request.env['ir.config_parameter'].sudo().get_param('saas_client.expiration_datetime', default='')
+        expiration_datetime = request.env['ir.config_parameter'].sudo().get_param('saas_client.expiration_datetime', default='').strip()
         datetime_obj = expiration_datetime and datetime.strptime(expiration_datetime, DEFAULT_SERVER_DATETIME_FORMAT)
         pay_subscription_url = request.env['ir.config_parameter'].sudo().get_param('saas_client.pay_subscription_url', default='').strip()
         if datetime_obj and user_obj.tz:

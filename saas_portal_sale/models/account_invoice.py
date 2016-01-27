@@ -13,9 +13,8 @@ class AccountInvoice(models.Model):
             client_obj = self.env['saas_portal.client'].search([('partner_id', '=', self.partner_id.id),
                                                                 ('plan_id', '=', line.plan_id.id)])
             if len(client_obj) == 1:
-                if line.product_id.subscription_per_user:
-                    payload = {'params': [{'key': 'saas_client.max_users', 'value': line.quantity, 'hidden': True}]}
-                    self.env['saas.config'].do_upgrade_database(payload, client_obj.id)
+                payload = {'params': [{'key': 'saas_client.max_users', 'value': line.max_users, 'hidden': True}]}
+                self.env['saas.config'].do_upgrade_database(payload, client_obj.id)
                 line.saas_portal_client_id = client_obj.id
                 client_obj.subscription_start = client_obj.subscription_start or fields.Datetime.now()
         return res
@@ -48,5 +47,17 @@ class AccountInvoiceLine(models.Model):
 
     saas_portal_client_id = fields.Many2one('saas_portal.client', string='SaaS client', help='reference to the SaaS client if this invoice line is created for a SaaS product')
     plan_id = fields.Many2one('saas_portal.plan', related='product_id.plan_id', readonly=True)
-    period = fields.Integer(string='Subscription period', help='subsciption period in days', related="product_id.period", readonly=True)
+    period = fields.Integer(string='Subscription period', help='subsciption period in days', readonly=True, default=0)
+    max_users = fields.Integer(help='maximum number of users allowed', readonly=True, default=0)
     state = fields.Selection(related='invoice_id.state', readonly=True)
+
+    @api.model
+    def create(self, vals):
+        product_obj = self.env['product.product'].browse(vals.get('product_id'))
+        attribute_value_obj = product_obj.attribute_value_ids.filtered(lambda r: r.attribute_id.saas_code == 'Subscription period')
+        period = attribute_value_obj and int(attribute_value_obj[0].saas_code_value) or 0
+        vals.update({'period': period})
+        attribute_value_obj = product_obj.attribute_value_ids.filtered(lambda r: r.attribute_id.saas_code == 'Max users')
+        max_users = attribute_value_obj and int(attribute_value_obj[0].saas_code_value) or 0
+        vals.update({'max_users': max_users})
+        return super(AccountInvoiceLine, self).create(vals)

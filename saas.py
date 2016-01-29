@@ -404,6 +404,10 @@ def wait_net_service(server, port, timeout=None):
                  throw unhandled network exception
     """
     log('Waiting for port', server, port)
+
+    if args.get('simulate'):
+        return
+
     import socket
 
     s = socket.socket()

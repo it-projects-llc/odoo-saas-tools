@@ -3,18 +3,23 @@
 ODOO_VERSION = 8
 SUPERUSER_ID = 1
 
+import ConfigParser
 import argparse
-import fcntl
 import contextlib
+import fcntl
 import json
 import os
 import psycopg2
 import requests
 import resource
 import signal
-import xmlrpclib
 import subprocess
+import traceback
+import xmlrpclib
 
+# ----------------------------------------------------------
+# Options
+# ----------------------------------------------------------
 
 parser = argparse.ArgumentParser(description='''Control script to manage saas system.
 It\'s assumed, that you have ^%h$ as dbfilter in odoo configuration.
@@ -33,9 +38,11 @@ settings_group = parser.add_argument_group('Common settings')
 settings_group.add_argument('--suffix', dest='suffix', default=ODOO_VERSION, help='suffix for names')
 settings_group.add_argument('--odoo-script', dest='odoo_script', help='Path to openerp-server', default='./openerp-server')
 settings_group.add_argument('--odoo-config', dest='odoo_config', help='Path to odoo configuration file')
+settings_group.add_argument('--odoo-data-dir', dest='odoo_data_dir', help='Path to odoo data dir', default=None)
+settings_group.add_argument('--odoo-xmlrpc-port', dest='xmlrpc_port', default=None)
 settings_group.add_argument('--admin-password', dest='admin_password', help='Password for admin user. It\'s used for new databases.')
 #settings_group.add_argument('--db_user', dest='db_user', help='database user name')
-other_group.add_argument('--simulate', dest='simulate', action='store_true', help='Don\'t make actual changes. Just show what script is going to do.')
+settings_group.add_argument('-s', '--simulate', dest='simulate', action='store_true', help='Don\'t make actual changes. Just show what script is going to do.')
 
 
 portal_group = parser.add_argument_group('Portal creation')
@@ -66,6 +73,29 @@ for a in args:
         args[a] = args[a].format(suffix=suffix)
 
 
+def get_odoo_config():
+    res = {}
+    if not args.get('odoo_config'):
+        return res
+    p = ConfigParser.ConfigParser()
+    p.read(args.get('odoo_config'))
+    for (name, value) in p.items('options'):
+        if value == 'True' or value == 'true':
+            value = True
+        if value == 'False' or value == 'false':
+            value = False
+        res[name] = value
+    return res
+
+odoo_config = get_odoo_config()
+
+datadir = args.get('odoo_data_dir') or odoo_config.get('data_dir')
+xmlrpc_port = args.get('xmlrpc_port') or odoo_config.get('xmlrpc_port') or '8069'
+
+
+# ----------------------------------------------------------
+# Main
+# ----------------------------------------------------------
 def main():
     if args.get('simulate'):
         print 'SIMULATION MODE'
@@ -89,12 +119,13 @@ def main():
         cmd = get_cmd()
         exec_cmd(cmd)
 
+
 # ----------------------------------------------------------
 # Tools
 # ----------------------------------------------------------
-
 def createdb(dbname, install_modules=['base'], without_demo=True):
     pg_dropdb(dbname)
+    pg_createdb(dbname, without_demo=without_demo)
 
     cmd = get_cmd()
     cmd += ['-d', dbname]
@@ -108,25 +139,30 @@ def createdb(dbname, install_modules=['base'], without_demo=True):
         return
     else:
         pid = spawn_cmd(cmd)
-        update_db(dbname, new_admin_password=args.get('admin_password'))
+        try:
+            wait_net_service('127.0.0.1', int(xmlrpc_port), 10)
+            update_db(dbname, new_admin_password=args.get('admin_password'))
+        except:
+            traceback.print_exc()
         kill(pid)
 
 
 def dropdb(dbname):
     pg_dropdb(dbname)
-    return  # TODO
     # cleanup filestore
-    #datadir = appdirs.user_data_dir()
     #paths = [os.path.join(datadir, pn, 'filestore', dbname) for pn in 'OpenERP Odoo'.split()]
-    #exec_cmd(['rm', '-rf'] + paths)
+    paths = [os.path.join(datadir, 'filestore', dbname)]
+    exec_cmd(['rm', '-rf'] + paths)
+
 
 def cleanup():
-    pass
+    for dbname in find_databases(args.get('portal_db_name')):
+        dropdb(dbname)
+
 
 # ----------------------------------------------------------
 # RPC Tools
 # ----------------------------------------------------------
-
 def update_db(dbname, new_admin_password=None):
 
     # Credentials
@@ -151,14 +187,25 @@ def update_db(dbname, new_admin_password=None):
 # ----------------------------------------------------------
 def pg_createdb(dbname, without_demo=True):
     print 'Creating empty database %s' % dbname
+    if args.get('simulate'):
+        return
     with local_pgadmin_cursor() as local_cr:
         local_cr.execute("""CREATE DATABASE "%s" TEMPLATE template0 LC_COLLATE 'C' ENCODING 'unicode'""" % dbname)
 
 
 def pg_dropdb(dbname):
     print 'Dropping  database %s' % dbname
+    if args.get('simulate'):
+        return
     with local_pgadmin_cursor() as local_cr:
         local_cr.execute('DROP DATABASE IF EXISTS "%s"' % dbname)
+
+
+def find_databases(root_database):
+    with local_pgadmin_cursor() as local_cr:
+        local_cr.execute("SELECT datname FROM pg_database WHERE  datname ilike '%%.{root}' OR datname='{root}'".format(root=root_database))
+        res = local_cr.fetchall()
+    return [row[0] for row in res]
 
 
 @contextlib.contextmanager
@@ -179,17 +226,26 @@ def local_pgadmin_cursor():
 def get_cmd():
     cmd = [
         args.get('odoo_script'),
+        "--xmlrpc-port=%s" % xmlrpc_port,
     ]
     if args.get('odoo_config'):
         cmd += ['--config=%s' % args.get('odoo_config')]
+
     return cmd
 
 
 def exec_cmd(cmd):
+    print 'EXEC: ', ' '.join(cmd)
+    if args.get('simulate'):
+        return
     os.system(' '.join(cmd))
 
 
-def spawn_cmd(self, cmd, cpu_limit=None, shell=False):
+def spawn_cmd(cmd, cpu_limit=None, shell=False):
+    print 'Spawn:',  ' '.join(cmd)
+    if args.get('simulate'):
+        return
+
     def preexec_fn():
         os.setsid()
         if cpu_limit:
@@ -208,14 +264,59 @@ def spawn_cmd(self, cmd, cpu_limit=None, shell=False):
                          #stderr=out,
                          preexec_fn=preexec_fn,
                          shell=shell)
+    print 'Spawn pid: %s' % p.pid
     return p.pid
 
 
 def kill(pid):
+    print 'KILL', pid
+    if args.get('simulate'):
+        return
     try:
         os.killpg(pid, signal.SIGKILL)
     except OSError:
         pass
+
+
+# http://code.activestate.com/recipes/576655-wait-for-network-service-to-appear/
+def wait_net_service(server, port, timeout=None):
+    """ Wait for network service to appear
+        @param timeout: in seconds, if None or 0 wait forever
+        @return: True of False, if timeout is None may return only True or
+                 throw unhandled network exception
+    """
+    import socket
+    import errno
+
+    s = socket.socket()
+    if timeout:
+        from time import time as now
+        # time module is needed to calc timeout shared between two exceptions
+        end = now() + timeout
+
+    while True:
+        try:
+            if timeout:
+                next_timeout = end - now()
+                if next_timeout < 0:
+                    return False
+                else:
+                    s.settimeout(next_timeout)
+
+            print 'Waiting for port', server, port
+            s.connect((server, port))
+
+        except socket.timeout, err:
+            # this exception occurs only if timeout is set
+            if timeout:
+                print 'Port timeout'
+                return False
+
+        except socket.error, err:
+            pass
+        else:
+            s.close()
+            return True
 
 
 if __name__ == "__main__":

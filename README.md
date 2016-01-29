@@ -3,8 +3,8 @@ odoo-saas-tools
 
 System to sale and manage odoo databases.
 
-Usage
-=====
+Requirements
+============
 
 To start SaaS system you need:
 
@@ -14,11 +14,14 @@ To start SaaS system you need:
 * [installed dependencies](docs/dependencies.rst)
 * records in /etc/hosts, if you install it locally, or dns records otherwise:
 
-    sudo bash -c "python saas.py --print-local-hosts >> /etc/hosts"
+    > sudo bash -c "python saas.py --print-local-hosts >> /etc/hosts"
 
-To prepare and run SaaS system, execute saas.py script. It could take some time:
+Build and run
+-------------
 
-    python saas.py --portal-create --server-create --plan-create --odoo-script=/path/to/openerp-server --odoo-config=/path/to/openerp-server.config
+Execute saas.py script and wait some time
+
+> python saas.py --portal-create --server-create --plan-create --odoo-script=/path/to/openerp-server --odoo-config=/path/to/openerp-server.config
 
 The SaaS system is ready! Try, for example, open start page:
 

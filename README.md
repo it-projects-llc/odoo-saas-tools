@@ -13,6 +13,7 @@ To start SaaS system you need:
 * [configured nginx](docs/port_80.rst) 
 * [installed dependencies](docs/dependencies.rst)
 * records in /etc/hosts, if you install it locally, or dns records otherwise:
+
     > sudo bash -c "python saas.py --print-local-hosts >> /etc/hosts"
 
 Build and run

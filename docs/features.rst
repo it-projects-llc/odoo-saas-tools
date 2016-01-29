@@ -19,4 +19,4 @@ Features
 * collect information from client databases (count of users, disk space usage, etc.)
 * sale subscription (saas_portal_sale, saas_portal_sale_online)
 * notify customers about subscription expiration
-* control system via external tool (see section API Integration below)
+* control system via external tool (see [api.rst](api.rst))

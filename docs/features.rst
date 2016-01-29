@@ -2,6 +2,7 @@ Features
 ========
 
 * create SaaS Client databases:
+
   * manually from SaaS Portal backend
   * by client after choosing subdomain (similar to https://www.odoo.com/page/start ) - module saas_portal_start
   * by client after choosing database template (e.g. template for POS, template for ECommerce etc) with auto-generated subdomain (e.g. demo-12345.odoo.com) - module saas_server_templates

@@ -47,7 +47,7 @@ class SaasPortalClient(models.Model):
             client_obj.expiration_datetime = datetime.strptime(client_obj.create_date, DEFAULT_SERVER_DATETIME_FORMAT) + timedelta(hours=client_obj.plan_id.expiration)  # for trial
             days = 0
             for line in self.env['account.invoice.line'].search([('saas_portal_client_id', '=', client_obj.id), ('invoice_id.state', '=', 'paid')]):
-                days += line.period
+                days += line.period * line.quantity
             if days != 0:
                 client_obj.expiration_datetime = datetime.strptime(client_obj.subscription_start or client_obj.create_date, DEFAULT_SERVER_DATETIME_FORMAT) + timedelta(days=days)
 #            client_obj.trial = not bool(days)

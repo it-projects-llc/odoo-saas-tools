@@ -21,7 +21,7 @@ Build and run
 
 Execute saas.py script and wait some time
 
-> python saas.py --portal-create --server-create --plan-create --odoo-script=/path/to/openerp-server --odoo-config=/path/to/openerp-server.config
+> python saas.py --portal-create --server-create --plan-create --run --odoo-script=/path/to/openerp-server --odoo-config=/path/to/openerp-server.config
 
 The SaaS system is ready! Try, for example, open start page:
 

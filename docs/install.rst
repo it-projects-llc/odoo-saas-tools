@@ -55,8 +55,7 @@ Instruction for manual installation
      * install saas_server
 
 3. Configure **Server Database**
-   * Tick "Technical Features" for admin at Settings/Users/Users - Administrator
-     * Refresh page
+   * Activate the developer mode via "(?)/About" menu at the top right-hand corner
    * Open Settings/Users/OAuth Providers - SaaS
      * click [Edit]
      * update domain name at "Authentication URL" and "Validation URL", change http to https if needed. E.g.
@@ -68,7 +67,7 @@ Instruction for manual installation
    
 
 4. Configure **Main Database**:
-   * open Settings/Configuration/SaaS Portal Settings
+   * open Settings/SaaS Portal Settings
      * set *Base SaaS domain*, e.g. **odoo.local**
      * click Apply (do it even if you didn't make changes)
 

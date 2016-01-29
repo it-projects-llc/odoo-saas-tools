@@ -6,17 +6,17 @@ System to sale and manage odoo databases.
 Usage
 =====
 
-To try SaaS system you need:
+To start SaaS system you need:
 
 * ubuntu/debian OS
 * [installed odoo](https://odoo-development.readthedocs.org/en/latest/install.html)
 * [configured nginx](docs/port_80.rst) 
 * [installed dependencies](docs/dependencies.rst)
-* some records in /etc/hosts, if you install it locally
+* records in /etc/hosts, if you install it locally, or dns records otherwise:
 
     sudo bash -c "python saas.py --print-local-hosts >> /etc/hosts"
 
-Once everything is done, use saas.py script to prepare and run system. It could take some minutes:
+To prepare and run SaaS system, execute saas.py script. It could take some time:
 
     python saas.py --portal-create --server-create --plan-create --odoo-script=/path/to/openerp-server --odoo-config=/path/to/openerp-server.config
 
@@ -24,8 +24,8 @@ The SaaS system is ready! Try, for example, open start page:
 
 * http://saas-portal-8.local/page/start?plan_id=1
 
-Documentations
-==============
+Links
+=====
 
 * Features: [docs/features.rst](docs/features.rst)
 * API integration: [docs/api.rst](docs/api.rst)

@@ -185,7 +185,11 @@ class SaasPortalPlan(models.Model):
         return vals
 
     @api.multi
-    def create_new_database(self, dbname=None, client_id=None, partner_id=None, user_id=None, notify_user=False, trial=False, support_team_id=None):
+    def create_new_database(self, dbname=None, client_id=None, partner_id=None, user_id=None, notify_user=False, trial=False, support_team_id=None, async=None):
+       return self._create_new_database(dbname, client_id, partner_id, user_id, notify_user, trial, support_team_id, async)
+
+    @api.multi
+    def _create_new_database(self, dbname=None, client_id=None, partner_id=None, user_id=None, notify_user=False, trial=False, support_team_id=None, async=None):
         self.ensure_one()
         db_count = self.env['saas_portal.client'].search_count([('partner_id', '=', partner_id),
                                                                 ('state', '=', 'open'),

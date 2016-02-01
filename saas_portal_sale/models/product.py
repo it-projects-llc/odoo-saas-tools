@@ -11,7 +11,10 @@ class ProductTemplateSaaS(models.Model):
 class ProductAttributeSaaS(models.Model):
     _inherit = "product.attribute"
 
-    saas_code = fields.Char('SaaS code')
+    saas_code = fields.Char('SaaS code', help='''Possible codes:
+    * SUBSCRIPTION_PERIOD
+    * MAX_USERS
+    ''')
 
 
 class ProductAttributeValueSaaS(models.Model):

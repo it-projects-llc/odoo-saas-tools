@@ -322,9 +322,11 @@ URL - %s
             raise Warning(msg)
         return self.action_sync_server()
 
-    @api.one
+    @api.multi
     def action_sync_server(self):
-        self.server_id.action_sync_server()
+        for r in self:
+            r.server_id.action_sync_server()
+        return True
 
     @api.multi
     def edit_template(self):

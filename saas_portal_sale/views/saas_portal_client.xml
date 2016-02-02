@@ -55,6 +55,8 @@
                                     <field name="product_id"/>
                                     <field name="plan_id"/>
                                     <field name="period"/>
+                                    <field name="max_users"/>
+                                    <field name="addons"/>
                                     <field name="price_unit"/>
                                     <field name="state"/>
                                 </tree>

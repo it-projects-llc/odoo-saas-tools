@@ -14,6 +14,8 @@ class ProductAttributeSaaS(models.Model):
     saas_code = fields.Char('SaaS code', help='''Possible codes:
     * SUBSCRIPTION_PERIOD
     * MAX_USERS
+    * INSTALL_MODULES
+    * STORAGE_LIMIT
     ''')
 
 

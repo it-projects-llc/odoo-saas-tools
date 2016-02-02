@@ -19,8 +19,13 @@ class SaasPortalPlan(models.Model):
         lines = self.env['saas_portal.find_payments_wizard'].find_partner_payments(partner_id=partner_id, plan_id=self.id)
 
         client_obj = self.env['saas_portal.client'].browse(res.get('id'))
-        for l in lines.sorted(key=lambda r: r.create_date):
-            payload = {'params': [{'key': 'saas_client.max_users', 'value': l.max_users, 'hidden': True}]}
+        for l in lines.sorted(reverse=True, key=lambda r: r.create_date):
+            payload = {
+                    'params': [{'key': 'saas_client.max_users', 'value': l.max_users, 'hidden': True},
+                               {'key': 'saas_client.total_storage_limit', 'value': l.storage_limit, 'hidden': True}],
+                    'install_addons': l.addons.split(',') if l.addons else [],
+                }
+
             self.env['saas.config'].do_upgrade_database(payload, client_obj.id)
             break
 
@@ -50,4 +55,4 @@ class SaasPortalClient(models.Model):
                 days += line.period * line.quantity
             if days != 0:
                 client_obj.expiration_datetime = datetime.strptime(client_obj.subscription_start or client_obj.create_date, DEFAULT_SERVER_DATETIME_FORMAT) + timedelta(days=days)
-#            client_obj.trial = not bool(days)
+            client_obj.trial = not bool(days)

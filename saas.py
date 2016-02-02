@@ -102,12 +102,6 @@ xmlrpc_port = args.get('xmlrpc_port') or odoo_config.get('xmlrpc_port') or '8069
 # Main
 # ----------------------------------------------------------
 def main():
-    if args.get('simulate'):
-        log('SIMULATION MODE')
-
-    if args.get('cleanup'):
-        cleanup()
-
     if args.get('print_local_hosts'):
         host_line = '127.0.0.1 %s'
         print ''
@@ -116,6 +110,13 @@ def main():
             print host_line % args.get(host)
         for i in range(1, 11):
             print host_line % (args.get('plan_clients').replace('%i', '%03i' % i))
+        return
+
+    if args.get('simulate'):
+        log('SIMULATION MODE')
+
+    if args.get('cleanup'):
+        cleanup()
 
     # create databases
     if args.get('portal_create'):

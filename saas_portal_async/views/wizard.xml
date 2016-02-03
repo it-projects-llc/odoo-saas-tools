@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
-        <record model="ir.ui.view" id="saas_portal_create_client_view_form_mod">
-            <field name="name">saas_portal.create_client.form.inherit</field>
+        <record model="ir.ui.view" id="modd">
+            <field name="name">aaaaaaaaaaaaaa</field>
             <field name="model">saas_portal.create_client</field>
             <field name="inherit_id" ref="saas_portal.saas_portal_create_client_view_form"></field>
             <field name="arch" type="xml">

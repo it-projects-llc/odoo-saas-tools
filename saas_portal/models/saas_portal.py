@@ -594,7 +594,7 @@ class SaasPortalClient(models.Model):
 
     @api.multi
     def update_client_db(self):
-        for record in self:
+        for record in [r for r in self if r.invoice_lines]:
             recent_invoice_line = record.invoice_lines.sorted(reverse=True, key=lambda r: r.create_date)[0]
             max_users = recent_invoice_line.max_users
             addons = recent_invoice_line.addons

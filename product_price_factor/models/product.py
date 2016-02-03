@@ -41,10 +41,6 @@ class ProductAttributeValue(osv.osv):
                                         digits_compute=dp.get_precision('Product Price')),
     }
 
-    _defaults = {
-        'price_factor': 1.0,
-    }
-
 
 class ProductAttributePrice(osv.osv):
     _inherit = "product.attribute.price"

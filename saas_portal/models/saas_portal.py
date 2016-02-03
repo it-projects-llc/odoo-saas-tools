@@ -231,7 +231,8 @@ class SaasPortalPlan(models.Model):
             'name': owner_user.name,
             'email': owner_user.email,
         }
-        trial_expiration_datetime = datetime.strptime(client.create_date, DEFAULT_SERVER_DATETIME_FORMAT) + timedelta(hours=self.expiration)  # for trial
+        trial_expiration_datetime = (datetime.strptime(client.create_date,
+                                        DEFAULT_SERVER_DATETIME_FORMAT) + timedelta(hours=self.expiration)).strftime(DEFAULT_SERVER_DATETIME_FORMAT)  # for trial
         state = {
             'd': client.name,
             'e': trial and trial_expiration_datetime or client.create_date,

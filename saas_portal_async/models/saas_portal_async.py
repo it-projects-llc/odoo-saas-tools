@@ -17,16 +17,10 @@ def async_client_create(session, mself, *args, **kwargs):
 
 class SaasPortalPlan(models.Model):
     _inherit = 'saas_portal.plan'
-    def create_new_database(self, dbname=None, client_id=None, partner_id=None, user_id=None, notify_user=False,
-                            trial=False, support_team_id=None, async=None):
+    def create_new_database(self, async=None, **kwargs):
         if async:
           session = ConnectorSession(self._cr, self._uid, self._context)
-          job_uuid = async_client_create.delay(session, self._name, self.id, dbname=dbname, client_id=client_id,
-                                                partner_id=partner_id, user_id=user_id, notify_user=notify_user,
-                                                trial=trial, support_team_id=support_team_id, async=async)
-          print 'Async job created and pending. UUID: ' + job_uuid
+          job_uuid = async_client_create.delay(session, self._name, self.id, async=async, **kwargs)
         else:
-            res = super(SaasPortalPlan, self)._create_new_database(dbname=dbname, client_id=client_id,
-                                                partner_id=partner_id, user_id=user_id, notify_user=notify_user,
-                                                trial=trial, support_team_id=support_team_id, async=async)
+            res = super(SaasPortalPlan, self)._create_new_database(async=async, **kwargs)
             return res

@@ -9,7 +9,6 @@
     'depends': [
         'base',
         'saas_portal',
-        'saas_portal_sale',
         'connector',
     ],
     'installable': True,

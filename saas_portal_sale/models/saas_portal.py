@@ -46,8 +46,6 @@ class SaasPortalClient(models.Model):
     @api.depends('invoice_lines.invoice_id.state')
     def _handle_paid_invoices(self):
         for client_obj in self:
-            if not client_obj:
-                return
             client_obj.expiration_datetime = datetime.strptime(client_obj.create_date, DEFAULT_SERVER_DATETIME_FORMAT) + timedelta(hours=client_obj.plan_id.expiration)  # for trial
             days = 0
             for line in self.env['account.invoice.line'].search([('saas_portal_client_id', '=', client_obj.id), ('invoice_id.state', '=', 'paid')]):

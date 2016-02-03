@@ -45,10 +45,10 @@ class AccountInvoiceLine(models.Model):
     @api.model
     def create(self, vals):
         product_obj = self.env['product.product'].browse(vals.get('product_id'))
-        attribute_value_obj = product_obj.attribute_value_ids.filtered(lambda r: r.attribute_id.saas_code == 'Subscription period')
+        attribute_value_obj = product_obj.attribute_value_ids.filtered(lambda r: r.attribute_id.saas_code == 'SUBSCRIPTION_PERIOD')
         period = attribute_value_obj and int(attribute_value_obj[0].saas_code_value) or 0
         vals.update({'period': period})
-        attribute_value_obj = product_obj.attribute_value_ids.filtered(lambda r: r.attribute_id.saas_code == 'Max users')
+        attribute_value_obj = product_obj.attribute_value_ids.filtered(lambda r: r.attribute_id.saas_code == 'MAX_USERS')
         max_users = attribute_value_obj and int(attribute_value_obj[0].saas_code_value) or 0
         vals.update({'max_users': max_users})
         return super(AccountInvoiceLine, self).create(vals)

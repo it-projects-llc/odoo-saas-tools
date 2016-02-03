@@ -32,4 +32,4 @@ Links
 
 * Features: [docs/features.rst](docs/features.rst)
 * API integration: [docs/api.rst](docs/api.rst)
-* Development: [docs/development.rst](docs/development.rst)odoo-saas-tools
+* Development: [docs/development.rst](docs/development.rst)

@@ -585,7 +585,11 @@ class SaasPortalClient(models.Model):
         for record in self:
             if record.expiration_datetime_sent and record.expiration_datetime and record.expiration_datetime_sent != record.expiration_datetime:
                 record.expiration_datetime_sent = record.expiration_datetime
-                record.update_client_db()
+
+                payload = record.get_upgrade_database_payload()
+                if payload:
+                    self.env['saas.config'].do_upgrade_database(payload, record.id)
+
                 record.send_expiration_info_to_partner()
                 # expiration date has been changed, flush expiration notification flag
                 record.notification_sent = False
@@ -593,21 +597,9 @@ class SaasPortalClient(models.Model):
                 record.expiration_datetime_sent = record.expiration_datetime
 
     @api.multi
-    def update_client_db(self):
-        for record in [r for r in self if r.invoice_lines]:
-            recent_invoice_line = record.invoice_lines.sorted(reverse=True, key=lambda r: r.create_date)[0]
-            max_users = recent_invoice_line.max_users
-            addons = recent_invoice_line.addons
-            storage_limit = recent_invoice_line.storage_limit
-            if record.expiration_datetime:
-                payload = {
-                    'params': [{'key': 'saas_client.expiration_datetime', 'value': record.expiration_datetime, 'hidden': True},
-                               {'key': 'saas_client.trial', 'value': 'False', 'hidden': True},
-                               {'key': 'saas_client.max_users', 'value': max_users, 'hidden': True},
-                               {'key': 'saas_client.total_storage_limit', 'value': storage_limit, 'hidden': True}],
-                    'install_addons': addons.split(',') if addons else [],
-                }
-                self.env['saas.config'].do_upgrade_database(payload, record.id)
+    def get_upgrade_database_payload(self):
+        self.ensure_one()
+        return {'params': [{'key': 'saas_client.expiration_datetime', 'value': self.expiration_datetime, 'hidden': True}]}
 
     @api.multi
     def send_params_to_client_db(self):

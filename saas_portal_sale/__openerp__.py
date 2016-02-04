@@ -6,7 +6,7 @@
     'website': "https://twitter.com/nasyrov_ildar",
     'category': 'SaaS',
     'version': '1.0.0',
-    'depends': ['sale', 'saas_portal'],
+    'depends': ['sale', 'saas_portal', 'product_price_factor'],
     'data': [
         'views/product_template.xml',
         'views/product_view.xml',

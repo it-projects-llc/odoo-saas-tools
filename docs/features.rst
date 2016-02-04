@@ -2,6 +2,7 @@ Features
 ========
 
 * create SaaS Client databases:
+
   * manually from SaaS Portal backend
   * by client after choosing subdomain (similar to https://www.odoo.com/page/start ) - module saas_portal_start
   * by client after choosing database template (e.g. template for POS, template for ECommerce etc) with auto-generated subdomain (e.g. demo-12345.odoo.com) - module saas_server_templates
@@ -19,4 +20,4 @@ Features
 * collect information from client databases (count of users, disk space usage, etc.)
 * sale subscription (saas_portal_sale, saas_portal_sale_online)
 * notify customers about subscription expiration
-* control system via external tool (see section API Integration below)
+* control system via external tool (see [api.rst](api.rst))

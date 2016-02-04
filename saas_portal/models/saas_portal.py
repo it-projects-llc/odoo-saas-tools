@@ -231,7 +231,8 @@ class SaasPortalPlan(models.Model):
             'name': owner_user.name,
             'email': owner_user.email,
         }
-        trial_expiration_datetime = datetime.strptime(client.create_date, DEFAULT_SERVER_DATETIME_FORMAT) + timedelta(hours=self.expiration)  # for trial
+        trial_expiration_datetime = (datetime.strptime(client.create_date,
+                                        DEFAULT_SERVER_DATETIME_FORMAT) + timedelta(hours=self.expiration)).strftime(DEFAULT_SERVER_DATETIME_FORMAT)  # for trial
         state = {
             'd': client.name,
             'e': trial and trial_expiration_datetime or client.create_date,
@@ -326,9 +327,11 @@ URL - %s
             raise Warning(msg)
         return self.action_sync_server()
 
-    @api.one
+    @api.multi
     def action_sync_server(self):
-        self.server_id.action_sync_server()
+        for r in self:
+            r.server_id.action_sync_server()
+        return True
 
     @api.multi
     def edit_template(self):
@@ -461,7 +464,7 @@ class SaasPortalClient(models.Model):
     user_id = fields.Many2one('res.users', default=lambda self: self.env.user, string='Salesperson')
     notification_sent = fields.Boolean(default=False, readonly=True, help='notification about oncoming expiration has sent')
     support_team_id = fields.Many2one('saas_portal.support_team', 'Support Team')
-    expiration_datetime_sent = fields.Datetime(help='updates every time send_expiration_info_to_client_db is executed')
+    expiration_datetime_sent = fields.Datetime(help='updates every time update_client_db is executed')
     active = fields.Boolean(default=True, compute='_compute_active', store=True)
     block_on_expiration = fields.Boolean('Block clients on expiration', default=False)
     block_on_storage_exceed = fields.Boolean('Block clients on storage exceed', default=False)
@@ -604,7 +607,7 @@ class SaasPortalClient(models.Model):
         for record in self:
             if record.expiration_datetime_sent and record.expiration_datetime and record.expiration_datetime_sent != record.expiration_datetime:
                 record.expiration_datetime_sent = record.expiration_datetime
-                record.send_expiration_info_to_client_db()
+                record.update_client_db()
                 record.send_expiration_info_to_partner()
                 # expiration date has been changed, flush expiration notification flag
                 record.notification_sent = False
@@ -612,16 +615,19 @@ class SaasPortalClient(models.Model):
                 record.expiration_datetime_sent = record.expiration_datetime
 
     @api.multi
-    def send_expiration_info_to_client_db(self):
-        for record in self:
-            # TODO: how to do refactoring for params sending
-            # max_users should be updated in client each time the new invoice is paid
-            max_users = record.invoice_lines.sorted(key=lambda r: r.create_date)[0].max_users
+    def update_client_db(self):
+        for record in [r for r in self if r.invoice_lines]:
+            recent_invoice_line = record.invoice_lines.sorted(reverse=True, key=lambda r: r.create_date)[0]
+            max_users = recent_invoice_line.max_users
+            addons = recent_invoice_line.addons
+            storage_limit = recent_invoice_line.storage_limit
             if record.expiration_datetime:
                 payload = {
                     'params': [{'key': 'saas_client.expiration_datetime', 'value': record.expiration_datetime, 'hidden': True},
                                {'key': 'saas_client.trial', 'value': 'False', 'hidden': True},
-                               {'key': 'saas_client.max_users', 'value': max_users, 'hidden': True}],
+                               {'key': 'saas_client.max_users', 'value': max_users, 'hidden': True},
+                               {'key': 'saas_client.total_storage_limit', 'value': storage_limit, 'hidden': True}],
+                    'install_addons': addons.split(',') if addons else [],
                 }
                 self.env['saas.config'].do_upgrade_database(payload, record.id)
 
@@ -653,7 +659,7 @@ class SaasPortalClient(models.Model):
     @api.one
     def write(self, vals):
         if 'expiration_datetime' in vals and vals['expiration_datetime']:
-            self.send_expiration_info_to_client_db()
+            self.update_client_db()
         result = super(SaasPortalClient, self).write(vals)
         return result
 

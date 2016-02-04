@@ -195,7 +195,7 @@ class SaasPortalPlan(models.Model):
                                                                 ('state', '=', 'open'),
                                                                 ('plan_id', '=', self.id)])
         if self.maximum_allowed_db_per_partner != 0 and db_count >= self.maximum_allowed_db_per_partner:
-            raise MaximumDBException
+            raise MaximumDBException("Limit of databases for this plan is %(maximum)s and it is reached" % {'maximum': self.maximum_allowed_db_per_partner})
 
         server = self.server_id
         if not server:

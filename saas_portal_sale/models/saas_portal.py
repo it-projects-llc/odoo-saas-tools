@@ -8,14 +8,17 @@ class SaasPortalPlan(models.Model):
     _inherit = 'saas_portal.plan'
 
     @api.multi
-    def create_new_database(self, dbname=None, client_id=None, partner_id=None, user_id=None, notify_user=False, trial=False, support_team_id=None):
-        res = super(SaasPortalPlan, self).create_new_database(dbname=dbname,
+    def _create_new_database(self, dbname=None, client_id=None, partner_id=None, user_id=None, notify_user=False, trial=False, support_team_id=None, async=None):
+        res = super(SaasPortalPlan, self)._create_new_database(dbname=dbname,
                                                               client_id=client_id,
                                                               partner_id=partner_id,
                                                               user_id=user_id,
                                                               notify_user=notify_user,
                                                               trial=trial,
-                                                              support_team_id=support_team_id)
+                                                              support_team_id=support_team_id,
+                                                              async=async)
+        if not partner_id:
+            return res
         lines = self.env['saas_portal.find_payments_wizard'].find_partner_payments(partner_id=partner_id, plan_id=self.id)
 
         client_obj = self.env['saas_portal.client'].browse(res.get('id'))

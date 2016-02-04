@@ -5,5 +5,9 @@
             <field name="key">saas.expiration_notify_in_advance</field>
             <field name="value">2</field>
         </record>
+        <record id="saas_page_for_maximumdb" model="ir.config_parameter">
+            <field name="key">saas_portal.page_for_maximumdb</field>
+            <field name="value">/</field>
+        </record>
     </data>
 </openerp>

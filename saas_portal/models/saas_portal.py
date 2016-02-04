@@ -274,14 +274,8 @@ class SaasPortalPlan(models.Model):
             template = self.env.ref('saas_portal.email_template_create_saas')
             client.message_post_with_template(template.id, composition_mode='comment')
 
-<<<<<<< HEAD
         if trial:
             client.expiration_datetime = trial_expiration_datetime
-=======
-        if client.trial:
-            client.expiration_datetime = datetime.strptime(client.create_date, DEFAULT_SERVER_DATETIME_FORMAT) + timedelta(hours=self.expiration)  # for trial
-
->>>>>>> 9.0-dev
         client.send_params_to_client_db()
         client.server_id.action_sync_server()
 

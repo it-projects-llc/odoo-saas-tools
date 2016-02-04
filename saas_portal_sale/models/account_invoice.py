@@ -48,31 +48,14 @@ class AccountInvoiceLine(models.Model):
     saas_portal_client_id = fields.Many2one('saas_portal.client', string='SaaS client', help='reference to the SaaS client if this invoice line is created for a SaaS product')
     plan_id = fields.Many2one('saas_portal.plan', related='product_id.plan_id', readonly=True)
     period = fields.Integer(string='Subscription period', help='subsciption period in days', readonly=True, default=0)
-    max_users = fields.Integer(help='maximum number of users allowed', readonly=True, default=0)
-    addons = fields.Char(help='list of modules to be installed')
     state = fields.Selection(related='invoice_id.state', readonly=True)
-    storage_limit = fields.Integer(help='Storage limit in Mb to be setted')
 
     @api.model
     def create(self, vals):
-        # TODO: how to simplify codes handling
         product_obj = self.env['product.product'].browse(vals.get('product_id'))
 
         attribute_value_obj = product_obj.attribute_value_ids.filtered(lambda r: r.attribute_id.saas_code == 'SUBSCRIPTION_PERIOD')
         period = attribute_value_obj and int(attribute_value_obj[0].saas_code_value) or 0
         vals.update({'period': period})
-
-        attribute_value_obj = product_obj.attribute_value_ids.filtered(lambda r: r.attribute_id.saas_code == 'MAX_USERS')
-        max_users = attribute_value_obj and int(attribute_value_obj[0].saas_code_value) or 0
-        vals.update({'max_users': max_users})
-
-        attribute_value_obj = product_obj.attribute_value_ids.filtered(lambda r: r.attribute_id.saas_code == 'INSTALL_MODULES')
-        addons = attribute_value_obj and attribute_value_obj[0].saas_code_value or ''
-        vals.update({'addons': addons})
-        
-        attribute_value_obj = product_obj.attribute_value_ids.filtered(lambda r: r.attribute_id.saas_code == 'STORAGE_LIMIT')
-        storage_limit = attribute_value_obj and int(attribute_value_obj[0].saas_code_value) or 0
-        vals.update({'storage_limit': storage_limit})
-
 
         return super(AccountInvoiceLine, self).create(vals)

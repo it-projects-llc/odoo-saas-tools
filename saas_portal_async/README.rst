@@ -2,6 +2,10 @@ SaaS Portal Asynchronous database creation
 ==========================================
 Asynchronous client database creation.
 
+Attention!
+==========
+Module does not work on 9.0 because connector ain't ported for 9.0 for this time.
+
 Usage
 =====
 

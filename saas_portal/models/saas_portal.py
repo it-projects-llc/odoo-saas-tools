@@ -468,7 +468,7 @@ class SaasPortalClient(models.Model):
     user_id = fields.Many2one('res.users', default=lambda self: self.env.user, string='Salesperson')
     notification_sent = fields.Boolean(default=False, readonly=True, help='notification about oncoming expiration has sent')
     support_team_id = fields.Many2one('saas_portal.support_team', 'Support Team')
-    expiration_datetime_sent = fields.Datetime(help='updates every time update_client_db is executed')
+    expiration_datetime_sent = fields.Datetime(help='updates every time send_expiration_info is executed')
     active = fields.Boolean(default=True, compute='_compute_active', store=True)
     block_on_expiration = fields.Boolean('Block clients on expiration', default=False)
     block_on_storage_exceed = fields.Boolean('Block clients on storage exceed', default=False)
@@ -655,7 +655,9 @@ class SaasPortalClient(models.Model):
     @api.one
     def write(self, vals):
         if 'expiration_datetime' in vals and vals['expiration_datetime']:
-            self.update_client_db()
+            self.env['saas.config'].do_upgrade_database(
+                payload={'params': [{'key': 'saas_client.expiration_datetime', 'value': record.expiration_datetime, 'hidden': True}]},
+                record.id)
         result = super(SaasPortalClient, self).write(vals)
         return result
 

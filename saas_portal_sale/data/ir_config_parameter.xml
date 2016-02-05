@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data noupdate="1">
-        <record id="saas_page_for_notpayed" model="ir.config_parameter">
-            <field name="key">saas_portal.page_for_notpayed</field>
+        <record id="saas_page_for_nonfree_subdomain" model="ir.config_parameter">
+            <field name="key">saas_portal.page_for_nonfree_subdomain</field>
             <field name="value">/</field>
         </record>
     </data>

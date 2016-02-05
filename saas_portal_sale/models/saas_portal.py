@@ -7,6 +7,8 @@ from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
 class SaasPortalPlan(models.Model):
     _inherit = 'saas_portal.plan'
 
+    free_subdomains = fields.Boolean(help='allow to choose subdomains for trials otherwise allow only after payment', default=True)
+
     @api.multi
     def _create_new_database(self, dbname=None, client_id=None, partner_id=None, user_id=None, notify_user=False, trial=False, support_team_id=None, async=None):
         res = super(SaasPortalPlan, self)._create_new_database(dbname=dbname,

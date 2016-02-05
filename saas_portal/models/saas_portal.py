@@ -626,7 +626,7 @@ class SaasPortalClient(models.Model):
     def write(self, vals):
         if 'expiration_datetime' in vals and vals['expiration_datetime']:
             self.env['saas.config'].do_upgrade_database(
-                payload={'params': [{'key': 'saas_client.expiration_datetime', 'value': record.expiration_datetime, 'hidden': True}]},
+                {'params': [{'key': 'saas_client.expiration_datetime', 'value': record.expiration_datetime, 'hidden': True}]},
                 record.id)
         result = super(SaasPortalClient, self).write(vals)
         return result

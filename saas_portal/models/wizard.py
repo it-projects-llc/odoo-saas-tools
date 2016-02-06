@@ -15,13 +15,12 @@ from openerp import http
 class SaasConfig(models.TransientModel):
     _name = 'saas.config'
 
-    def _default_database_id(self):
-        return self._context.get('active_id')
+    def _default_database_ids(self):
+        return self._context.get('active_ids')
 
     action = fields.Selection([('edit', 'Edit'), ('upgrade', 'Configure'), ('delete', 'Delete')],
                                 'Action')
-    database_id = fields.Many2one('saas_portal.client', string='Database', default=_default_database_id)
-    server_id = fields.Many2one('saas_portal.server', string='Server', related='database_id.server_id', readonly=True)
+    database_ids = fields.Many2many('saas_portal.client', string='Database', default=_default_database_ids)
     update_addons_list = fields.Boolean('Update Addon List', default=True)
     update_addons = fields.Char('Update Addons', size=256)
     install_addons = fields.Char('Install Addons', size=256)
@@ -42,7 +41,7 @@ class SaasConfig(models.TransientModel):
 
     @api.multi
     def delete_database(self):
-        return self.database_id.delete_database()
+        return self.database_ids.delete_database()
 
     @api.multi
     def upgrade_database(self):
@@ -59,8 +58,12 @@ class SaasConfig(models.TransientModel):
             'fixes': [[x.model, x.method] for x in obj.fix_ids],
             'params': [{'key': x.key, 'value': x.value, 'hidden': x.hidden} for x in obj.param_ids],
         }
-        res_text = self.do_upgrade_database(payload, self.database_id.id)
-        obj.write({'description': res_text})
+        res = []
+        # maybe use multiprocessing here
+        for database in self.database_ids:
+            res.append(self.do_upgrade_database(payload.copy(), database.id))
+        res_str = '\n\n'.join(res)
+        obj.write({'description': res_str})
         return {
             'type': 'ir.actions.act_window',
             'view_type': 'form',
@@ -81,7 +84,7 @@ class SaasConfig(models.TransientModel):
             client_id=client.client_id,
             state=state,
         )[0]
-        res = requests.get(url, verify=(self.server_id.request_scheme == 'https' and self.server_id.verify_ssl))
+        res = requests.get(url, verify=(client.server_id.request_scheme == 'https' and client.server_id.verify_ssl))
         if res.ok != True:
             msg = """Status Code - %s
 Reason - %s

@@ -5,7 +5,7 @@ from openerp import SUPERUSER_ID, exceptions
 from openerp.tools.translate import _
 from openerp.addons.web import http
 from openerp.addons.web.http import request
-from openerp.addons.saas_base.exceptions import MaximumDBException
+from openerp.addons.saas_base.exceptions import MaximumDBException, MaximumTrialDBException
 import werkzeug
 import simplejson
 
@@ -34,8 +34,12 @@ class SaasPortal(http.Controller):
         try:
             res = plan.create_new_database(dbname=dbname, user_id=user_id, partner_id=partner_id)
         except MaximumDBException:
-            page_for_maximumDB = request.env['ir.config_parameter'].sudo().get_param('saas_portal.page_for_maximumdb', '/')
-            return werkzeug.utils.redirect(page_for_maximumDB)
+            url = request.env['ir.config_parameter'].sudo().get_param('saas_portal.page_for_maximumdb', '/')
+            return werkzeug.utils.redirect(url)
+        except MaximumTrialDBException:
+            url = request.env['ir.config_parameter'].sudo().get_param('saas_portal.page_for_maximumtrialdb', '/')
+            return werkzeug.utils.redirect(url)
+
         return werkzeug.utils.redirect(res.get('url'))
 
     def get_config_parameter(self, param):

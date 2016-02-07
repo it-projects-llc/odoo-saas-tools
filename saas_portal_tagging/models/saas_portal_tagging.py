@@ -68,8 +68,9 @@ class SaasPortalClient(models.Model):
     @api.model
     @api.returns('self', lambda value:value.id)
     def create(self, vals):
-        plan = self.env['saas_portal.plan'].browse(vals['plan_id'])
-        vals['category_ids'] = [(6, 0, plan.category_ids.ids)]
+        if vals.get('plan_id'):
+	    plan = self.env['saas_portal.plan'].browse(vals['plan_id'])
+            vals['category_ids'] = [(6, 0, plan.category_ids.ids)]
         return super(SaasPortalClient, self).create(vals)
     
 class SaasPortalPlan(models.Model):

@@ -15,18 +15,6 @@
 			</xpath>
 		</template>
 
-
-		<template id="layout" inherit_id="website.layout" name="inherited main layout">
-			<xpath expr="//main" position="after">
-				<style type="text/css">
-					#wrapwrap>footer{
-					background-color: #34495e;
-					}
-				</style>
-			</xpath>
-			
-		</template>
-
 		<template id="website.start" name="Create new database" page="True" priority="29">
 			<t t-call="website.layout">
 				<div id="wrap" class="oe_structure oe_empty">

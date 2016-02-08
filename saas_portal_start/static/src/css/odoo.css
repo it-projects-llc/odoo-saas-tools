@@ -7080,5 +7080,5 @@ img.shadow {
   bottom: 0;
 }
 #wrapwrap>footer{
-    background-color: #34495e;
+    background-color: #34495e !important;
 }

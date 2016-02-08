@@ -9,5 +9,9 @@
             <field name="key">saas_portal.page_for_maximumdb</field>
             <field name="value">/</field>
         </record>
+        <record id="saas_page_for_maximumtrialdb" model="ir.config_parameter">
+            <field name="key">saas_portal.page_for_maximumtrialdb</field>
+            <field name="value">/</field>
+        </record>
     </data>
 </openerp>

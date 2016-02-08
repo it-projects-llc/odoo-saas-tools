@@ -91,15 +91,15 @@ class SaasPortalSale(http.Controller):
         partner = request.env['res.users'].browse(uid).partner_id
         trial_plan = request.env['saas_portal.plan'].sudo().browse(plan_id)
         support_team = request.env.ref('saas_portal.main_support_team')
-        db_creation_allowed = True
+
         try:
             trial_plan.create_new_database(partner_id=partner.id, user_id=uid, notify_user=True, trial=True, support_team_id=support_team.id)
-        except MaximumDBException:
-            db_creation_allowed = False
+        except MaximumTrialDBException:
+            url = request.env['ir.config_parameter'].sudo().get_param('saas_portal.page_for_maximumtrialdb', '/')
+            return werkzeug.utils.redirect(url)
 
         values = {
             'plan': trial_plan,
-            'db_creation_allowed': db_creation_allowed,
         }
 
         return request.render('saas_portal.try_trial', values)

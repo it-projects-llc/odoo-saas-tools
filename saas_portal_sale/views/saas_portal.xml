@@ -74,8 +74,9 @@
             <field name="inherit_id" ref="saas_portal.view_plans_form"/>
             <field name="arch" type="xml">
                 <data>
-                    <xpath expr="//field[@name='maximum_allowed_db_per_partner']" position="after">
-                        <field name="free_subdomains"/>
+                    <xpath expr="//field[@name='maximum_allowed_trial_dbs_per_partner']" position="after">
+                      <field name="free_subdomains"/>
+                      <field name="non_trial_instances"/>
                     </xpath>
                 </data>
             </field>

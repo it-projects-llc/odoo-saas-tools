@@ -8,7 +8,8 @@ class SaasPortalPlan(models.Model):
     _inherit = 'saas_portal.plan'
 
     free_subdomains = fields.Boolean(help='allow to choose subdomains for trials otherwise allow only after payment', default=True)
-    non_trial_instances = fields.Selection([('from_trial', 'From trial'), ('create_new', 'Create new')], string='Non-trial instances', required=True, default='create_new')
+    non_trial_instances = fields.Selection([('from_trial', 'From trial'), ('create_new', 'Create new')], string='Non-trial instances',
+                                           help='Whether to use trial database or create new one when user make payment', required=True, default='create_new')
 
     @api.multi
     def _create_new_database(self, dbname=None, client_id=None, partner_id=None, user_id=None, notify_user=False, trial=False, support_team_id=None, async=None):

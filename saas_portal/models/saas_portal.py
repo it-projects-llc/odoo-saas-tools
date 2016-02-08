@@ -144,7 +144,7 @@ class SaasPortalPlan(models.Model):
     summary = fields.Char('Summary')
     template_id = fields.Many2one('saas_portal.database', 'Template', ondelete='restrict')
     demo = fields.Boolean('Install Demo Data')
-    maximum_allowed_dbs_per_partner = fields.Integer(help='maximum allowed databases per customer', require=True, default=0)
+    maximum_allowed_dbs_per_partner = fields.Integer(help='maximum allowed non-trial databases per customer', require=True, default=0)
     maximum_allowed_trial_dbs_per_partner = fields.Integer(help='maximum allowed trial databases per customer', require=True, default=0)
 
     max_users = fields.Char('Initial Max users', default='0')
@@ -197,19 +197,19 @@ class SaasPortalPlan(models.Model):
     @api.multi
     def _create_new_database(self, dbname=None, client_id=None, partner_id=None, user_id=None, notify_user=False, trial=False, support_team_id=None, async=None):
         self.ensure_one()
-        if not trial:
+        if not trial and self.maximum_allowed_dbs_per_partner != 0:
             db_count = self.env['saas_portal.client'].search_count([('partner_id', '=', partner_id),
                                                                     ('state', '=', 'open'),
                                                                     ('plan_id', '=', self.id),
                                                                     ('trial', '=', False)])
-            if self.maximum_allowed_dbs_per_partner != 0 and db_count >= self.maximum_allowed_dbs_per_partner:
+            if db_count >= self.maximum_allowed_dbs_per_partner:
                 raise MaximumDBException("Limit of databases for this plan is %(maximum)s reached" % {'maximum': self.nmaximum_allowed_dbs_per_partner})
-        else:
+        if trial and self.maximum_allowed_trial_dbs_per_partner != 0:
             trial_db_count = self.env['saas_portal.client'].search_count([('partner_id', '=', partner_id),
                                                                           ('state', '=', 'open'),
                                                                           ('plan_id', '=', self.id),
                                                                           ('trial', '=', True)])
-            if self.maximum_allowed_trial_dbs_per_partner != 0 and trial_db_count >= self.maximum_allowed_trial_dbs_per_partner:
+            if trial_db_count >= self.maximum_allowed_trial_dbs_per_partner:
                 raise MaximumTrialDBException("Limit of trial databases for this plan is %(maximum)s reached" % {'maximum': self.maximum_allowed_trial_dbs_per_partner})
 
 

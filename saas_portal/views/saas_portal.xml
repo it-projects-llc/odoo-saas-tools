@@ -238,7 +238,8 @@
                             <group string="Plan Settings">
                                 <field name="dbname_template"/>
                                 <field name="expiration"/>
-                                <field name="maximum_allowed_db_per_partner"/>
+                                <field name="maximum_allowed_dbs_per_partner"/>
+                                <field name="maximum_allowed_trial_dbs_per_partner"/>
                             </group>
                         </group>
                         <group string="Client Settings">

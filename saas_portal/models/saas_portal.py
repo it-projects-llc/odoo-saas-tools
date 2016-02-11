@@ -213,6 +213,9 @@ class SaasPortalPlan(models.Model):
             server = self.env['saas_portal.server'].get_saas_server()
 
         server.action_sync_server()
+        if not partner_id and user_id:
+            user = self.env['res.users'].browse(user_id)
+            partner_id = user.partner_id.id
 
         vals = {'name': dbname or self.generate_dbname()[0],
                 'server_id': server.id,

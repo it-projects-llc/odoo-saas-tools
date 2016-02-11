@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <!-- saas_client Category -->
+       <record id="view_saas_client_category_form" model="ir.ui.view">
+            <field name="name">saas.portal.category.form</field>
+            <field name="model">saas.portal.category</field>
+            <field name="arch" type="xml">
+                <form string="SaaS Client Category">
+                    <group>
+                        <field name="name"/>
+                        <field name="parent_id"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_saas_client_category_list" model="ir.ui.view">
+            <field name="name">saas.portal.category.list</field>
+            <field name="model">saas.portal.category</field>
+            <field eval="8" name="priority"/>
+            <field name="arch" type="xml">
+                <tree string="SaaS Client Categories">
+                    <field name="display_name"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_saas_client_category_tree" model="ir.ui.view">
+            <field name="name">saas.portal.category.tree</field>
+            <field name="model">saas.portal.category</field>
+            <field name="field_parent">child_ids</field>
+            <field name="arch" type="xml">
+                <tree string="SaaS Client Categories">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="open_view_saas_categ_form" model="ir.actions.act_window">
+            <field name="name">Saas Client Tags</field>
+            <field name="res_model">saas.portal.category</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem action="open_view_saas_categ_form" id="menu_view_saas_client_category_form"
+            parent="saas_portal.menu_saas_tech" sequence="100"/>
+    
+            
+        <record id="view_clients_form" model="ir.ui.view">
+            <field name="name">saas_portal.client.form</field>
+            <field name="model">saas_portal.client</field>
+            <field name="inherit_id" ref="saas_portal.view_clients_form" />
+            <field name="arch" type="xml">
+                <group string="Settings" position="after">
+                    <group string="Tags">
+                        <field name="category_ids" widget="many2many_tags" />
+                    </group>
+                </group>
+            </field>
+        </record>
+        
+        <record id="view_plans_form" model="ir.ui.view">
+            <field name="name">saas_portal.plan.form</field>
+            <field name="model">saas_portal.plan</field>
+            <field name="inherit_id" ref="saas_portal.view_plans_form" />
+            <field name="arch" type="xml">
+                <h1 position="after">
+                    <label for="category_ids" class="oe_edit_only" />
+                    <field name="category_ids" widget="many2many_tags" placeholder="e.g. Bronze Package" />
+                </h1>
+            </field>
+        </record>
+    </data>
+</openerp>

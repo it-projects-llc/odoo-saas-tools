@@ -9,6 +9,7 @@
     'depends': ['saas_sysadmin'],
     'data': [
         'views/saas_portal_views.xml',
+        'views/wizard.xml'
         ],
     'installable': True,
 }

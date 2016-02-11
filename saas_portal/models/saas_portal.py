@@ -197,6 +197,16 @@ class SaasPortalPlan(models.Model):
     @api.multi
     def _create_new_database(self, dbname=None, client_id=None, partner_id=None, user_id=None, notify_user=False, trial=False, support_team_id=None, async=None):
         self.ensure_one()
+
+        server = self.server_id
+        if not server:
+            server = self.env['saas_portal.server'].get_saas_server()
+
+        server.action_sync_server()
+        if not partner_id and user_id:
+            user = self.env['res.users'].browse(user_id)
+            partner_id = user.partner_id.id
+
         if not trial and self.maximum_allowed_dbs_per_partner != 0:
             db_count = self.env['saas_portal.client'].search_count([('partner_id', '=', partner_id),
                                                                     ('state', '=', 'open'),
@@ -212,15 +222,6 @@ class SaasPortalPlan(models.Model):
             if trial_db_count >= self.maximum_allowed_trial_dbs_per_partner:
                 raise MaximumTrialDBException("Limit of trial databases for this plan is %(maximum)s reached" % {'maximum': self.maximum_allowed_trial_dbs_per_partner})
 
-
-        server = self.server_id
-        if not server:
-            server = self.env['saas_portal.server'].get_saas_server()
-
-        server.action_sync_server()
-        if not partner_id and user_id:
-            user = self.env['res.users'].browse(user_id)
-            partner_id = user.partner_id.id
 
         vals = {'name': dbname or self.generate_dbname()[0],
                 'server_id': server.id,

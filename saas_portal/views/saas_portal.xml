@@ -21,7 +21,8 @@
                     <field name="trial"/>
                     <field name="expiration_datetime"/>
                     <field name="expired" invisible="1"/>
-                    <button name="edit_database" type="object" icon="gtk-connect" attrs="{'invisible':[('state', 'in', ['deleted', 'draft'])]}" help="Log in client database"/>
+                    <button name="edit_database" type="object" icon="gtk-connect" attrs="{'invisible':[('state', 'in', ['deleted', 'draft'])]}"
+                            help="Log in client database. Make sure that your browser allows popup windows from SaaS Portal"/>
                     <button name="upgrade_database" attrs="{'invisible':[('state', 'in', ['deleted'])]}" type="object" icon="gtk-execute" help="Configure client database"/>
                     <button name="delete_database_server" type="object" attrs="{'invisible':[('state', 'not in', ['pending'])]}" icon="gtk-delete" help="Delete client database"
                     confirm="Are you sure to delete this database?"/>
@@ -37,7 +38,8 @@
                 <form string="Clients" create="false" delete="false" edit="false">
                     <field name="expired" invisible="1"/>
                     <header>
-                        <button string="Log in" name="edit_database" type="object" attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}" icon="gtk-connect" class="oe_highlight"/>
+                      <button string="Log in" name="edit_database" type="object" attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}"
+                              icon="gtk-connect" class="oe_highlight" help="Make sure that your browser allows popup windows from SaaS Portal"/>
                         <button string="Configure" name="upgrade_database" type="object" attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}" icon="gtk-execute" />
                         <button string="Delete" name="delete_database_server" type="object" attrs="{'invisible':['|',('state', 'not in', ['pending'])]}" icon="gtk-delete" 
                         confirm="Are you sure to delete this database?"/>
@@ -212,7 +214,8 @@
                 <form string="plans">
                     <header>
                         <button string="Create template DB" name="create_template" type="object" attrs="{'invisible':['|', '|', ('state','not in', ['draft']), ('server_id','=',False), ('template_id','=',False)]}" icon="gtk-apply" class="oe_highlight"/>
-                        <button string="Log in to template DB" name="edit_template" type="object" states="confirmed" icon="gtk-edit" class="oe_highlight"/>
+                        <button string="Log in to template DB" name="edit_template" type="object" states="confirmed" icon="gtk-edit"
+                                help="Make sure that your browser allows popup windows from SaaS Portal" class="oe_highlight"/>
                         <!--<button string="Configure template DB" name="upgrade_template" type="object" states="confirmed" icon="gtk-execute" />-->
                         <button string="Delete template DB" name="delete_template" type="object" states="confirmed" icon="gtk-cancel" />
                         <button string="Sync server" type="object" name="action_sync_server" icon="gtk-refresh" attrs="{'invisible': [('id', '=', False)]}"/>

@@ -314,7 +314,7 @@ class SaasServerClient(models.Model):
     def delete_expired_databases(self):
         now = time.strftime(DEFAULT_SERVER_DATETIME_FORMAT)
 
-        res = self.search([('state', 'not in', ['deleted']), ('expiration_datetime', '<=', now), ('trial', '=', True)])
+        res = self.search([('state', 'not in', ['deleted', 'template']), ('expiration_datetime', '<=', now), ('trial', '=', True)])
         _logger.info('delete_expired_databases %s', res)
         res.delete_database()
 

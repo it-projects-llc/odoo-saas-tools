@@ -83,11 +83,7 @@ class SaasConfig(models.TransientModel):
         )[0]
         res = requests.get(url, verify=(self.server_id.request_scheme == 'https' and self.server_id.verify_ssl))
         if res.ok != True:
-            msg = """Status Code - %s
-Reason - %s
-URL - %s
-            """ % (res.status_code, res.reason, res.url)
-            raise Warning(msg)
+            raise Warning('Reason: %s \n Message: %s' % (res.reason, res.content))
         return res.text
 
 class SaasConfigFix(models.TransientModel):

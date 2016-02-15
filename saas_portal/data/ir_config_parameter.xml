@@ -2,7 +2,7 @@
 <openerp>
     <data noupdate="1">
         <record id="_configuration" model="ir.config_parameter">
-            <field name="key">saas.expiration_notify_in_advance</field>
+            <field name="key">saas_portal.expiration_notify_in_advance</field>
             <field name="value">2</field>
         </record>
         <record id="saas_page_for_maximumdb" model="ir.config_parameter">

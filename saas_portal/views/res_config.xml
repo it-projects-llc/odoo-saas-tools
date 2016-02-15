@@ -16,6 +16,17 @@
                         <group string="Domain">
 							<field name="base_saas_domain" placeholder="odoo.com" />
 						</group>
+            <group string="Error pages">
+              <field name="page_for_maximumdb"/>
+              <field name="page_for_maximumtrialdb"/>
+              <field name="page_for_nonfree_subdomains"/>
+            </group>
+            <group string="Notifications">
+              <field name="expiration_notify_in_advance" class="oe_inline"/>
+            </group>
+            <group string="Features">
+              <field name="module_saas_portal_sale_online"/>
+            </group>
 					</div>
                 </form>
             </field>

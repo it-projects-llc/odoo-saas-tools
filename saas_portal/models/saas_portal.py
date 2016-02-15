@@ -4,7 +4,7 @@ from openerp import models, fields, api, SUPERUSER_ID, exceptions
 from openerp.addons.saas_utils import connector, database
 from openerp import http
 from openerp.tools import config, scan_languages
-from openerp.tools.translate import _
+from openerp.tools.transplate import _
 from openerp.addons.base.res.res_partner import _tz_get
 import time
 from datetime import datetime, timedelta
@@ -531,7 +531,7 @@ class SaasPortalClient(models.Model):
     @api.model
     def _cron_notify_expired_clients(self):
         # send notification about expiration by email
-        notification_delta = int(self.env['ir.config_parameter'].get_param('saas.expiration_notify_in_advance', '0'))
+        notification_delta = int(self.env['ir.config_parameter'].get_param('saas_portal.expiration_notify_in_advance', '0'))
         if notification_delta > 0:
             records = self.search([('expiration_datetime', '<=', (datetime.now() + timedelta(days=notification_delta)).strftime(DEFAULT_SERVER_DATETIME_FORMAT)),
                                    ('notification_sent', '=', False)])

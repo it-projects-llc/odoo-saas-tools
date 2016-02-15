@@ -4,7 +4,7 @@ from openerp import models, fields, api, SUPERUSER_ID, exceptions
 from openerp.addons.saas_utils import connector, database
 from openerp import http
 from openerp.tools import config, scan_languages
-from openerp.tools.transplate import _
+from openerp.tools.translate import _
 from openerp.addons.base.res.res_partner import _tz_get
 import time
 from datetime import datetime, timedelta

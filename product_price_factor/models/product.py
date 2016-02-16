@@ -105,5 +105,17 @@ class ProductAttributeLine(osv.osv):
     _order = 'sequence'
 
     _columns = {
-        'sequence': fields.integer('Sequence', help="Determine the display order"),
+        'sequence': fields.integer('Sequence', help="Determine the display order", required=True),
+    }
+
+    def _get_default_sequence(self, cr, uid, context=None):
+        # without this function there was a bug when attributes were created
+        # from Product Variants tab. If several attributes were created without pushing the save button
+        # sequence got the same value for their attribute lines. And if there was no lines before
+        # sequence got False for the first attribute
+        num = self.search_count(cr, uid, [], context=context) + 1
+        return num
+
+    _defaults = {
+        'sequence': _get_default_sequence,
     }

@@ -33,11 +33,7 @@ class SaasPortalClient(models.Model):
         res = requests.get(url, verify=(self.server_id.request_scheme == 'https' and self.server_id.verify_ssl))
         _logger.info('delete database: %s', res.text)
         if res.ok != True:
-            msg = """Status Code - %s 
-            Reason - %s
-            URL - %s
-            """ % (res.status_code, res.reason, res.url)
-            raise Warning(msg)
+            raise Warning('Reason: %s \n Message: %s' % (res.reason, res.content))
         data = simplejson.loads(res.text)
         if data[0]['status'] != 'success':
             warning = data[0].get('message', 'Could not backup database; please check your logs')

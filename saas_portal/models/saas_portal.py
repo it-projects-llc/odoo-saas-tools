@@ -396,8 +396,6 @@ class SaasPortalDatabase(models.Model):
                               ('template','Template'),
                           ],
                              'State', default='draft', track_visibility='onchange')
-    backup = fields.Boolean('Backup on Modify', help="Backs up first before deleting \
-                            or upgrading", default=True)
 
     @api.multi
     def _backup(self):
@@ -421,23 +419,6 @@ class SaasPortalDatabase(models.Model):
             warning = data[0].get('message', 'Could not backup database; please check your logs')
             raise Warning(warning)
         return True
-
-    @api.multi
-    def action_backup(self):
-        self.ensure_one()
-        self._backup()
-
-    @api.multi
-    def delete_database(self):
-        if self[0].backup:
-            self._backup()
-        return super(SaasPortalDatabase, self).delete_database()
-
-    @api.multi
-    def upgrade_database(self):
-        if self[0].backup:
-            self._backup()
-        return super(SaasPortalDatabase, self).upgrade_database()
 
     @api.one
     def action_sync_server(self):

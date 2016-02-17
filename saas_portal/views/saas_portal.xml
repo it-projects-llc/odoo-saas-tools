@@ -44,7 +44,6 @@
                         <button string="Delete" name="delete_database_server" type="object" attrs="{'invisible':['|',('state', 'not in', ['pending'])]}" icon="gtk-delete" 
                         confirm="Are you sure to delete this database?"/>
                         <button string="Sync server" type="object" name="action_sync_server" icon="gtk-refresh"/>
-                        <button string="Backup DB" name="action_backup" type="object" attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}" icon="gtk-execute" />
                         <button name="%(saas_portal.action_rename_database)d" string="Rename Database" type="action"/>
                         <field name="state" widget="statusbar" statusbar_visible="open,pending,deleted" clickable="False"/>
                     </header>
@@ -73,9 +72,6 @@
                     <group string="Settings">
                         <field name="block_on_expiration" class="oe_inline"/>
                         <field name="block_on_storage_exceed" class="oe_inline"/>
-                    </group>
-                    <group string="Database settings">
-                      <field name="backup"/>
                     </group>
                     <notebook>
                         <!--
@@ -426,18 +422,12 @@
             <field name="model">saas_portal.database</field>
             <field name="arch" type="xml">
               <form string="plans" create="false">
-                <header>
-                  <button string="Backup DB" name="action_backup" type="object" attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}" icon="gtk-execute" />
-                </header>
                     <sheet>
                         <group>
                            <field name="name" />
                            <field name="state" readonly="1"/>
                            <field name="client_id" readonly="1" />
                            <field name="server_id" readonly="1"/>
-                        </group>
-                        <group string="Settings">
-                          <field name="backup"/>
                         </group>
                     </sheet>
                 </form>

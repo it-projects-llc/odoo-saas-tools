@@ -17,10 +17,21 @@ import simplejson
 import logging
 _logger = logging.getLogger(__name__)
 
+def webservice(f):
+    @functools.wraps(f)
+    def wrap(*args, **kw):
+        try:
+            return f(*args, **kw)
+        except Exception, e:
+            _logger.exception(str(e))
+            return http.Response(response=str(e), status=500)
+    return wrap
+
 class SaasServer(http.Controller):
 
     @http.route('/saas_server/new_database', type='http', website=True, auth='public')
     @fragment_to_query_string
+    @webservice
     def new_database(self, **post):
         _logger.info('new_database post: %s', post)
 
@@ -87,6 +98,7 @@ class SaasServer(http.Controller):
 
     @http.route('/saas_server/edit_database', type='http', auth='public', website=True)
     @fragment_to_query_string
+    @webservice
     def edit_database(self, **post):
         _logger.info('edit_database post: %s', post)
 
@@ -105,6 +117,7 @@ class SaasServer(http.Controller):
 
     @http.route('/saas_server/upgrade_database', type='http', auth='public')
     @fragment_to_query_string
+    @webservice
     def upgrade_database(self, **post):
         state = simplejson.loads(post.get('state'))
         data = state.get('data')
@@ -125,6 +138,7 @@ class SaasServer(http.Controller):
 
     @http.route('/saas_server/rename_database', type='http', website=True, auth='public')
     @fragment_to_query_string
+    @webservice
     def rename_database(self, **post):
         _logger.info('delete_database post: %s', post)
         state = simplejson.loads(post.get('state'))
@@ -145,6 +159,7 @@ class SaasServer(http.Controller):
 
     @http.route('/saas_server/delete_database', type='http', website=True, auth='public')
     @fragment_to_query_string
+    @webservice
     def delete_database(self, **post):
         _logger.info('delete_database post: %s', post)
 
@@ -241,6 +256,7 @@ class SaasServer(http.Controller):
 
 
     @http.route(['/saas_server/sync_server'], type='http', auth='public')
+    @webservice
     def stats(self, **post):
         _logger.info('sync_server post: %s', post)
 

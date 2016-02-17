@@ -111,11 +111,7 @@ class SaasPortalServer(models.Model):
         res = requests.get(url, verify=(self.request_scheme == 'https' and self.verify_ssl))
 
         if res.ok != True:
-            msg = """Status Code - %s
-Reason - %s
-URL - %s
-            """ % (res.status_code, res.reason, res.url)            
-            raise Warning(msg)
+            raise Warning('Reason: %s \n Message: %s' % (res.reason, res.content))
         data = simplejson.loads(res.text)
 
         for r in data:
@@ -335,11 +331,7 @@ class SaasPortalPlan(models.Model):
                                                                       params=werkzeug.url_encode(params))
         res = requests.get(url, verify=(plan.server_id.request_scheme == 'https' and plan.server_id.verify_ssl))
         if res.ok != True:
-            msg = """Status Code - %s
-Reason - %s
-URL - %s
-            """ % (res.status_code, res.reason, res.url)
-            raise Warning(msg)
+            raise Warning('Reason: %s \n Message: %s' % (res.reason, res.content))
         return self.action_sync_server()
 
     @api.multi
@@ -358,7 +350,8 @@ URL - %s
 
     @api.multi
     def delete_template(self):
-        res = self[0].template_id.delete_database()
+        self.ensure_one()
+        res = self.template_id.delete_database_server()
         return res
 
 

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import functools
 import datetime
 import openerp
 from openerp import api, SUPERUSER_ID

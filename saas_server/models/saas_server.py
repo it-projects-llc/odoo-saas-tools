@@ -332,7 +332,7 @@ class SaasServerClient(models.Model):
         self.name = new_dbname
 
     @api.model
-    def _transport_backup(self, db_dump):
+    def _transport_backup(self, db_dump, filename=None):
         '''
         backup transport agents should override this
         '''

@@ -282,8 +282,7 @@
                      <group>
                         <field name="id" invisible="1" />
                         <field name="action" readonly="1"/>
-                        <field name="database_id" />
-                        <field name="server_id"/>
+                        
                      </group>
                      <notebook>
                      <page string="Result"  attrs="{'invisible': [('id', '=', False)]}">
@@ -323,6 +322,15 @@
                              </tree>
                          </field>
                      </page>
+                     <page string='Affected Database(s)'>
+                        <field name="database_ids">
+                            <tree>
+                                <field name="name"/>
+                                <field name="server_id"/>
+                                <field name="plan_id"/>
+                            </tree>
+                        </field>
+                     </page>
                      </notebook>
                      <footer>
                         <button name="execute_action" string="Execute" type="object" class="oe_highlight"/>
@@ -342,6 +350,15 @@
             <field name="target">new</field>
             <field name="context">{'default_action': 'upgrade'}</field>
         </record>
+        
+        <act_window
+        id="act_configure_clients"
+        name="Configure Clients"
+        res_model="saas.config"
+        key2="client_action_multi"
+        src_model="saas_portal.client"
+        context="{'default_action': 'upgrade'}"
+        view_mode="form" target="new" view_type="form" />
 
         <!--<menuitem action="action_upgrade_clients" id="menu_upgrade_clients" parent="saas_portal.menu_saas" sequence="100"/>-->
 

@@ -411,7 +411,7 @@ class SaasPortalDatabase(models.Model):
 
         url = self.server_id._request_server(path='/saas_server/backup_database', state=state, client_id=self.client_id)[0]
         res = requests.get(url, verify=(self.server_id.request_scheme == 'https' and self.server_id.verify_ssl))
-        _logger.info('delete database: %s', res.text)
+        _logger.info('backup database: %s', res.text)
         if res.ok != True:
             raise Warning('Reason: %s \n Message: %s' % (res.reason, res.content))
         data = simplejson.loads(res.text)
@@ -445,11 +445,13 @@ class SaasPortalDatabase(models.Model):
 
     @api.multi
     def edit_database(self):
-        return self._request('/saas_server/edit_database')
+        for database_obj in self:
+            return database_obj._request('/saas_server/edit_database')
 
     @api.multi
     def delete_database(self):
-        return self._request('/saas_server/delete_database')
+        for database_obj in self:
+            return database_obj._request('/saas_server/delete_database')
 
     @api.one
     def delete_database_server(self, **kwargs):

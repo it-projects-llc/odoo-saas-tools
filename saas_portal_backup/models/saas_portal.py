@@ -15,15 +15,10 @@ class SaasPortalDatabase(models.Model):
 
     @api.multi
     def delete_database(self):
-        if self[0].backup:
-            self._backup()
+        for database_obj in self:
+            if database_obj.backup:
+                database_obj._backup()
         return super(SaasPortalDatabase, self).delete_database()
-
-    @api.multi
-    def upgrade_database(self):
-        if self[0].backup:
-            self._backup()
-        return super(SaasPortalDatabase, self).upgrade_database()
 
 
 class SaasPortalClient(models.Model):
@@ -39,12 +34,7 @@ class SaasPortalClient(models.Model):
 
     @api.multi
     def delete_database(self):
-        if self[0].backup:
-            self._backup()
-        return super(SaasPortalClient, self).delete_database()
-
-    @api.multi
-    def upgrade_database(self):
-        if self[0].backup:
-            self._backup()
-        return super(SaasPortalClient, self).upgrade_database()
+        for database_obj in self:
+            if database_obj.backup:
+                database_obj._backup()
+        return super(SaasPortalDatabase, self).delete_database()

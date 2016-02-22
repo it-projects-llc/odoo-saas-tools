@@ -23,7 +23,7 @@
                     <field name="expired" invisible="1"/>
                     <button name="edit_database" type="object" icon="gtk-connect" attrs="{'invisible':[('state', 'in', ['deleted', 'draft'])]}"
                             help="Log in client database. Make sure that your browser allows popup windows from SaaS Portal"/>
-                    <button name="upgrade_database" attrs="{'invisible':[('state', 'in', ['deleted'])]}" type="object" icon="gtk-execute" help="Configure client database"/>
+                    <button name="show_upgrade_wizard" attrs="{'invisible':[('state', 'in', ['deleted'])]}" type="object" icon="gtk-execute" help="Configure client database"/>
                     <button name="delete_database_server" type="object" attrs="{'invisible':[('state', 'not in', ['pending'])]}" icon="gtk-delete" help="Delete client database"
                     confirm="Are you sure to delete this database?"/>
                 </tree>
@@ -40,7 +40,7 @@
                     <header>
                       <button string="Log in" name="edit_database" type="object" attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}"
                               icon="gtk-connect" class="oe_highlight" help="Make sure that your browser allows popup windows from SaaS Portal"/>
-                        <button string="Configure" name="upgrade_database" type="object" attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}" icon="gtk-execute" />
+                        <button string="Configure" name="show_upgrade_wizard" type="object" attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}" icon="gtk-execute" />
                         <button string="Delete" name="delete_database_server" type="object" attrs="{'invisible':['|',('state', 'not in', ['pending'])]}" icon="gtk-delete" 
                         confirm="Are you sure to delete this database?"/>
                         <button string="Sync server" type="object" name="action_sync_server" icon="gtk-refresh"/>

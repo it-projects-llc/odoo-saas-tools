@@ -453,6 +453,15 @@ class SaasPortalDatabase(models.Model):
         for database_obj in self:
             return database_obj._request('/saas_server/delete_database')
 
+    @api.multi
+    def upgrade_database(self, payload):
+        config_obj = self.env['saas.config']
+        res = []
+        for database_obj in self:
+            res.append(config_obj.do_upgrade_database(payload=payload.copy()))
+        return res
+
+
     @api.one
     def delete_database_server(self, **kwargs):
         return self._delete_database_server(**kwargs)
@@ -472,7 +481,7 @@ class SaasPortalDatabase(models.Model):
             self.state = 'deleted'
 
     @api.multi
-    def upgrade_database(self):
+    def show_upgrade_wizard(self):
         obj = self[0]
         return {
             'type': 'ir.actions.act_window',

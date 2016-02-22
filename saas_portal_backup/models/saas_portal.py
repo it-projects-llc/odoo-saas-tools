@@ -20,6 +20,13 @@ class SaasPortalDatabase(models.Model):
                 database_obj._backup()
         return super(SaasPortalDatabase, self).delete_database()
 
+    @api.multi
+    def upgrade_database(self):
+        for database_obj in self:
+            if database_obj.backup:
+                database_obj._backup()
+        return super(SaasPortalDatabase, self).upgrade_database()
+
 
 class SaasPortalClient(models.Model):
     _inherit = 'saas_portal.client'
@@ -38,3 +45,10 @@ class SaasPortalClient(models.Model):
             if database_obj.backup:
                 database_obj._backup()
         return super(SaasPortalDatabase, self).delete_database()
+
+    @api.multi
+    def upgrade_database(self):
+        for database_obj in self:
+            if database_obj.backup:
+                database_obj._backup()
+        return super(SaasPortalDatabase, self).upgrade_database()

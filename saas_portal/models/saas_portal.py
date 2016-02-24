@@ -17,7 +17,7 @@ import random
 
 from datetime import datetime, timedelta
 from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
-from openerp.addons.saas_base.exceptions import MaximumDBException
+from openerp.addons.saas_base.exceptions import MaximumDBException, MaximumTrialDBException
 
 import logging
 _logger = logging.getLogger(__name__)
@@ -107,11 +107,7 @@ class SaasPortalServer(models.Model):
         url = self._request_server(path='/saas_server/sync_server', state=state, client_id=self.client_id)[0]
         res = requests.get(url, verify=(self.request_scheme == 'https' and self.verify_ssl))
         if res.ok != True:
-            msg = """Status Code - %s
-Reason - %s
-URL - %s
-            """ % (res.status_code, res.reason, res.url)            
-            raise Warning(msg)
+            raise Warning('Reason: %s \n Message: %s' % (res.reason, res.content))
         data = simplejson.loads(res.text)
         for r in data:
             r['server_id'] = self.id
@@ -139,7 +135,8 @@ class SaasPortalPlan(models.Model):
     summary = fields.Char('Summary')
     template_id = fields.Many2one('saas_portal.database', 'Template', ondelete='restrict')
     demo = fields.Boolean('Install Demo Data')
-    maximum_allowed_db_per_partner = fields.Integer(help='maximum allowed databases per customer', default=0)
+    maximum_allowed_dbs_per_partner = fields.Integer(help='maximum allowed non-trial databases per customer', require=True, default=0)
+    maximum_allowed_trial_dbs_per_partner = fields.Integer(help='maximum allowed trial databases per customer', require=True, default=0)
 
     max_users = fields.Char('Initial Max users', default='0')
     total_storage_limit = fields.Integer('Total storage limit (MB)')
@@ -191,17 +188,31 @@ class SaasPortalPlan(models.Model):
     @api.multi
     def _create_new_database(self, dbname=None, client_id=None, partner_id=None, user_id=None, notify_user=False, trial=False, support_team_id=None, async=None):
         self.ensure_one()
-        db_count = self.env['saas_portal.client'].search_count([('partner_id', '=', partner_id),
-                                                                ('state', '=', 'open'),
-                                                                ('plan_id', '=', self.id)])
-        if self.maximum_allowed_db_per_partner != 0 and db_count >= self.maximum_allowed_db_per_partner:
-            raise MaximumDBException
 
         server = self.server_id
         if not server:
             server = self.env['saas_portal.server'].get_saas_server()
 
         server.action_sync_server()
+        if not partner_id and user_id:
+            user = self.env['res.users'].browse(user_id)
+            partner_id = user.partner_id.id
+
+        if not trial and self.maximum_allowed_dbs_per_partner != 0:
+            db_count = self.env['saas_portal.client'].search_count([('partner_id', '=', partner_id),
+                                                                    ('state', '=', 'open'),
+                                                                    ('plan_id', '=', self.id),
+                                                                    ('trial', '=', False)])
+            if db_count >= self.maximum_allowed_dbs_per_partner:
+                raise MaximumDBException("Limit of databases for this plan is %(maximum)s reached" % {'maximum': self.maximum_allowed_dbs_per_partner})
+        if trial and self.maximum_allowed_trial_dbs_per_partner != 0:
+            trial_db_count = self.env['saas_portal.client'].search_count([('partner_id', '=', partner_id),
+                                                                          ('state', '=', 'open'),
+                                                                          ('plan_id', '=', self.id),
+                                                                          ('trial', '=', True)])
+            if trial_db_count >= self.maximum_allowed_trial_dbs_per_partner:
+                raise MaximumTrialDBException("Limit of trial databases for this plan is %(maximum)s reached" % {'maximum': self.maximum_allowed_trial_dbs_per_partner})
+
 
         vals = {'name': dbname or self.generate_dbname()[0],
                 'server_id': server.id,
@@ -324,11 +335,7 @@ class SaasPortalPlan(models.Model):
                                                                       params=werkzeug.url_encode(params))
         res = requests.get(url, verify=(plan.server_id.request_scheme == 'https' and plan.server_id.verify_ssl))
         if res.ok != True:
-            msg = """Status Code - %s
-Reason - %s
-URL - %s
-            """ % (res.status_code, res.reason, res.url)
-            raise Warning(msg)
+            raise Warning('Reason: %s \n Message: %s' % (res.reason, res.content))
         return self.action_sync_server()
 
     @api.multi
@@ -347,7 +354,8 @@ URL - %s
 
     @api.multi
     def delete_template(self):
-        res = self[0].template_id.delete_database()
+        self.ensure_one()
+        res = self.template_id.delete_database_server()
         return res
 
 
@@ -468,7 +476,7 @@ class SaasPortalClient(models.Model):
     user_id = fields.Many2one('res.users', default=lambda self: self.env.user, string='Salesperson')
     notification_sent = fields.Boolean(default=False, readonly=True, help='notification about oncoming expiration has sent')
     support_team_id = fields.Many2one('saas_portal.support_team', 'Support Team')
-    expiration_datetime_sent = fields.Datetime(help='updates every time update_client_db is executed')
+    expiration_datetime_sent = fields.Datetime(help='updates every time send_expiration_info is executed')
     active = fields.Boolean(default=True, compute='_compute_active', store=True)
     block_on_expiration = fields.Boolean('Block clients on expiration', default=False)
     block_on_storage_exceed = fields.Boolean('Block clients on storage exceed', default=False)
@@ -516,7 +524,7 @@ class SaasPortalClient(models.Model):
     @api.model
     def _cron_notify_expired_clients(self):
         # send notification about expiration by email
-        notification_delta = int(self.env['ir.config_parameter'].get_param('saas.expiration_notify_in_advance', '0'))
+        notification_delta = int(self.env['ir.config_parameter'].get_param('saas_portal.expiration_notify_in_advance', '0'))
         if notification_delta > 0:
             records = self.search([('expiration_datetime', '<=', (datetime.now() + timedelta(days=notification_delta)).strftime(DEFAULT_SERVER_DATETIME_FORMAT)),
                                    ('notification_sent', '=', False)])
@@ -655,9 +663,10 @@ class SaasPortalClient(models.Model):
     @api.one
     def write(self, vals):
         if 'expiration_datetime' in vals and vals['expiration_datetime']:
-            self.update_client_db()
-        result = super(SaasPortalClient, self).write(vals)
-        return result
+            self.env['saas.config'].do_upgrade_database(
+                {'params': [{'key': 'saas_client.expiration_datetime', 'value': vals['expiration_datetime'], 'hidden': True}]},
+                self.id)
+        return super(SaasPortalClient, self).write(vals)
 
     @api.multi
     def storage_usage_monitoring(self):

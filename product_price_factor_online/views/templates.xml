@@ -1,0 +1,18 @@
+<openerp>
+  <data>
+
+    <template id="variants_factor" inherit_id="website_sale.variants">
+      <xpath expr="//option/span[@t-if='value_id.price_extra']" position="after">
+        <span t-if="value_id.price_factor and value_id.price_factor != 1">
+          x<span t-field="value_id.price_factor" style="white-space: nowrap;" />
+        </span>
+      </xpath>
+      <xpath expr="//label/span[@t-if='value_id.price_extra']" position="after">
+        <span class="badge" t-if="value_id.price_factor and value_id.price_factor != 1">
+          x<span t-field="value_id.price_factor" style="white-space: nowrap;"/>
+        </span>
+      </xpath>
+    </template>
+
+  </data>
+</openerp>

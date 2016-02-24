@@ -10,11 +10,13 @@ class AccountInvoice(models.Model):
         res = super(AccountInvoice, self).invoice_validate()
 
         for line in self.invoice_line:
-            client_obj = self.env['saas_portal.client'].search([('partner_id', '=', self.partner_id.id),
-                                                                ('plan_id', '=', line.plan_id.id)])
+            client_obj = self.env['saas_portal.client'].search(['&', '&', ('partner_id', '=', self.partner_id.id),
+                                                                ('plan_id', '=', line.plan_id.id),
+                                                                '|', '&',
+                                                                ('trial', '=', True),
+                                                                ('plan_id.non_trial_instances', '=', 'from_trial'),
+                                                                ('trial', '=', False)])
             if len(client_obj) == 1:
-                payload = {'params': [{'key': 'saas_client.max_users', 'value': line.max_users, 'hidden': True}]}
-                self.env['saas.config'].do_upgrade_database(payload, client_obj.id)
                 line.saas_portal_client_id = client_obj.id
                 client_obj.subscription_start = client_obj.subscription_start or fields.Datetime.now()
         return res
@@ -22,7 +24,11 @@ class AccountInvoice(models.Model):
     @api.multi
     def confirm_paid(self):
         for record in self:
-            client_plan_id_list = [client.plan_id.id for client in self.env['saas_portal.client'].search([('partner_id', '=', record.partner_id.id)])]
+            client_plan_id_list = [client.plan_id.id for client in self.env['saas_portal.client'].search([('partner_id', '=', record.partner_id.id),
+                                                                                                          '|', '&',
+                                                                                                          ('trial', '=', True),
+                                                                                                          ('plan_id.non_trial_instances', '=', 'from_trial'),
+                                                                                                          ('trial', '=', False)])]
             invoice_plan_id_list = [line.plan_id.id for line in record.invoice_line]
             plans = set(invoice_plan_id_list) - set(client_plan_id_list)
             if plans:

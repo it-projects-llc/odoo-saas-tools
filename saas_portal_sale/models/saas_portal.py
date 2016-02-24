@@ -7,6 +7,10 @@ from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
 class SaasPortalPlan(models.Model):
     _inherit = 'saas_portal.plan'
 
+    free_subdomains = fields.Boolean(help='allow to choose subdomains for trials otherwise allow only after payment', default=True)
+    non_trial_instances = fields.Selection([('from_trial', 'From trial'), ('create_new', 'Create new')], string='Non-trial instances',
+                                           help='Whether to use trial database or create new one when user make payment', required=True, default='create_new')
+
     @api.multi
     def _create_new_database(self, dbname=None, client_id=None, partner_id=None, user_id=None, notify_user=False, trial=False, support_team_id=None, async=None):
         res = super(SaasPortalPlan, self)._create_new_database(dbname=dbname,
@@ -19,16 +23,19 @@ class SaasPortalPlan(models.Model):
                                                               async=async)
         if not partner_id:
             return res
-        lines = self.env['saas_portal.find_payments_wizard'].find_partner_payments(partner_id=partner_id, plan_id=self.id)
+        if trial and self.non_trial_instances != 'from_trial':
+            return res
 
+        lines = self.env['saas_portal.find_payments_wizard'].find_partner_payments(partner_id=partner_id, plan_id=self.id)
         client_obj = self.env['saas_portal.client'].browse(res.get('id'))
+        lines.write({'saas_portal_client_id': client_obj.id})
 
         if not trial:
             client_obj.subscription_start = client_obj.create_date
 
-        lines.write({'saas_portal_client_id': client_obj.id})
         payload = client_obj.get_upgrade_database_payload()
         self.env['saas.config'].do_upgrade_database(payload, client_obj.id)
+
         return res
 
 
@@ -80,5 +87,4 @@ class SaasPortalClient(models.Model):
 
 
             res['params'].extend(params)
-            print '\n\n\n', 'in get_upgrade_database_payload ', 'res ', res, '\n\n\n'
         return res

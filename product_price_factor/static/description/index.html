@@ -3,23 +3,46 @@
         <div class="oe_span12">
             <h2 class="oe_slogan">Product price multiplier</h2>
             <h3 class="oe_slogan">Variate your product prices with multiplier</h3>
-            <p>
-             Odoo product model by it self has not ability to scale price different ways except of simple adding. 
-             This module adds ability to scale product price by multiplying it. 
-             For example if you need to sale some web service for hundred of user for two months you will be 
-             forced to create different product positions for same item. But using this module you can just multiply price the way you want.
+            <p>This module was designed for our Saas portal sale module to customize SaaS prices.
+                The task was to manage prices with regards of the maximum number of users attribute along with the
+                subscription period attribute. Price should be first increased according to subscription period and then
+                the result should be multiplied according to maximum number of users.
+                Odoo product.product model by itself has no ability to multiply prices depending on product variants.
+                There is only addition implemented. So this module gives this ability.
+                It can be used also in cases where some percents should be applied coherently on a price.
             </p>
             <h4>Instruction</h4>
             <div class="oe_row_img oe_centered oe_mt32">
-            <p>First of all enter in debug mode and mark "Manage product variants" checkbox in your user settings.</p>
+                <p>First of all enter in debug mode and mark "Manage product variants" checkbox in your user
+                    settings.</p>
                 <img class="oe_picture oe_screenshot" src="1.png"/>
-            <p>Then open some product and add "Attribute" and pair or more of "Attribute values". </p>    
+                <p>Then open the Variants tab of your Product and create attributes with values. Important thing here is
+                    the order of attributes. When price is calculated the first attribute is processed first. The second
+                    attribute calculation takes the previous step result and adds and multiplies on it and so on. You
+                    can reorder the attributes by drag&drop them in form's edit mode. Move your mouse pointer on the
+                    column between the "Attribute" and "Attribute values" columns then grab and position the line as
+                    needed.
+                </p>
                 <img class="oe_picture oe_screenshot" src="2.png"/>
-            <p>Press "Save" and you will see this button. Press it.</p>    
+                <p>Then you will see "Variant Prices" button. Press it. </p>
                 <img class="oe_picture oe_screenshot" src="3.png"/>
-            <p>Enter corresponding multiplier for each position. </p>
+                <p>You got to fill this table according to your needs. Consider attribute's price factor value as a
+                    multiplier. It can be any number except zero.
+                    By example: we sale SaaS Service with one month subscription period and 3 users maximum. This
+                    variant of product should cost 10$. Base price for this product also 10$. We have there 1.0 price
+                    factor and 0.0 price extra for each of our two attributes. After 0.0 addition and multiplication by
+                    1.0 the price obviously should stay the same. So this is base variant of product.
+                    Further we want to multiply our price by 2 for the same product with 6 users maximum variant. For
+                    this case we leave the same values for monthly subscription and place 2.0 in the price factor field
+                    of Number of users attribute value 6. And so on.
+                </p>
                 <img class="oe_picture oe_screenshot" src="4.png"/>
-            <p>In this example single passengers have regular price (coeficient is 1). Family passingers have coeficient of 1.3 (price * 1.3).</p> 
+                <p>Create new sale order and add items like on the screenshot below. Here you can see how attributes
+                    affect the price. For example the price of the Quarter Subscription variant of service with 6 users
+                    limit is calculated like this: (10+18)*2=56. I.e. basic price plus Subscription period variant extra
+                    price multiplied on price factor 2.0 assigned for 6 users.
+                </p>
+                <img class="oe_picture oe_screenshot" src="5.png"/>
             </div>
         </div>
 

@@ -350,7 +350,7 @@ class SaasPortalPlan(models.Model):
 
     @api.multi
     def upgrade_template(self):
-        return self[0].template_id.upgrade_database()
+        return self[0].template_id.show_upgrade_wizard()
 
     @api.multi
     def delete_template(self):
@@ -454,11 +454,14 @@ class SaasPortalDatabase(models.Model):
             return database_obj._request('/saas_server/delete_database')
 
     @api.multi
-    def upgrade_database(self, payload):
+    def upgrade(self, payload=None):
         config_obj = self.env['saas.config']
         res = []
-        for database_obj in self:
-            res.append(config_obj.do_upgrade_database(payload=payload.copy()))
+
+        if payload != None:
+            # maybe use multiprocessing here
+            for database_obj in self:
+                res.append(config_obj.do_upgrade_database(payload.copy(), database_obj.id))
         return res
 
 

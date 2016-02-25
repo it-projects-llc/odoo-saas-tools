@@ -2,7 +2,7 @@
 {
     'name': "Product price factor",
     'summary': """Variate your product prices with multiplier""",
-    'license': 'GPL-3',
+    'license': 'LGPL-3',
     'author': "IT-Projects LLC, Ildar Nasyrov",
     'website': "https://twitter.com/nasyrov_ildar",
     'category': 'Sales Management',

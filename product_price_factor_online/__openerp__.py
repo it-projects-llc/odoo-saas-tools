@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "Product price factor online",
+    'name': "Product price factor for web shop",
     'category': 'Website',
     'license': 'GPL-3',
     'author': "IT-Projects LLC, Ildar Nasyrov",

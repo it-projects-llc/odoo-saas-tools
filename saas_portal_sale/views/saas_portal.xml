@@ -68,5 +68,19 @@
             </field>
         </record>
 
+        <record id="view_sale_plans_form" model="ir.ui.view">
+            <field name="name">saas_portal_sale.plans.form</field>
+            <field name="model">saas_portal.plan</field>
+            <field name="inherit_id" ref="saas_portal.view_plans_form"/>
+            <field name="arch" type="xml">
+                <data>
+                    <xpath expr="//field[@name='maximum_allowed_trial_dbs_per_partner']" position="after">
+                      <field name="free_subdomains"/>
+                      <field name="non_trial_instances"/>
+                    </xpath>
+                </data>
+            </field>
+        </record>
+
     </data>
 </openerp>

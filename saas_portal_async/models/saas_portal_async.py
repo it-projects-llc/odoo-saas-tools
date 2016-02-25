@@ -1,9 +1,14 @@
 # -*- coding: utf-8 -*-
-from openerp.addons.saas_utils import connector, database
 from openerp.addons.web.http import request
 from openerp import models, fields, api, SUPERUSER_ID
-from openerp.addons.connector.queue.job import job, related_action
-from openerp.addons.connector.session import ConnectorSession
+try:
+    from openerp.addons.connector.queue.job import job, related_action
+    from openerp.addons.connector.session import ConnectorSession
+except:
+    def empty_decorator(func):
+        return func
+    job = empty_decorator
+
 from openerp.models import TransientModel
 
 @job

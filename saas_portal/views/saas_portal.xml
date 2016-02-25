@@ -23,7 +23,7 @@
                     <field name="expired" invisible="1"/>
                     <button name="edit_database" type="object" icon="gtk-connect" attrs="{'invisible':[('state', 'in', ['deleted', 'draft'])]}"
                             help="Log in client database. Make sure that your browser allows popup windows from SaaS Portal"/>
-                    <button name="upgrade_database" attrs="{'invisible':[('state', 'in', ['deleted'])]}" type="object" icon="gtk-execute" help="Configure client database"/>
+                    <button name="show_upgrade_wizard" attrs="{'invisible':[('state', 'in', ['deleted'])]}" type="object" icon="gtk-execute" help="Configure client database"/>
                     <button name="delete_database_server" type="object" attrs="{'invisible':[('state', 'not in', ['pending'])]}" icon="gtk-delete" help="Delete client database"
                     confirm="Are you sure to delete this database?"/>
                 </tree>
@@ -35,12 +35,12 @@
             <field name="name">saas_portal.client.form</field>
             <field name="model">saas_portal.client</field>
             <field name="arch" type="xml">
-                <form string="Clients" create="false" delete="false" edit="false">
+                <form string="Clients" create="false" delete="false" edit="true">
                     <field name="expired" invisible="1"/>
                     <header>
                       <button string="Log in" name="edit_database" type="object" attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}"
                               icon="gtk-connect" class="oe_highlight" help="Make sure that your browser allows popup windows from SaaS Portal"/>
-                        <button string="Configure" name="upgrade_database" type="object" attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}" icon="gtk-execute" />
+                        <button string="Configure" name="show_upgrade_wizard" type="object" attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}" icon="gtk-execute" />
                         <button string="Delete" name="delete_database_server" type="object" attrs="{'invisible':['|',('state', 'not in', ['pending'])]}" icon="gtk-delete" 
                         confirm="Are you sure to delete this database?"/>
                         <button string="Sync server" type="object" name="action_sync_server" icon="gtk-refresh"/>
@@ -438,7 +438,7 @@
             <field name="name">saas_portal.databases.form</field>
             <field name="model">saas_portal.database</field>
             <field name="arch" type="xml">
-                <form string="plans" create="false">
+              <form string="plans" create="false">
                     <sheet>
                         <group>
                            <field name="name" />

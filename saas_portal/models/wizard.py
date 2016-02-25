@@ -58,10 +58,8 @@ class SaasConfig(models.TransientModel):
             'fixes': [[x.model, x.method] for x in obj.fix_ids],
             'params': [{'key': x.key, 'value': x.value, 'hidden': x.hidden} for x in obj.param_ids],
         }
-        res = []
-        # maybe use multiprocessing here
-        for database in self.database_ids:
-            res.append(self.do_upgrade_database(payload.copy(), database.id))
+        res = self.database_ids.upgrade(payload=payload)
+
         res_str = '\n\n'.join(res)
         obj.write({'description': res_str})
         return {

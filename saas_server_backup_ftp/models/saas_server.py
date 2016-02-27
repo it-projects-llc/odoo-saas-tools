@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import StringIO
+import tempfile
 from openerp import api, models
 import xmlrpclib
 import socket
@@ -30,40 +30,38 @@ class SaasServerClient(models.Model):
         return False
 
     @api.model
-    def _transport_backup(self, db_dump, filename=None):
+    def _transport_backup(self, dump_db, filename=None):
         server = self.env['ir.config_parameter'].get_param('saas_server.sftp_server', None)
         username = self.env['ir.config_parameter'].get_param('saas_server.sftp_username', None)
         password = self.env['ir.config_parameter'].get_param('saas_server.sftp_password', None)
         path = self.env['ir.config_parameter'].get_param('saas_server.sftp_path', None)
 
+        srv = pysftp.Connection(host=server, username=username, password=password)
+        #set keepalive to prevent socket closed / connection dropped error
+        srv._transport.set_keepalive(30)
+
         try:
-            srv = pysftp.Connection(host=server, username=username, password=password)
-            #set keepalive to prevent socket closed / connection dropped error
-            srv._transport.set_keepalive(30)
-
-            try:
-                srv.chdir(path)
-            except IOError:
-                #Create directory and subdirs if they do not exist.
-                currentDir = ''
-                for dirElement in path.split('/'):
-                    currentDir += dirElement + '/'
-                    try:
-                        srv.chdir(currentDir)
-                    except:
-                        print('(Part of the) path didn\'t exist. Creating it now at ' + currentDir)
-                        #Make directory and then navigate into it
-                        srv.mkdir(currentDir, mode=777)
-                        srv.chdir(currentDir)
-                        pass
             srv.chdir(path)
-            output = StringIO.StringIO(db_dump)
-            srv.putfo(output, filename)
-            output.close()
-            srv.close()
-        except Exception, e:
-            _logger.debug('Exception! We couldn\'t back up to the FTP server..')
+        except IOError:
+            #Create directory and subdirs if they do not exist.
+            currentDir = ''
+            for dirElement in path.split('/'):
+                currentDir += dirElement + '/'
+                try:
+                    srv.chdir(currentDir)
+                except:
+                    print('(Part of the) path didn\'t exist. Creating it now at ' + currentDir)
+                    # Make directory and then navigate into it
+                    srv.mkdir(currentDir, mode=777)
+                    srv.chdir(currentDir)
+                    pass
 
+        srv.chdir(path)
+        with tempfile.TemporaryFile() as t:
+            dump_db(t)
+            t.seek(0)
+            srv.putfo(t, filename)
+        srv.close()
 
     @api.model
     def schedule_saas_databases_backup(self):

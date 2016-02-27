@@ -332,7 +332,7 @@ class SaasServerClient(models.Model):
         self.name = new_dbname
 
     @api.model
-    def _transport_backup(self, db_dump, filename=None):
+    def _transport_backup(self, dump_db, filename=None):
         '''
         backup transport agents should override this
         '''
@@ -344,18 +344,23 @@ class SaasServerClient(models.Model):
         for database_obj in self:
             data = {}
             data['name'] = database_obj.name
-            try:
-                db_dump = base64.b64decode(db.exp_dump(database_obj.name))
-                filename = "%(db_name)s_%(timestamp)s.zip" % {
+
+            filename = "%(db_name)s_%(timestamp)s.zip" % {
                     'db_name': database_obj.name,
                     'timestamp': datetime.utcnow().strftime(
-                        "%Y-%m-%d_%H-%M-%SZ")
-                }
-                database_obj._transport_backup(db_dump, filename=filename)
+                        "%Y-%m-%d_%H-%M-%SZ")}
+
+            def dump_db(stream):
+                return db.dump_db(database_obj.name, stream)
+
+            try:
+                database_obj._transport_backup(dump_db, filename=filename)
                 data['status'] = 'success'
             except Exception, e:
                 _logger.exception('An error happened during database %s backup' %(database_obj.name))
                 data['status'] = 'fail'
                 data['message'] = str(e)
+
             res.append(data)
+
         return res

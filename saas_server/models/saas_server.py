@@ -338,20 +338,24 @@ class SaasServerClient(models.Model):
         '''
         raise exceptions.Warning('Transport agent has not been configured')
 
-    @api.one
+    @api.multi
     def backup_database(self):
-        data = {}
-        try:
-            db_dump = base64.b64decode(db.exp_dump(self.name))
-            filename = "%(db_name)s %(timestamp)s.zip" % {
-            'db_name': self.name,
-            'timestamp': datetime.utcnow().strftime(
-                "%Y-%m-%d_%H-%M-%SZ")
-            }
-            self._transport_backup(db_dump, filename=filename)
-            data['status'] = 'success'
-        except Exception, e:
-            _logger.exception('An error happened during database %s backup' %(self.name))
-            data['status'] = 'fail'
-            data['message'] = str(e)
-        return data
+        res = []
+        for database_obj in self:
+            data = {}
+            data['name'] = database_obj.name
+            try:
+                db_dump = base64.b64decode(db.exp_dump(database_obj.name))
+                filename = "%(db_name)s %(timestamp)s.zip" % {
+                    'db_name': database_obj.name,
+                    'timestamp': datetime.utcnow().strftime(
+                        "%Y-%m-%d_%H-%M-%SZ")
+                }
+                database_obj._transport_backup(db_dump, filename=filename)
+                data['status'] = 'success'
+            except Exception, e:
+                _logger.exception('An error happened during database %s backup' %(database_obj.name))
+                data['status'] = 'fail'
+                data['message'] = str(e)
+            res.append(data)
+        return res

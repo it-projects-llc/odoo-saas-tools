@@ -1,7 +1,6 @@
 from openerp.addons.saas_base.tools import get_size
 import time
 import openerp
-import base64
 from datetime import datetime
 from openerp.service import db
 from openerp import api, models, fields, SUPERUSER_ID, exceptions
@@ -346,9 +345,9 @@ class SaasServerClient(models.Model):
             data['name'] = database_obj.name
 
             filename = "%(db_name)s_%(timestamp)s.zip" % {
-                    'db_name': database_obj.name,
-                    'timestamp': datetime.utcnow().strftime(
-                        "%Y-%m-%d_%H-%M-%SZ")}
+                'db_name': database_obj.name,
+                'timestamp': datetime.utcnow().strftime(
+                    "%Y-%m-%d_%H-%M-%SZ")}
 
             def dump_db(stream):
                 return db.dump_db(database_obj.name, stream)

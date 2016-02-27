@@ -3,6 +3,8 @@ import sys
 import time
 from multiprocessing.pool import Pool
 import multiprocessing
+import tempfile
+import base64
 from tempfile import NamedTemporaryFile
 import math
 
@@ -138,10 +140,15 @@ class SaasServerClient(models.Model):
         _logger.info('Data successfully backed up to s3') 
     
     @api.model
-    def _transport_backup(self, db_dump, filename=None):
+    def _transport_backup(self, dump_db, filename=None):
         '''
         send db dump to S3
-        '''           
+        '''
+        with tempfile.TemporaryFile() as t:
+            dump_db(t)
+            t.seek(0)
+            db_dump = base64.b64decode(t.read().encode('base64'))
+
         if parallel_upload and sys.getsizeof(db_dump) > 5242880:
             ir_params = self.env['ir.config_parameter']
             aws_key = ir_params.get_param('saas_s3.saas_s3_aws_accessid')

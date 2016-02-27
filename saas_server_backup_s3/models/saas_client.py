@@ -4,6 +4,7 @@ import time
 from multiprocessing.pool import Pool
 import multiprocessing
 import tempfile
+import base64
 from tempfile import NamedTemporaryFile
 import math
 
@@ -146,7 +147,7 @@ class SaasServerClient(models.Model):
         with tempfile.TemporaryFile() as t:
             dump_db(t)
             t.seek(0)
-            db_dump = t.read().encode('base64')
+            db_dump = base64.b64decode(t.read().encode('base64'))
 
         if parallel_upload and sys.getsizeof(db_dump) > 5242880:
             ir_params = self.env['ir.config_parameter']

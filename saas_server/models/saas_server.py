@@ -346,7 +346,7 @@ class SaasServerClient(models.Model):
             data['name'] = database_obj.name
             try:
                 db_dump = base64.b64decode(db.exp_dump(database_obj.name))
-                filename = "%(db_name)s %(timestamp)s.zip" % {
+                filename = "%(db_name)s_%(timestamp)s.zip" % {
                     'db_name': database_obj.name,
                     'timestamp': datetime.utcnow().strftime(
                         "%Y-%m-%d_%H-%M-%SZ")

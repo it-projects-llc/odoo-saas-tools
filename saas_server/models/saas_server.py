@@ -1,7 +1,6 @@
 from openerp.addons.saas_base.tools import get_size
 import time
 import openerp
-import base64
 from datetime import datetime
 from openerp.service import db
 from openerp import api, models, fields, SUPERUSER_ID, exceptions
@@ -332,26 +331,35 @@ class SaasServerClient(models.Model):
         self.name = new_dbname
 
     @api.model
-    def _transport_backup(self, db_dump, filename=None):
+    def _transport_backup(self, dump_db, filename=None):
         '''
         backup transport agents should override this
         '''
         raise exceptions.Warning('Transport agent has not been configured')
 
-    @api.one
+    @api.multi
     def backup_database(self):
-        data = {}
-        try:
-            db_dump = base64.b64decode(db.exp_dump(self.name))
-            filename = "%(db_name)s %(timestamp)s.zip" % {
-            'db_name': self.name,
-            'timestamp': datetime.utcnow().strftime(
-                "%Y-%m-%d_%H-%M-%SZ")
-            }
-            self._transport_backup(db_dump, filename=filename)
-            data['status'] = 'success'
-        except Exception, e:
-            _logger.exception('An error happened during database %s backup' %(self.name))
-            data['status'] = 'fail'
-            data['message'] = str(e)
-        return data
+        res = []
+        for database_obj in self:
+            data = {}
+            data['name'] = database_obj.name
+
+            filename = "%(db_name)s_%(timestamp)s.zip" % {
+                'db_name': database_obj.name,
+                'timestamp': datetime.utcnow().strftime(
+                    "%Y-%m-%d_%H-%M-%SZ")}
+
+            def dump_db(stream):
+                return db.dump_db(database_obj.name, stream)
+
+            try:
+                database_obj._transport_backup(dump_db, filename=filename)
+                data['status'] = 'success'
+            except Exception, e:
+                _logger.exception('An error happened during database %s backup' %(database_obj.name))
+                data['status'] = 'fail'
+                data['message'] = str(e)
+
+            res.append(data)
+
+        return res

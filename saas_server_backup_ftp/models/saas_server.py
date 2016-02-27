@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 import tempfile
 from openerp import api, models
-import xmlrpclib
-import socket
 try:
     import pysftp
 except ImportError:
@@ -14,20 +12,6 @@ _logger = logging.getLogger(__name__)
 
 class SaasServerClient(models.Model):
     _inherit = 'saas_server.client'
-
-    @api.multi
-    def _check_db_exist(self):
-        # TODO: should we use this function somehow?
-        conn = xmlrpclib.ServerProxy('http://localhost:8069/xmlrpc/db')
-        try:
-            db_list = conn.list()
-        except socket.error,e:
-            raise e
-
-        for rec in self:
-            if rec.name in db_list:
-                return True
-        return False
 
     @api.model
     def _transport_backup(self, dump_db, filename=None):

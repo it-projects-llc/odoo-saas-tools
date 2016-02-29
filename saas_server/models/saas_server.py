@@ -1,6 +1,8 @@
 from openerp.addons.saas_base.tools import get_size
 import time
 import openerp
+from datetime import datetime
+from openerp.service import db
 from openerp import api, models, fields, SUPERUSER_ID, exceptions
 from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
 import psycopg2
@@ -201,9 +203,9 @@ class SaasServerClient(models.Model):
             return {'state': 'deleted'}
         users = client_env['res.users'].search([('share', '=', False)])
         param_obj = client_env['ir.config_parameter']
-        max_users = param_obj.get_param('saas_client.max_users', '_')
-        suspended = param_obj.get_param('saas_client.suspended', '0')
-        total_storage_limit = param_obj.get_param('saas_client.total_storage_limit', '0')
+        max_users = param_obj.get_param('saas_client.max_users', '0').strip()
+        suspended = param_obj.get_param('saas_client.suspended', '0').strip()
+        total_storage_limit = param_obj.get_param('saas_client.total_storage_limit', '0').strip()
         users_len = len(users)
         data_dir = openerp.tools.config['data_dir']
 
@@ -314,7 +316,7 @@ class SaasServerClient(models.Model):
     def delete_expired_databases(self):
         now = time.strftime(DEFAULT_SERVER_DATETIME_FORMAT)
 
-        res = self.search([('state', 'not in', ['deleted']), ('expiration_datetime', '<=', now), ('trial', '=', True)])
+        res = self.search([('state', 'not in', ['deleted', 'template']), ('expiration_datetime', '<=', now), ('trial', '=', True)])
         _logger.info('delete_expired_databases %s', res)
         res.delete_database()
 
@@ -327,3 +329,37 @@ class SaasServerClient(models.Model):
     def rename_database(self, new_dbname):
         openerp.service.db.exp_rename(self.name, new_dbname)
         self.name = new_dbname
+
+    @api.model
+    def _transport_backup(self, dump_db, filename=None):
+        '''
+        backup transport agents should override this
+        '''
+        raise exceptions.Warning('Transport agent has not been configured')
+
+    @api.multi
+    def backup_database(self):
+        res = []
+        for database_obj in self:
+            data = {}
+            data['name'] = database_obj.name
+
+            filename = "%(db_name)s_%(timestamp)s.zip" % {
+                'db_name': database_obj.name,
+                'timestamp': datetime.utcnow().strftime(
+                    "%Y-%m-%d_%H-%M-%SZ")}
+
+            def dump_db(stream):
+                return db.dump_db(database_obj.name, stream)
+
+            try:
+                database_obj._transport_backup(dump_db, filename=filename)
+                data['status'] = 'success'
+            except Exception, e:
+                _logger.exception('An error happened during database %s backup' %(database_obj.name))
+                data['status'] = 'fail'
+                data['message'] = str(e)
+
+            res.append(data)
+
+        return res

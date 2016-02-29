@@ -202,12 +202,14 @@ def rpc_auth(dbname, admin_username='admin', admin_password='admin'):
     common = xmlrpclib.ServerProxy('{}/xmlrpc/2/common'.format(main_url))
     admin_uid = common.authenticate(dbname, admin_username, admin_password, {})
     models = xmlrpclib.ServerProxy('{}/xmlrpc/2/object'.format(main_url))
+    assert admin_uid, 'Authentication failed %s' % ((dbname, admin_username, admin_password),)
 
     return dbname, models, admin_uid, admin_password
 
 
 def rpc_execute_kw(auth, model, method, rpc_args=[], rpc_kwargs={}):
     dbname, models, admin_uid, admin_password = auth
+    log('auth', auth)
     log('RPC Execute', model, method, rpc_args, rpc_kwargs)
     if args.get('simulate'):
         return
@@ -310,6 +312,7 @@ def pg_createdb(dbname, without_demo=True):
         return
     with local_pgadmin_cursor() as local_cr:
         local_cr.execute("""CREATE DATABASE "%s" TEMPLATE template0 LC_COLLATE 'C' ENCODING 'unicode'""" % dbname)
+        log('Result: %s' % local_cr.statusmessage)
 
 
 def pg_dropdb(dbname):
@@ -318,7 +321,7 @@ def pg_dropdb(dbname):
         return
     with local_pgadmin_cursor() as local_cr:
         local_cr.execute('DROP DATABASE IF EXISTS "%s"' % dbname)
-
+        log('Result: %s' % local_cr.statusmessage)
 
 def find_databases(root_database):
     with local_pgadmin_cursor() as local_cr:

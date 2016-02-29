@@ -58,10 +58,8 @@ class SaasConfig(models.TransientModel):
             'fixes': [[x.model, x.method] for x in obj.fix_ids],
             'params': [{'key': x.key, 'value': x.value, 'hidden': x.hidden} for x in obj.param_ids],
         }
-        res = []
-        # maybe use multiprocessing here
-        for database in self.database_ids:
-            res.append(self.do_upgrade_database(payload.copy(), database.id))
+        res = self.database_ids.upgrade(payload=payload)
+
         res_str = '\n\n'.join(res)
         obj.write({'description': res_str})
         return {
@@ -130,9 +128,10 @@ class SaasPortalCreateClient(models.TransientModel):
     user_id = fields.Many2one('res.users', string='User')
     notify_user = fields.Boolean(help='Notify user by email when database will have been created', default=False)
     support_team_id = fields.Many2one('saas_portal.support_team', 'Support Team', default=lambda self: self.env.user.support_team_id)
+    async_creation = fields.Boolean('Asynchronous', default=False, help='Asynchronous creation of client base')
 
     @api.onchange('user_id')
-    def update_parter(self):
+    def update_partner(self):
         if self.user_id:
             self.partner_id = self.user_id.partner_id
 
@@ -141,7 +140,10 @@ class SaasPortalCreateClient(models.TransientModel):
         wizard = self[0]
         res = wizard.plan_id.create_new_database(dbname=wizard.name, partner_id=wizard.partner_id.id, user_id=self.user_id.id,
                                                  notify_user=self.notify_user,
-                                                 support_team_id=self.support_team_id.id)
+                                                 support_team_id=self.support_team_id.id,
+                                                 async=self.async_creation)
+        if self.async_creation:
+            return
         client = self.env['saas_portal.client'].browse(res.get('id'))
         client.server_id.action_sync_server()
         return {

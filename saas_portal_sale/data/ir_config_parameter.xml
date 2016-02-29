@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="1">
+        <record id="saas_page_for_nonfree_subdomains" model="ir.config_parameter">
+            <field name="key">saas_portal.page_for_nonfree_subdomains</field>
+            <field name="value">/</field>
+        </record>
+    </data>
+</openerp>

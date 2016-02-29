@@ -49,4 +49,4 @@ class SaasServerClient(models.Model):
 
     @api.model
     def schedule_saas_databases_backup(self):
-        self.search([]).backup_database()
+        self.search([('state', '!=', 'deleted')]).backup_database()

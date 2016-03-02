@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 import tempfile
 from openerp import api, models
+import logging
+_logger = logging.getLogger(__name__)
 try:
     import pysftp
 except ImportError:
-    raise ImportError('This module needs pysftp to automaticly write backups to the FTP through SFTP. Please install pysftp on your system. (sudo pip install pysftp)')
-
-import logging
-_logger = logging.getLogger(__name__)
+    _logger.critical('saas_server_backup_ftp requires the python library pysftp which is not found on your installation')
 
 
 class SaasServerClient(models.Model):

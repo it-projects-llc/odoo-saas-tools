@@ -2,11 +2,12 @@
 from openerp import models, fields
 from openerp import tools, _
 from openerp.osv import osv
-
+import logging
+_logger = logging.getLogger(__name__)
 try:
     import pysftp
 except ImportError:
-    raise ImportError('This module needs pysftp to automaticly write backups to the FTP through SFTP. Please install pysftp on your system. (sudo pip install pysftp)')
+    _logger.critical('saas_server_backup_ftp requires the python library pysftp which is not found on your installation')
 
 
 class SaasPortalConfigWizard(models.TransientModel):

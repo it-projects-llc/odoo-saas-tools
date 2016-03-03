@@ -126,7 +126,7 @@
             <field name="model">saas_portal.server</field>
             <field name="priority">4</field>
             <field name="arch" type="xml">
-                <tree string="Server">
+                <tree string="Server" delete="false">
                     <field name="sequence" widget="handle"/>
                     <field name="name"/>
                     <field name="active"/>
@@ -139,7 +139,7 @@
             <field name="name">saas_portal.server.form</field>
             <field name="model">saas_portal.server</field>
             <field name="arch" type="xml">
-                <form string="Server">
+                <form string="Server" delete="false">
                     <header>
                         <!-- TODO
                              action_create_server will ask for master password only.
@@ -426,7 +426,7 @@
             <field name="name">saas_portal.databases.tree</field>
             <field name="model">saas_portal.database</field>
             <field name="arch" type="xml">
-                <tree string="Plans" create="false">
+                <tree string="Plans" create="false" edit="false" delete="false">
                      <field name="name" />
                      <field name="state" />
                      <field name="client_id" />
@@ -438,7 +438,7 @@
             <field name="name">saas_portal.databases.form</field>
             <field name="model">saas_portal.database</field>
             <field name="arch" type="xml">
-              <form string="plans" create="false">
+              <form string="plans" create="false" edit="false" delete="false">
                     <sheet>
                         <group>
                            <field name="name" />

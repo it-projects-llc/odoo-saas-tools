@@ -42,7 +42,7 @@ class SaasPortalPlan(models.Model):
 class SaasPortalClient(models.Model):
     _inherit = 'saas_portal.client'
 
-    subscription_start = fields.Datetime(string="Subscription start", track_visibility='onchange')
+    subscription_start = fields.Datetime(string="Subscription start", track_visibility='onchange', readonly=True)
     expiration_datetime = fields.Datetime(string="Expiration", compute='_handle_paid_invoices',
                                           store=True,
                                           help='Subscription start plus all paid days from related invoices')

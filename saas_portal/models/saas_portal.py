@@ -507,8 +507,8 @@ class SaasPortalClient(models.Model):
     _inherit = ['mail.thread', 'saas_portal.database', 'saas_base.client']
 
     name = fields.Char(required=True)
-    partner_id = fields.Many2one('res.partner', string='Partner', track_visibility='onchange')
-    plan_id = fields.Many2one('saas_portal.plan', string='Plan', track_visibility='onchange', ondelete='restrict')
+    partner_id = fields.Many2one('res.partner', string='Partner', track_visibility='onchange', readonly=True)
+    plan_id = fields.Many2one('saas_portal.plan', string='Plan', track_visibility='onchange', ondelete='restrict', readonly=True)
     expired = fields.Boolean('Expired', default=False, readonly=True)
     user_id = fields.Many2one('res.users', default=lambda self: self.env.user, string='Salesperson')
     notification_sent = fields.Boolean(default=False, readonly=True, help='notification about oncoming expiration has sent')

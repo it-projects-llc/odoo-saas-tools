@@ -140,7 +140,7 @@ class SaasServerClient(models.Model):
         _logger.info('Data successfully backed up to s3') 
     
     @api.model
-    def _transport_backup(self, dump_db, filename=None):
+    def _transport_backup(self, dump_db, filename=None, database_id=None):
         '''
         send db dump to S3
         '''
@@ -158,7 +158,55 @@ class SaasServerClient(models.Model):
         else:
             conn, bucket_name = _get_s3_conn(self.env)
             self._transport_backup_simple(conn, bucket_name, db_dump, filename)
-        
+        self.env['saas_server.backup.map'].create({
+             'client_id': database_id,
+             'name': filename,
+        })
         return True
     
+    @api.multi
+    def _get_backup_file_list(self):
+        '''
+        get backups stored for this client
+        returns [{
+            'name': 'name', # unique name or id
+            'date_created': '20-12-1990',
+        }]    
+        '''
+        self.ensure_one()
+        res = []
+        files = self.env['saas_server.backup.map'].search([('client_id', '=', self.id)])
+        for rec in files:
+            res.append({
+                 'name': rec.name,
+                 'date_created': rec.date_created,
+            })
+        return res
+
+    @api.model
+    def _delete_backup_files(self, files):
+        '''
+        list  of unique name/id of file to erase
+        '''
+        conn, bucketname = _get_s3_conn(self.env)
+        bucket = conn.get_bucket(bucketname)
+        
+        for key in files:
+            try:
+                bucket.delete_key(key)
+                expired = self.env['saas_server.backup.map'].search([('name', '=', key)])
+                expired.unlink()
+            except Exception as e:
+                _logger.exception(str(e))
     
+class SaasServerBackupMap(models.Model):
+    _name = 'saas_server.backup.map'
+    _order = 'date_created'
+    
+    date_created = fields.Datetime(default=fields.Datetime.now, required=True)
+    client_id = fields.Many2one('saas_server.client', required=True)
+    name = fields.Char(required=True)
+    
+    _sql_constraints = [
+        ('name_uniq', 'unique(name)', 'File name has to be unique.'),
+    ] 

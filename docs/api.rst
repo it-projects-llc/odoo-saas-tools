@@ -6,6 +6,8 @@ To control SaaS via external tool `built-in XML-RPC <https://www.odoo.com/docume
 Example in python language
 --------------------------
 
+::
+
     # Import libs
     import json
     import xmlrpclib

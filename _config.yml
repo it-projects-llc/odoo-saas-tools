@@ -1,5 +1,6 @@
 # Site settings
 title: My Territory
+index_title: Shikher Verma # same as title in index.html file, so that custom description can be set in page.html layout.
 blog_title: My Territory
 header-img: img/home-bg.jpg
 email: root@shikherverma.com

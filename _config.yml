@@ -1,16 +1,15 @@
 # Site settings
 title: My Territory
-blog_title: Logcat
+blog_title: My Territory
 header-img: img/home-bg.jpg
-email: your-email@yourdomain.com
-copyright_name: Your/Project/Corporate Name
-description: "Write your site description here. It will be used as your sites meta description as well!"
+email: root@shikherverma.com
+copyright_name: ShikherVerma
+description: "Online Territory of Shikher Verma"
 baseurl: ""
 url: ""
-twitter_username: SBootstrap
-github_username:  davidtmiller
-facebook_username:  IronSummitMedia
-email_username:  your-email@yourdomain.com
+github_username:  shikherverma
+facebook_username:  shikherverma1
+email_username:  root@shikherverma.com
 
 # Build settings
 markdown: kramdown

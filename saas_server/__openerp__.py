@@ -12,7 +12,6 @@
         'data/auth_oauth_data.xml',
         'data/ir_config_parameter.xml',
         'data/pre_install.yml',
-        'data/cron.xml',
     ],
     'installable': True,
 }

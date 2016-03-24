@@ -11,12 +11,7 @@
                         or
                         <button string="Cancel" type="object" name="cancel" class="oe_link"/>
                     </header>
-                    <div>
-                        <group string="Backup Storage">
-                            <field name="max_backup_open" />
-                            <field name="max_backup_not_open" />
-                        </group>
-                    </div>
+                    
                 </form>
             </field>
         </record>

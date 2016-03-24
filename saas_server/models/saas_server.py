@@ -331,7 +331,7 @@ class SaasServerClient(models.Model):
         self.name = new_dbname
 
     @api.model
-    def _transport_backup(self, dump_db, filename=None, database_id=None):
+    def _transport_backup(self, dump_db, filename=None):
         '''
         backup transport agents should override this
         '''
@@ -339,64 +339,27 @@ class SaasServerClient(models.Model):
 
     @api.multi
     def backup_database(self):
-        self.ensure_one()
+        res = []
+        for database_obj in self:
+            data = {}
+            data['name'] = database_obj.name
 
-        data = {}
-        data['name'] = self.name
+            filename = "%(db_name)s_%(timestamp)s.zip" % {
+                'db_name': database_obj.name,
+                'timestamp': datetime.utcnow().strftime(
+                    "%Y-%m-%d_%H-%M-%SZ")}
 
-        filename = "%(db_name)s_%(timestamp)s.zip" % {
-            'db_name': self.name,
-            'timestamp': datetime.utcnow().strftime(
-                "%Y-%m-%d_%H-%M-%SZ")}
+            def dump_db(stream):
+                return db.dump_db(database_obj.name, stream)
 
-        def dump_db(stream):
-            return db.dump_db(self.name, stream)
+            try:
+                database_obj._transport_backup(dump_db, filename=filename)
+                data['status'] = 'success'
+            except Exception, e:
+                _logger.exception('An error happened during database %s backup' %(database_obj.name))
+                data['status'] = 'fail'
+                data['message'] = str(e)
 
-        try:
-            self._transport_backup(dump_db, filename=filename, database_id=self.id)
-            data['status'] = 'success'
-        except Exception, e:
-            _logger.exception('An error happened during database %s backup' %(self.name))
-            data['status'] = 'fail'
-            data['message'] = str(e)
+            res.append(data)
 
-        return data
-    
-    @api.multi
-    def _get_backup_file_list(self):
-        '''
-        get backups stored for this client
-        returns [{
-            'name': 'name', # unique name or id
-            'date_created': '20-12-1990',
-            'size': 10, # in bytes
-        }]    
-        '''
-        self.ensure_one()
-        raise exceptions.Warning('Not Implemented')
-
-    @api.model
-    def _delete_backup_files(self, files):
-        '''
-        list  of unique name/id of file to erase
-        '''
-        raise exceptions.Warning('Not Implemented')
-
-    @api.model
-    def delete_old_backup(self):
-        clients = self.search([('state', '!=', 'delete')])
-        config_parameter = self.env["ir.config_parameter"]
-        max_backup_open = int(config_parameter.get_param('saas_server.max_backup_open', default=10))
-        max_backup_not_open = int(config_parameter.get_param('saas_server.max_backup_not_open', default=3))
-        for client in clients:
-            stored_files = client._get_backup_file_list()
-            # TODO we don't want to be hardcoding this here
-            if not stored_files:
-                continue
-            max_files = (client.state == 'open') and max_backup_open or max_backup_not_open
-            if len(stored_files) > max_files:
-                sorted_stored_files = sorted(
-                    stored_files, key=lambda k: k['date_created'], reverse=True)
-                to_expire_files = sorted_stored_files[(max_files):]
-                client._delete_backup_files([r['name'] for r in to_expire_files])
-
+        return res

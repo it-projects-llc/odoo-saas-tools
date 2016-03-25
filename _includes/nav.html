@@ -18,15 +18,21 @@
                 <li>
                     <a href="{{ site.baseurl }}/">Home</a>
                 </li>
-                {% for page in site.pages %}{% if page.title %}
-                {% if page.url != '/404.html' %}
-				{% if page.title != site.index_title %}
+                {% for page in site.pages %} <!-- site.pages liquid tag lists all the pages in root directory, including folders containing index.html -->
+                {% if page.title %} <!-- true if page has a title -->
+                {% if page.url != '/404.html' %} <!-- you obviously don't want to show 404 in nav bar -->
+                {% if page.title != site.index_title %} <!-- this is done to remove dublicate entry -->
+				{% if page.url contains "page" %}
+                    <!-- if page url contains page that means it is a paginated subdirectory of blog so don't show in nav bar -->
+                {% else %} <!-- now that we have filtered out all the redundant pages, its time to add the left to nav bar -->
                 <li>
                     <a href="{{ page.url | prepend: site.baseurl }}">{{ page.title }}</a>
                 </li>
                 {% endif %}
+                {% endif %}
 				{% endif %}
-                {% endif %}{% endfor %}
+                {% endif %}
+                {% endfor %}
             </ul>
         </div>
         <!-- /.navbar-collapse -->

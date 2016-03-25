@@ -15,8 +15,12 @@ email_username:  root@shikherverma.com
 # Build settings
 markdown: kramdown
 highlighter: rouge
-permalink: pretty
-paginate: 5
 exclude: ["less","node_modules","Gruntfile.js","package.json","README.md"]
+port: 8888
 
-gems: [jekyll-paginate, jekyll-feed]
+# jekyll-paginate
+paginate: 5
+paginate_path: blog/page:num
+
+# gem dependencies
+gems: [jekyll-paginate, jekyll-feed, jekyll-archives]

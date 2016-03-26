@@ -11,10 +11,14 @@ layout: default
                     <h1>{% if page.title %}{{ page.title }}{% else %}{{ site.blog_title }}{% endif %}</h1>
                     <hr class="small">
                     <span class="subheading">
-                        {% if page.description != "replaceme" %}
-                            {{ page.description }}
-                        {% else %} 
+                        {% if page.description == "showaboutdescription" %}
                             Half Hacker <i class="fa fa-cogs "></i> Half Roboticist
+                        {% elsif page.description == "showtags" %}
+                            {% for tag in page.tags %}
+                                <a href="/blog/tags/{{ tag }}/" style="text-decoration: none; font-weight: normal; color: #999999;">{{ tag }}</a>  
+                            {% endfor %}
+                        {% else %}
+                            {{ page.description }}
                         {% endif %}
                     </span>
                 </div>

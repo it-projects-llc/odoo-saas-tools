@@ -12,6 +12,9 @@ github_username:  shikherverma
 facebook_username:  shikherverma1
 email_username:  root@shikherverma.com
 
+# used to estimate reading time
+wpm: 180
+
 # Build settings
 markdown: kramdown
 highlighter: rouge

@@ -14,7 +14,7 @@ layout: default
                     {% endif %}
                     <span class="meta" style='margin-top:0.5em;'>Posted by {% if page.author %}{{ page.author }}{% else %}{{ site.title }}{% endif %} on {{ page.date | date: "%B %-d, %Y" }}
                     </span>
-                    <span class="meta" style='margin-top:0.5em;'> Tags: {% for tag in page.tags %}<a href="/blog/tags/{{ tag }}/">{{ tag }}</a> {% endfor %} </span>
+                    <span class="meta" style='margin-top:0.5em;'> Tags: {% for tag in page.tags %}<a href="/blog/tags/{{ tag }}/"><i class="fa fa-tag"></i> {{ tag }}</a> {% endfor %} </span>
                     <span class="meta" style='margin-top:0.5em;'>
                     {% assign minutes = content | number_of_words | divided_by: site.wpm %}
                         <i class="fa fa-clock-o"></i>&nbsp;{% if minutes == 0 %}{% assign minutes = 1 %}{% endif %}

@@ -22,7 +22,7 @@
                 {% if page.title %} <!-- true if page has a title -->
                 {% if page.url != '/404.html' %} <!-- you obviously don't want to show 404 in nav bar -->
                 {% if page.title != site.index_title %} <!-- this is done to remove dublicate entry -->
-				{% if page.url contains "/page" or page.url contains "/tags/" %}
+				{% if page.url contains "/page" or page.url contains "/tags/" or page.url contains "/search" %}
                     <!-- if page url contains "page" or "tag" that means it is a paginated subdirectory of blog so don't show in nav bar -->
                 {% else %} <!-- now that we have filtered out all the redundant pages, its time to add the left to nav bar -->
                 <li>
@@ -33,6 +33,11 @@
 				{% endif %}
                 {% endif %}
                 {% endfor %}
+                <li>
+                    <a href="{{ root_url }}/search/" class="nav-search-link" title="SEARCH">
+                        <span class="fa fa-search nav-search-icon"></span>
+                    </a>
+                </li>
             </ul>
         </div>
         <!-- /.navbar-collapse -->

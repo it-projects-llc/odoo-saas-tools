@@ -1,0 +1,26 @@
+---
+layout: page
+title: Search
+description: "What are you looking for?"
+header-img: "img/search-bg.jpg"
+---
+
+<!-- Html Elements for Search -->
+<input type="text" id="search-input" placeholder="Enter keywords...">
+<ul id="results-container" ></ul>    
+
+<!-- Script pointing to jekyll-search.js -->
+<script src="{{ site.baseurl }}/js/jekyll-search.js" type="text/javascript"></script>
+
+    <script type="text/javascript">
+      SimpleJekyllSearch({
+        searchInput: document.getElementById('search-input'),
+        resultsContainer: document.getElementById('results-container'),
+        json: '{{ site.baseurl }}/search.json',
+        searchResultTemplate: '<li><a href="{url}" title="{desc}">{title}</a></li>',
+        noResultsText: 'No results found',
+        limit: 10,
+        fuzzy: true,
+        exclude: ['Welcome', 'Blog']
+      })
+    </script>

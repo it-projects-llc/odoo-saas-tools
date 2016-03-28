@@ -6,7 +6,7 @@ before_script:
 install:
   - bundle install
   - bundle exec jekyll build
-  - bundle exec htmlproofer ./_site --only-4xx --empty-alt-ignore --check-html --url-ignore [ '*/js/*' ]
+  - bundle exec htmlproofer ./_site --only-4xx --external_only
 
 env:
   global:

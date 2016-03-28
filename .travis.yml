@@ -6,7 +6,8 @@ before_script:
 install:
   - bundle install
   - bundle exec jekyll build
-  - bundle exec htmlproofer ./_site --only-4xx --check-html
+  - bundle exec htmlproofer ./_site --only-4xx --empty-alt-ignore --check-html --url-ignore [ '*/js/*' ]
+
 env:
   global:
   - NOKOGIRI_USE_SYSTEM_LIBRARIES=true

@@ -14,7 +14,7 @@ if uid and self.pool('res.users').browse(cr, uid, uid, context=context).has_grou
     config = todos and todos.action_launch(context=context)
     if config.get('type') not in ('ir.actions.act_window_close',):
         action = config
-action = action or self.pool['ir.model.data'].xmlid_to_object(cr, uid, 'base.open_menu').action_launch(context=context)
+action = action or self.pool['ir.model.data'].xmlid_to_object(cr, 1, 'base.open_menu').action_launch(context=context)
             </field>
         </record>
     </data>

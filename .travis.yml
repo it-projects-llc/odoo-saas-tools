@@ -1,15 +1,11 @@
 language: ruby
 rvm:
   - 2.1
-
 before_script:
  - bundle update
  - chmod +x ./script/cibuild.sh
-
 script: ./script/cibuild.sh
-
 env:
   global:
   - NOKOGIRI_USE_SYSTEM_LIBRARIES=true
-
 sudo: false

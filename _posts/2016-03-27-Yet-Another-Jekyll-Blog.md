@@ -6,7 +6,7 @@ date:       2016-03-27 17:00:00
 author:     "Shikher Verma"
 header-img: "img/posts/jekyll-bg.jpg"
 comments: true
-tags: [CodeMonkey]
+tags: CodeMonkey
 ---
 
 ## Convincing myself to make this blog

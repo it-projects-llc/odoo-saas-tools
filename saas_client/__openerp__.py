@@ -13,6 +13,7 @@
         'data/ir_cron.xml',
         'data/auth_oauth_data.xml',
         'data/ir_config_parameter.xml',
+        'data/ir_actions.xml',
     ],
     'installable': True,
 }

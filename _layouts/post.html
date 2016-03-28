@@ -14,11 +14,11 @@ layout: default
                     {% endif %}
                     <span class="meta" style='margin-top:0.5em;'>Posted by {% if page.author %}{{ page.author }}{% else %}{{ site.title }}{% endif %} on {{ page.date | date: "%B %-d, %Y" }}
                     </span>
-                    <span class="meta" style='margin-top:0.5em;'> Tags: {% for tag in page.tags %}<a href="/blog/tags/{{ tag }}/"><i class="fa fa-tag"></i> {{ tag }}</a> {% endfor %} </span>
+                    <span class="meta" style='margin-top:0.5em;'> Tags: {% for tag in page.tags %}<a href="/blog/tags/{{ tag }}"><i class="fa fa-tag"></i> {{ tag }}</a> {% endfor %} </span>
                     <span class="meta" style='margin-top:0.5em;'>
-                    {% assign minutes = content | number_of_words | divided_by: site.wpm %}
+                        {% assign minutes = content | number_of_words | divided_by: site.wpm %}
                         <i class="fa fa-clock-o"></i>&nbsp;{% if minutes == 0 %}{% assign minutes = 1 %}{% endif %}
-                    {{ minutes }} minute read
+                        {{ minutes }} minute read
                     </span>
                 </div>
             </div>
@@ -31,11 +31,12 @@ layout: default
     <div class="container">
         <div class="row">
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
-
-				{{ content }}
-
-                <hr>
-
+                {{ content }}
+                <br>
+                {% if page.comments %}
+                    {% include disqus_comments.html %}
+                {% endif %}
+                <br>
                 <ul class="pager">
                     {% if page.previous.url %}
                     <li class="previous">
@@ -54,23 +55,3 @@ layout: default
     </div>
 </article>
 <hr>
-
-{% if post.comments %}
-<div id="disqus_thread"></div>
-<script>
-    var disqus_url = 'shikherverma.com'
-    var disqus_config = function () {
-        this.page.url = "{{ page.url }}";
-        this.page.identifier = "{{ site.disqusid }}{{ page.url | replace:'index.html','' }}";
-    };
-    (function() {  // DON'T EDIT BELOW THIS LINE
-        var d = document, s = d.createElement('script');
-        
-        s.src = '//shikherverma.disqus.com/embed.js';
-        
-        s.setAttribute('data-timestamp', +new Date());
-        (d.head || d.body).appendChild(s);
-    })();
-</script>
-<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
-{% endif %}

@@ -15,7 +15,7 @@ layout: default
                             Half Hacker <i class="fa fa-cogs "></i> Half Roboticist
                         {% elsif page.description == "showtags" %}
                             {% for tag in page.tags %}
-                                <a href="/blog/tags/{{ tag }}/" style="text-decoration: normal; font-weight: normal; color: #999999;"><i class="fa fa-tag"></i>{{ tag }}</a>  
+                                <a href="/blog/tags/{{ tag }}" style="text-decoration: normal; font-weight: normal; color: #999999;"><i class="fa fa-tag"></i>{{ tag }}</a>  
                             {% endfor %}
                         {% else %}
                             {{ page.description }}

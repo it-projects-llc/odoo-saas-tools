@@ -7,11 +7,10 @@ email: root@shikherverma.com
 copyright_name: ShikherVerma
 description: "Online Territory of Shikher Verma"
 baseurl: "" #base url is for when the site is not at the root but at some subdirectory.
-url: shikherverma.com
+url: shikherverma.com #only used in disque comments for now
 github_username:  shikherverma
 facebook_username:  shikherverma1
 email_username:  root@shikherverma.com
-disqusid: shikher_verma
 # used to estimate reading time
 wpm: 180
 

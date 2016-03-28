@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+    <!-- Set this action in the Home Action field on Preferences tab of User form in a client database. -->
+    <!-- The action runs the active ir.action.todo todoes. -->
+    <!-- Set it for the 'owner_template' user in template database if you want it to be set  automatically -->
+    <!-- in all client databases created from the temlate. -->
+    <!-- The User must be a member of the base.group_system (Settings) group to run todoes -->
+        <record id="saas_action_run_ir_action_todo" model="ir.actions.server">
+            <field name="name">SaaS Run Remaining Action Todo</field>
+            <field name="condition">True</field>
+            <field name="type">ir.actions.server</field>
+            <field name="model_id" ref="base.model_res_config"/>
+            <field name="state">code</field>
+            <field name="code">
+action = {}
+if uid and self.pool('res.users').browse(cr, uid, uid, context=context).has_group('base.group_system'):
+    todos = self._next_action(cr, uid) or {}
+    config = todos and todos.action_launch(context=context)
+    if config.get('type') not in ('ir.actions.act_window_close',):
+        action = config
+action = action or self.pool['ir.model.data'].xmlid_to_object(cr, 1, 'base.open_menu').action_launch(context=context)
+            </field>
+        </record>
+    </data>
+</openerp>

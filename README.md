@@ -1,6 +1,6 @@
-# Jekyll blog based on [Clean Blog](http://startbootstrap.com/template-overviews/clean-blog/).
+[![Build Status](https://travis-ci.org/ShikherVerma/Shikherverma.github.io.svg?branch=master)](https://travis-ci.org/ShikherVerma/Shikherverma.github.io)
 
-Served at shikherverma.com
+Jekyll blog based on [Clean Blog](http://startbootstrap.com/template-overviews/clean-blog/). Served at shikherverma.com
 
 ## Usage
 

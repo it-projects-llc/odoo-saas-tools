@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
-    <data>
+  <data>
+    <!-- Set this action in the Home Action field on Preferences tab of User form in a client database. -->
+    <!-- The action runs the active ir.action.todo todoes. -->
+    <!-- Set it for the 'owner_template' user in template database if you want it to be set  automatically -->
+    <!-- in all client databases created from the temlate. -->
+    <!-- The User must be a member of the base.group_system (Settings) group to run todoes -->
         <record id="saas_action_run_ir_action_todo" model="ir.actions.server">
             <field name="name">SaaS Run Remaining Action Todo</field>
             <field name="condition">True</field>

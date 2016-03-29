@@ -5,7 +5,7 @@
     'license': 'GPL-3',
     'category': 'SaaS',
     'website': 'http://idtlabs.sl',
-    'depends': ['saas_server', 'saas_server_backup_s3'],
+    'depends': ['saas_server', 'saas_server_backup_s3', 'saas_server_backup_rotate'],
     'data': [
         ],
     'installable': True,

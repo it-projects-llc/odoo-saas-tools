@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import openerp
-from openerp import http
+from openerp import http, SUPERUSER_ID
 from openerp.http import request
 from openerp.addons.web_settings_dashboard.controllers.main import WebSettingsDashboard
 from openerp.addons.saas_base.tools import get_size
@@ -19,7 +19,7 @@ class SaaSWebSettingsDashboard(WebSettingsDashboard):
 
         uid = request.session.uid
         user_obj = request.env['res.users'].sudo().browse(uid)
-        cur_users = request.env['res.users'].search_count([('share', '=', False)]) - 1 # don't count the admin
+        cur_users = request.env['res.users'].search_count([('share', '=', False), ('id', '!=', SUPERUSER_ID)])
         max_users = request.env['ir.config_parameter'].sudo().get_param('saas_client.max_users', default='')
         expiration_datetime = request.env['ir.config_parameter'].sudo().get_param('saas_client.expiration_datetime', default='').strip()
         datetime_obj = expiration_datetime and datetime.strptime(expiration_datetime, DEFAULT_SERVER_DATETIME_FORMAT)

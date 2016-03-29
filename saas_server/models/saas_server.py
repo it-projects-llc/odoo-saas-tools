@@ -201,12 +201,12 @@ class SaasServerClient(models.Model):
         client_id = client_env['ir.config_parameter'].get_param('database.uuid')
         if check_client_id != client_id:
             return {'state': 'deleted'}
-        users = client_env['res.users'].search([('share', '=', False)])
+        users = client_env['res.users'].search([('share', '=', False), ('id', '!=', SUPERUSER_ID)])
         param_obj = client_env['ir.config_parameter']
         max_users = param_obj.get_param('saas_client.max_users', '0').strip()
         suspended = param_obj.get_param('saas_client.suspended', '0').strip()
         total_storage_limit = param_obj.get_param('saas_client.total_storage_limit', '0').strip()
-        users_len = len(users) - 1 # don't count the admin
+        users_len = len(users)
         data_dir = openerp.tools.config['data_dir']
 
         file_storage = get_size('%s/filestore/%s' % (data_dir, self.name))

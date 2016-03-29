@@ -35,7 +35,8 @@ class ResUsers(models.Model):
         max_users = self.env["ir.config_parameter"].sudo().get_param("saas_client.max_users")
         if max_users:
             max_users = int(max_users)
-            cur_users = self.env['res.users'].search_count([('share', '=', False)])
+            cur_users = self.env['res.users'].search_count([('share', '=', False)]) - 1
+            # minus one on the line above is there because we don't count the administrator user
             if cur_users >= max_users:
                 raise exceptions.Warning(_('Maximimum allowed users is %(max_users)s, while you already have %(cur_users)s') % {'max_users':max_users, 'cur_users': cur_users})
         return super(ResUsers, self).create(vals)

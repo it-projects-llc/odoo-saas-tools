@@ -8,6 +8,7 @@
     'depends': ['auth_oauth', 'auth_oauth_check_client_id', 'saas_utils', 'mail', 'web_settings_dashboard'],
     'data': [
         'views/saas_client.xml',
+        'views/res_config.xml',
         'security/rules.xml',
         'security/groups.xml',
         'data/ir_cron.xml',

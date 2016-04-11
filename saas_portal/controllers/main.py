@@ -44,6 +44,17 @@ class SaasPortal(http.Controller):
 
         return werkzeug.utils.redirect(res.get('url'))
 
+    @http.route(['/saas_portal/rename_client'], type='http', auth='user', website=True)
+    def rename_client(self, **post):
+        client_id = int(post.get('client_id'))
+        new_domain_name = post.get('dbname')
+
+        client_obj = request.env['saas_portal.client'].sudo().search([('id', '=', client_id)])
+        client_obj.rename_database(new_domain_name)
+        config_obj = request.env['ir.config_parameter']
+        url = config_obj.sudo().get_param('web.base.url') + '/my/home'
+        return werkzeug.utils.redirect(url)
+
     def get_config_parameter(self, param):
         config = request.registry['ir.config_parameter']
         full_param = 'saas_portal.%s' % param

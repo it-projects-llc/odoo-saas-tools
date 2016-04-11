@@ -97,7 +97,7 @@ class SaasServerClient(models.Model):
 
     @api.model
     def _config_parameters_to_copy(self):
-        return ['saas_client.ab_location', 'saas_client.ab_register']
+        return ['saas_client.ab_location', 'saas_client.ab_register', 'saas_client.saas_dashboard']
 
     @api.one
     def _prepare_database(self, client_env, owner_user=None, is_template_db=False, addons=[], access_token=None, tz=None):

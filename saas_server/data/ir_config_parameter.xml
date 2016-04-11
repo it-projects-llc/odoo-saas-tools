@@ -9,5 +9,9 @@
             <field name="key">saas_client.ab_register</field>
             <field name="value">https://www.it-projects.info/page/website.contactus/?</field>
         </record>
+        <record id="ab_dashboard" model="ir.config_parameter">
+          <field name="key">saas_client.saas_dashboard</field>
+          <field name="value">http://odoo.local/my/home</field>
+        </record>
     </data>
 </openerp>

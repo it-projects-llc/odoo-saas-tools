@@ -591,6 +591,11 @@ class SaasPortalClient(models.Model):
         if res.status_code != 500:
             self.name = new_dbname
 
+    @api.multi
+    def check_partner_access(self, partner_id):
+        self.ensure_one()
+        return self.partner_id.id == partner_id
+
     @api.one
     def duplicate_database(self, dbname=None, partner_id=None, expiration=None):
         server = self.server_id

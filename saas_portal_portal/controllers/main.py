@@ -30,7 +30,7 @@ class WebsiteSaasDashboard(website_account):
 
         res_saas_portal_client = request.env['saas_portal.client']
         saas_portal_client = res_saas_portal_client.sudo().search([
-            ('partner_id.id', '=', partner.id),
+            ('partner_id', '=', partner.id),
         ])
         config_obj = request.env['ir.config_parameter']
         base_saas_domain = config_obj.get_param('base_saas_domain')

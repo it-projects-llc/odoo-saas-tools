@@ -594,9 +594,9 @@ class SaasPortalClient(models.Model):
 
     @api.multi
     def check_partner_access(self, partner_id):
-        self.ensure_one()
-        if self.partner_id.id != partner_id:
-            raise Forbidden
+        for record in self:
+            if record.partner_id.id != partner_id:
+                raise Forbidden
 
     @api.one
     def duplicate_database(self, dbname=None, partner_id=None, expiration=None):

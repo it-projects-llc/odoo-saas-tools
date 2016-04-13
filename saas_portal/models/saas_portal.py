@@ -20,6 +20,7 @@ from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
 from openerp.addons.saas_base.exceptions import MaximumDBException, MaximumTrialDBException
 
 from openerp.addons.saas_base.exceptions import MaximumDBException
+from werkzeug.exceptions import Forbidden
 
 import logging
 _logger = logging.getLogger(__name__)
@@ -590,6 +591,12 @@ class SaasPortalClient(models.Model):
         _logger.info('delete database: %s', res.text)
         if res.status_code != 500:
             self.name = new_dbname
+
+    @api.multi
+    def check_partner_access(self, partner_id):
+        for record in self:
+            if record.partner_id.id != partner_id:
+                raise Forbidden
 
     @api.one
     def duplicate_database(self, dbname=None, partner_id=None, expiration=None):

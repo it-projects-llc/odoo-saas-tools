@@ -48,9 +48,13 @@ class SaasPortal(http.Controller):
     def rename_client(self, **post):
         client_id = int(post.get('client_id'))
         new_domain_name = post.get('dbname')
+        user_id = request.session.uid
+        user = request.env['res.users'].browse(user_id)
 
-        client_obj = request.env['saas_portal.client'].sudo().search([('id', '=', client_id)])
-        client_obj.rename_database(new_domain_name)
+        client_obj = request.env['saas_portal.client'].sudo().browse(client_id)
+        client_obj.check_partner_access(user.partner_id.id)
+
+        client_obj.sudo().rename_database(new_domain_name)
         config_obj = request.env['ir.config_parameter']
         url = config_obj.sudo().get_param('web.base.url') + '/my/home'
         return werkzeug.utils.redirect(url)

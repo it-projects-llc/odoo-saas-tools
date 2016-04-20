@@ -18,21 +18,21 @@ We need to add several Type 'A' records on our dns server.
 Example:
 When Portal, Server and Clients on the same IP we can add the following records.
 
-If Portal is example.com then the record is
+If Portal is example.com then the record is::
 
-Type: A
+    Type: A
 
-Name: exmaple.com
+    Name: exmaple.com
 
-IP: 40.50.70.28
+    IP: 1.2.3.4
 
 If Server is server-1.example.com and Clients are client-001.example.com, client-002.example.com... We need to add just one record for them
 
-Type: A
+    Type: A
 
-Name: *.example.com
+    Name: *.example.com
 
-IP: 40.50.70.28
+    IP: 1.2.3.4
  
  
 

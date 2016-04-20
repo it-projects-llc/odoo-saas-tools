@@ -26,7 +26,7 @@ If Portal is example.com then the record is::
 
     IP: 1.2.3.4
 
-If Server is server-1.example.com and Clients are client-001.example.com, client-002.example.com... We need to add just one record for them
+If Server is server-1.example.com and Clients are client-001.example.com, client-002.example.com... We need to add just one record for them::
 
     Type: A
 

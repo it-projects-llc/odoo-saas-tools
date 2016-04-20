@@ -22,7 +22,7 @@ If Portal is example.com then the record is::
 
     Type: A
 
-    Name: exmaple.com
+    Name: example.com
 
     IP: 1.2.3.4
 

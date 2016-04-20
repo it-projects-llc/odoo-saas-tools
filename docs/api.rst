@@ -1,7 +1,7 @@
 API integration
 ===============
 
-To control SaaS via external tool [built-in XML-RPC](https://www.odoo.com/documentation/8.0/api_integration.html) can be used.
+To control SaaS via external tool `built-in XML-RPC <https://www.odoo.com/documentation/8.0/api_integration.html>`_ can be used.
 
 Example in python language
 --------------------------

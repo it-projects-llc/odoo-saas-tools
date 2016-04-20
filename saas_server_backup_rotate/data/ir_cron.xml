@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="1">
+        <record forcecreate="True" id="saas_server_backup_agent_delete_expired" model="ir.cron">
+            <field name="name">Saas Server - Delete Expired Backup</field>
+            <field eval="True" name="active" />
+            <field name="user_id" ref="base.user_root"/>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False"/>
+            <field name="model">saas_server.client</field>
+            <field name="function">rotate_backups</field>
+            <field name="args">()</field>
+        </record>
+    </data>
+</openerp>

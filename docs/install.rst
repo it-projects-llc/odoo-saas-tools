@@ -8,46 +8,50 @@ Instruction for manual installation
    * set dbfilter in config file or run odoo with --db-filter parameter, e.g. ^%h$
    
      * be sure, that you don't use db_name in config file and don't run odoo with -d (--database) parameter
-     * check [odoo documentation](https://www.odoo.com/documentation/8.0/reference/cmdline.html) for understanding db filter and database parameters.
+     * check `odoo documentation <https://www.odoo.com/documentation/8.0/reference/cmdline.html>`_ for understanding db filter and database parameters.
 
-   * execute commands below to allow create databases with dots in name:
+   * execute commands below to allow create databases with dots in name: ::
 
-   > cd path/to/odoo
+    cd path/to/odoo
+    
+    sed -i 's/matches="[^"]*"//g' addons/web/static/src/xml/base.xml
 
-   > sed -i 's/matches="[^"]*"//g' addons/web/static/src/xml/base.xml
+   * If you run odoo locally, add domains you are going to use to /etc/hosts. E.g. ::
 
-   * If you run odoo locally, add domains you are going to use to /etc/hosts. E.g.
-
-   > 127.0.0.1	odoo.local # portal
-
-   > 127.0.0.1	s1.odoo.local # server
-
-   > 127.0.0.1	t1.odoo.local # template
-
-   > 127.0.0.1	t2.odoo.local # template
-
-   > 127.0.0.1	client-x.odoo.local
-
-   > 127.0.0.1	client-y.odoo.local
-
-   > 127.0.0.1	client-z.odoo.local
+    127.0.0.1	odoo.local # portal
+    
+    127.0.0.1	s1.odoo.local # server
+    
+    127.0.0.1	t1.odoo.local # template
+    
+    127.0.0.1	t2.odoo.local # template
+    
+    127.0.0.1	client-x.odoo.local
+    
+    127.0.0.1	client-y.odoo.local
+    
+    127.0.0.1	client-z.odoo.local
 
    * Redirect requests to domains above to localhost:8069 (e.g. via nginx)
-     * be sure, that odoo gets host header, e.g. for nginx:
+   
+     * be sure, that odoo gets host header, e.g. for nginx: ::
 
-     > proxy_set_header Host $host;
-
-     > proxy_set_header X-Real-IP       $remote_addr;
-
-     > proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-
-     > proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header Host $host;
+    
+    proxy_set_header X-Real-IP       $remote_addr;
+    
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    
+    proxy_set_header X-Forwarded-Proto $scheme;
 
    * install dependencies:
    
      * oauthlib:
+     
        * pip install oauthlib
+       
      * requests
+     
        * pip install requests --upgrade
 
 2. Create two databases (via /web/database/manager):
@@ -68,8 +72,8 @@ Instruction for manual installation
      * click [Edit]
      * update domain name at "Authentication URL" and "Validation URL", change http to https if needed. E.g.
      
-       * http://**odoo.local**/oauth2/auth
-       * http://**odoo.local**/oauth2/tokeninfo
+       * ``http://odoo.local/oauth2/auth``
+       * ``http://odoo.local/oauth2/tokeninfo``
        
 	 * Edit Body according to your brand
 	 * click [Save]
@@ -104,7 +108,7 @@ Instruction for manual installation
      * click [Save]
      * click [Create Template DB].
      * wait couple minutes while Database is being created.
-	 * click [Sync server]
+     * click [Sync server]
 
 7. Prepare Template Database for Plan
 
@@ -132,13 +136,13 @@ Instruction for manual installation
    
      * click [Configure]
      
-	   * open Parameters tab
-	   * add parameter "Max Users", set Value 2
-	   * click [Execute]
-	   * click [Close]
-           * click [Log in]
-	   * you see created database
-	   * try to create new user to test "Max Users" setting
+       * open Parameters tab
+       * add parameter "Max Users", set Value 2
+       * click [Execute]
+       * click [Close]
+       * click [Log in]
+       * you see created database
+       * try to create new user to test "Max Users" setting
 
 9. Get more
 

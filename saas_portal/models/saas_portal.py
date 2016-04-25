@@ -199,7 +199,7 @@ class SaasPortalPlan(models.Model):
         if not server:
             server = self.env['saas_portal.server'].get_saas_server()
 
-        server.action_sync_server()
+        #server.action_sync_server()
         if not partner_id and user_id:
             user = self.env['res.users'].browse(user_id)
             partner_id = user.partner_id.id
@@ -289,7 +289,8 @@ class SaasPortalPlan(models.Model):
         if trial:
             client.expiration_datetime = trial_expiration_datetime
         client.send_params_to_client_db()
-        client.server_id.action_sync_server()
+        #TODO make async call of action_sync_server here
+        #client.server_id.action_sync_server()
 
         return {'url': url, 'id': client.id, 'client_id': client_id}
 

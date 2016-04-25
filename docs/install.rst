@@ -129,8 +129,7 @@ Instruction for manual installation
      * set DB Name, e.g. client-x.odoo.local
      * click [Create]
      * wait couple minutes while Database is being created.
-     
-       * click [Sync server]
+     * click [Sync server]
 	 
    * open SaaS/SaaS/Client - choose client
    

@@ -6,12 +6,12 @@
             <field name="model">saas_portal.config.settings</field>
             <field name="inherit_id" ref="saas_portal.view_saas_portal__config_settings" />
             <field name="arch" type="xml">
-                <group string="Domain" position="after">
+              <xpath expr="//group[1]" position="after">
                     <group string="AWS Access">
                         <field name="saas_route53_aws_accessid" />
                         <field name="saas_route53_aws_accesskey" />
                     </group>
-                </group>
+              </xpath>
             </field>
         </record>
     </data>

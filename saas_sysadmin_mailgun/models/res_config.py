@@ -7,7 +7,7 @@ class SaasPortalConfigWizard(models.TransientModel):
 
     def get_default_saas_mailgun_api_key(self, cr, uid, ids, context=None):
         saas_mailgun_api_key = self.pool.get("ir.config_parameter").get_param(cr, uid, "saas_mailgun.saas_mailgun_api_key", default=None, context=context)
-        return {'saas_mailgun_api_key': saas_route53_aws_accessid  or False}
+        return {'saas_mailgun_api_key': saas_mailgun_api_key  or False}
 
     def set_saas_mailgun_api_key (self, cr, uid, ids, context=None):
         config_parameters = self.pool.get("ir.config_parameter")

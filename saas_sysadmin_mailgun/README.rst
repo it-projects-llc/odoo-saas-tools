@@ -7,6 +7,7 @@ mail configurations on saas client's odoo
 using http://www.mailgun.com/ service credentials.
 It creates and validates mail domain
 on mailgun using their API.
+Validation is done using Amazon Route53 DNS service.
 
 Contributors
 ============
@@ -21,4 +22,6 @@ Further information
 
 Usage instructions: `<doc/index.rst>`_
 
-Tested on Odoo 9.0 ODOO_COMMIT_SHA_TO_BE_UPDATED
+Changelog: `<doc/changelog.rst>`_
+
+Tested on Odoo 9.0 1b5c2ced45b508a6e86681cad47efe12c486362b

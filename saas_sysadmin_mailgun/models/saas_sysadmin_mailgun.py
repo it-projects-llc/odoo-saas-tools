@@ -54,6 +54,17 @@ class SaasPortalPlan(models.Model):
                                                               async=async)
         #PROBLEM:
         # How to send mail credentials to the server and then save them in client database?
+        # state = {
+        #     'd': client.name,
+        #     'e': trial and trial_expiration_datetime or client.create_date,
+        #     'r': '%s://%s:%s/web' % (scheme, client.name, port),
+        #     'owner_user': owner_user_data,
+        #     't': client.trial,
+        # }
+        # if self.template_id:
+        #     state.update({'db_template': self.template_id.name})
+        # scope = ['userinfo', 'force_login', 'trial', 'skiptheuse']
+
         # url = server._request_server(path='/saas_server/new_database',
         #                       scheme=scheme,
         #                       port=port,

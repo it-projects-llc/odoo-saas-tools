@@ -42,10 +42,6 @@ class SaasPortalClient(models.Model):
 class SaasPortalPlan(models.Model):
     _inherit = 'saas_portal.plan'
 
-    free_subdomains = fields.Boolean(help='allow to choose subdomains for trials otherwise allow only after payment', default=True)
-    non_trial_instances = fields.Selection([('from_trial', 'From trial'), ('create_new', 'Create new')], string='Non-trial instances',
-                                           help='Whether to use trial database or create new one when user make payment', required=True, default='create_new')
-
     @api.multi
     def _create_new_database(self, dbname=None, client_id=None, partner_id=None, user_id=None, notify_user=False, trial=False, support_team_id=None, async=None):
         res = super(SaasPortalPlan, self)._create_new_database(dbname=dbname,
@@ -58,4 +54,12 @@ class SaasPortalPlan(models.Model):
                                                               async=async)
         #PROBLEM:
         # How to send mail credentials to the server and then save them in client database?
+        # url = server._request_server(path='/saas_server/new_database',
+        #                       scheme=scheme,
+        #                       port=port,
+        #                       state=state,
+        #                       client_id=client_id,
+        #                       scope=scope,)[0]
+        # res = requests.get(url, verify=(self.server_id.request_scheme == 'https' and self.server_id.verify_ssl))
+
         return res

@@ -77,12 +77,12 @@ class SaasConfig(models.TransientModel):
         state = {
             'data': payload,
         }
-        url = client.server_id._request_server(
+        prepped = client.server_id._request_server(
             path='/saas_server/upgrade_database',
             client_id=client.client_id,
             state=state,
         )[0]
-        res = requests.get(url, verify=(client.server_id.request_scheme == 'https' and client.server_id.verify_ssl))
+        res = requests.Session().send(prepped, verify=(client.server_id.request_scheme == 'https' and client.server_id.verify_ssl))
         if res.ok != True:
             raise Warning('Reason: %s \n Message: %s' % (res.reason, res.content))
         return res.text

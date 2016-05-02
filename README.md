@@ -9,7 +9,7 @@ Requirements
 To start SaaS system you need:
 
 * ubuntu/debian OS
-* [installed odoo](https://odoo-development.readthedocs.org/en/latest/install.html)
+* [installed odoo](http://odoo-development.readthedocs.io/en/latest/admin/install.html)
 * [configured nginx](docs/port_80.rst) 
 * [installed dependencies](docs/dependencies.rst)
 * records in /etc/hosts, if you install it locally, or dns records otherwise:

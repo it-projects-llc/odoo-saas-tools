@@ -160,6 +160,7 @@
                             <field name="request_scheme"/>
 			                      <field name="verify_ssl" attrs="{'invisible': [('request_scheme', '!=', 'https')]}"/>
                             <field name="request_port"/>
+                            <field name="local_request_scheme"/>
                             <field name="local_host"/>
                             <field name="local_port"/>
                         </group>

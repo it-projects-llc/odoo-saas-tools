@@ -42,6 +42,8 @@ class SaasPortalServer(models.Model):
     verify_ssl = fields.Boolean('Verify SSL', default=True, help="verify SSL certificates for HTTPS requests, just like a web browser")
     request_port = fields.Integer('Request Port', default=80)
     client_ids = fields.One2many('saas_portal.client', 'server_id', string='Clients')
+    local_host = fields.Char('Local host', help='local host ip address or name of server for server-side requests')
+    local_port = fields.Char('Local port', help='local tcp port of server for server-side requests')
 
     @api.model
     def create(self, vals):
@@ -82,7 +84,8 @@ class SaasPortalServer(models.Model):
             'access_token': access_token,
             'expires_in': 3600,
         })
-        url = '{scheme}://{saas_server}:{port}{path}?{params}'.format(scheme=scheme, saas_server=self.name, port=port, path=path, params=werkzeug.url_encode(params))
+        url = '{scheme}://{saas_server}:{port}{path}?{params}'.format(scheme=scheme, saas_server=self.local_host or self.name, port=self.local_port or port,
+                                                                      path=path, params=werkzeug.url_encode(params))
         return url
 
     @api.multi
@@ -109,7 +112,7 @@ class SaasPortalServer(models.Model):
         }
 
         url = self._request_server(path='/saas_server/sync_server', state=state, client_id=self.client_id)[0]
-        res = requests.get(url, verify=(self.request_scheme == 'https' and self.verify_ssl))
+        res = requests.get(url, verify=(self.request_scheme == 'https' and self.verify_ssl), headers={'host': self.name})
 
         if res.ok != True:
             raise Warning('Reason: %s \n Message: %s' % (res.reason, res.content))

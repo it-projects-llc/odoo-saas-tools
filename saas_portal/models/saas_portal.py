@@ -74,9 +74,11 @@ class SaasPortalServer(models.Model):
         url = '/oauth2/auth?%s' % werkzeug.url_encode(params)
         return url
 
-    @api.one
+    @api.multi
     def _request_server(self, path=None, scheme=None, port=None, **kwargs):
+        self.ensure_one()
         scheme = scheme or self.local_request_scheme or self.request_scheme
+        host = self.local_host or self.name
         port = port or self.local_port or self.request_port
         params = self._request_params(**kwargs)[0]
         access_token = self.oauth_application_id.sudo()._get_access_token(create=True)
@@ -85,7 +87,7 @@ class SaasPortalServer(models.Model):
             'access_token': access_token,
             'expires_in': 3600,
         })
-        url = '{scheme}://{saas_server}:{port}{path}'.format(scheme=scheme, saas_server=self.local_host or self.name, port=port, path=path)
+        url = '{scheme}://{host}:{port}{path}'.format(scheme=scheme, host=host, port=port, path=path)
         req = requests.Request('GET', url, data=params, headers={'host': self.name})
         req_kwargs = {'verify': self.verify_ssl}
         return req.prepare(), req_kwargs
@@ -113,7 +115,7 @@ class SaasPortalServer(models.Model):
             'client_id': self.client_id,
         }
 
-        req, req_kwargs = self._request_server(path='/saas_server/sync_server', state=state, client_id=self.client_id)[0]
+        req, req_kwargs = self._request_server(path='/saas_server/sync_server', state=state, client_id=self.client_id)
         res = requests.Session().send(req, **req_kwargs)
 
         if res.ok != True:
@@ -274,7 +276,7 @@ class SaasPortalPlan(models.Model):
                               port=port,
                               state=state,
                               client_id=client_id,
-                              scope=scope,)[0]
+                              scope=scope,)
         res = requests.Session().send(req, **req_kwargs)
         if res.status_code != 200:
             # TODO /saas_server/new_database show more details here
@@ -412,7 +414,7 @@ class SaasPortalDatabase(models.Model):
             'client_id': self.client_id,
         }
 
-        req, req_kwargs = self.server_id._request_server(path='/saas_server/backup_database', state=state, client_id=self.client_id)[0]
+        req, req_kwargs = self.server_id._request_server(path='/saas_server/backup_database', state=state, client_id=self.client_id)
         res = requests.Session().send(req, **req_kwargs)
         _logger.info('backup database: %s', res.text)
         if res.ok != True:
@@ -482,7 +484,7 @@ class SaasPortalDatabase(models.Model):
         }
         if force_delete:
             state['force_delete'] = 1
-        req, req_kwargs = self.server_id._request_server(path='/saas_server/delete_database', state=state, client_id=self.client_id)[0]
+        req, req_kwargs = self.server_id._request_server(path='/saas_server/delete_database', state=state, client_id=self.client_id)
         res = requests.Session().send(req, **req_kwargs)
         _logger.info('delete database: %s', res.text)
         if res.status_code != 500:
@@ -592,7 +594,7 @@ class SaasPortalClient(models.Model):
             'client_id': self.client_id,
             'new_dbname': new_dbname,
         }
-        req, req_kwargs = self.server_id._request_server(path='/saas_server/rename_database', state=state, client_id=self.client_id)[0]
+        req, req_kwargs = self.server_id._request_server(path='/saas_server/rename_database', state=state, client_id=self.client_id)
         res = requests.Session().send(req, **req_kwargs)
         _logger.info('delete database: %s', res.text)
         if res.status_code != 500:

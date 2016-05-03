@@ -81,7 +81,7 @@ class SaasConfig(models.TransientModel):
             path='/saas_server/upgrade_database',
             client_id=client.client_id,
             state=state,
-        )[0]
+        )
         res = requests.Session().send(req, **req_kwargs)
         if res.ok != True:
             raise Warning('Reason: %s \n Message: %s' % (res.reason, res.content))

@@ -49,6 +49,7 @@ class SaasConfig(models.TransientModel):
         obj = self[0]
         scheme = request.httprequest.scheme
         payload = {
+            # TODO: add configure mail server option here
             'update_addons_list': (obj.update_addons_list or ''),
             'update_addons': obj.update_addons.split(',') if obj.update_addons else [],
             'install_addons': obj.install_addons.split(',') if obj.install_addons else [],

@@ -17,7 +17,8 @@ class SaasPortalClient(models.Model):
     # CNAME record
 
     @api.multi
-    def _create_mail_domain(self):
+    def _create_mail_domain_on_mailgun(self):
+        '''Creates domain on mailgun and returns smtp credentials'''
         ir_params = self.env['ir.config_parameter']
         api_key = ir_params.get_param('saas_mailgun.saas_mailgun_api_key')
         #TODO:
@@ -27,10 +28,11 @@ class SaasPortalClient(models.Model):
         # 3) create domain on mailgun using library
         # 4) from return values take TX, MX, CNAME records to be created on DNS server and save them in model
         # 5) from return values take smtp credentials and save them in model
+        
 
     @api.multi
-    def _validate_mail_domain(self):
-        ir_params = env['ir.config_parameter']
+    def _validate_mail_domain_using_route53(self):
+        ir_params = self.env['ir.config_parameter']
         aws_access_key_id = ir_params.get_param('saas_route53.saas_route53_aws_accessid')
         aws_secret_access_key = ir_params.get_param('saas_route53.saas_route53_aws_accesskey')
         #TODO:
@@ -43,15 +45,10 @@ class SaasPortalPlan(models.Model):
     _inherit = 'saas_portal.plan'
 
     @api.multi
-    def _create_new_database(self, dbname=None, client_id=None, partner_id=None, user_id=None, notify_user=False, trial=False, support_team_id=None, async=None):
-        res = super(SaasPortalPlan, self)._create_new_database(dbname=dbname,
-                                                              client_id=client_id,
-                                                              partner_id=partner_id,
-                                                              user_id=user_id,
-                                                              notify_user=notify_user,
-                                                              trial=trial,
-                                                              support_team_id=support_team_id,
-                                                              async=async)
+    def _create_new_database(self, **kw):
+        res = super(SaasPortalPlan, self)._create_new_database(**kw)
+
+
         #PROBLEM:
         # How to send mail credentials to the server and then save them in client database?
         # state = {
@@ -72,5 +69,10 @@ class SaasPortalPlan(models.Model):
         #                       client_id=client_id,
         #                       scope=scope,)[0]
         # res = requests.get(url, verify=(self.server_id.request_scheme == 'https' and self.server_id.verify_ssl))
-
+        client_obj = self.env['saas_portal.client'].browse(res.get('id'))
+        smtp_credentials = client_obj._create_mail_domain_on_mailgun()
+        client_obj._validate_mail_domain_using_route53()
+        ir_params = self.env['ir.config_parameter']
+        api_key = ir_params.get_param('saas_mailgun.saas_mailgun_api_key')
+        client_obj.upgrade(payload={'configure_outgoing_mail': smtp_credentials, 'params': [{'key': 'saas_client.mailgun_api_key', 'value': api_key, 'hidden': True}]})
         return res

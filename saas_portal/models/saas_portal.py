@@ -44,7 +44,7 @@ class SaasPortalServer(models.Model):
     client_ids = fields.One2many('saas_portal.client', 'server_id', string='Clients')
     local_host = fields.Char('Local host', help='local host or ip address of server for server-side requests')
     local_port = fields.Char('Local port', help='local tcp port of server for server-side requests')
-    local_request_scheme = fields.Char('Local request scheme', help='scheme for server-side requests')
+    local_request_scheme = fields.Selection([('http', 'http'), ('https', 'https')], 'Scheme', default='http', required=True)
 
     @api.model
     def create(self, vals):

@@ -241,6 +241,13 @@ class SaasPortalPlan(models.Model):
         else:
             client = self.env['saas_portal.client'].create(vals)
         client_id = client.client_id
+        scheme = server.request_scheme
+        port = server.request_port
+        port_str = str(port)
+        if scheme == 'http' and port_str == '80' or scheme == 'https' and port_str == '443':
+            port_str = ''
+        else:
+            port_str = ':' + port_str
 
         if user_id:
             owner_user = self.env['res.users'].browse(user_id)
@@ -257,7 +264,7 @@ class SaasPortalPlan(models.Model):
         state = {
             'd': client.name,
             'e': trial and trial_expiration_datetime or client.create_date,
-            'r': '%s://%s:%s/web' % (scheme, client.name, port),
+            'r': '%s://%s%s/web' % (scheme, client.name, port_str),
             'owner_user': owner_user_data,
             't': client.trial,
         }

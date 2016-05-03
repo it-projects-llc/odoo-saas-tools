@@ -158,11 +158,13 @@
                             <field name="client_id"/>
                             <field name="active"/>
                             <field name="request_scheme"/>
-			                      <field name="verify_ssl" attrs="{'invisible': [('request_scheme', '!=', 'https')]}"/>
                             <field name="request_port"/>
-                            <field name="local_request_scheme"/>
-                            <field name="local_host"/>
-                            <field name="local_port"/>
+                        </group>
+                        <group string="Server-side requests">
+                          <field name="local_request_scheme"/>
+                          <field name="verify_ssl" attrs="{'invisible': [('local_request_scheme', '!=', 'https')]}"/>
+                          <field name="local_host"/>
+                          <field name="local_port"/>
                         </group>
                     </group>
                     <field name="client_ids" readonly="1">

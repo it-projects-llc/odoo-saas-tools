@@ -242,8 +242,6 @@ class SaasPortalPlan(models.Model):
             client = self.env['saas_portal.client'].create(vals)
         client_id = client.client_id
 
-        scheme = server.request_scheme
-        port = server.request_port
         if user_id:
             owner_user = self.env['res.users'].browse(user_id)
         else:
@@ -267,8 +265,6 @@ class SaasPortalPlan(models.Model):
             state.update({'db_template': self.template_id.name})
         scope = ['userinfo', 'force_login', 'trial', 'skiptheuse']
         req, req_kwargs = server._request_server(path='/saas_server/new_database',
-                              scheme=scheme,
-                              port=port,
                               state=state,
                               client_id=client_id,
                               scope=scope,)

@@ -7,7 +7,7 @@
       <field name="inherit_id" ref="saas_sysadmin.view_server_form"/>
       <field name="arch" type="xml">
         <field name="ip_address" position="after">
-          <field name="aws_hosted_zone" placeholder="example.com." attrs="{'readonly': [('ip_address', '=', False)]}"/>
+          <field name="aws_hosted_zone_id" placeholder="example.com." attrs="{'readonly': [('ip_address', '=', False)]}"/>
         </field>
       </field>
     </record>

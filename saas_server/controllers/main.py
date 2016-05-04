@@ -85,9 +85,9 @@ class SaasServer(http.Controller):
             oauth_provider_id = client_env.ref('saas_server.saas_oauth_provider').id
             action_id = client_env.ref(action).id
 
-        port = self._get_port()
         scheme = request.httprequest.scheme
-        url = '{scheme}://{domain}:{port}/saas_client/new_database'.format(scheme=scheme, domain=new_db, port=port)
+        port = self._get_port_str(scheme)
+        url = '{scheme}://{domain}{port}/saas_client/new_database'.format(scheme=scheme, domain=new_db, port=port)
         return simplejson.dumps({
             'url': url,
             'state': simplejson.dumps({
@@ -104,7 +104,7 @@ class SaasServer(http.Controller):
         _logger.info('edit_database post: %s', post)
 
         scheme = request.httprequest.scheme
-        port = self._get_port()
+        port = self._get_port_str(scheme)
         state = simplejson.loads(post.get('state'))
         domain = state.get('d')
 
@@ -112,7 +112,7 @@ class SaasServer(http.Controller):
             'access_token': post['access_token'],
             'state': simplejson.dumps(state),
         }
-        url = '{scheme}://{domain}:{port}/saas_client/edit_database?{params}'
+        url = '{scheme}://{domain}{port}/saas_client/edit_database?{params}'
         url = url.format(scheme=scheme, domain=domain, port=port, params=werkzeug.url_encode(params))
         return werkzeug.utils.redirect(url)
 
@@ -290,6 +290,13 @@ class SaasServer(http.Controller):
     def _get_port(self):
         host_parts = request.httprequest.host.split(':')
         return len(host_parts) > 1 and host_parts[1] or 80
+
+    def _get_port_str(self, scheme):
+        port = str(self._get_port())
+        if scheme == 'http' and port == '80' or scheme == 'https' and port == '443':
+            return ''
+        else:
+            return ':' + port
     
     def _get_message(self, dbuuid):
         message = False

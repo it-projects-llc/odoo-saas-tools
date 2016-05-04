@@ -39,9 +39,12 @@ class SaasPortalServer(models.Model):
     sequence = fields.Integer('Sequence')
     active = fields.Boolean('Active', default=True)
     request_scheme = fields.Selection([('http', 'http'), ('https', 'https')], 'Scheme', default='http', required=True)
-    verify_ssl = fields.Boolean('Verify SSL', default=True, help="verify SSL certificates for HTTPS requests, just like a web browser")
+    verify_ssl = fields.Boolean('Verify SSL', default=True, help="verify SSL certificates for server-side HTTPS requests, just like a web browser")
     request_port = fields.Integer('Request Port', default=80)
     client_ids = fields.One2many('saas_portal.client', 'server_id', string='Clients')
+    local_host = fields.Char('Local host', help='local host or ip address of server for server-side requests')
+    local_port = fields.Char('Local port', help='local tcp port of server for server-side requests')
+    local_request_scheme = fields.Selection([('http', 'http'), ('https', 'https')], 'Scheme', default='http', required=True)
 
     @api.model
     def create(self, vals):
@@ -71,10 +74,12 @@ class SaasPortalServer(models.Model):
         url = '/oauth2/auth?%s' % werkzeug.url_encode(params)
         return url
 
-    @api.one
+    @api.multi
     def _request_server(self, path=None, scheme=None, port=None, **kwargs):
-        scheme = scheme or self.request_scheme
-        port = port or self.request_port
+        self.ensure_one()
+        scheme = scheme or self.local_request_scheme or self.request_scheme
+        host = self.local_host or self.name
+        port = port or self.local_port or self.request_port
         params = self._request_params(**kwargs)[0]
         access_token = self.oauth_application_id.sudo()._get_access_token(create=True)
         params.update({
@@ -82,8 +87,10 @@ class SaasPortalServer(models.Model):
             'access_token': access_token,
             'expires_in': 3600,
         })
-        url = '{scheme}://{saas_server}:{port}{path}?{params}'.format(scheme=scheme, saas_server=self.name, port=port, path=path, params=werkzeug.url_encode(params))
-        return url
+        url = '{scheme}://{host}:{port}{path}'.format(scheme=scheme, host=host, port=port, path=path)
+        req = requests.Request('GET', url, data=params, headers={'host': self.name})
+        req_kwargs = {'verify': self.verify_ssl}
+        return req.prepare(), req_kwargs
 
     @api.multi
     def action_redirect_to_server(self):
@@ -108,8 +115,8 @@ class SaasPortalServer(models.Model):
             'client_id': self.client_id,
         }
 
-        url = self._request_server(path='/saas_server/sync_server', state=state, client_id=self.client_id)[0]
-        res = requests.get(url, verify=(self.request_scheme == 'https' and self.verify_ssl))
+        req, req_kwargs = self._request_server(path='/saas_server/sync_server', state=state, client_id=self.client_id)
+        res = requests.Session().send(req, **req_kwargs)
 
         if res.ok != True:
             raise Warning('Reason: %s \n Message: %s' % (res.reason, res.content))
@@ -239,9 +246,14 @@ class SaasPortalPlan(models.Model):
         else:
             client = self.env['saas_portal.client'].create(vals)
         client_id = client.client_id
-
         scheme = server.request_scheme
         port = server.request_port
+        port_str = str(port)
+        if scheme == 'http' and port_str == '80' or scheme == 'https' and port_str == '443':
+            port_str = ''
+        else:
+            port_str = ':' + port_str
+
         if user_id:
             owner_user = self.env['res.users'].browse(user_id)
         else:
@@ -257,20 +269,18 @@ class SaasPortalPlan(models.Model):
         state = {
             'd': client.name,
             'e': trial and trial_expiration_datetime or client.create_date,
-            'r': '%s://%s:%s/web' % (scheme, client.name, port),
+            'r': '%s://%s%s/web' % (scheme, client.name, port_str),
             'owner_user': owner_user_data,
             't': client.trial,
         }
         if self.template_id:
             state.update({'db_template': self.template_id.name})
         scope = ['userinfo', 'force_login', 'trial', 'skiptheuse']
-        url = server._request_server(path='/saas_server/new_database',
-                              scheme=scheme,
-                              port=port,
+        req, req_kwargs = server._request_server(path='/saas_server/new_database',
                               state=state,
                               client_id=client_id,
-                              scope=scope,)[0]
-        res = requests.get(url, verify=(self.server_id.request_scheme == 'https' and self.server_id.verify_ssl))
+                              scope=scope,)
+        res = requests.Session().send(req, **req_kwargs)
         if res.status_code != 200:
             # TODO /saas_server/new_database show more details here
             raise exceptions.Warning('Error %s' % res.status_code)
@@ -407,8 +417,8 @@ class SaasPortalDatabase(models.Model):
             'client_id': self.client_id,
         }
 
-        url = self.server_id._request_server(path='/saas_server/backup_database', state=state, client_id=self.client_id)[0]
-        res = requests.get(url, verify=(self.server_id.request_scheme == 'https' and self.server_id.verify_ssl))
+        req, req_kwargs = self.server_id._request_server(path='/saas_server/backup_database', state=state, client_id=self.client_id)
+        res = requests.Session().send(req, **req_kwargs)
         _logger.info('backup database: %s', res.text)
         if res.ok != True:
             raise Warning('Reason: %s \n Message: %s' % (res.reason, res.content))
@@ -477,8 +487,8 @@ class SaasPortalDatabase(models.Model):
         }
         if force_delete:
             state['force_delete'] = 1
-        url = self.server_id._request_server(path='/saas_server/delete_database', state=state, client_id=self.client_id)[0]
-        res = requests.get(url, verify=(self.server_id.request_scheme == 'https' and self.server_id.verify_ssl))
+        req, req_kwargs = self.server_id._request_server(path='/saas_server/delete_database', state=state, client_id=self.client_id)
+        res = requests.Session().send(req, **req_kwargs)
         _logger.info('delete database: %s', res.text)
         if res.status_code != 500:
             self.state = 'deleted'
@@ -587,8 +597,8 @@ class SaasPortalClient(models.Model):
             'client_id': self.client_id,
             'new_dbname': new_dbname,
         }
-        url = self.server_id._request_server(path='/saas_server/rename_database', state=state, client_id=self.client_id)[0]
-        res = requests.get(url, verify=(self.server_id.request_scheme == 'https' and self.server_id.verify_ssl))
+        req, req_kwargs = self.server_id._request_server(path='/saas_server/rename_database', state=state, client_id=self.client_id)
+        res = requests.Session().send(req, **req_kwargs)
         _logger.info('delete database: %s', res.text)
         if res.status_code != 500:
             self.name = new_dbname

@@ -71,7 +71,10 @@ class SaasPortalServer(models.Model):
         method = '%s_%s' % (action, type)
         if action in ('add', 'update'):
             try:
-                getattr(zone, method)(name, value)
+                if type == 'txt' and action == 'add':
+                    zone.add_record(resource_type=type, name=name, value=value)
+                else:
+                    getattr(zone, method)(name, value)
             except DNSServerError as e:
                 if e.error_code == 'InvalidChangeBatch':
                     method = method.replace('add', 'update')

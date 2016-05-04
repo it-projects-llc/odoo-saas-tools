@@ -26,7 +26,7 @@ class SaasRoute53Zone(models.Model):
 
     name = fields.Char('Domain Name', required=True)
     create_zone = fields.Boolean('Create Zone', help="True if you want zone to be created for you. Leave unchecked if zone has already been created manually")
-    hosted_zone_id = fields.Char('Hosted Zone ID', readonly=True)
+    hosted_zone_ID = fields.Char('Hosted Zone ID', readonly=True)
 
     @api.model
     @api.returns('self', lambda value:value.id)
@@ -39,7 +39,7 @@ class SaasRoute53Zone(models.Model):
             res = conn.create_zone(zone_name)
             zone.write({
                        'name' : zone_name,
-                       'hosted_zone_id' : res.id,  # TODO check if right
+                       'hosted_zone_ID' : res.id,  # TODO check if right
                        })
         return zone
 
@@ -57,7 +57,7 @@ class SaasRoute53Zone(models.Model):
 class SaasPortalServer(models.Model):
     _inherit = 'saas_portal.server'
 
-    aws_hosted_zone = fields.Many2one('saas_sysadmin.route53.zone', 'AWS Hosted Zone')
+    aws_hosted_zone_id = fields.Many2one('saas_sysadmin.route53.zone', 'AWS Hosted Zone')
 
     def _update_zone(self, name=None, value=None, action='add', type='a'):
         '''
@@ -67,7 +67,7 @@ class SaasPortalServer(models.Model):
         if action in ('add', 'write') and value == None:
             raise Warning('This operation requires a supplied value')
         conn = _get_route53_conn(self.env)
-        zone = conn.get_zone(self.aws_hosted_zone.name)
+        zone = conn.get_zone(self.aws_hosted_zone_id.name)
         method = '%s_%s' % (action, type)
         if action in ('add', 'update'):
             try:
@@ -92,7 +92,7 @@ class SaasPortalServer(models.Model):
     @api.returns('self', lambda value:value.id)
     def create(self, vals):
         server = super(SaasPortalServer, self).create(vals)
-        if server.aws_hosted_zone:
+        if server.aws_hosted_zone_id:
             server._update_zone(server.name, value=server.ip_address)
         return server
 
@@ -100,7 +100,7 @@ class SaasPortalServer(models.Model):
     def write(self, vals):
         super(SaasPortalServer, self).write(vals)
         for server in self:
-            if server.aws_hosted_zone:
+            if server.aws_hosted_zone_id:
                 if 'ip_address' in vals:
                     self._update_zone(server.name, value=server.ip_address, action='update')
         return True
@@ -108,6 +108,6 @@ class SaasPortalServer(models.Model):
     @api.multi
     def unlink(self):
         for server in self:
-            if server.aws_hosted_zone:
+            if server.aws_hosted_zone_id:
                 self._update_zone(server.name, action='delete')
         super(SaasPortalServer, self).unlink()

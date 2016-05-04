@@ -6,7 +6,7 @@
     'website': "https://twitter.com/nasyrov_ildar",
     'category': 'SaaS',
     'version': '1.0.0',
-    'depends': ['saas_sysadmin'],
+    'depends': ['saas_sysadmin', 'saas_sysadmin_aws'],
     'data': [
         'views/res_config.xml',
     ],

@@ -72,7 +72,8 @@ class SaasPortalServer(models.Model):
         if action in ('add', 'update'):
             try:
                 if type == 'txt' and action == 'add':
-                    zone.add_record(resource_type=type, name=name, value=value)
+                    value = '"' + value + '"'
+                    zone.add_record(resource_type=type.upper(), name=name, value=value, ttl=300)
                 else:
                     getattr(zone, method)(name, value)
             except DNSServerError as e:

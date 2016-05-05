@@ -1,5 +1,13 @@
 # -*- coding: utf-8 -*-
 import requests
+import os, string
+
+def random_password(length=10):
+    chars = string.ascii_uppercase + string.digits + string.ascii_lowercase
+    password = ''
+    for i in range(length):
+        password += chars[ord(os.urandom(1)) % len(chars)]
+    return password
 
 def add_domain(api_key=None, domain_name=None, smtp_password=None):
     """Adding a domain.

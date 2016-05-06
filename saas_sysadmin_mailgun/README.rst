@@ -2,7 +2,7 @@
  Mailgun for saas clients
 ==========================
 
-This module automatically do
+This module automatically does
 mail configurations on saas client's odoo
 using http://www.mailgun.com/ service credentials.
 It creates and validates mail domain

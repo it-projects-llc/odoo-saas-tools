@@ -71,5 +71,5 @@ class SaasPortalPlan(models.Model):
 
         ir_params = self.env['ir.config_parameter']
         api_key = ir_params.get_param('saas_mailgun.saas_mailgun_api_key')
-        client_obj.upgrade(payload={'configure_outgoing_mail': [new_domain_info['domain']], 'params': [{'key': 'saas_client.mailgun_api_key', 'value': api_key, 'hidden': True}]})
+        client_obj.upgrade(payload={'configure_outgoing_mail': [new_domain_info['domain']], 'params': [{'key': 'mailgun.apikey', 'value': api_key, 'hidden': True}]})
         return res

@@ -77,6 +77,7 @@ class SaasPortalServer(models.Model):
                 else:
                     getattr(zone, method)(name, value)
             except DNSServerError as e:
+                _logger.critical(e)
                 if e.error_code == 'InvalidChangeBatch':
                     method = method.replace('add', 'update')
                     getattr(zone, method)(name, value)

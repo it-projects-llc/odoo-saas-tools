@@ -33,8 +33,9 @@ class SaasPortalClient(models.Model):
         self.ensure_one()
         receiving_dns_records = domain_info.get('receiving_dns_records')
         name = self.mail_domain
+        value = []
         for r in receiving_dns_records:
-            value = r.get('priority') + ' ' + r.get('value') + '\n'
+            value.append("%(priority)s %(value)s" % r)
         type = 'mx'
         self.server_id._update_zone(name=name, type=type, value=value)
 
@@ -60,5 +61,5 @@ class SaasPortalPlan(models.Model):
 
         ir_params = self.env['ir.config_parameter']
         api_key = ir_params.get_param('saas_mailgun.saas_mailgun_api_key')
-        client_obj.upgrade(payload={'configure_outgoing_mail': new_domain_info['domain'], 'params': [{'key': 'saas_client.mailgun_api_key', 'value': api_key, 'hidden': True}]})
+        client_obj.upgrade(payload={'configure_outgoing_mail': [new_domain_info['domain']], 'params': [{'key': 'saas_client.mailgun_api_key', 'value': api_key, 'hidden': True}]})
         return res

@@ -200,3 +200,14 @@ def create_credentials(api_key=None, domain=None):
         data={"login": "alice@YOUR_DOMAIN_NAME",
               "password": "secret"})
 
+def create_store_route(api_key=None, domain=None, mail_domain=None):
+    """Create a route for message storing and notification"""
+    action = "store(notify='http://%s/mailgun/notify')" % domain
+    expression = "match_recipient('.*@%s')" % mail_domain
+    return requests.post(
+        "https://api.mailgun.net/v3/routes",
+        auth=("api", api_key),
+        data={"priority": 0,
+              "description": "odoo mailgun",
+              "expression": expression,
+              "action": [action]})

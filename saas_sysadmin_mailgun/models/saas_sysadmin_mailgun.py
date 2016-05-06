@@ -29,6 +29,14 @@ class SaasPortalClient(models.Model):
         return mailgun.add_domain(api_key=api_key, domain_name=self.mail_domain, smtp_password=password)
 
     @api.multi
+    def _create_route_on_mailgun(self):
+        self.ensure_one()
+        '''Create route on mailgun for storing incomming messages'''
+        ir_params = self.env['ir.config_parameter']
+        api_key = ir_params.get_param('saas_mailgun.saas_mailgun_api_key')
+        return mailgun.create_store_route(api_key=api_key, domain=self.name, mail_domain=self.mail_domain)
+
+    @api.multi
     def _domain_verification_and_dns_route53(self, domain_info):
         self.ensure_one()
         receiving_dns_records = domain_info.get('receiving_dns_records')
@@ -56,6 +64,8 @@ class SaasPortalPlan(models.Model):
 
         client_obj = self.env['saas_portal.client'].browse(res.get('id'))
         mailgun_res = client_obj._create_domain_on_mailgun()
+        client_obj._create_route_on_mailgun()
+
         new_domain_info = simplejson.loads(mailgun_res.text)
         client_obj._domain_verification_and_dns_route53(new_domain_info)
 

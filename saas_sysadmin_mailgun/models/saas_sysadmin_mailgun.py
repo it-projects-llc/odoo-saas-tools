@@ -34,7 +34,8 @@ class SaasPortalClient(models.Model):
         '''Create route on mailgun for storing incomming messages'''
         ir_params = self.env['ir.config_parameter']
         api_key = ir_params.get_param('saas_mailgun.saas_mailgun_api_key')
-        return mailgun.create_store_route(api_key=api_key, domain=self.name, mail_domain=self.mail_domain)
+        return mailgun.create_store_route(api_key=api_key, domain=self.name,
+                                          mail_domain=self.mail_domain, request_scheme=self.server_id.request_scheme)
 
     @api.multi
     def _domain_verification_and_dns_route53(self, domain_info):

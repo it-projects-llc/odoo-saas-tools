@@ -187,14 +187,14 @@ class SaasServerClient(models.Model):
     def update(self):
         try:
             registry = self.registry()[0]
+            with registry.cursor() as client_cr:
+                client_env = api.Environment(client_cr, SUPERUSER_ID, self._context)
+                data = self._get_data(client_env, self.client_id)[0]
+                self.write(data)
         except psycopg2.OperationalError:
             if self.state != 'draft':
                 self.state = 'deleted'
             return
-        with registry.cursor() as client_cr:
-            client_env = api.Environment(client_cr, SUPERUSER_ID, self._context)
-            data = self._get_data(client_env, self.client_id)[0]
-            self.write(data)
 
     @api.one
     def _get_data(self, client_env, check_client_id):

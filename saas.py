@@ -171,6 +171,7 @@ def main():
                 # TODO get plan_id
                 plan_id = 1
             rpc_run_tests(args.get('portal_db_name'), plan_id)
+            log('SaaS tests were passed successfully')
 
     except Exception, e:
         error = e

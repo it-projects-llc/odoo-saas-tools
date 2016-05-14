@@ -2,12 +2,15 @@
 
 ODOO_VERSION = 8
 SUPERUSER_ID = 1
+SAAS_PORTAL_MODULES_REGEXP = '(saas_portal.*|saas_sysadmin.*)'
+SAAS_SERVER_MODULES_REGEXP = '(saas_server.*)'
 
 import ConfigParser
 import argparse
 import contextlib
 import fcntl
 import json
+import re
 import os
 import psycopg2
 import requests
@@ -45,6 +48,7 @@ settings_group.add_argument('--odoo-config', dest='odoo_config', help='Path to o
 settings_group.add_argument('--odoo-data-dir', dest='odoo_data_dir', help='Path to odoo data dir', default=None)
 settings_group.add_argument('--odoo-xmlrpc-port', dest='xmlrpc_port', default=None)
 settings_group.add_argument('--admin-password', dest='admin_password', help='Password for admin user. It\'s used for all databases.', default='admin')
+settings_group.add_argument('--install-modules', dest='install_modules', help='Comma-separated list of modules to install. They will be automatically installed on appropriate database (Portal or Server)', default='saas_portal_start,saas_portal_sale_online')
 #settings_group.add_argument('--db_user', dest='db_user', help='database user name')
 settings_group.add_argument('-s', '--simulate', dest='simulate', action='store_true', help='Don\'t make actual changes. Just show what script is going to do.')
 
@@ -52,10 +56,12 @@ settings_group.add_argument('-s', '--simulate', dest='simulate', action='store_t
 portal_group = parser.add_argument_group('Portal creation')
 portal_group.add_argument('--portal-create', dest='portal_create', help='Create SaaS Portal database', action='store_true')
 portal_group.add_argument('--portal-db-name', dest='portal_db_name', default='saas-portal-{suffix}.local')
+portal_group.add_argument('--portal-modules', dest='portal_install_modules', help='Comma-separated list of modules to install on Portal', default='auth_signup')
 
 server_group = parser.add_argument_group('Server creation')
 server_group.add_argument('--server-create', dest='server_create', help='Create SaaS Server database', action='store_true')
 server_group.add_argument('--server-db-name', dest='server_db_name', default='server-1.saas-portal-{suffix}.local')
+portal_group.add_argument('--server-modules', dest='server_install_modules', help='Comma-separated list of modules to install on Server')
 
 plan_group = parser.add_argument_group('Plan creation')
 plan_group.add_argument('--plan-create', dest='plan_create', help='Create Plan', action='store_true')
@@ -66,6 +72,7 @@ plan_group.add_argument('--plan-clients', dest='plan_clients', default='client-%
 other_group = parser.add_argument_group('Other')
 other_group.add_argument('--print-local-hosts', dest='print_local_hosts', action='store_true', help='Print hosts rules for local usage.')
 other_group.add_argument('--run', dest='run', action='store_true', help='Run server')
+other_group.add_argument('--test', dest='test', action='store_true', help='Test system')
 other_group.add_argument('--cleanup', dest='cleanup', action='store_true', help='Drop all saas databases. Use along with --simulate to check which database would be deleted')
 
 args = vars(parser.parse_args())
@@ -97,6 +104,16 @@ odoo_config = get_odoo_config()
 datadir = args.get('odoo_data_dir') or odoo_config.get('data_dir')
 xmlrpc_port = args.get('xmlrpc_port') or odoo_config.get('xmlrpc_port') or '8069'
 
+def filter_modules(s, regexp):
+    return set([m for m in s.split(',') if re.match(regexp, m)])
+
+portal_modules = filter_modules(args.get('install_modules', ''), SAAS_PORTAL_MODULES_REGEXP)
+portal_modules.union((args.get('portal_install_modules') or '').split(','))
+portal_modules.add('saas_portal')
+
+server_modules = filter_modules(args.get('install_modules', ''), SAAS_PORTAL_MODULES_REGEXP)
+server_modules.union((args.get('server_install_modules') or '').split(','))
+server_modules.add('saas_server')
 
 # ----------------------------------------------------------
 # Main
@@ -120,15 +137,16 @@ def main():
 
     # create databases
     if args.get('portal_create'):
-        createdb(args.get('portal_db_name'), ['auth_signup', 'saas_portal', 'saas_portal_start', 'saas_portal_sale_online'])
+        createdb(args.get('portal_db_name'), portal_modules)
 
     if args.get('server_create'):
-        createdb(args.get('server_db_name'), ['saas_server'])
+        createdb(args.get('server_db_name'), server_modules)
 
     # run odoo to make updates via rpc
     cmd = get_cmd()
     pid = spawn_cmd(cmd)
     error = None
+    plan_id = None
     try:
         wait_net_service('127.0.0.1', int(xmlrpc_port), 10)
 
@@ -142,7 +160,13 @@ def main():
             rpc_add_server_to_portal(args.get('portal_db_name'))
 
         if args.get('plan_create'):
-            rpc_create_plan(args.get('portal_db_name'))
+            plan_id = rpc_create_plan(args.get('portal_db_name'))
+
+        if args.get('test'):
+            if not plan_id:
+                # TODO get plan_id
+                plan_id = 1
+            rpc_run_tests(args.get('portal_db_name'), plan_id)
 
     except Exception, e:
         error = e
@@ -300,7 +324,13 @@ def rpc_create_plan(portal_db_name):
     #      * wait couple minutes while Database is being created.
     dropdb(plan_template_db_name)
     rpc_execute_kw(auth, 'saas_portal.plan', 'create_template', [[plan_id]])
+    return plan_id
 
+def rpc_run_tests(portal_db_name, plan_id):
+    auth = rpc_auth(portal_db_name, admin_password=args.get('admin_password'))
+    create_new_database = rpc_execute_kw(auth, 'saas_portal.plan', 'create_new_database', [[plan_id]])
+    rpc_execute_kw(auth, 'saas_portal.plan', 'action_sync_server', [[plan_id]])
+    requests.get(create_new_database.get('url'))
 
 # some functions below were taken from runbot module: https://github.com/odoo/odoo-extra/tree/master/runbot
 # ----------------------------------------------------------

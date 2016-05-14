@@ -74,6 +74,9 @@ other_group.add_argument('--print-local-hosts', dest='print_local_hosts', action
 other_group.add_argument('--run', dest='run', action='store_true', help='Run server')
 other_group.add_argument('--test', dest='test', action='store_true', help='Test system')
 other_group.add_argument('--log-db', dest='log_db', help='Logging database. The same as odoo parameter')
+other_group.add_argument("--addons-path", dest="addons_path",
+                 help="specify additional addons paths (separated by commas).")
+
 other_group.add_argument('--cleanup', dest='cleanup', action='store_true', help='Drop all saas databases. Use along with --simulate to check which database would be deleted')
 
 args = vars(parser.parse_args())
@@ -386,6 +389,9 @@ def get_cmd():
 
     if args.get('log_db'):
         cmd += ['--log-db=%s' % args.get('log_db')]
+
+    if args.get('addons_path'):
+        cmd += ['--addons-path=%s' % args.get('addons_path')]
 
     return cmd
 

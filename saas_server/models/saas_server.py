@@ -310,6 +310,12 @@ class SaasServerClient(models.Model):
                         users.append((3, u.id, 0))
                 g.write({'users': users})
 
+        # 7. Configure outgoing mail
+        data = post.get('configure_outgoing_mail', [])
+        for mail_conf in data:
+            ir_mail_server = client_env['ir.mail_server']
+            ir_mail_server.create({'name': 'mailgun', 'smtp_host': 'smtp.mailgun.org', 'smtp_user': mail_conf['smtp_login'], 'smtp_pass': mail_conf['smtp_password']})
+
         return res
 
     @api.model

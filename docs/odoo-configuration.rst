@@ -19,3 +19,11 @@ workers
 =======
 
 Set ``workers`` parameter to ``3`` or above. In some context it could be less, but ``3`` is enough at any case.
+
+addons_path
+===========
+It must include
+
+* odoo addons
+* odoo-saas-tools
+* `dependencies <dependencies.rst#addons>`_

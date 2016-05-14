@@ -1,9 +1,10 @@
-Dependencies
-============
+==============
+ Dependencies
+==============
 
 
 Core dependencies
------------------
+=================
 
 * oauthlib:
 
@@ -12,6 +13,9 @@ Core dependencies
 * requests
 
     pip install requests --upgrade
+
+Addons
+======
 
 saas_portal_sale_online
 -----------------------

@@ -51,6 +51,9 @@ settings_group.add_argument('--odoo-script', dest='odoo_script', help='Path to o
 settings_group.add_argument('--odoo-config', dest='odoo_config', help='Path to odoo configuration file')
 settings_group.add_argument('--odoo-data-dir', dest='odoo_data_dir', help='Path to odoo data dir', default=None)
 settings_group.add_argument('--odoo-xmlrpc-port', dest='xmlrpc_port', default=None)
+settings_group.add_argument('--odoo-log-db', dest='log_db', help='Logging database. The same as odoo parameter')
+settings_group.add_argument("--odoo-addons-path", dest="addons_path",
+                 help="specify additional addons paths (separated by commas).")
 settings_group.add_argument('--admin-password', dest='admin_password', help='Password for admin user. It\'s used for all databases.', default='admin')
 settings_group.add_argument('--install-modules', dest='install_modules', help='Comma-separated list of modules to install. They will be automatically installed on appropriate database (Portal or Server)', default='saas_portal_start,saas_portal_sale_online')
 #settings_group.add_argument('--db_user', dest='db_user', help='database user name')
@@ -77,10 +80,6 @@ other_group = parser.add_argument_group('Other')
 other_group.add_argument('--print-local-hosts', dest='print_local_hosts', action='store_true', help='Print hosts rules for local usage.')
 other_group.add_argument('--run', dest='run', action='store_true', help='Run server')
 other_group.add_argument('--test', dest='test', action='store_true', help='Test system')
-other_group.add_argument('--log-db', dest='log_db', help='Logging database. The same as odoo parameter')
-other_group.add_argument("--addons-path", dest="addons_path",
-                 help="specify additional addons paths (separated by commas).")
-
 other_group.add_argument('--cleanup', dest='cleanup', action='store_true', help='Drop all saas databases. Use along with --simulate to check which database would be deleted')
 
 args = vars(parser.parse_args())

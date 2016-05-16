@@ -26,4 +26,4 @@ It must include
 
 * odoo addons
 * odoo-saas-tools
-* `dependencies <dependencies.rst#addons>`_
+* `dependencies <dependencies.rst>`_

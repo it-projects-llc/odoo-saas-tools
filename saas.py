@@ -55,7 +55,6 @@ settings_group.add_argument('--odoo-log-db', dest='log_db', help='Logging databa
 settings_group.add_argument("--odoo-addons-path", dest="addons_path",
                  help="specify additional addons paths (separated by commas).")
 settings_group.add_argument('--admin-password', dest='admin_password', help='Password for admin user. It\'s used for all databases.', default='admin')
-settings_group.add_argument('--base-domain', dest='base_domain', help='Base domain. Used for system that work with --db-filter=%d (e.g. runbot)')
 settings_group.add_argument('--install-modules', dest='install_modules', help='Comma-separated list of modules to install. They will be automatically installed on appropriate database (Portal or Server)', default='saas_portal_start,saas_portal_sale_online')
 #settings_group.add_argument('--db_user', dest='db_user', help='database user name')
 settings_group.add_argument('-s', '--simulate', dest='simulate', action='store_true', help='Don\'t make actual changes. Just show what script is going to do.')
@@ -226,9 +225,7 @@ def cleanup():
 # RPC Tools
 # ----------------------------------------------------------
 def rpc_auth(dbname, admin_username='admin', admin_password='admin'):
-    main_url = 'http://%s' % dbname
-    if arg.get('base_domain'):
-        main_url += '.' + arg.get('base_domain')
+    main_url = 'http://localhost:%s' % xmlrpc_port
     if args.get('simulate'):
         return None, None, None, None
 

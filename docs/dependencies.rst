@@ -22,7 +22,6 @@ Amazon services
     pip install boto
 
 Used by
-^^^^^^^
 
 * `saas_server_backup_rotate_s3 <../saas_server_backup_rotate_s3/>`_
 * `saas_sysadmin_route53 <../saas_sysadmin_route53/>`_
@@ -35,7 +34,6 @@ FTP
 
  
 Used by
-^^^^^^^
 
 * `saas_server_backup_ftp <../saas_server_backup_ftp/>`_
 
@@ -49,6 +47,5 @@ website_sale_require_login
  
  
 Used by
-^^^^^^^
 
 * `saas_portal_sale_online <../saas_portal_sale_online/>`_

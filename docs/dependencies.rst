@@ -32,6 +32,7 @@ FTP
 
 * pysftp
 
+    pip install pysftp
  
 Used by
 

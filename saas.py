@@ -54,6 +54,8 @@ settings_group.add_argument('--odoo-xmlrpc-port', dest='xmlrpc_port', default=No
 settings_group.add_argument('--odoo-log-db', dest='log_db', help='Logging database. The same as odoo parameter')
 settings_group.add_argument("--odoo-addons-path", dest="addons_path",
                  help="specify additional addons paths (separated by commas).")
+settings_group.add_argument("--odoo-database", dest="odoo_db_name",
+                            help="Value to be passed to odoo as --database parameter", default='')
 settings_group.add_argument('--admin-password', dest='admin_password', help='Password for admin user. It\'s used for all databases.', default='admin')
 settings_group.add_argument('--install-modules', dest='install_modules', help='Comma-separated list of modules to install. They will be automatically installed on appropriate database (Portal or Server)', default='saas_portal_start,saas_portal_sale_online')
 #settings_group.add_argument('--db_user', dest='db_user', help='database user name')
@@ -387,6 +389,7 @@ def get_cmd():
     cmd = [
         args.get('odoo_script'),
         "--xmlrpc-port=%s" % xmlrpc_port,
+        "--database=%s" % args.get('odoo_db_name')
     ]
     if args.get('odoo_config'):
         cmd += ['--config=%s' % args.get('odoo_config')]

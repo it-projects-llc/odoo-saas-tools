@@ -171,6 +171,7 @@ class SaasServerClient(models.Model):
                 user = client_env['res.users'].browse(SUPERUSER_ID)
             user.write({
                 'login': owner_user['login'],
+                'password': owner_user['password'],
                 'name': owner_user['name'],
                 'email': owner_user['email'],
                 'oauth_provider_id': oauth_provider.id,

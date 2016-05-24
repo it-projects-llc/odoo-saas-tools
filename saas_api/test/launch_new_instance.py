@@ -25,7 +25,7 @@ plan = {
     'plan_id': 1
 }
 database = {
-    'name': 'launch_new_instance2',
+    'name': 'launch1',
 }
 
 datas = json.dumps({'user': user, 'plan': plan, 'database': database})

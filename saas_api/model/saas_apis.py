@@ -1,9 +1,9 @@
 from openerp import api, fields, models, _
 import json
-from openerp import SUPERUSER_ID, exceptions
 from openerp.addons.web.http import request
 from openerp.addons.saas_base.exceptions import MaximumDBException, MaximumTrialDBException
-import werkzeug
+import logging
+
 
 class api(models.Model):
 
@@ -21,25 +21,31 @@ class api(models.Model):
         full_dbname = '%s.%s' % (dbname, self.get_config_parameter('base_saas_domain'))
         return full_dbname.replace('www.', '')
 
-    def get_plan(self, plan_id=None):
-        domain = [('id', '=', plan_id)]
+    def get_plan(self, plan_id):
+        domain = [('id', '=', plan_id), ('server_id', '!=', None), ('template_id', '!=', None)]
         plans = self.env['saas_portal.plan'].search(domain)
-        if not plans:
-            raise exceptions.Warning(_('There is no plan configured'))
-        return plans[0]
+        if plans:
+            return plans[0]
+        else:
+            return None
 
     @api.model
-    def get_all_plans(self):
+    def get_all_plans(self, vals=None):
+        log = self.env['saas.api.logs'].create({
+            'name': 'get_all_plans',
+            'data': vals
+        })
+        vals = json.loads(vals)
         plans = self.env['saas_portal.plan'].search([('demo', '=', False), ('template_id', '!=', None), ('server_id', '!=', None)])
         code = None
-        value = None
-        datas = []
+        values = None
+        values = []
         if plans:
             code = 200
         else:
             code = 401
         for plan in plans:
-            datas.append({
+            values.append({
                 'name': plan.name,
                 'summary': plan.summary,
                 'template_id': plan.template_id.name,
@@ -51,11 +57,18 @@ class api(models.Model):
                 'block_on_storage_exceed': plan.block_on_storage_exceed,
                 'lang': plan.lang,
             })
-        return json.dumps({'code': code, 'value': datas})
+        if code == 200:
+            log.write({'state': 'done'})
+        else:
+            log.write({'state': 'fail'})
+        return json.dumps({'code': code, 'values': values})
 
     @api.model
     def launch_new_instance(self, vals):
-        print vals, type(vals)
+        log = self.env['saas.api.logs'].create({
+            'name': 'get_all_plans',
+            'data': vals
+        })
         vals = json.loads(vals)
         user_val = vals['user']
         plan_val = vals['plan']
@@ -66,7 +79,7 @@ class api(models.Model):
         ])
         user_id = None
         partner_id = None
-        plan = self.get_plan(plan_val.get('plan_id', 0))
+        plan = self.get_plan(int(plan_val.get('plan_id', 0) or 0))
         if not user:
             user = self.env['res.users'].create(user_val)
             user_id = user.id
@@ -77,24 +90,29 @@ class api(models.Model):
         dbname = self.get_full_dbname(database_name)
         code = None
         value = None
-        try:
-            res = plan.create_new_database(dbname=dbname, user_id=user_id, partner_id=partner_id)
-            code = 200
-            value = res.get('url')
-        except MaximumDBException:
-            url = request.env['ir.config_parameter'].sudo().get_param('saas_portal.page_for_maximumdb', '/')
-            code = 401
-            value = 'Maxium size'
-            return json.dumps({'code': 401, 'value': value})
-        except MaximumTrialDBException:
-            url = request.env['ir.config_parameter'].sudo().get_param('saas_portal.page_for_maximumtrialdb', '/')
-            code = 402
-            value = 'Maxium trial beta'
-            return json.dumps({'code': code, 'value': value})
-        except:
-            code = 403
-            value = 'Databse already exists'
-            return json.dumps({'code': code, 'value': value})
+        if plan:
+            try:
+                res = plan.create_new_database(dbname=dbname, user_id=user_id, partner_id=partner_id)
+                code = 200
+                value = res.get('url')
+            except MaximumDBException:
+                url = request.env['ir.config_parameter'].sudo().get_param('saas_portal.page_for_maximumdb', '/')
+                code = 401
+                value = 'Maxium size'
+            except MaximumTrialDBException:
+                url = request.env['ir.config_parameter'].sudo().get_param('saas_portal.page_for_maximumtrialdb', '/')
+                code = 402
+                value = 'Maxium trial beta'
+            # except:
+            #     code = 403
+            #     value = 'Databse already exists'
+        else:
+            code = 404
+            value = 'have not plan'
+        if code == 200:
+            log.write({'state': 'done'})
+        else:
+            log.write({'state': 'fail'})
         return json.dumps({'code': code, 'value': value})
 
 
@@ -108,4 +126,4 @@ class api_logs(models.Model):
         ('new', 'New'),
         ('fail', 'Fail'),
         ('done', 'Done'),
-    ], 'State')
+    ], 'State', default='new')

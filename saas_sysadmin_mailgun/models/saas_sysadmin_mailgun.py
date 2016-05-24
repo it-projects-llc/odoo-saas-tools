@@ -76,7 +76,7 @@ class SaasPortalPlan(models.Model):
                                            {'key': 'mail.catchall.domain', 'value': client_obj.mail_domain, 'hidden': True}]})
             client_obj._domain_verification_and_dns_route53(new_domain_info)
         except Exception as e:
-            _logger.debug("Error during mailgun domain creation", exc_info=True)
+            _logger.exception("Error during mailgun domain creation", exc_info=True)
             pass
 
         return res

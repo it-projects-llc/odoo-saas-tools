@@ -3,6 +3,9 @@ import json
 from openerp.addons.web.http import request
 from openerp.addons.saas_base.exceptions import MaximumDBException, MaximumTrialDBException
 import logging
+import openerp
+
+logger = logging.getLogger(__name__)
 
 
 class api(models.Model):
@@ -65,6 +68,8 @@ class api(models.Model):
 
     @api.model
     def launch_new_instance(self, vals):
+        logger.info('begin launch_new_instance')
+        logger.info(vals)
         log = self.env['saas.api.logs'].create({
             'name': 'get_all_plans',
             'data': vals
@@ -103,9 +108,9 @@ class api(models.Model):
                 url = request.env['ir.config_parameter'].sudo().get_param('saas_portal.page_for_maximumtrialdb', '/')
                 code = 402
                 value = 'Maxium trial beta'
-            # except:
-            #     code = 403
-            #     value = 'Databse already exists'
+            except:
+                code = 403
+                value = 'Databse already exists'
         else:
             code = 404
             value = 'have not plan'
@@ -113,7 +118,76 @@ class api(models.Model):
             log.write({'state': 'done'})
         else:
             log.write({'state': 'fail'})
+        logger.info('end launch_new_instance')
         return json.dumps({'code': code, 'value': value})
+
+    #TODO: delete instance
+    @api.model
+    def delete_instance(self, vals):
+        log = self.env['saas.api.logs'].create({
+            'name': 'get_all_plans',
+            'data': vals
+        })
+        code = None
+        values = None
+        client_name = json.loads(vals).get('database_name')
+        config_obj = self.env['ir.config_parameter']
+        base_saas_domain = config_obj.get_param('saas_portal.base_saas_domain')
+        print client_name
+        print base_saas_domain
+        client = self.env['saas_portal.client'].search([('name', '=', client_name + '.' + base_saas_domain)])
+        if not client:
+            code = 401
+            values = 'database is valid'
+            log.write({'state': 'fail'})
+        else:
+            try:
+                for cl in client:
+                    cl.delete_database_server()
+                code = 200
+                values = 'Done'
+                log.write({'state': 'done'})
+            except:
+                code = 403
+                values = 'Databse not already exists'
+                log.write({'state': 'fail'})
+        return json.dumps({'code': code, 'values': values})
+
+    #TODO: execute database
+    @api.model
+    def execute_instance(self, vals):
+        log = self.env['saas.api.logs'].create({
+            'name': 'get_all_plans',
+            'data': vals
+        })
+        code = None
+        values = None
+        vals = json.loads(vals)
+        config_obj = self.env['ir.config_parameter']
+        base_saas_domain = config_obj.get_param('saas_portal.base_saas_domain')
+        client = self.env['saas_portal.client'].search([('name', '=', vals.get('database') + '.' + base_saas_domain)])
+        if not client:
+            code = 400
+            values = 'Database not already exists'
+        else:
+
+            payload = {
+                # TODO: add configure mail server option here
+                'update_addons_list': vals.get('update_addons_list'),
+                'update_addons': vals.get('update_addons'),
+                'install_addons': vals.get('install_addons'),
+                'uninstall_addons': vals.get('uninstall_addons'),
+                'access_owner_add': vals.get('access_owner_add'),
+                'access_remove': vals.get('access_remove'),
+                'fixes': vals.get('fixes'),
+                'params': vals.get('params'),
+            }
+            res = client.upgrade(payload=payload)
+            print res
+            code = 200
+            values = 'Done'
+        return json.dumps({'code': code, 'values': values})
+
 
 
 class api_logs(models.Model):

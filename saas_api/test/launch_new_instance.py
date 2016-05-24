@@ -24,10 +24,14 @@ user  = {
 plan = {
     'plan_id': 1
 }
-database = {
-    'name': 'launch1',
-}
 
-datas = json.dumps({'user': user, 'plan': plan, 'database': database})
-new_instance = sock.execute_kw(db, uid, password, 'saas.api', 'launch_new_instance', [datas])
-print new_instance
+instances = ['client-1', 'client-2']
+for ins in instances:
+    database = {
+        'name': ins,
+    }
+
+    datas = json.dumps({'user': user, 'plan': plan, 'database': database})
+
+    new_instance = sock.execute_kw(db, uid, password, 'saas.api', 'launch_new_instance', [datas])
+    print new_instance

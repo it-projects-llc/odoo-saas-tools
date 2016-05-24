@@ -171,6 +171,7 @@ class SaasServerClient(models.Model):
                 user = client_env['res.users'].browse(SUPERUSER_ID)
             user.write({
                 'login': owner_user['login'],
+                'password': owner_user['password'],
                 'name': owner_user['name'],
                 'email': owner_user['email'],
                 'oauth_provider_id': oauth_provider.id,
@@ -187,14 +188,14 @@ class SaasServerClient(models.Model):
     def update(self):
         try:
             registry = self.registry()[0]
+            with registry.cursor() as client_cr:
+                client_env = api.Environment(client_cr, SUPERUSER_ID, self._context)
+                data = self._get_data(client_env, self.client_id)[0]
+                self.write(data)
         except psycopg2.OperationalError:
             if self.state != 'draft':
                 self.state = 'deleted'
             return
-        with registry.cursor() as client_cr:
-            client_env = api.Environment(client_cr, SUPERUSER_ID, self._context)
-            data = self._get_data(client_env, self.client_id)[0]
-            self.write(data)
 
     @api.one
     def _get_data(self, client_env, check_client_id):
@@ -309,6 +310,12 @@ class SaasServerClient(models.Model):
                     if u.id != SUPERUSER_ID:
                         users.append((3, u.id, 0))
                 g.write({'users': users})
+
+        # 7. Configure outgoing mail
+        data = post.get('configure_outgoing_mail', [])
+        for mail_conf in data:
+            ir_mail_server = client_env['ir.mail_server']
+            ir_mail_server.create({'name': 'mailgun', 'smtp_host': 'smtp.mailgun.org', 'smtp_user': mail_conf['smtp_login'], 'smtp_pass': mail_conf['smtp_password']})
 
         return res
 

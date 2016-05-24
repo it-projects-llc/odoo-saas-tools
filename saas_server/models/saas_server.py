@@ -120,6 +120,9 @@ class SaasServerClient(models.Model):
             value = self.env['ir.config_parameter'].get_param(key, default='')
             client_env['ir.config_parameter'].set_param(key, value)
 
+        # set web.base.url config
+        client_env['ir.config_parameter'].set_param('web.base.url', 'http://%s' % self.name) 
+
         # copy auth provider from saas_server
         saas_oauth_provider = self.env.ref('saas_server.saas_oauth_provider')
         oauth_provider = None

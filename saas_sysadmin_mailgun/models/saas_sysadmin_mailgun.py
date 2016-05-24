@@ -69,14 +69,15 @@ class SaasPortalPlan(models.Model):
             client_obj._create_route_on_mailgun()
 
             new_domain_info = simplejson.loads(mailgun_res.text)
-            ir_params = self.env['ir.config_parameter']
-            api_key = ir_params.get_param('saas_mailgun.saas_mailgun_api_key')
-            client_obj.upgrade(payload={'configure_outgoing_mail': [new_domain_info['domain']],
-                                    'params': [{'key': 'mailgun.apikey', 'value': api_key, 'hidden': True},
-                                           {'key': 'mail.catchall.domain', 'value': client_obj.mail_domain, 'hidden': True}]})
             client_obj._domain_verification_and_dns_route53(new_domain_info)
         except Exception as e:
             _logger.exception("Error during mailgun domain creation", exc_info=True)
-            pass
+            return res
+
+        ir_params = self.env['ir.config_parameter']
+        api_key = ir_params.get_param('saas_mailgun.saas_mailgun_api_key')
+        client_obj.upgrade(payload={'configure_outgoing_mail': [new_domain_info['domain']],
+                                    'params': [{'key': 'mailgun.apikey', 'value': api_key, 'hidden': True},
+                                           {'key': 'mail.catchall.domain', 'value': client_obj.mail_domain, 'hidden': True}]})
 
         return res

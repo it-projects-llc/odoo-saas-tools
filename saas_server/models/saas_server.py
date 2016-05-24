@@ -100,7 +100,7 @@ class SaasServerClient(models.Model):
         return ['saas_client.ab_location', 'saas_client.ab_register']
 
     @api.one
-    def _prepare_database(self, client_env, owner_user=None, is_template_db=False, addons=[], access_token=None, tz=None):
+    def _prepare_database(self, client_env, owner_user=None, is_template_db=False, addons=[], access_token=None, tz=None, server_requests_scheme='http'):
         client_id = self.client_id
 
         # update saas_server.client state
@@ -121,7 +121,7 @@ class SaasServerClient(models.Model):
             client_env['ir.config_parameter'].set_param(key, value)
 
         # set web.base.url config
-        client_env['ir.config_parameter'].set_param('web.base.url', 'http://%s' % self.name) 
+        client_env['ir.config_parameter'].set_param('web.base.url', '%s://%s' % (server_requests_scheme, self.name)) 
 
         # copy auth provider from saas_server
         saas_oauth_provider = self.env.ref('saas_server.saas_oauth_provider')

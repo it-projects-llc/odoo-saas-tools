@@ -70,7 +70,8 @@ class SaasServer(http.Controller):
             tz=tz,
             owner_user = owner_user,
             is_template_db = is_template_db,
-            access_token = access_token)
+            access_token = access_token,
+            server_requests_scheme = request.httprequest.scheme)
 
         if is_template_db:
             res = [{

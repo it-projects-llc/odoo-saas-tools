@@ -12,6 +12,9 @@ disqus_url: shikherverma.com # disque comments are broken if you send http:// al
 github_username:  shikherverma
 facebook_username:  shikherverma1
 email_username:  root@shikherverma.com
+collections:
+  - portfolio
+
 # used to estimate reading time
 wpm: 180
 

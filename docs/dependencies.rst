@@ -44,7 +44,7 @@ Addons
 website_sale_require_login
 --------------------------
 
-  The module can be found here: https://github.com/OCA/e-commerce/tree/8.0/website_sale_require_login
+The module can be found here: https://github.com/OCA/e-commerce/tree/8.0/website_sale_require_login
  
  
 Used by

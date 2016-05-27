@@ -18,21 +18,11 @@
                 <li>
                     <a href="{{ site.baseurl }}/">Home</a>
                 </li>
-                {% for page in site.pages %} <!-- site.pages liquid tag lists all the pages in root directory, including folders containing index.html -->
-                {% if page.title %} <!-- true if page has a title -->
-                {% if page.url != '/404.html' %} <!-- you obviously don't want to show 404 in nav bar -->
-                {% if page.title != site.index_title %} <!-- this is done to remove dublicate entry -->
-				{% if page.url contains "/page" or page.url contains "/tags/" or page.url contains "/search" %}
-                    <!-- if page url contains "page" or "tag" that means it is a paginated subdirectory of blog so don't show in nav bar -->
-                {% else %} <!-- now that we have filtered out all the redundant pages, its time to add the left to nav bar -->
+                {% for page in site.pages %} {% if page.title %} {% if page.url != '/404.html' %} {% if page.title != site.index_title %} {% if page.url contains "/page" or page.url contains "/tags/" or page.url contains "/search" %} {% else %}
                 <li>
                     <a href="{{ page.url | prepend: site.baseurl }}">{{ page.title }}</a>
                 </li>
-                {% endif %}
-                {% endif %}
-				{% endif %}
-                {% endif %}
-                {% endfor %}
+                {% endif %} {% endif %} {% endif %} {% endif %} {% endfor %}
                 <li>
                     <a href="{{ root_url }}/search/" class="nav-search-link" title="SEARCH">
                         <span class="fa fa-search nav-search-icon"></span>

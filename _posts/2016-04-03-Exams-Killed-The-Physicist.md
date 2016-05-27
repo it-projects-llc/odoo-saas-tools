@@ -9,7 +9,7 @@ comments: true
 tags: Life@IITK
 ---
 Some times I like to think about what went wrong with us. It all started so good. I though we would always stay together. You are probably scratching your head and thinking what the hell is this guy talking about! Lets start from the very beginning.
-*The Honeymoon period* It all started in fiitjee, while I was preparing for jee. My coaching's physics teacher was awesome. He made me fall in love with physics. I really enjoyed how you take a few mathematical structures and describe and predict everything about the real world around you. Sure I had to take tests often but I never really had to make any effort for physics. Consequently when I was filling my choice list for iitjee I was filled with all the physics degrees. Engineering physics at Bombay, Delhi, Kanpur, Guwahati...
+*The Honeymoon period* It all started in fiitjee, while I was preparing for jee. My coaching's physics teacher was awesome. He made me fall in love with physics. I really enjoyed how you take a few mathematical structures and describe and predict everything about the real world around you. Sure I had to take tests often but I never really had to make any effort for physics. Consequently when I was filling my choice list for iitjee it was filled up with all the physics degrees that were offered. Engineering physics at Bombay, Delhi, Kanpur, Guwahati...
 Even though my coaching teacher warned me that physics in college will be quite different than school physics and my father warned me that the placement statistics might not be good. But I went with it anyway.
 Life was good. I joined physics b.s. at iit kanpur.
 

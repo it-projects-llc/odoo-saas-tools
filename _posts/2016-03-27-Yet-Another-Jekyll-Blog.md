@@ -62,3 +62,6 @@ Most probably no matter which theme you choose you will want to tweak something 
 Now coming to our primary concern. To publish a blog post add a file in ```_post/``` folder. Lets say ```2016-03-27-Untitled-Post.md```. Notice that the file name contains today’s date and the title of your post. Jekyll requires posts to be named year-month-day-title.md.
 Update the front matter at the beginning of the file.
 
+### Update [2016-05-28]
+As of May 2016; 6 people have forked my jekyll theme.
+So technically this is my most popular open source project :)

@@ -16,7 +16,7 @@ collections:
   - portfolio
 
 # used to estimate reading time
-wpm: 180
+wpm: 150
 
 # Build settings
 markdown: kramdown

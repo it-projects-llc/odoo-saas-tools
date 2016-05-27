@@ -31,9 +31,9 @@ header-img: "img/home-bg.jpg"
 		{% for item in site.portfolio %}
 			<div class="col-sm-4 portfolio-item">
 				<a href="#{{ item.id }}" class="portfolio-link" data-toggle="modal">
-					<div class="caption">
-						<div class="caption-content">
-							<i class="fa fa-search-plus fa-3x"></i>
+					<div class="caption" >
+						<div class="caption-content" style="white-space: pre-wrap; line-height:14px;" >{{ item.title }}
+						{{ item.category }} <i class="fa fa-search-plus"></i>
 						</div>
 					</div>
 					<img src="{{ item.image }}" class="img-responsive" alt="">

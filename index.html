@@ -30,7 +30,7 @@ header-img: "img/home-bg.jpg"
 		<div class="row">
 		{% for item in site.portfolio %}
 			<div class="col-sm-4 portfolio-item">
-				<a href="#{{ item.title }}" class="portfolio-link" data-toggle="modal">
+				<a href="#{{ item.id }}" class="portfolio-link" data-toggle="modal">
 					<div class="caption">
 						<div class="caption-content">
 							<i class="fa fa-search-plus fa-3x"></i>
@@ -45,7 +45,7 @@ header-img: "img/home-bg.jpg"
 <!-- Portfolio Modals -->
 <section id="portfolio modals">
 	{% for item in site.portfolio %}
-	<div class="portfolio-modal modal fade" id="{{ item.title }}" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="portfolio-modal modal fade" id="{{ item.id }}" tabindex="-1" role="dialog" aria-hidden="true">
 		<div class="modal-content">
 			<div class="close-modal" data-dismiss="modal">
 				<div class="lr">
@@ -67,7 +67,7 @@ header-img: "img/home-bg.jpg"
 									</strong>
 								</li>
 								<li>Date:
-									<strong>{{ item.date }}
+									<strong>{{ item.date | date: '%B %Y' }}
 									</strong>
 								</li>
 								<li>Category:

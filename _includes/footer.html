@@ -53,7 +53,7 @@
                     </li>
                     {% endif %}
                 </ul>
-                <p class="copyright text-muted">Copyright &copy; {{ site.copyright_name }} {{ site.time | date: '%Y' }}</p>
+                <p class="copyright text-muted">{% include feedburner_subscribe.html %} <br><br> Copyright &copy; {{ site.copyright_name }} {{ site.time | date: '%Y' }}</p>
             </div>
         </div>
     </div>

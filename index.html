@@ -30,12 +30,12 @@ header-img: "img/home-bg.jpg"
 	<div class="row">
 		{% for item in site.portfolio %}
 		<div class="col-sm-4 portfolio-item">
-			<a href="#{{ item.id }}" class="portfolio-link" data-keyboard="true" data-toggle="modal">
+			<a href="#{{ item.anchor }}" class="portfolio-link" data-keyboard="true" data-toggle="modal">
 				<div class="caption" >
 					<div class="caption-content" >
-						<p>{{ item.title }}<br>
-						Category: {{ item.category }}<br>
-						<i class="fa fa-search-plus"></i></p>
+						{{ item.title }}<p></p>
+						<i class="fa fa-search-plus"></i><p></p>
+						Category: {{ item.category }}
 					</div>
 				</div>
 				<img src="{{ item.image }}" class="img-responsive" alt="">
@@ -47,7 +47,7 @@ header-img: "img/home-bg.jpg"
 	<!-- Portfolio Modals -->
 	<section id="portfolio modals">
 		{% for item in site.portfolio %}
-		<div class="portfolio-modal modal fade" id="{{ item.id }}" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="portfolio-modal modal fade" id="{{ item.anchor }}" tabindex="-1" role="dialog" aria-hidden="true">
 			<div class="modal-content">
 				<div class="close-modal" data-dismiss="modal">
 					<div class="lr">

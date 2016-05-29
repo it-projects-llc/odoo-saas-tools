@@ -6,7 +6,7 @@ date: 2016-05-28 05:20:26
 author: "Shikher Verma"
 header-img: "img/posts/smalltalk-bg.jpg"
 comments: true
-tags: [ CodeMonkey ]
+tags: [ CodeMonkey, Life@IITK ]
 ---
 
 After reading this guide you won't ever feel like this.

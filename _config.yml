@@ -30,4 +30,4 @@ paginate: 5
 paginate_path: blog/page:num
 
 # gem dependencies
-gems: [jekyll-paginate, jekyll-feed]
+gems: [jekyll-paginate, jekyll-feed, jekyll-gist]

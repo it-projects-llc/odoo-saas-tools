@@ -296,7 +296,7 @@ def rpc_add_server_to_portal(portal_db_name):
     auth = rpc_auth(portal_db_name, admin_password=args.get('admin_password'))
     server_db_name = args.get('server_db_name')
     uuid = rpc_get_uuid(server_db_name)
-    rpc_execute_kw(auth, 'saas_portal.server', 'create', [{'name': server_db_name, 'client_id': uuid}])
+    rpc_execute_kw(auth, 'saas_portal.server', 'create', [{'name': server_db_name, 'client_id': uuid, 'local_port': xmlrpc_port}])
 
 
 def rpc_get_uuid(dbname):

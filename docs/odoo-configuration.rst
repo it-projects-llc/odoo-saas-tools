@@ -19,3 +19,21 @@ workers
 =======
 
 Set ``workers`` parameter to ``3`` or above. In some context it could be less, but ``3`` is enough at any case.
+
+limit_time_cpu
+==============
+
+Increase this value. Set it 600 or more.
+
+limit_time_real
+==============
+
+Increase this value. Set it 1200 or more.
+
+addons_path
+===========
+It must include
+
+* odoo addons
+* odoo-saas-tools
+* `dependencies <dependencies.rst>`_

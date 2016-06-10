@@ -355,7 +355,6 @@ class SaasPortalPlan(models.Model):
                                                                       port=plan.server_id.request_port,
                                                                       path='/saas_server/new_database',
                                                                       params=werkzeug.url_encode(params))
-        print 'url', url
         res = requests.get(url, verify=(plan.server_id.request_scheme == 'https' and plan.server_id.verify_ssl))
         if res.ok != True:
             raise Warning('Reason: %s \n Message: %s' % (res.reason, res.content))

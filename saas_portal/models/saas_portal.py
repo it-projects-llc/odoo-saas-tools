@@ -351,12 +351,16 @@ class SaasPortalPlan(models.Model):
             'expires_in': 3600,
         })
         port = plan.server_id.local_port or plan.server_id.request_port
+        host = plan.server_id.local_host or plan.server_id.host
         url = '{scheme}://{saas_server}:{port}{path}?{params}'.format(scheme=plan.server_id.request_scheme,
-                                                                      saas_server=plan.server_id.host,
+                                                                      saas_server=host,
                                                                       port=port,
                                                                       path='/saas_server/new_database',
                                                                       params=werkzeug.url_encode(params))
-        res = requests.get(url, verify=(plan.server_id.request_scheme == 'https' and plan.server_id.verify_ssl))
+        req = requests.Request('GET', url, headers={'host': plan.server_id.host})
+        req_kwargs = {'verify': (plan.server_id.request_scheme == 'https' and plan.server_id.verify_ssl)}
+        res = requests.Session().send(req, **req_kwargs)
+
         if res.ok != True:
             raise Warning('Error on request: %s\nReason: %s \n Message: %s' % (url, res.reason, res.content))
         return self.action_sync_server()

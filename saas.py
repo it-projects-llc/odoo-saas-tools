@@ -262,7 +262,9 @@ def rpc_init_portal(dbname):
     #   * set *Base SaaS domain*, e.g. **odoo.local**
     #   * click Apply (do it even if you didn't make changes)
     auth = rpc_auth(dbname, admin_password=args.get('admin_password'))
-    base_saas_domain = args.get('base_domain') or dbname
+    base_saas_domain = dbname
+    if args.get('base_domain') and '.' not in dbname:
+        base_saas_domain = args.get('base_domain')
     rpc_execute_kw(auth, 'ir.config_parameter', 'set_param', ['saas_portal.base_saas_domain', base_saas_domain])
 
     # Allow external users to sign up

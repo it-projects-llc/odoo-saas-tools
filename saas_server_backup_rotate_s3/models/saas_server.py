@@ -17,13 +17,13 @@ try:
     import boto
     from boto.s3.key import Key
 except:
-    _logger.critical('SAAS Sysadmin Bacnkup Agent S3 Requires the python library Boto which is not \
+    _logger.debug('SAAS Sysadmin Bacnkup Agent S3 Requires the python library Boto which is not \
     found on your installation')
 
 try:
     from rotate_backups_s3 import S3RotateBackups
 except:
-    _logger.critical('SAAS Server Backup Rotate S3 Requires the python library'
+    _logger.debug('SAAS Server Backup Rotate S3 Requires the python library'
     'rotate-backups-s3; grab it from pypi')
 
 class SaasServerClient(models.Model):

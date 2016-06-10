@@ -7,7 +7,7 @@ _logger = logging.getLogger(__name__)
 try:
     import pysftp
 except ImportError:
-    _logger.critical('saas_server_backup_ftp requires the python library pysftp which is not found on your installation')
+    _logger.debug('saas_server_backup_ftp requires the python library pysftp which is not found on your installation')
 
 
 class SaasPortalConfigWizard(models.TransientModel):

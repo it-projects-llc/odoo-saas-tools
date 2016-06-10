@@ -262,7 +262,8 @@ def rpc_init_portal(dbname):
     #   * set *Base SaaS domain*, e.g. **odoo.local**
     #   * click Apply (do it even if you didn't make changes)
     auth = rpc_auth(dbname, admin_password=args.get('admin_password'))
-    rpc_execute_kw(auth, 'ir.config_parameter', 'set_param', ['saas_portal.base_saas_domain', dbname])
+    base_saas_domain = args.get('base_domain') or dbname
+    rpc_execute_kw(auth, 'ir.config_parameter', 'set_param', ['saas_portal.base_saas_domain', base_saas_domain])
 
     # Allow external users to sign up
     rpc_execute_kw(auth, 'ir.config_parameter', 'set_param', ['auth_signup.allow_uninvited', repr(True)])
@@ -271,11 +272,13 @@ def rpc_init_portal(dbname):
 def rpc_init_server(server_db_name, new_admin_password=None):
     # Update OAuth Provider urls
     auth = rpc_auth(server_db_name, admin_password=args.get('admin_password'))
-    portal_db_name = args.get('portal_db_name')
+    portal_host = args.get('portal_db_name')
+    if args.get('base_domain') and '.' not in portal_host:
+        portal_host = '%s.%s' % (portal_host, args.get('base_domain'))
     oauth_provider = rpc_xmlid_to_object(auth, 'saas_server.saas_oauth_provider', 'auth.oauth.provider')
     vals = {
-        'auth_endpoint': oauth_provider.get('auth_endpoint').replace('odoo.local', portal_db_name),
-        'validation_endpoint': oauth_provider.get('validation_endpoint').replace('odoo.local', portal_db_name),
+        'auth_endpoint': oauth_provider.get('auth_endpoint').replace('odoo.local', portal_host),
+        'validation_endpoint': oauth_provider.get('validation_endpoint').replace('odoo.local', portal_host),
     }
     oauth_provider = rpc_execute_kw(auth, 'auth.oauth.provider', 'write', [[oauth_provider.get('id')], vals])
 

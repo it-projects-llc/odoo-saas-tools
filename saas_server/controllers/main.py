@@ -106,7 +106,7 @@ class SaasServer(http.Controller):
         scheme = request.httprequest.scheme
         port = self._get_port()
         state = simplejson.loads(post.get('state'))
-        domain = state.get('d')
+        domain = state.get('host')
 
         params = {
             'access_token': post['access_token'],

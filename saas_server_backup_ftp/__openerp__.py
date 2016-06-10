@@ -7,6 +7,7 @@
     'category': 'SaaS',
     'version': '1.0.0',
     'depends': ['saas_server'],
+    "external_dependencies": {"python": ['pysftp'], "bin": []},
     'data': [
         'views/res_config.xml',
         'data/ir_cron.xml',

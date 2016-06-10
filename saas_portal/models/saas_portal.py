@@ -358,6 +358,7 @@ class SaasPortalPlan(models.Model):
                                                                       path='/saas_server/new_database',
                                                                       params=werkzeug.url_encode(params))
         req = requests.Request('GET', url, headers={'host': plan.server_id.host})
+        req = req.prepare()
         req_kwargs = {'verify': (plan.server_id.request_scheme == 'https' and plan.server_id.verify_ssl)}
         res = requests.Session().send(req, **req_kwargs)
 

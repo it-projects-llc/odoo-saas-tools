@@ -30,8 +30,8 @@ def _compute_host(self):
     base_saas_domain = self.env['ir.config_parameter'].get_param('saas_portal.base_saas_domain')
     for r in self:
         host = r.name
-        if base_saas_domain and '.' not in name:
-            host = '%s.%s' % (name, base_saas_domain)
+        if base_saas_domain and '.' not in r.name:
+            host = '%s.%s' % (r.name, base_saas_domain)
         r.host = host
 
 
@@ -124,7 +124,6 @@ class SaasPortalServer(models.Model):
             'd': self.name,
             'client_id': self.client_id,
         }
-
         req, req_kwargs = self._request_server(path='/saas_server/sync_server', state=state, client_id=self.client_id)
         res = requests.Session().send(req, **req_kwargs)
 
@@ -352,6 +351,7 @@ class SaasPortalPlan(models.Model):
                                                                       port=plan.server_id.request_port,
                                                                       path='/saas_server/new_database',
                                                                       params=werkzeug.url_encode(params))
+        print 'url', url
         res = requests.get(url, verify=(plan.server_id.request_scheme == 'https' and plan.server_id.verify_ssl))
         if res.ok != True:
             raise Warning('Reason: %s \n Message: %s' % (res.reason, res.content))
@@ -460,6 +460,7 @@ class SaasPortalDatabase(models.Model):
         r = self[0]
         state = {
             'd': r.name,
+            'host': r.host,
             'client_id': r.client_id,
         }
         url = r.server_id._request(path=path, state=state, client_id=r.client_id)
@@ -647,7 +648,7 @@ class SaasPortalClient(models.Model):
         state = {
             'd': client.name,
             'e': client.expiration_datetime,
-            'r': '%s://%s:%s/web' % (scheme, port, client.host),
+            'r': '%s://%s:%s/web' % (scheme, client.host, port),
         }
         state.update({'db_template': self.name,
                       'disable_mail_server' : True})

@@ -55,6 +55,7 @@ settings_group.add_argument('--odoo-log-db', dest='log_db', help='Logging databa
 settings_group.add_argument("--odoo-addons-path", dest="addons_path",
                  help="specify additional addons paths (separated by commas).")
 settings_group.add_argument('--admin-password', dest='admin_password', help='Password for admin user. It\'s used for all databases.', default='admin')
+settings_group.add_argument('--base-domain', dest='base_domain', help='Base domain. Used for system that work with --db-filter=%d')
 settings_group.add_argument('--install-modules', dest='install_modules', help='Comma-separated list of modules to install. They will be automatically installed on appropriate database (Portal or Server)', default='saas_portal_start,saas_portal_sale_online')
 #settings_group.add_argument('--db_user', dest='db_user', help='database user name')
 settings_group.add_argument('-s', '--simulate', dest='simulate', action='store_true', help='Don\'t make actual changes. Just show what script is going to do.')
@@ -261,7 +262,10 @@ def rpc_init_portal(dbname):
     #   * set *Base SaaS domain*, e.g. **odoo.local**
     #   * click Apply (do it even if you didn't make changes)
     auth = rpc_auth(dbname, admin_password=args.get('admin_password'))
-    rpc_execute_kw(auth, 'ir.config_parameter', 'set_param', ['saas_portal.base_saas_domain', dbname])
+    base_saas_domain = dbname
+    if args.get('base_domain') and '.' not in dbname:
+        base_saas_domain = args.get('base_domain')
+    rpc_execute_kw(auth, 'ir.config_parameter', 'set_param', ['saas_portal.base_saas_domain', base_saas_domain])
 
     # Allow external users to sign up
     rpc_execute_kw(auth, 'ir.config_parameter', 'set_param', ['auth_signup.allow_uninvited', repr(True)])
@@ -270,11 +274,13 @@ def rpc_init_portal(dbname):
 def rpc_init_server(server_db_name, new_admin_password=None):
     # Update OAuth Provider urls
     auth = rpc_auth(server_db_name, admin_password=args.get('admin_password'))
-    portal_db_name = args.get('portal_db_name')
+    portal_host = args.get('portal_db_name')
+    if args.get('base_domain') and '.' not in portal_host:
+        portal_host = '%s.%s' % (portal_host, args.get('base_domain'))
     oauth_provider = rpc_xmlid_to_object(auth, 'saas_server.saas_oauth_provider', 'auth.oauth.provider')
     vals = {
-        'auth_endpoint': oauth_provider.get('auth_endpoint').replace('odoo.local', portal_db_name),
-        'validation_endpoint': oauth_provider.get('validation_endpoint').replace('odoo.local', portal_db_name),
+        'auth_endpoint': oauth_provider.get('auth_endpoint').replace('odoo.local', portal_host),
+        'validation_endpoint': oauth_provider.get('validation_endpoint').replace('odoo.local', portal_host),
     }
     oauth_provider = rpc_execute_kw(auth, 'auth.oauth.provider', 'write', [[oauth_provider.get('id')], vals])
 

@@ -6,6 +6,7 @@
     'category': 'SaaS',
     'website': 'http://idtlabs.sl',
     'depends': ['saas_server', 'saas_server_backup_s3', 'saas_server_backup_rotate'],
+    "external_dependencies": {"python": ['boto', 'rotate_backups_s3'], "bin": []},
     'data': [
         ],
     'installable': True,

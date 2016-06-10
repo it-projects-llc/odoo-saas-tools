@@ -25,7 +25,7 @@ try:
     import boto
     from boto.s3.key import Key
 except:
-    _logger.critical('SAAS Sysadmin Bacnkup Agent S3 Requires the python library Boto which is not \
+    _logger.debug('SAAS Sysadmin Bacnkup Agent S3 Requires the python library Boto which is not \
     found on your installation')
     
 
@@ -34,7 +34,7 @@ try:
     from filechunkio import FileChunkIO
     parallel_upload = True
 except:
-    _logger.warning('SAAS Sysadmin Bacnkup Agent S3 performs better with large '
+    _logger.debug('SAAS Sysadmin Bacnkup Agent S3 performs better with large '
                     'files if you have FileChunkIO installed')
     
 def _get_s3_conn(env):

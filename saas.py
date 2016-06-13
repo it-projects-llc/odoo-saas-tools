@@ -54,6 +54,7 @@ settings_group.add_argument('--odoo-xmlrpc-port', dest='xmlrpc_port', default=No
 settings_group.add_argument('--odoo-log-db', dest='log_db', help='Logging database. The same as odoo parameter')
 settings_group.add_argument("--odoo-addons-path", dest="addons_path",
                  help="specify additional addons paths (separated by commas).")
+settings_group.add_argument('--odoo-db-filter', dest='db_filter', default='%h')
 settings_group.add_argument('--admin-password', dest='admin_password', help='Password for admin user. It\'s used for all databases.', default='admin')
 settings_group.add_argument('--base-domain', dest='base_domain', help='Base domain. Used for system that work with --db-filter=%d')
 settings_group.add_argument('--install-modules', dest='install_modules', help='Comma-separated list of modules to install. They will be automatically installed on appropriate database (Portal or Server)', default='saas_portal_start,saas_portal_sale_online')
@@ -119,7 +120,7 @@ portal_modules = filter_modules(args.get('install_modules', ''), SAAS_PORTAL_MOD
 portal_modules.union((args.get('portal_install_modules') or '').split(','))
 portal_modules.add('saas_portal')
 
-server_modules = filter_modules(args.get('install_modules', ''), SAAS_PORTAL_MODULES_REGEXP)
+server_modules = filter_modules(args.get('install_modules', ''), SAAS_SERVER_MODULES_REGEXP)
 server_modules.union((args.get('server_install_modules') or '').split(','))
 server_modules.add('saas_server')
 
@@ -281,6 +282,8 @@ def rpc_init_server(server_db_name, new_admin_password=None):
     vals = {
         'auth_endpoint': oauth_provider.get('auth_endpoint').replace('odoo.local', portal_host),
         'validation_endpoint': oauth_provider.get('validation_endpoint').replace('odoo.local', portal_host),
+        'local_ip': 'localhost',
+        'local_port': xmlrpc_port,
     }
     oauth_provider = rpc_execute_kw(auth, 'auth.oauth.provider', 'write', [[oauth_provider.get('id')], vals])
 
@@ -295,7 +298,7 @@ def rpc_add_server_to_portal(portal_db_name):
     auth = rpc_auth(portal_db_name, admin_password=args.get('admin_password'))
     server_db_name = args.get('server_db_name')
     uuid = rpc_get_uuid(server_db_name)
-    rpc_execute_kw(auth, 'saas_portal.server', 'create', [{'name': server_db_name, 'client_id': uuid}])
+    rpc_execute_kw(auth, 'saas_portal.server', 'create', [{'name': server_db_name, 'client_id': uuid, 'local_port': xmlrpc_port, 'local_host':'localhost'}])
 
 
 def rpc_get_uuid(dbname):
@@ -393,6 +396,8 @@ def get_cmd(dbname=''):
         args.get('odoo_script'),
         "--xmlrpc-port=%s" % xmlrpc_port,
         "--database=%s" % dbname,
+        "--db-filter=%s" % args.get('db_filter'),
+        "--workers=3",
     ]
     if args.get('odoo_config'):
         cmd += ['--config=%s' % args.get('odoo_config')]

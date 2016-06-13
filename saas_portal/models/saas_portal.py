@@ -287,8 +287,7 @@ class SaasPortalPlan(models.Model):
                               scope=scope,)
         res = requests.Session().send(req, **req_kwargs)
         if res.status_code != 200:
-            # TODO /saas_server/new_database show more details here
-            raise exceptions.Warning('Error %s' % res.status_code)
+            raise Warning('Error on request: %s\nReason: %s \n Message: %s' % (req.url, res.reason, res.content))
         data = simplejson.loads(res.text)
         params = {
             'state': data.get('state'),
@@ -330,7 +329,6 @@ class SaasPortalPlan(models.Model):
     @api.multi
     def create_template(self):
         assert len(self)==1, 'This method is applied only for single record'
-        # TODO use create_new_database function
         plan = self[0]
         state = {
             'd': plan.template_id.name,
@@ -342,28 +340,12 @@ class SaasPortalPlan(models.Model):
         }
         client_id = plan.template_id.client_id
         plan.template_id.server_id = plan.server_id
-        params = plan.server_id._request_params(path='/saas_server/new_database', state=state, client_id=client_id)[0]
 
-        access_token = plan.template_id.oauth_application_id.sudo()._get_access_token(create=True)
-        params.update({
-            'token_type': 'Bearer',
-            'access_token': access_token,
-            'expires_in': 3600,
-        })
-        port = plan.server_id.local_port or plan.server_id.request_port
-        host = plan.server_id.local_host or plan.server_id.host
-        url = '{scheme}://{saas_server}:{port}{path}?{params}'.format(scheme=plan.server_id.request_scheme,
-                                                                      saas_server=host,
-                                                                      port=port,
-                                                                      path='/saas_server/new_database',
-                                                                      params=werkzeug.url_encode(params))
-        req = requests.Request('GET', url, headers={'host': plan.server_id.host})
-        req = req.prepare()
-        req_kwargs = {'verify': (plan.server_id.request_scheme == 'https' and plan.server_id.verify_ssl)}
+        req, req_kwargs = self.server_id._request_server(path='/saas_server/new_database', state=state, client_id=client_id)
         res = requests.Session().send(req, **req_kwargs)
 
         if res.ok != True:
-            raise Warning('Error on request: %s\nReason: %s \n Message: %s' % (url, res.reason, res.content))
+            raise Warning('Error on request: %s\nReason: %s \n Message: %s' % (req.url, res.reason, res.content))
         return self.action_sync_server()
 
     @api.multi

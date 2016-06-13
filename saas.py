@@ -120,7 +120,7 @@ portal_modules = filter_modules(args.get('install_modules', ''), SAAS_PORTAL_MOD
 portal_modules.union((args.get('portal_install_modules') or '').split(','))
 portal_modules.add('saas_portal')
 
-server_modules = filter_modules(args.get('install_modules', ''), SAAS_PORTAL_MODULES_REGEXP)
+server_modules = filter_modules(args.get('install_modules', ''), SAAS_SERVER_MODULES_REGEXP)
 server_modules.union((args.get('server_install_modules') or '').split(','))
 server_modules.add('saas_server')
 
@@ -282,6 +282,8 @@ def rpc_init_server(server_db_name, new_admin_password=None):
     vals = {
         'auth_endpoint': oauth_provider.get('auth_endpoint').replace('odoo.local', portal_host),
         'validation_endpoint': oauth_provider.get('validation_endpoint').replace('odoo.local', portal_host),
+        'local_ip': 'localhost',
+        'local_port': xmlrpc_port,
     }
     oauth_provider = rpc_execute_kw(auth, 'auth.oauth.provider', 'write', [[oauth_provider.get('id')], vals])
 
@@ -395,6 +397,7 @@ def get_cmd(dbname=''):
         "--xmlrpc-port=%s" % xmlrpc_port,
         "--database=%s" % dbname,
         "--db-filter=%s" % args.get('db_filter'),
+        "--workers=3",
     ]
     if args.get('odoo_config'):
         cmd += ['--config=%s' % args.get('odoo_config')]

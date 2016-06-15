@@ -1,3 +1,4 @@
+[![Build Status](http://runbot.it-projects.info/runbot/badge/flat/37/9.0.svg)](http://runbot.it-projects.info/runbot/37/9.0)
 
 odoo-saas-tools
 ===============

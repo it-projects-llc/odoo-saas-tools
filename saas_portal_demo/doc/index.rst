@@ -13,11 +13,15 @@ Use format below (example for `reminder modules<https://apps.odoo.com/apps/modul
 
     # -*- coding: utf-8 -*-
     {
-        "technical_name": "reminders",
+        "title_url": "reminders-and-agenda",
         "title": "Reminders and Agenda",
         "summary": "Set of modules to organise all your tasks, todos, events, etc.",
-        "addons_extra":  ["reminder_crm_next_action", "reminder_phonecall"],
+        "addons_extra_demo":  ["reminder_crm_next_action", "reminder_phonecall"],
+        "addons_extra":  ["website"],
     }
+
+* ``"addons_extra_demo"`` - additional addons to be demostrated
+* ``"addons_extra"`` - additional addons to be installed, but without noticing in Demo Page
 
 Configuration
 =============
@@ -30,6 +34,8 @@ Automatic Plans generation
 
   * specify Odoo version
   * specify Path -- comma separated list of paths, where modules with ``__demo__.py`` can be found
+  * Switch ``[x] Publish on website after creating`` off, if you want to check Plan before publishing
+  * Switch ``[ ] Show Add To Cart button`` on, if you are going to use Plans to sale databases (e.g. via ``saas_portal_sale_online`` module)
   * click ``[Generate Plans]``
 
 * Open  ``SaaS / SaaS / Plans`` -- you see new plans
@@ -40,15 +46,10 @@ Manual creating demo Plans
 * Open  ``SaaS / SaaS / Plans``
 * Click ``[Create]``
 
-  * specify **Technical Name**
   * specify **Expiration (hours)**
   * specify **Version**
-
   * At ``Demo Databases`` section
 
-    * switch **Demo Page Enabled** on
-    * specify **Demo Title**
-    * specify **Demo Summary**
     * add some **Demo modules**
 
       * **Name**
@@ -57,6 +58,14 @@ Manual creating demo Plans
       * **Icon Url**
       * **Price**
       * **Currency**
+
+* Click ``[Save]``
+* Click ``Products`` smart button
+
+  * Click ``[Create]``
+  * Specify **SEO URL**
+  * Switch ``[ ] Show Add To Cart button`` on if needed
+  * Click ``[Save]``
 
 Adding demo link to Application
 -------------------------------
@@ -69,9 +78,9 @@ Adding demo link to Application
 Workflow
 ========
 
-* User opens *Demo Page Url*
+* User opens *Demo Page*
 * User is navigate to Demo Page
-* User clicks ``[Live Preview]``
+* User clicks ``[Get Demo]``
 * User is asked to login \ sign up
 * On signing up user is asked to specify
 

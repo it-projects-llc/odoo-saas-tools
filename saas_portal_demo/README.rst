@@ -4,7 +4,21 @@
 
 All you need to create demos for your applications in `odoo apps store <https://apps.odoo.com/>`_!
 
-The module creates pages /demo/<odoo_version>/<technical_name> (e.g. /demo/9.0/mail-addons). That page contains list of demostrated modules and button 'Live Preview'. On clicking that page user is asked to login. After that he receive an email with a link to fresh database with installed modules.
+The module extends shop pages:
+
+* Adds list of demostrated modules
+
+  * design is similar to one in apps store + button Buy
+  * clicking on each module navigates user to app store
+
+* Adds button ``Get Demo``.
+
+  * On clicking that page user is asked to login
+  * After that he receive an email with a link to fresh database with installed modules.
+
+* Allows to hide ``Add To Cart`` button.
+
+The module depends on ``website_seo_url`` to allow links without id, e.g. ``/shop/product/reminders-and-agenda`` instead of ``/shop/product/reminders-and-agenda-123``. It help to have static urls.
 
 Demo databases are automatically destroyed after 3 hours (configurable).
 

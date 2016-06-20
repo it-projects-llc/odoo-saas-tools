@@ -11,14 +11,18 @@ The module extends shop pages:
   * design is similar to one in apps store + button Buy
   * clicking on each module navigates user to app store
 
-* Adds button ``Get Demo``.
+* Adds button ``Get Demo for X.0``.
 
   * On clicking that page user is asked to login
   * After that he receive an email with a link to fresh database with installed modules.
 
-* Allows to hide ``Add To Cart`` button.
+* Adds note ``Also available for [8.0], ...``
+
+* Allows to hide ``Add To Cart`` button (via ``website_sale_add_to_cart_disable``).
 
 The module depends on ``website_seo_url`` to allow links without id, e.g. ``/shop/product/reminders-and-agenda`` instead of ``/shop/product/reminders-and-agenda-123``. It help to have static urls.
+
+Current version is taken from ``version`` parameter, e.g. ``/shop/product/reminders-and-agenda?version=8.0``
 
 Demo databases are automatically destroyed after 3 hours (configurable).
 

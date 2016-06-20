@@ -53,6 +53,7 @@ Manual creating demo Plans
     * add some **Demo modules**
 
       * **Name**
+      * **Technical Name**
       * **Summary**
       * **Image Url**
       * **Icon Url**

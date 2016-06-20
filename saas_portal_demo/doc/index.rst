@@ -61,12 +61,20 @@ Manual creating demo Plans
       * **Currency**
 
 * Click ``[Save]``
-* Click ``Products`` smart button
+* Open ``Sale / Products / Products``
+* Click ``[Create]``
 
-  * Click ``[Create]``
-  * Specify **SEO URL**
-  * Switch ``[ ] Show Add To Cart button`` on if needed
-  * Click ``[Save]``
+* Specify **SEO URL**
+* Switch ``[ ] Show Add To Cart button`` on if needed
+* Open ``Variants`` Tab
+
+  * add Attribute Version
+  * add Attribute Values (e.g. 8.0, 9.0)
+
+* Click ``[Save]``
+* Click ``[List of Variants]`` smart button
+  * Create \ Open some record
+  * Specify **Plan for Variant**
 
 Adding demo link to Application
 -------------------------------

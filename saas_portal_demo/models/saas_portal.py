@@ -50,4 +50,9 @@ class SaaSPortalVersion(models.Model):
     name = fields.Char('Name', required=True, help='Branded name of a version. Can be the same as technical name')
     technical_name = fields.Char('Technical Name', required=True, help='7.0, 8.0, 9.0 etc.')
     sequence = fields.Integer('Sequence')
-    attribute_value = fields.Many2one('product.attribute.value', 'Attribute Value', help='Specify corresponded value for "Version" attribute')
+    attribute_value_id = fields.Many2one('product.attribute.value', 'Attribute Value', help='Specify corresponded value for "Version" attribute')
+
+class ProductVariant(models.Model):
+    _inherit = 'product.product'
+
+    variant_plan_id = fields.Many2one('saas_portal.plan', string=' Plan for Variant')

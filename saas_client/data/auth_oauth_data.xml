@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <openerp>
     <data>
-        <delete id="auth_oauth.provider_openerp" model="auth.oauth.provider"/>
+        <record id="auth_oauth.provider_openerp" model="auth.oauth.provider">
+            <field name="enabled" eval="False"/>
+        </record>
     </data>
 </openerp>

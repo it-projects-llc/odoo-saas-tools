@@ -26,19 +26,43 @@ Use format below (example for `reminder modules<https://apps.odoo.com/apps/modul
 Configuration
 =============
 
+SaaS Servers
+------------
+
+You need at least one SaaS Server per each odoo version (e.g. server-8, server-9).
+
+* Odoo version can be configured in ``saas_server.odoo_version`` config Paramater
+
+
 Automatic Plans generation
 --------------------------
 
-* Open ``SaaS / Configuration / Demo Database / Addons Path``
+Open *SaaS Server*
+
+* Open ``SaaS Server / Configuration / Repositories``
 * Create new record
 
-  * specify Odoo version
-  * specify Path -- comma separated list of paths, where modules with ``__demo__.py`` can be found
+  * specify Path
   * Switch ``[x] Publish on website after creating`` off, if you want to check Plan before publishing
   * Switch ``[ ] Show Add To Cart button`` on, if you are going to use Plans to sale databases (e.g. via ``saas_portal_sale_online`` module)
-  * click ``[Generate Plans]``
+
+Open *SaaS Portal*
+* Open  ``SaaS / SaaS / Servers``
+
+  * Switch to some Server
+  * click ``[Update Repositories]``
+  * click ``[Restart Server]`` (TODO: do we need it?)
+  * click ``[Generate Demo Plans]``
 
 * Open  ``SaaS / SaaS / Plans`` -- you see new plans
+
+Also, you can activate cron task for recurring checking for updates
+* Open ``Settings / Technical / Automation / Scheduled Actions``
+* Switch to ``Scan for demo databases``
+* Click ``[Edit]``
+* Switch ``Active`` on
+* Click ``[Save]``
+
 
 Manual creating demo Plans
 --------------------------
@@ -46,6 +70,8 @@ Manual creating demo Plans
 * Open  ``SaaS / SaaS / Plans``
 * Click ``[Create]``
 
+  * specify **Server**
+  * specify **Template**
   * specify **Expiration (hours)**
   * specify **Version**
   * At ``Demo Databases`` section
@@ -88,7 +114,6 @@ Workflow
 ========
 
 * User opens *Demo Page*
-* User is navigate to Demo Page
 * User clicks ``[Get Demo]``
 * User is asked to login \ sign up
 * On signing up user is asked to specify

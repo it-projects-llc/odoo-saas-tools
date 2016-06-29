@@ -5,7 +5,8 @@ import logging
 try:
     from oauthlib.oauth2 import RequestValidator, MobileApplicationServer
 except:
-    pass
+    RequestValidator = object
+    MobileApplicationServer = False
 from datetime import datetime, timedelta
 from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT, DEFAULT_SERVER_DATE_FORMAT
 
@@ -209,4 +210,6 @@ class OAuth2Validator(RequestValidator):
 
 
 validator = OAuth2Validator()
-server = MobileApplicationServer(validator)
+server = None
+if MobileApplicationServer:
+    server = MobileApplicationServer(validator)

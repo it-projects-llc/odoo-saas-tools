@@ -28,7 +28,7 @@ class ResUsers(models.Model):
     _inherit = 'res.users'
 
     _defaults = {
-        'oauth_provider_id': lambda self,cr,uid,ctx=None: self.pool['ir.model.data'].xmlid_to_res_id(cr, SI, 'saas_server.saas_oauth_provider')
+        'oauth_provider_id': lambda self,cr,uid,ctx=None: self.pool['ir.model.data'].xmlid_to_res_id(cr, SI, 'saas_client.saas_oauth_provider')
     }
     @api.model
     def create(self, vals):

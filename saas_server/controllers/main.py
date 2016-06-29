@@ -83,7 +83,7 @@ class SaasServer(http.Controller):
 
         with client.registry()[0].cursor() as cr:
             client_env = api.Environment(cr, SUPERUSER_ID, request.context)
-            oauth_provider_id = client_env.ref('saas_server.saas_oauth_provider').id
+            oauth_provider_id = client_env.ref('saas_client.saas_oauth_provider').id
             action_id = client_env.ref(action).id
 
         port = self._get_port()

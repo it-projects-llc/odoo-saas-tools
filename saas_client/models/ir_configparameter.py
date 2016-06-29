@@ -10,7 +10,7 @@ class IrConfigParameter(models.Model):
         if force:
             IMD = self.pool['ir.model.data']
             oauth_oe = IMD.xmlid_to_object(cr, SUPERUSER_ID,
-                                           'saas_server.saas_oauth_provider')
+                                           'saas_client.saas_oauth_provider')
             dbuuid = self.get_param(cr, SUPERUSER_ID, 'database.uuid')
             oauth_oe.write({'client_id': dbuuid})
 

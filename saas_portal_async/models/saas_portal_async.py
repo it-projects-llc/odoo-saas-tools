@@ -22,6 +22,8 @@ def async_client_create(session, mself, *args, **kwargs):
 
 class SaasPortalPlan(models.Model):
     _inherit = 'saas_portal.plan'
+
+    @api.multi
     def create_new_database(self, async=None, **kwargs):
         if async:
           session = ConnectorSession(self._cr, self._uid, self._context)

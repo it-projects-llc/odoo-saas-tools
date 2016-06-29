@@ -129,7 +129,7 @@ class SaasPortalServer(models.Model):
         try:
             data = simplejson.loads(res.text)
         except:
-            _logger.error('Error on parsing response: %s' res.text)
+            _logger.error('Error on parsing response: %s' % res.text)
             raise
         for r in data:
             r['server_id'] = self.id

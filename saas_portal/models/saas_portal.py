@@ -126,7 +126,11 @@ class SaasPortalServer(models.Model):
 
         if res.ok != True:
             raise Warning('Reason: %s \n Message: %s' % (res.reason, res.content))
-        data = simplejson.loads(res.text)
+        try:
+            data = simplejson.loads(res.text)
+        except:
+            _logger.error('Error on parsing response: %s\n%s' % ([req.url, req.headers, req.body], res.text))
+            raise
         for r in data:
             r['server_id'] = self.id
             client = self.env['saas_portal.client'].with_context(active_test=False).search([('client_id', '=', r.get('client_id'))])
@@ -204,7 +208,7 @@ class SaasPortalPlan(models.Model):
         return self._create_new_database(**kwargs)
 
     @api.multi
-    def _create_new_database(self, dbname=None, client_id=None, partner_id=None, user_id=None, notify_user=False, trial=False, support_team_id=None, async=None):
+    def _create_new_database(self, dbname=None, client_id=None, partner_id=None, user_id=None, notify_user=False, trial=False, support_team_id=None, async=None, owner_password=None):
         self.ensure_one()
 
         server = self.server_id
@@ -266,6 +270,7 @@ class SaasPortalPlan(models.Model):
         owner_user_data = {
             'user_id': owner_user.id,
             'login': owner_user.login,
+            'password': owner_password,
             'name': owner_user.name,
             'email': owner_user.email,
         }

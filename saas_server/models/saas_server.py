@@ -100,7 +100,7 @@ class SaasServerClient(models.Model):
         return ['saas_client.ab_location', 'saas_client.ab_register']
 
     @api.one
-    def _prepare_database(self, client_env, owner_user=None, is_template_db=False, addons=[], access_token=None, tz=None):
+    def _prepare_database(self, client_env, owner_user=None, is_template_db=False, addons=[], access_token=None, tz=None, server_requests_scheme='http'):
         client_id = self.client_id
 
         # update saas_server.client state
@@ -120,23 +120,20 @@ class SaasServerClient(models.Model):
             value = self.env['ir.config_parameter'].get_param(key, default='')
             client_env['ir.config_parameter'].set_param(key, value)
 
+        # set web.base.url config
+        client_env['ir.config_parameter'].set_param('web.base.url', '%s://%s' % (server_requests_scheme, self.name)) 
+
         # copy auth provider from saas_server
         saas_oauth_provider = self.env.ref('saas_server.saas_oauth_provider')
         oauth_provider = None
-        if is_template_db and not client_env.ref('saas_server.saas_oauth_provider', raise_if_not_found=False):
+        if is_template_db and not client_env.ref('saas_client.saas_oauth_provider', raise_if_not_found=False):
             oauth_provider_data = {'enabled': False, 'client_id': client_id}
             for attr in ['name', 'auth_endpoint', 'scope', 'validation_endpoint', 'data_endpoint', 'css_class', 'body', 'enabled']:
                 oauth_provider_data[attr] = getattr(saas_oauth_provider, attr)
-            oauth_provider = client_env['auth.oauth.provider'].create(oauth_provider_data)
-            client_env['ir.model.data'].create({
-                'name': 'saas_oauth_provider',
-                'module': 'saas_server',
-                'noupdate': True,
-                'model': 'auth.oauth.provider',
-                'res_id': oauth_provider.id,
-            })
+            oauth_provider = client_env.ref('saas_client.saas_oauth_provider')
+            oauth_provider.write(oauth_provider_data)
         if not oauth_provider:
-            oauth_provider = client_env.ref('saas_server.saas_oauth_provider')
+            oauth_provider = client_env.ref('saas_client.saas_oauth_provider')
 
         if not is_template_db:
             oauth_provider.client_id = client_id
@@ -171,6 +168,7 @@ class SaasServerClient(models.Model):
                 user = client_env['res.users'].browse(SUPERUSER_ID)
             user.write({
                 'login': owner_user['login'],
+                'password': owner_user['password'],
                 'name': owner_user['name'],
                 'email': owner_user['email'],
                 'oauth_provider_id': oauth_provider.id,

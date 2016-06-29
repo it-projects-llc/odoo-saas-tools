@@ -16,7 +16,7 @@ class SaasClient(http.Controller):
         params = post.copy()
         state = simplejson.loads(post.get('state'))
         if not state.get('p'):
-            state['p'] = request.env.ref('saas_server.saas_oauth_provider').id
+            state['p'] = request.env.ref('saas_client.saas_oauth_provider').id
         params['state'] = simplejson.dumps(state)
         return werkzeug.utils.redirect('/auth_oauth/signin?%s' % werkzeug.url_encode(params))
 

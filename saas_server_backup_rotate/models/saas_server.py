@@ -53,5 +53,3 @@ class SaasServerClient(models.Model):
 
         clients = self.search([('state', '!=', 'delete')])
         clients._rotate_backups(rotation_scheme)
-        
-        

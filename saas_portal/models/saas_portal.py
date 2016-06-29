@@ -129,8 +129,11 @@ class SaasPortalServer(models.Model):
 
         if res.ok != True:
             raise Warning('Reason: %s \n Message: %s' % (res.reason, res.content))
-        data = simplejson.loads(res.text)
-
+        try:
+            data = simplejson.loads(res.text)
+        except:
+            _logger.error('Error on parsing response: %s\n%s' % ([req.url, req.headers, req.body], res.text))
+            raise
         for r in data:
             r['server_id'] = self.id
             client = self.env['saas_portal.client'].with_context(active_test=False).search([('client_id', '=', r.get('client_id'))])

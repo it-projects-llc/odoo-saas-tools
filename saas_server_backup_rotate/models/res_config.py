@@ -2,8 +2,7 @@ from openerp import models, fields, api
 
 
 class SaasServerWizard(models.TransientModel):
-    _name = 'saas_server.config.settings'
-    _inherit = 'res.config.settings'
+    _inherit = 'saas_server.config.settings'
 
     backup_rotate_unlimited = fields.Boolean(
         'Unlimited Backup',

@@ -11,10 +11,12 @@
             'boto',
         ],
     },
-    'depends': ['saas_sysadmin'],
+    'depends': [
+        'saas_sysadmin',
+        'saas_sysadmin_aws',
+        'saas_sysadmin_aws_route53',
+    ],
     'data': [
-        'views/saas_sysadmin_route53.xml',
-        'views/res_config.xml',
         ],
     'installable': True,
 }

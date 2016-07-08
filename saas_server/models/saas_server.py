@@ -123,19 +123,18 @@ class SaasServerClient(models.Model):
         # set web.base.url config
         client_env['ir.config_parameter'].set_param('web.base.url', '%s://%s' % (server_requests_scheme, self.name)) 
 
-        # copy auth provider from saas_server
-        saas_oauth_provider = self.env.ref('saas_server.saas_oauth_provider')
-        oauth_provider = None
-        if is_template_db and not client_env.ref('saas_client.saas_oauth_provider', raise_if_not_found=False):
+        # saas_client must be already installed
+        oauth_provider = client_env.ref('saas_client.saas_oauth_provider')
+        if is_template_db:
+            # copy auth provider from saas_server
+            saas_oauth_provider = self.env.ref('saas_server.saas_oauth_provider')
+
             oauth_provider_data = {'enabled': False, 'client_id': client_id}
             for attr in ['name', 'auth_endpoint', 'scope', 'validation_endpoint', 'data_endpoint', 'css_class', 'body', 'enabled']:
                 oauth_provider_data[attr] = getattr(saas_oauth_provider, attr)
             oauth_provider = client_env.ref('saas_client.saas_oauth_provider')
             oauth_provider.write(oauth_provider_data)
-        if not oauth_provider:
-            oauth_provider = client_env.ref('saas_client.saas_oauth_provider')
-
-        if not is_template_db:
+        else:
             oauth_provider.client_id = client_id
 
         # prepare users

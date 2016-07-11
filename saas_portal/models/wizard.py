@@ -28,6 +28,7 @@ class SaasConfig(models.TransientModel):
     access_owner_add = fields.Char('Grant access to Owner')
     access_remove = fields.Char('Restrict access', help='Restrict access for all users except super-user.\nNote, that ')
     fix_ids = fields.One2many('saas.config.fix', 'config_id', 'Fixes')
+    limit_line_ids = fields.One2many('saas.config.limit_number_of_records_line', 'config_id', 'Limit line')
     param_ids = fields.One2many('saas.config.param', 'config_id', 'Parameters')
     description = fields.Text('Result')
 
@@ -58,6 +59,7 @@ class SaasConfig(models.TransientModel):
             'access_remove': obj.access_remove.split(',') if obj.access_remove else [],
             'fixes': [[x.model, x.method] for x in obj.fix_ids],
             'params': [{'key': x.key, 'value': x.value, 'hidden': x.hidden} for x in obj.param_ids],
+            'limit_nuber_of_records': [{'model': x.model, 'max_records': x.max_records, 'domain': x.domain} for x in obj.limit_line_ids],
         }
         res = self.database_ids.upgrade(payload=payload)
 
@@ -95,12 +97,22 @@ class SaasConfigFix(models.TransientModel):
     method = fields.Char('Method', required=1, size=64)
     config_id = fields.Many2one('saas.config', 'Config')
 
+
+class SaasConfigLimitNumberOfRecords(models.TransientModel):
+    _name = 'saas.config.limit_number_of_records_line'
+
+    model = fields.Char('Model', required=1, size=64)
+    domain = fields.Char('Domain', required=1, size=64, default='[]')
+    max_records = fields.Integer(string='Maximum Records', required=1)
+    config_id = fields.Many2one('saas.config', 'Config')
+
+
 class SaasConfigParam(models.TransientModel):
     _name = 'saas.config.param'
 
     def _get_keys(self):
         return [
-            ('saas_client.max_users', 'Max Users'),
+            ('saas_client.max_users', 'Max Users (obsolete)'), # this parameter is obsolete. use access_limit_records_number module
             ('saas_client.suspended', 'Suspended'),
             ('saas_client.total_storage_limit', 'Total storage limit'),
         ]

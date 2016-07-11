@@ -51,3 +51,12 @@ website_sale_require_login
 Used by
 
 * `saas_portal_sale_online <../saas_portal_sale_online/>`_
+  
+access_limit_records_number
+---------------------------
+
+  The module can be found here: https://github.com/it-projects-llc/access-addons/tree/9.0/access_limit_records_number
+  
+Used by
+
+* `saas_client <../saas_client/>`_

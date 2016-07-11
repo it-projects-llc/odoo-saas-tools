@@ -331,6 +331,16 @@
                              </tree>
                          </field>
                      </page>
+                     <page string="Limit Number Of Records" attrs="{'invisible': [('action', '!=', 'upgrade')]}">
+                       <p>This sections allows to limit number of records in arbitrary model on client. Ask developers for instructions.</p>
+                       <field name="limit_line_ids" colspan="4" >
+                         <tree editable="bottom">
+                           <field name="model" />
+                           <field name="max_records" />
+                           <field name="domain" />
+                         </tree>
+                       </field>
+                     </page>
                      <page string='Affected Database(s)'>
                         <field name="database_ids">
                             <tree>

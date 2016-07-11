@@ -313,6 +313,25 @@ class SaasServerClient(models.Model):
             ir_mail_server = client_env['ir.mail_server']
             ir_mail_server.create({'name': 'mailgun', 'smtp_host': 'smtp.mailgun.org', 'smtp_user': mail_conf['smtp_login'], 'smtp_pass': mail_conf['smtp_password']})
 
+        # 8.Limit number of records
+        model_obj = client_env['ir.model']
+        base_limit_records_number_obj = client_env['base.limit.records_number']
+        data = post.get('limit_nuber_of_records', [])
+        for limit_line in data:
+            model = model_obj.search([('model', '=', limit_line['model'])])
+            if model:
+                limit_record = base_limit_records_number_obj.search([('model_id', '=', model.id)])
+                if limit_record:
+                    limit_record.update({'domain': limit_line['domain'],
+                                         'max_records': limit_line['max_records'],})
+                else:
+                    base_limit_records_number_obj.create({'name': 'limit_' + limit_line['model'],
+                                                      'model_id': model.id,
+                                                      'domain': limit_line['domain'],
+                                                      'max_records': limit_line['max_records'],})
+            else:
+                res['limit'] = "there is no model named %s" % limit_line['model']
+
         return res
 
     @api.model

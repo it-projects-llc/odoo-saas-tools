@@ -12,6 +12,7 @@
         'saas_utils',
         'mail',
         'web_settings_dashboard',
+        'access_limit_records_number',
     ],
     'data': [
         'views/saas_client.xml',

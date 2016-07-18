@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<openerp>
+    <data noupdate="0">
+
+        <record id="saas_login_authenKey" model="ir.config_parameter">
+            <field name="key">saas_portal.authenKey</field>
+            <field name="value">=5GPCkP^Q3lbw!x</field>
+        </record>
+
+    </data>
+</openerp>

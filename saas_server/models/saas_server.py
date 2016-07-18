@@ -53,6 +53,8 @@ class SaasServerClient(models.Model):
 
     @api.one
     def install_addons(self, addons, is_template_db):
+        print addons
+        print '-' * 100
         addons = set(addons)
         addons.add('mail_delete_sent_by_footer')  # debug
         if is_template_db:

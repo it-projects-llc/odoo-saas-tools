@@ -72,8 +72,6 @@ class SaaSPortalDemoPlanModule(models.Model):
     url = fields.Char('url', compute="_compute_url", store=True)
     demo_plan_id = fields.Many2one('saas_portal.plan', string='Demo plan where the module intended to be installed', ondelete='cascade', require=True)
 
-    #TODO: store module infro (technical_names, urls) in its own model, use Many2one link here
-
     @api.multi
     @api.depends('technical_name')
     def _compute_url(self):

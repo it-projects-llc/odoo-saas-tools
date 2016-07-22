@@ -1,8 +1,8 @@
 ==================
- demo datatabases
+ Demo datatabases
 ==================
 
-new parameters in __openerp__.py for demonstraton
+New parameters in __openerp__.py for demonstraton
 =================================================
 
 Put this in your module __openerp__.py file.

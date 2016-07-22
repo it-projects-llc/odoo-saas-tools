@@ -50,6 +50,7 @@ Open *SaaS Portal*
   * check that the right version is in ``Odoo version`` field. The version should look like 8 for odoo 8.0 or 9 for odoo 9.0, etc. 
   * click ``[Update Repositories]``
   * click ``[Generate Demo Plans]``
+  * click ``[Create Demo Template DBs]``
 
 * Open  ``SaaS / SaaS / Plans`` -- you see new plans. For example, ``Demo 8 Reminders and Agenda (technical core)``
 for reminder modules in 8.0 server

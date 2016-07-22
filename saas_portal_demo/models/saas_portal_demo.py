@@ -63,6 +63,19 @@ class SaasPortalServer(models.Model):
 
         return None
 
+    @api.multi
+    def create_demo_templates(self):
+        plan_obj = self.env['saas_portal.plan']
+        for record in self:
+            demo_plan_ids = plan_obj.search([('server_id', '=', record.id), ('template_id.state', '=', 'draft')])
+            for plan in demo_plan_ids:
+                plan.with_context({'skip_sync_server': True}).create_template()
+                addons = plan.demo_plan_module_ids.mapped('technical_name')
+                addons.extend(plan.demo_plan_hidden_module_ids.mapped('technical_name'))
+                payload = {'install_addons': addons,}
+                plan.template_id.upgrade(payload=payload)
+                record.action_sync_server()
+
 
 class SaaSPortalDemoPlanModule(models.Model):
     _name = 'saas_portal.demo_plan_module'

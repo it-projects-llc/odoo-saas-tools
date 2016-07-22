@@ -347,6 +347,8 @@ class SaasPortalPlan(models.Model):
 
         if res.ok != True:
             raise Warning('Error on request: %s\nReason: %s \n Message: %s' % (req.url, res.reason, res.content))
+        if self._context.get('skip_sync_server'):
+            return
         return self.action_sync_server()
 
     @api.multi
@@ -476,7 +478,7 @@ class SaasPortalDatabase(models.Model):
         if payload != None:
             # maybe use multiprocessing here
             for database_obj in self:
-                res.append(config_obj.do_upgrade_database(payload.copy(), database_obj.id))
+                res.append(config_obj.do_upgrade_database(payload.copy(), database_obj))
         return res
 
 

@@ -33,7 +33,6 @@ class SaasPortalServer(models.Model):
                 template_name = 'template_' + record.odoo_version + '_' + module['name'] + '.' + base_saas_domain
                 plan_name = 'Demo ' + record.odoo_version + ' ' + module['display_name']
                 product_template_name = 'Demo ' + module['display_name']
-                product_product_name = 'Demo ' + record.odoo_version + ' ' + module['display_name']
                 if template_obj.search_count([('name', '=', template_name)]) == 0:
                     template = template_obj.create({'name': template_name, 'server_id': record.id})
                     if plan_obj.search_count([('name', '=', plan_name)]) == 0:

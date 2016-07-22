@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     "name": """Saas Server Demo""",
-    "summary": """Generate template databases for modules demonstration, control repositories for demonstration""",
+    "summary": """new parameters in __openerp__.py for demonstrative modules, control repositories for demonstration""",
     "category": "SaaS",
     "images": [],
     "version": "1.0.0",

@@ -52,6 +52,7 @@ class SaasPortalServer(models.Model):
     local_port = fields.Char('Local port', help='local tcp port of server for server-side requests')
     local_request_scheme = fields.Selection([('http', 'http'), ('https', 'https')], 'Scheme', default='http', required=True)
     host = fields.Char('Host', compute=_compute_host)
+    odoo_version = fields.Char('Odoo version') #TODO: make required=True?
 
     @api.model
     def create(self, vals):

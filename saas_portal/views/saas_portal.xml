@@ -130,6 +130,7 @@
                     <field name="sequence" widget="handle"/>
                     <field name="name"/>
                     <field name="active"/>
+                    <field name="odoo_version"/>
                 </tree>
             </field>
         </record>
@@ -154,6 +155,7 @@
                     <sheet>
                     <group>
                         <group>
+                            <field name="odoo_version"/>
                             <field name="name"/>
                             <field name="client_id"/>
                             <field name="active"/>

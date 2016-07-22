@@ -47,7 +47,7 @@ Open *SaaS Portal*
 * Open  ``SaaS / SaaS / Servers``
 
   * Switch to some Server
-  * check that the right version is in ``Odoo version`` field. Ther version should look like 8 for odoo 8.0 or 9 for odoo 9.0, etc. 
+  * check that the right version is in ``Odoo version`` field. The version should look like 8 for odoo 8.0 or 9 for odoo 9.0, etc. 
   * click ``[Update Repositories]``
   * click ``[Generate Demo Plans]``
 

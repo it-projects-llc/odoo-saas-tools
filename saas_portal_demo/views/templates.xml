@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+		<template id="theme_module_shop" inherit_id="website.theme" name="saas portal assets">
+			<xpath expr="//link[@href='/website/static/src/css/website.css']" position="before">
+				<link rel='stylesheet' href='/saas_portal_demo/static/src/css/module_shop.css' t-ignore="true"/>
+			</xpath>
+		</template>
+
+    <template id="demo_addons" inherit_id="website_sale.product">
+      <xpath expr="//div[@class='row'][2]" position="after">
+        <div id="loempia_content" class="col-sm-9 col-xs-12"> 
+          <div class="row">
+
+            <div class="col-xs-12">
+              <div class="row">
+                <t t-foreach="product.product_variant_ids" t-as="product_variant">
+                  <t t-if="set(product_variant.attribute_value_ids.ids) &amp; attrib_set">
+                    <div t-foreach="product_variant.variant_plan_id.demo_plan_module_ids" t-as="module" class="col-lg-4 col-md-6 col-sm-6">
+                      <div class="panel deep-1 deep_hover">
+                        <a t-att-href="module.url">
+                          <div class="loempia_panel_thumbnail loempia_panel_thumbnail_nocover o_apps_category_reminders_and_agenda">
+                            
+                            
+                            
+                            <div class="loempia_panel_thumbnail_icon">
+                              
+                              <img class="pull-left" t-attf-src="/web/binary/saveas?id=#{module.icon_attachment_id.id}&amp;model=ir.attachment&amp;field=datas&amp;fieldname_field=datas_fname" height="64">
+                              </img>
+                            </div>
+                            <p class="loempia_panel_short_desc"><t t-esc="module.shortdesc"/></p>
+                            
+                          </div>
+                          <div class="row loempia_panel_desc">
+                            <div class="col-md-12">
+                              <h4><b><t t-esc="module.shortdesc"/></b></h4>
+                            </div>
+                            <div class="col-xs-8 loempia_panel_author">
+                              by <t t-esc="module.author"/>
+                            </div>
+                            <div class="col-xs-4 text-right loempia_card_price">
+                              <b>
+                                
+                                
+                                <!-- <span><span class="oe_currency_value">9.00</span>&nbsp;€</span> -->
+                                
+                              </b>
+                            </div>
+                          </div>
+                        </a>
+                      </div>
+                    </div>
+                  </t>
+                </t>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+      </xpath>
+    </template>
+
+  </data>
+</openerp>

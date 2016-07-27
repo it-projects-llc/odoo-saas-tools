@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from openerp import models, fields, api
 import xmlrpclib
+import openerp.addons.decimal_precision as dp
 
 
 class SaasPortalServer(models.Model):
@@ -8,6 +9,7 @@ class SaasPortalServer(models.Model):
 
     @api.multi
     def generate_demo_plans(self):
+        ir_attachment_obj = self.env['ir.attachment']
         plan_obj = self.env['saas_portal.plan']
         template_obj = self.env['saas_portal.database']
         demo_plan_module_obj = self.env['saas_portal.demo_plan_module']
@@ -37,7 +39,16 @@ class SaasPortalServer(models.Model):
                     template = template_obj.create({'name': template_name, 'server_id': record.id})
                     if plan_obj.search_count([('name', '=', plan_name)]) == 0:
                         plan = plan_obj.create({'name': plan_name, 'server_id': record.id, 'template_id': template.id})
-                        demo_plan_module_obj.create({'technical_name': module['name'], 'demo_plan_id': plan.id})
+                        ir_attachment = ir_attachment_obj.create({'name': template_name, 'type': 'binary', 'db_datas': module['icon_image']})
+                        demo_plan_module_obj.create({'technical_name': module['name'],
+                                                     'demo_plan_id': plan.id,
+                                                     'shortdesc': module['shortdesc'],
+                                                     'author': module['author'],
+                                                     'icon_attachment_id': ir_attachment.id,
+                                                     'summary': module['summary'],
+                                                     'price': module['price'],
+                                                     'currency': module['currency'],
+                                                     })
                         product_template = product_template_obj.search([('module_name', '=', module['name'])], limit=1)
                         if not product_template:
                             product_template = product_template_obj.create({'name': product_template_name,
@@ -55,8 +66,22 @@ class SaasPortalServer(models.Model):
                                                                       'variant_plan_id': plan.id,
                                                                   })
                         if module.get('demo_addons'):
-                            for addon in module['demo_addons'].split(','):
-                                demo_plan_module_obj.create({'technical_name': addon, 'demo_plan_id': plan.id})
+                            ids = models.execute_kw(db, uid, password, 'ir.module.module', 'search',
+                                                    [[['name', 'in', module['demo_addons'].split(',')]]],
+                                                    {'limit': 10})
+                            addon_modules = models.execute_kw(db, uid, password, 'ir.module.module', 'read', [ids])
+                            for addon in addon_modules:
+                                attachment_name = 'addon_' + record.odoo_version + '_' + addon['name'] + '.' + base_saas_domain
+                                ir_attachment = ir_attachment_obj.create({'name': attachment_name, 'type': 'binary', 'db_datas': addon['icon_image']})
+                                demo_plan_module_obj.create({'technical_name': addon['name'],
+                                                             'demo_plan_id': plan.id,
+                                                             'shortdesc': addon['shortdesc'],
+                                                             'author': addon['author'],
+                                                             'icon_attachment_id': ir_attachment.id,
+                                                             'summary': addon['summary'],
+                                                             'price': module['price'],
+                                                             'currency': module['currency'],
+                                                         })
                         if module.get('demo_addons_hidden'):
                             for addon in module['demo_addons_hidden'].split(','):
                                 demo_plan_hidden_module_obj.create({'technical_name': addon, 'demo_plan_id': plan.id})
@@ -84,6 +109,12 @@ class SaaSPortalDemoPlanModule(models.Model):
     technical_name = fields.Char('Technical Name')
     url = fields.Char('url', compute="_compute_url", store=True)
     demo_plan_id = fields.Many2one('saas_portal.plan', string='Demo plan where the module intended to be installed', ondelete='cascade', require=True)
+    shortdesc = fields.Char('Module Name', readonly=True, translate=True)
+    author = fields.Char("Author", readonly=True)
+    icon_attachment_id = fields.Many2one('ir.attachment', ondelete='restrict')
+    summary = fields.Char('Summary', readonly=True)
+    price = fields.Float(string='Price')
+    currency = fields.Char("Currency")
 
     @api.multi
     @api.depends('technical_name')

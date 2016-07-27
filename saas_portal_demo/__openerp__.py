@@ -24,6 +24,7 @@
         # "security/ir.model.access.csv",
         # "views/saas_portal.xml",
         # "views/website.xml"
+        "views/templates.xml",
         "views/saas_portal_demo.xml",
         "views/product.xml",
         "data/product.xml",

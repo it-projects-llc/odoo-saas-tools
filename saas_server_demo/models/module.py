@@ -10,6 +10,8 @@ class ModuleDemo(models.Model):
     demo_addons = fields.Char(string='Demo addons', help='Comma-separated string of modules technical names')
     demo_addons_hidden = fields.Char(string='Demo addons hidden', help='Comma-separated string of modules technical names')
     demo_url = fields.Char(string='Demo url')
+    price = fields.Float(string='Price', default=0)
+    currency = fields.Char("Currency", help="The currency the field is expressed in.")
 
     @staticmethod
     def get_values_from_terp(terp):
@@ -18,5 +20,7 @@ class ModuleDemo(models.Model):
                     'demo_addons': ','.join(terp.get('demo_addons', [])),
                     'demo_addons_hidden': ','.join(terp.get('demo_addons_hidden', [])),
                     'demo_url': terp.get('demo_url', False),
+                    'price': terp.get('price', False),
+                    'currency': terp.get('currency', False),
                     })
         return res

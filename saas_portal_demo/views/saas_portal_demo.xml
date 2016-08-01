@@ -9,6 +9,7 @@
         <xpath expr="//button[@name='action_sync_server']" position="after">
             <button name="generate_demo_plans" type="object" string="Generate Demo Plans"/>
             <button name="create_demo_templates" type="object" string="Create Demo Template DBs"/>
+            <button name="update_repositories" type="object" string="Update Repositories"/>
         </xpath>
       </field>
     </record>

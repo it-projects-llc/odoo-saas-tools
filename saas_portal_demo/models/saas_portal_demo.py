@@ -101,6 +101,20 @@ class SaasPortalServer(models.Model):
                 plan.template_id.upgrade(payload=payload)
                 record.action_sync_server()
 
+    @api.multi
+    def update_repositories(self):
+        for record in self:
+            url = record.local_request_scheme + '://' + record.name
+            db = record.name
+            username = 'admin'
+            password = 'admin'
+            #TODO: store username and password in saas_portal.server model
+            common = xmlrpclib.ServerProxy('{}/xmlrpc/2/common'.format(url))
+            uid = common.authenticate(db, username, password, {})
+            models = xmlrpclib.ServerProxy('{}/xmlrpc/2/object'.format(url))
+            ids = models.execute_kw(db, uid, password, 'saas_server.repository', 'search', [[]],)
+            modules = models.execute_kw(db, uid, password, 'saas_server.repository', 'update', [ids])
+
 
 class SaaSPortalDemoPlanModule(models.Model):
     _name = 'saas_portal.demo_plan_module'

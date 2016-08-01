@@ -2,7 +2,9 @@
 import os
 import openerp
 from openerp import models, fields, api
-from openerp.exceptions import ValidationError
+from openerp.exceptions import ValidationError, Warning
+import subprocess
+import tempfile
 
 
 class SaasServerRepository(models.Model):
@@ -21,3 +23,32 @@ class SaasServerRepository(models.Model):
                  and os.path.exists(p + '/.git')]
         return paths
 
+    @api.multi
+    def update(self):
+        cwd = os.getcwd()
+        ret = []
+        for record in self:
+            stderr_fd, stderr_path = tempfile.mkstemp(text=True)
+            os.chdir(record.path)
+            try:
+                status = subprocess.call(['git', 'pull'], stderr=stderr_fd)
+                os.close(stderr_fd) # ensure flush before reading
+                stderr_fd = None # avoid closing again in finally block
+                fobj = open(stderr_path, 'r')
+                error_message = fobj.read()
+                fobj.close()
+                if not error_message:
+                    error_message = 'No diagnosis message was provided'
+                else:
+                    error_message = 'The following diagnosis message was provided:\n' + error_message
+                if status:
+                    raise Warning("The command 'git pull' failed with error code = %s. Message: %s" % (status, error_message))
+
+                ret.append({'record.path': status})
+            finally:
+                if stderr_fd is not None:
+                    os.close(stderr_fd)
+
+
+        os.chdir(cwd)
+        return ret

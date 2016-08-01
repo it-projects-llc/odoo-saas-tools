@@ -15,7 +15,7 @@
     "depends": [
         "saas_server",
     ],
-    "external_dependencies": {"python": [], "bin": []},
+    "external_dependencies": {"python": [], "bin": ['git']},
     "data": [
         "views/saas_server_demo.xml",
     ],

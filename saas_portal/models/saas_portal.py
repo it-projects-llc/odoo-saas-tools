@@ -66,7 +66,7 @@ class SaasPortalServer(models.Model):
         port = port or self.request_port
         scope = scope or ['userinfo', 'force_login', 'trial', 'skiptheuse']
         scope = ' '.join(scope)
-        client_id = client_id or self.env['saas_portal.client'].generate_client_id()
+        client_id = client_id or self.env['oauth.application'].generate_client_id()
         params = {
             'scope': scope,
             'state': simplejson.dumps(state),

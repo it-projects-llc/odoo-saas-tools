@@ -41,14 +41,14 @@ class SaasPortalServer(models.Model):
                     if plan_obj.search_count([('name', '=', plan_name)]) == 0:
                         plan = plan_obj.create({'name': plan_name, 'server_id': record.id, 'template_id': template.id})
                         ir_attachment = ir_attachment_obj.create({'name': template_name, 'type': 'binary', 'db_datas': module['icon_image']})
-                        demo_plan_module_obj.create({'technical_name': module['name'],
+                        demo_plan_module_obj.create({'technical_name': module.get('name'),
                                                      'demo_plan_id': plan.id,
-                                                     'shortdesc': module['shortdesc'],
-                                                     'author': module['author'],
+                                                     'shortdesc': module.get('shortdesc'),
+                                                     'author': module.get('author'),
                                                      'icon_attachment_id': ir_attachment.id,
-                                                     'summary': module['summary'],
-                                                     'price': module['price'],
-                                                     'currency': module['currency'],
+                                                     'summary': module.get('summary'),
+                                                     'price': module.get('price'),
+                                                     'currency': module.get('currency'),
                                                      })
                         product_template = product_template_obj.search([('module_name', '=', module['name'])], limit=1)
                         if not product_template:
@@ -74,14 +74,14 @@ class SaasPortalServer(models.Model):
                             for addon in addon_modules:
                                 attachment_name = 'addon_' + record.odoo_version + '_' + addon['name'] + '.' + base_saas_domain
                                 ir_attachment = ir_attachment_obj.create({'name': attachment_name, 'type': 'binary', 'db_datas': addon['icon_image']})
-                                demo_plan_module_obj.create({'technical_name': addon['name'],
+                                demo_plan_module_obj.create({'technical_name': addon.get('name'),
                                                              'demo_plan_id': plan.id,
-                                                             'shortdesc': addon['shortdesc'],
-                                                             'author': addon['author'],
+                                                             'shortdesc': addon.get('shortdesc'),
+                                                             'author': addon.get('author'),
                                                              'icon_attachment_id': ir_attachment.id,
-                                                             'summary': addon['summary'],
-                                                             'price': module['price'],
-                                                             'currency': module['currency'],
+                                                             'summary': addon.get('summary'),
+                                                             'price': addon.get('price'),
+                                                             'currency': addon.get('currency'),
                                                          })
                         if module.get('demo_addons_hidden'):
                             for addon in module['demo_addons_hidden'].split(','):

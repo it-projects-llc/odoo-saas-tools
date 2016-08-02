@@ -11,8 +11,7 @@ Use format below (example for `reminder modules<https://apps.odoo.com/apps/modul
 
 .. code-block:: python
 
-    # -*- coding: utf-8 -*-
-    {
+   ...
         "demo_demonstrative": True,
         "demo_url": "reminders-and-agenda",
         "demo_addons":  ["reminder_crm_next_action", "reminder_phonecall"],

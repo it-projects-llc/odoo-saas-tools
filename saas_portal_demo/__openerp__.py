@@ -19,7 +19,7 @@
         "website_seo_url_product",
         "website_sale_add_to_cart_disable",
     ],
-    "external_dependencies": {"python": [], "bin": []},
+    "external_dependencies": {"python": ['requests'], "bin": []},
     "data": [
         # "security/ir.model.access.csv",
         # "views/saas_portal.xml",

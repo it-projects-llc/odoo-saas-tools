@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import requests
 from openerp import models, fields, api
 import xmlrpclib
 import openerp.addons.decimal_precision as dp
@@ -114,6 +115,16 @@ class SaasPortalServer(models.Model):
             models = xmlrpclib.ServerProxy('{}/xmlrpc/2/object'.format(url))
             ids = models.execute_kw(db, uid, password, 'saas_server.repository', 'search', [[]],)
             modules = models.execute_kw(db, uid, password, 'saas_server.repository', 'update', [ids])
+
+    @api.multi
+    def restart_server(self):
+        for server in self:
+            req, req_kwargs = server._request_server(
+                path='/saas_server/restart',
+            )
+            res = requests.Session().send(req, **req_kwargs)
+            if res.ok != True:
+                raise Warning('Reason: %s \n Message: %s' % (res.reason, res.content))
 
 
 class SaaSPortalDemoPlanModule(models.Model):

@@ -10,6 +10,7 @@
             <button name="generate_demo_plans" type="object" string="Generate Demo Plans"/>
             <button name="create_demo_templates" type="object" string="Create Demo Template DBs"/>
             <button name="update_repositories" type="object" string="Update Repositories"/>
+            <button name="restart_server" type="object" string="Restart Server"/>
         </xpath>
       </field>
     </record>

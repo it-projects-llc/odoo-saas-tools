@@ -9,6 +9,20 @@ class SaasPortalServer(models.Model):
     _inherit = 'saas_portal.server'
 
     @api.multi
+    def _get_xmlrpc_object(self):
+        self.ensure_one()
+
+        url = self.local_request_scheme + '://' + self.name
+        db = self.name
+        username = 'admin'
+        password = 'admin'
+        #TODO: store username and password in saas_portal.server model
+        common = xmlrpclib.ServerProxy('{}/xmlrpc/2/common'.format(url))
+        uid = common.authenticate(db, username, password, {})
+
+        return db, uid, password, xmlrpclib.ServerProxy('{}/xmlrpc/2/object'.format(url))
+
+    @api.multi
     def generate_demo_plans(self):
         ir_attachment_obj = self.env['ir.attachment']
         plan_obj = self.env['saas_portal.plan']
@@ -20,14 +34,7 @@ class SaasPortalServer(models.Model):
         product_attribute_line_obj = self.env['product.attribute.line']
         base_saas_domain = self.env['ir.config_parameter'].get_param('saas_portal.base_saas_domain')
         for record in self:
-            url = record.local_request_scheme + '://' + record.name
-            db = record.name
-            username = 'admin'
-            password = 'admin'
-            #TODO: store username and password in saas_portal.server model
-            common = xmlrpclib.ServerProxy('{}/xmlrpc/2/common'.format(url))
-            uid = common.authenticate(db, username, password, {})
-            models = xmlrpclib.ServerProxy('{}/xmlrpc/2/object'.format(url))
+            db, uid, password, models = record._get_xmlrpc_object()
             ids = models.execute_kw(db, uid, password, 'ir.module.module', 'search',
                                     [[['demo_demonstrative', '=', True]]],
                                     {'limit': 10})
@@ -105,26 +112,15 @@ class SaasPortalServer(models.Model):
     @api.multi
     def update_repositories(self):
         for record in self:
-            url = record.local_request_scheme + '://' + record.name
-            db = record.name
-            username = 'admin'
-            password = 'admin'
-            #TODO: store username and password in saas_portal.server model
-            common = xmlrpclib.ServerProxy('{}/xmlrpc/2/common'.format(url))
-            uid = common.authenticate(db, username, password, {})
-            models = xmlrpclib.ServerProxy('{}/xmlrpc/2/object'.format(url))
+            db, uid, password, models = record._get_xmlrpc_object()
             ids = models.execute_kw(db, uid, password, 'saas_server.repository', 'search', [[]],)
-            modules = models.execute_kw(db, uid, password, 'saas_server.repository', 'update', [ids])
+            models.execute_kw(db, uid, password, 'saas_server.repository', 'update', [ids])
 
     @api.multi
     def restart_server(self):
-        for server in self:
-            req, req_kwargs = server._request_server(
-                path='/saas_server/restart',
-            )
-            res = requests.Session().send(req, **req_kwargs)
-            if res.ok != True:
-                raise Warning('Reason: %s \n Message: %s' % (res.reason, res.content))
+        for record in self:
+            db, uid, password, models = record._get_xmlrpc_object()
+            models.execute_kw(db, uid, password, 'saas_server.client', 'restart_server', [])
 
 
 class SaaSPortalDemoPlanModule(models.Model):

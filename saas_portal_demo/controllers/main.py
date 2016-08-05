@@ -31,16 +31,14 @@ class SaasPortalDemo(SaasPortal):
 
 class website_sale_custom(website_sale):
 
-    @http.route()
-    def shop(self, page=0, category=None, search='', **post):
-        version = post.get('version')
+    @http.route(['/shop/product/<model("product.template"):product>'], type='http', auth="public", website=True)
+    def product(self, product, category='', search='', **kwargs):
+        version = kwargs.get('version')
         if version:
-            v = request.env['saas_portal.version'].search([('name', '=', version)])
-            if v:
-                v = v[0]
-                url = TODO # get original url
-                # add related attrib
-                return werkzeug.utils.redirect(url)
+            attr_id = request.env.ref('saas_portal_demo.odoo_version_product_attribute').id
+            var_id = request.env['product.attribute.value'].search([('attribute_id', '=', attr_id),('name', '=', version)]).id
+            url = request.httprequest.url.split('?', 1)[0] + '?attrib=%s-%s' % (attr_id, var_id)
+            return werkzeug.utils.redirect(url)
 
-        return super(website_sale_custom, self).shop(page=page, category=category, search=search, **post)
+        return super(website_sale_custom, self).product(product=product, category=category, search=search, **kwargs)
 

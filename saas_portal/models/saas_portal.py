@@ -337,7 +337,7 @@ class SaasPortalPlan(models.Model):
         plan = self[0]
         addons_module = []
         for addons in plan.app_store_module_ids:
-            print addons.name,addons.technical_name
+            # print addons.name,addons.technical_name
             addons_module.append(addons.technical_name)
         state = {
             'd': plan.template_id.name,

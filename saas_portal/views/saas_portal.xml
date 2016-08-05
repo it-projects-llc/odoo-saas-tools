@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
-        <menuitem name="SaaS" id="menu_base_saas" sequence="30" />
+        <menuitem name="SaaS" id="menu_base_saas" sequence="30"   groups="base.group_system"/>
         <menuitem id="menu_saas" parent="menu_base_saas" name="SaaS" sequence="1" />
 
         <!-- Client -->

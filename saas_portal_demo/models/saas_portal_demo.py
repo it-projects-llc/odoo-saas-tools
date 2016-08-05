@@ -36,13 +36,13 @@ class SaasPortalServer(models.Model):
         for record in self:
             db, uid, password, models = record._get_xmlrpc_object()
             ids = models.execute_kw(db, uid, password, 'ir.module.module', 'search',
-                                    [[['demo_demonstrative', '=', True]]],
-                                    {'limit': 10})
+                                    [[['demo_url', '!=', False]]],
+                                    )
             modules = models.execute_kw(db, uid, password, 'ir.module.module', 'read', [ids])
             for module in modules:
                 template_name = 'template_' + record.odoo_version + '_' + module['name'] + '.' + base_saas_domain
                 plan_name = 'Demo ' + record.odoo_version + ' ' + module['display_name']
-                product_template_name = 'Demo ' + module['display_name']
+                product_template_name = module['demo_title']
                 if template_obj.search_count([('name', '=', template_name)]) == 0:
                     template = template_obj.create({'name': template_name, 'server_id': record.id})
                     if plan_obj.search_count([('name', '=', plan_name)]) == 0:

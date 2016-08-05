@@ -47,7 +47,7 @@ class SaasPortalServer(models.Model):
                     template = template_obj.create({'name': template_name, 'server_id': record.id})
                     if plan_obj.search_count([('name', '=', plan_name)]) == 0:
                         plan = plan_obj.create({'name': plan_name, 'server_id': record.id, 'template_id': template.id})
-                        ir_attachment = ir_attachment_obj.create({'name': template_name, 'type': 'binary', 'db_datas': module['icon_image']})
+                        ir_attachment = ir_attachment_obj.create({'name': template_name, 'type': 'binary', 'db_datas': module.get('icon_image')})
                         demo_plan_module_obj.create({'technical_name': module.get('name'),
                                                      'demo_plan_id': plan.id,
                                                      'shortdesc': module.get('shortdesc'),
@@ -62,6 +62,7 @@ class SaasPortalServer(models.Model):
                             product_template = product_template_obj.create({'name': product_template_name,
                                                                             'module_name': module['name'],
                                                                             'seo_url': module.get('demo_url'),
+                                                                            'description': module.get('demo_summary'),
                                                                             'type': 'service'})
                             product_attribute_line = product_attribute_line_obj.create({'product_tmpl_id': product_template.id,
                                                                                         'attribute_id': self.env.ref('saas_portal_demo.odoo_version_product_attribute').id,

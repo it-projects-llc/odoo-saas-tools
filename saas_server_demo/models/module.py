@@ -10,6 +10,7 @@ class ModuleDemo(models.Model):
     demo_addons_hidden = fields.Char(string='Demo addons hidden', help='Comma-separated string of modules technical names')
     demo_url = fields.Char(string='Demo url')
     demo_title = fields.Char(string='Title of a demo set. Also title for demo product on the portal')
+    demo_summary = fields.Char(string='Demo set summary')
     price = fields.Float(string='Price', default=0)
     currency = fields.Char("Currency", help="The currency the field is expressed in.")
 
@@ -18,6 +19,7 @@ class ModuleDemo(models.Model):
         res = A.get_values_from_terp(terp)
         res.update({
                     'demo_title': terp.get('demo_title', False),
+                    'demo_summary': terp.get('demo_summary', False),
                     'demo_addons': ','.join(terp.get('demo_addons', [])),
                     'demo_addons_hidden': ','.join(terp.get('demo_addons_hidden', [])),
                     'demo_url': terp.get('demo_url', False),

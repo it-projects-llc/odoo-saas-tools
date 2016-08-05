@@ -60,6 +60,19 @@
         </div>
         
       </xpath>
+
+      <xpath expr="//t[@t-call='website_sale.product_price']" position="replace">
+        <t t-if="not product.module_name">
+          <t t-call="website_sale.product_price"/>
+        </t>
+      </xpath>
+
+    </template>
+
+    <template id="hide_odoo_version_attribute_li" inherit_id="website_sale.variants">
+      <xpath expr="//li[@t-if='len(variant_id.value_ids) > 1']" position="attributes">
+        <attribute name="t-if">len(variant_id.value_ids) > 1 and variant_id.attribute_id.name != 'Odoo Version'</attribute>
+      </xpath>
     </template>
 
   </data>

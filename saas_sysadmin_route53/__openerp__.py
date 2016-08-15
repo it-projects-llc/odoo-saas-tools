@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 {
     'name': 'SaaS System Administration Route 53',
     'summary': "Aws Route 53 integration for SAAS Tools",
@@ -17,6 +18,6 @@
         'saas_sysadmin_aws_route53',
     ],
     'data': [
-        ],
+    ],
     'installable': True,
 }

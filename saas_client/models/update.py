@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
 from openerp.models import AbstractModel
 from openerp.tools.config import config
+
 
 class publisher_warranty_contract(AbstractModel):
     _inherit = "publisher_warranty.contract"

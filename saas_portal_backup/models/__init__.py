@@ -1,2 +1,2 @@
 # -*- coding: utf-8 -*-
-import saas_portal
+from . import saas_portal

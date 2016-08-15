@@ -3,55 +3,55 @@
     <data>
 
 
-		<template id="theme" inherit_id="website.theme" name="saas portal assets">
-			<xpath expr="//link[@href='/website/static/src/css/website.css']" position="before">
-				<link rel='stylesheet' href='/saas_portal_start/static/src/css/odoo.css' t-ignore="true"/>
-			</xpath>
-		</template>
+        <template id="theme" inherit_id="website.theme" name="saas portal assets">
+            <xpath expr="//link[@href='/website/static/src/css/website.css']" position="before">
+                <link rel='stylesheet' href='/saas_portal_start/static/src/css/odoo.css' t-ignore="true"/>
+            </xpath>
+        </template>
 
-		<template id="assets_frontend" inherit_id="website.assets_frontend" name="saas portal assets">
-			<xpath expr="." position="inside">
-				<script type='text/javascript' src='/saas_portal_start/static/src/js/main.js'/>
-			</xpath>
-		</template>
+        <template id="assets_frontend" inherit_id="website.assets_frontend" name="saas portal assets">
+            <xpath expr="." position="inside">
+                <script type='text/javascript' src='/saas_portal_start/static/src/js/main.js'/>
+            </xpath>
+        </template>
 
-		<template id="website.start" name="Create new database" page="True" priority="29">
-			<t t-call="website.layout">
-				<div id="wrap" class="oe_structure oe_empty">
-					<section class="odoo_secondary_A">
-						<div class="container">
-							<div class="row">
-								<div class="text-center mt64 mb92">
-									<h2>Get your own Database!</h2>
-									<div class="odoo_call_action mt16">
-										<div class="odoo_call_action_bg">
-											<form role="form" class="form-inline">
+        <template id="website.start" name="Create new database" page="True" priority="29">
+            <t t-call="website.layout">
+                <div id="wrap" class="oe_structure oe_empty">
+                    <section class="odoo_secondary_A">
+                        <div class="container">
+                            <div class="row">
+                                <div class="text-center mt64 mb92">
+                                    <h2>Get your own Database!</h2>
+                                    <div class="odoo_call_action mt16">
+                                        <div class="odoo_call_action_bg">
+                                            <form role="form" class="form-inline">
                                                 <input type="hidden" name="plan_id" t-att-value="plan_id"/>
                                                 <input type="hidden" name="base_saas_domain" t-att-value="base_saas_domain"/>
-												<div class="pull-right">
-													<button type="submit" id="create_instance" class="btn btn-info">
-														<strong>Create!</strong> <span class="hidden-xs"></span>
-													</button>
-												</div>
-												
-												<div class="input-group">
-													<input data-placement="bottom" name="odoo_db_name" data-trigger="manual" type="text" placeholder="your-company-name" class="form-control odoo_db_name" data-original-title="" title=""/>
-														<span class="input-group-addon">.<t t-raw="base_saas_domain"/></span>
+                                                <div class="pull-right">
+                                                    <button type="submit" id="create_instance" class="btn btn-info">
+                                                        <strong>Create!</strong> <span class="hidden-xs"></span>
+                                                    </button>
+                                                </div>
+                                                
+                                                <div class="input-group">
+                                                    <input data-placement="bottom" name="odoo_db_name" data-trigger="manual" type="text" placeholder="your-company-name" class="form-control odoo_db_name" data-original-title="" title=""/>
+                                                        <span class="input-group-addon">.<t t-raw="base_saas_domain"/></span>
 
-													</div>                
-												</form>
-											</div>
-											<p class="mt4 text-muted" id="cta_footer"></p>
-										</div>
+                                                    </div>                
+                                                </form>
+                                            </div>
+                                            <p class="mt4 text-muted" id="cta_footer"></p>
+                                        </div>
 
-									</div>
-								</div>
-							</div>
-						</section>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
 
-					</div>
-				</t>
-		</template>
+                    </div>
+                </t>
+        </template>
 
-	 </data>
+     </data>
 </openerp>

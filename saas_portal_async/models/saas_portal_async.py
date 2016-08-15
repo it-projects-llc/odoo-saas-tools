@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
-from openerp.addons.web.http import request
-from openerp import models, fields, api, SUPERUSER_ID
+from openerp import api
+from openerp import models
 try:
-    from openerp.addons.connector.queue.job import job, related_action
+    from openerp.addons.connector.queue.job import job
     from openerp.addons.connector.session import ConnectorSession
 except:
     def empty_decorator(func):
         return func
     job = empty_decorator
 
-from openerp.models import TransientModel
+
 
 @job
 def async_client_create(session, mself, *args, **kwargs):
@@ -20,14 +20,15 @@ def async_client_create(session, mself, *args, **kwargs):
     client = model.env['saas_portal.client'].browse(res.get('id'))
     client.server_id.action_sync_server()
 
+
 class SaasPortalPlan(models.Model):
     _inherit = 'saas_portal.plan'
 
     @api.multi
     def create_new_database(self, async=None, **kwargs):
         if async:
-          session = ConnectorSession(self._cr, self._uid, self._context)
-          job_uuid = async_client_create.delay(session, self._name, self.id, async=async, **kwargs)
+            session = ConnectorSession(self._cr, self._uid, self._context)
+            job_uuid = async_client_create.delay(session, self._name, self.id, async=async, **kwargs)
         else:
             res = super(SaasPortalPlan, self)._create_new_database(async=async, **kwargs)
             return res

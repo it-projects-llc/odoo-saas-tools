@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import re
 import werkzeug
 import urllib2
@@ -5,6 +6,7 @@ import json
 import urlparse
 
 from openerp import models, fields
+
 
 class auth_oauth_provider(models.Model):
 

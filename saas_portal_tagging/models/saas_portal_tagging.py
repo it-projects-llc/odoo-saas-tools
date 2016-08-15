@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from openerp import models, fields, api
 from openerp.exceptions import Warning
 
@@ -50,7 +51,7 @@ class SaasPortalCategory(models.Model):
         ids = self.ids
         while len(ids):
             cr.execute('select distinct parent_id from saas_portal_category where id IN %s', (tuple(ids), ))
-            ids = filter(None, map(lambda x:x[0], cr.fetchall()))
+            ids = filter(None, map(lambda x: x[0], cr.fetchall()))
             if not level:
                 raise Warning('Error! You cannot create recursive Categories')
             level -= 1
@@ -59,25 +60,25 @@ class SaasPortalCategory(models.Model):
 
 class SaasPortalClient(models.Model):
     _inherit = 'saas_portal.client'
-    
+
     category_ids = fields.Many2many(
         'saas.portal.category',
         string='Tags'
     )
-    
+
     @api.model
-    @api.returns('self', lambda value:value.id)
+    @api.returns('self', lambda value: value.id)
     def create(self, vals):
         if vals.get('plan_id'):
-	    plan = self.env['saas_portal.plan'].browse(vals['plan_id'])
+            plan = self.env['saas_portal.plan'].browse(vals['plan_id'])
             vals['category_ids'] = [(6, 0, plan.category_ids.ids)]
         return super(SaasPortalClient, self).create(vals)
-    
+
+
 class SaasPortalPlan(models.Model):
     _inherit = 'saas_portal.plan'
-    
+
     category_ids = fields.Many2many(
         'saas.portal.category',
         string='Client Tags'
     )
-

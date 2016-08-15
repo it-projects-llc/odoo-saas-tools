@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
-import openerp
-from openerp import models, fields, api, SUPERUSER_ID, exceptions
-from openerp.addons.saas_utils import connector, database
-from openerp import http
-from openerp.tools import config, scan_languages
+from openerp import api
+from openerp import exceptions
+from openerp import fields
+from openerp import models
+from openerp.tools import scan_languages
 from openerp.tools.translate import _
 from openerp.addons.base.res.res_partner import _tz_get
-import time
 from datetime import datetime, timedelta
 from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
-import urllib2
 import simplejson
 import werkzeug
 import requests
@@ -21,6 +19,7 @@ from openerp.addons.saas_base.exceptions import MaximumDBException, MaximumTrial
 
 import logging
 _logger = logging.getLogger(__name__)
+
 
 @api.multi
 def _compute_host(self):
@@ -124,7 +123,7 @@ class SaasPortalServer(models.Model):
         req, req_kwargs = self._request_server(path='/saas_server/sync_server', state=state, client_id=self.client_id)
         res = requests.Session().send(req, **req_kwargs)
 
-        if res.ok != True:
+        if not res.ok:
             raise Warning('Reason: %s \n Message: %s' % (res.reason, res.content))
         try:
             data = simplejson.loads(res.text)
@@ -183,7 +182,7 @@ class SaasPortalPlan(models.Model):
     server_id = fields.Many2one('saas_portal.server', string='SaaS Server',
                                 ondelete='restrict',
                                 help='User this saas server or choose random')
-    
+
     website_description = fields.Html('Website description')
     logo = fields.Binary('Logo')
 
@@ -215,7 +214,7 @@ class SaasPortalPlan(models.Model):
         if not server:
             server = self.env['saas_portal.server'].get_saas_server()
 
-        #server.action_sync_server()
+        # server.action_sync_server()
         if not partner_id and user_id:
             user = self.env['res.users'].browse(user_id)
             partner_id = user.partner_id.id
@@ -234,7 +233,6 @@ class SaasPortalPlan(models.Model):
                                                                           ('trial', '=', True)])
             if trial_db_count >= self.maximum_allowed_trial_dbs_per_partner:
                 raise MaximumTrialDBException("Limit of trial databases for this plan is %(maximum)s reached" % {'maximum': self.maximum_allowed_trial_dbs_per_partner})
-
 
         vals = {'name': dbname or self.generate_dbname()[0],
                 'server_id': server.id,
@@ -275,7 +273,7 @@ class SaasPortalPlan(models.Model):
             'email': owner_user.email,
         }
         trial_expiration_datetime = (datetime.strptime(client.create_date,
-                                        DEFAULT_SERVER_DATETIME_FORMAT) + timedelta(hours=self.expiration)).strftime(DEFAULT_SERVER_DATETIME_FORMAT)  # for trial
+                                                       DEFAULT_SERVER_DATETIME_FORMAT) + timedelta(hours=self.expiration)).strftime(DEFAULT_SERVER_DATETIME_FORMAT)  # for trial
         state = {
             'd': client.name,
             'e': trial and trial_expiration_datetime or client.create_date,
@@ -287,9 +285,9 @@ class SaasPortalPlan(models.Model):
             state.update({'db_template': self.template_id.name})
         scope = ['userinfo', 'force_login', 'trial', 'skiptheuse']
         req, req_kwargs = server._request_server(path='/saas_server/new_database',
-                              state=state,
-                              client_id=client_id,
-                              scope=scope,)
+                                                 state=state,
+                                                 client_id=client_id,
+                                                 scope=scope,)
         res = requests.Session().send(req, **req_kwargs)
         if res.status_code != 200:
             raise Warning('Error on request: %s\nReason: %s \n Message: %s' % (req.url, res.reason, res.content))
@@ -317,8 +315,8 @@ class SaasPortalPlan(models.Model):
         if trial:
             client.expiration_datetime = trial_expiration_datetime
         client.send_params_to_client_db()
-        #TODO make async call of action_sync_server here
-        #client.server_id.action_sync_server()
+        # TODO make async call of action_sync_server here
+        # client.server_id.action_sync_server()
 
         return {'url': url, 'id': client.id, 'client_id': client_id}
 
@@ -333,7 +331,7 @@ class SaasPortalPlan(models.Model):
 
     @api.multi
     def create_template(self):
-        assert len(self)==1, 'This method is applied only for single record'
+        assert len(self) == 1, 'This method is applied only for single record'
         plan = self[0]
         state = {
             'd': plan.template_id.name,
@@ -349,7 +347,7 @@ class SaasPortalPlan(models.Model):
         req, req_kwargs = self.server_id._request_server(path='/saas_server/new_database', state=state, client_id=client_id)
         res = requests.Session().send(req, **req_kwargs)
 
-        if res.ok != True:
+        if not res.ok:
             raise Warning('Error on request: %s\nReason: %s \n Message: %s' % (req.url, res.reason, res.content))
         return self.action_sync_server()
 
@@ -403,13 +401,13 @@ class SaasPortalDatabase(models.Model):
     name = fields.Char('Database name', readonly=False)
     oauth_application_id = fields.Many2one('oauth.application', 'OAuth Application', required=True, ondelete='cascade')
     server_id = fields.Many2one('saas_portal.server', ondelete='restrict', string='Server', readonly=True)
-    state = fields.Selection([('draft','New'),
-                              ('open','In Progress'),
+    state = fields.Selection([('draft', 'New'),
+                              ('open', 'In Progress'),
                               ('cancelled', 'Cancelled'),
-                              ('pending','Pending'),
-                              ('deleted','Deleted'),
-                              ('template','Template'),
-                          ],
+                              ('pending', 'Pending'),
+                              ('deleted', 'Deleted'),
+                              ('template', 'Template'),
+                              ],
                              'State', default='draft', track_visibility='onchange')
     host = fields.Char('Host', compute=_compute_host)
 
@@ -428,7 +426,7 @@ class SaasPortalDatabase(models.Model):
         req, req_kwargs = self.server_id._request_server(path='/saas_server/backup_database', state=state, client_id=self.client_id)
         res = requests.Session().send(req, **req_kwargs)
         _logger.info('backup database: %s', res.text)
-        if res.ok != True:
+        if not res.ok:
             raise Warning('Reason: %s \n Message: %s' % (res.reason, res.content))
         data = simplejson.loads(res.text)
         if not isinstance(data, dict):
@@ -477,12 +475,11 @@ class SaasPortalDatabase(models.Model):
         config_obj = self.env['saas.config']
         res = []
 
-        if payload != None:
+        if payload is not None:
             # maybe use multiprocessing here
             for database_obj in self:
                 res.append(config_obj.do_upgrade_database(payload.copy(), database_obj.id))
         return res
-
 
     @api.one
     def delete_database_server(self, **kwargs):
@@ -512,8 +509,8 @@ class SaasPortalDatabase(models.Model):
             'res_model': 'saas.config',
             'target': 'new',
             'context': {
-               'default_action': 'upgrade',
-               'default_database': obj.name
+                'default_action': 'upgrade',
+                'default_database': obj.name
             }
         }
 
@@ -598,7 +595,6 @@ class SaasPortalClient(models.Model):
                 composer = self.env['mail.compose.message'].with_context(email_ctx).create({})
                 composer.send_mail()
 
-
     def unlink(self, cr, uid, ids, context=None):
         user_model = self.pool.get('res.users')
         token_model = self.pool.get('oauth.access_token')
@@ -608,11 +604,11 @@ class SaasPortalClient(models.Model):
             if tk_ids:
                 token_model.unlink(cr, uid, tk_ids)
             # TODO: it seems we don't need stuff below
-            #to_search2 = [('database', '=', obj.name)]
-            #user_ids = user_model.search(cr, uid, to_search2, context=context)
-            #if user_ids:
+            # to_search2 = [('database', '=', obj.name)]
+            # user_ids = user_model.search(cr, uid, to_search2, context=context)
+            # if user_ids:
             #    user_model.unlink(cr, uid, user_ids)
-            #openerp.service.db.exp_drop(obj.name)
+            # openerp.service.db.exp_drop(obj.name)
         return super(SaasPortalClient, self).unlink(cr, uid, ids, context)
 
     @api.multi
@@ -659,7 +655,7 @@ class SaasPortalClient(models.Model):
             'r': '%s://%s:%s/web' % (scheme, client.host, port),
         }
         state.update({'db_template': self.name,
-                      'disable_mail_server' : True})
+                      'disable_mail_server': True})
         scope = ['userinfo', 'force_login', 'trial', 'skiptheuse']
         # TODO use _request_server
         url = server._request(path='/saas_server/new_database',

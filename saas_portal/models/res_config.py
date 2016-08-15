@@ -1,6 +1,7 @@
+# -*- coding: utf-8 -*-
 from openerp import models, fields
-from openerp.addons.web.http import request
 import urlparse
+
 
 class SaasPortalConfigWizard(models.TransientModel):
     _name = 'saas_portal.config.settings'
@@ -71,4 +72,3 @@ class SaasPortalConfigWizard(models.TransientModel):
         config_parameters = self.pool.get("ir.config_parameter")
         for record in self.browse(cr, uid, ids, context=context):
             config_parameters.set_param(cr, uid, "saas_portal.expiration_notify_in_advance", record.expiration_notify_in_advance or '0', context=context)
-

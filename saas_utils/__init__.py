@@ -19,5 +19,5 @@
 #
 ##############################################################################
 
-import connector
-import database
+from . import connector
+from . import database

@@ -19,11 +19,11 @@ openerp.saas_client = function(instance){
                     } else if (r.key == 'saas_client.ab_register'){
                         self._ab_register_value = r.value;
                     }
-                })
+                });
                 if (!self._ab_location_value)
                     return;
                 _super.apply(self);
-        })
+        });
         }
-    })
-}
+    });
+};

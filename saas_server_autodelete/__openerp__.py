@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 {
     'name': 'SaaS Server - Autodelete expired databases',
     'version': '1.0.0',
@@ -8,6 +9,6 @@
     'depends': ['saas_server'],
     'data': [
         'data/ir_cron.xml',
-        ],
+    ],
     'installable': True,
 }

@@ -15,13 +15,13 @@ Contributors
 
 Sponsors
 ========
-* `IT-Projects LLC <https://it-projects.info>`_
+* `IT-Projects LLC <https://it-projects.info>`__
 
 Further information
 ===================
 
-Usage instructions: `<doc/index.rst>`_
+Usage instructions: `<doc/index.rst>`__
 
-Changelog: `<doc/changelog.rst>`_
+Changelog: `<doc/changelog.rst>`__
 
 Tested on Odoo 9.0 1b5c2ced45b508a6e86681cad47efe12c486362b

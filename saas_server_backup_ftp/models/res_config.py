@@ -21,42 +21,42 @@ class SaasPortalConfigWizard(models.TransientModel):
     # sftp_server
     def get_default_sftp_server(self, cr, uid, ids, context=None):
         sftp_server = self.pool.get("ir.config_parameter").get_param(cr, uid, "saas_server.sftp_server", default=None, context=context)
-        return {'sftp_server': sftp_server  or False}
+        return {'sftp_server': sftp_server or False}
 
-    def set_sftp_server (self, cr, uid, ids, context=None):
+    def set_sftp_server(self, cr, uid, ids, context=None):
         config_parameters = self.pool.get("ir.config_parameter")
         for record in self.browse(cr, uid, ids, context=context):
-            config_parameters.set_param(cr, uid, "saas_server.sftp_server", record.sftp_server  or '', context=context)
+            config_parameters.set_param(cr, uid, "saas_server.sftp_server", record.sftp_server or '', context=context)
 
     # sftp_username
     def get_default_sftp_username(self, cr, uid, ids, context=None):
         sftp_username = self.pool.get("ir.config_parameter").get_param(cr, uid, "saas_server.sftp_username", default=None, context=context)
-        return {'sftp_username': sftp_username  or False}
+        return {'sftp_username': sftp_username or False}
 
-    def set_sftp_username (self, cr, uid, ids, context=None):
+    def set_sftp_username(self, cr, uid, ids, context=None):
         config_parameters = self.pool.get("ir.config_parameter")
         for record in self.browse(cr, uid, ids, context=context):
-            config_parameters.set_param(cr, uid, "saas_server.sftp_username", record.sftp_username  or '', context=context)
+            config_parameters.set_param(cr, uid, "saas_server.sftp_username", record.sftp_username or '', context=context)
 
     # sftp_password
     def get_default_sftp_password(self, cr, uid, ids, context=None):
         sftp_password = self.pool.get("ir.config_parameter").get_param(cr, uid, "saas_server.sftp_password", default=None, context=context)
-        return {'sftp_password': sftp_password  or False}
+        return {'sftp_password': sftp_password or False}
 
-    def set_sftp_password (self, cr, uid, ids, context=None):
+    def set_sftp_password(self, cr, uid, ids, context=None):
         config_parameters = self.pool.get("ir.config_parameter")
         for record in self.browse(cr, uid, ids, context=context):
-            config_parameters.set_param(cr, uid, "saas_server.sftp_password", record.sftp_password  or '', context=context)
+            config_parameters.set_param(cr, uid, "saas_server.sftp_password", record.sftp_password or '', context=context)
 
     # sftp_path
     def get_default_sftp_path(self, cr, uid, ids, context=None):
         sftp_path = self.pool.get("ir.config_parameter").get_param(cr, uid, "saas_server.sftp_path", default=None, context=context)
-        return {'sftp_path': sftp_path  or False}
+        return {'sftp_path': sftp_path or False}
 
-    def set_sftp_path (self, cr, uid, ids, context=None):
+    def set_sftp_path(self, cr, uid, ids, context=None):
         config_parameters = self.pool.get("ir.config_parameter")
         for record in self.browse(cr, uid, ids, context=context):
-            config_parameters.set_param(cr, uid, "saas_server.sftp_path", record.sftp_path  or '', context=context)
+            config_parameters.set_param(cr, uid, "saas_server.sftp_path", record.sftp_path or '', context=context)
 
     def test_sftp_connection(self, cr, uid, ids, context=None):
         server = self.pool.get("ir.config_parameter").get_param(cr, uid, "saas_server.sftp_server", default=None, context=context)
@@ -68,13 +68,13 @@ class SaasPortalConfigWizard(models.TransientModel):
         messageContent = ""
 
         try:
-            #Connect with external server over SFTP, so we know sure that everything works.
+            # Connect with external server over SFTP, so we know sure that everything works.
             srv = pysftp.Connection(host=server, username=username, password=password)
             srv.close()
-            #We have a success.
+            # We have a success.
             messageTitle = "Connection Test Succeeded!"
             messageContent = "Everything seems properly set up for FTP back-ups!"
-        except Exception, e:
+        except Exception as e:
             messageTitle = "Connection Test Failed!"
             messageContent += "Here is what we got instead:\n"
         if "Failed" in messageTitle:

@@ -39,7 +39,7 @@ class OauthApplication(models.Model):
             if access_token.is_expired():
                 access_token = None
         if not access_token and create:
-            expires = datetime.now() + timedelta(seconds=60*60)
+            expires = datetime.now() + timedelta(seconds=60 * 60)
             vals = {
                 'user_id': user_id,
                 'scope': 'userinfo',

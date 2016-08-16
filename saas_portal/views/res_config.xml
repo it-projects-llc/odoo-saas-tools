@@ -14,8 +14,8 @@
                     </header>
                     <div>
                         <group string="Domain">
-							<field name="base_saas_domain" placeholder="odoo.com" />
-						</group>
+                            <field name="base_saas_domain" placeholder="odoo.com" />
+                        </group>
             <group string="Error pages">
               <field name="page_for_maximumdb"/>
               <field name="page_for_maximumtrialdb"/>
@@ -27,7 +27,7 @@
             <group string="Features">
               <field name="module_saas_portal_sale_online"/>
             </group>
-					</div>
+                    </div>
                 </form>
             </field>
         </record>

@@ -181,7 +181,7 @@ class SaasPortalPlan(models.Model):
         if not server:
             server = self.env['saas_portal.server'].get_saas_server()
 
-        server.action_sync_server()
+        # server.action_sync_server()
 
         vals = {'name': dbname or self.generate_dbname()[0],
                 'server_id': server.id,

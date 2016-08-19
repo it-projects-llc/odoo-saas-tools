@@ -21,6 +21,7 @@
         'data/res_users.xml',
         'data/base_action_rule.xml',
         'views/try_trial_template.xml',
+        'security/ir.model.access.csv',
     ],
     'installable': True,
 }

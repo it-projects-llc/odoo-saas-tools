@@ -34,7 +34,7 @@ If you are (lazy like me) and don't want to write CSS, Html & Javascript for fro
 * [jekyllthemes.org](http://jekyllthemes.org/)
 
 I chose [Clean Blog](http://startbootstrap.com/template-overviews/clean-blog/):
-![Clean Blog](http://sbootstrap.startbootstrapc.netdna-cdn.com/assets/img/templates/clean-blog.jpg)
+![Clean Blog](https://startbootstrap.com/img/templates/clean-blog.jpg)
 
 ### 2.Hosting and adding custom domain
 

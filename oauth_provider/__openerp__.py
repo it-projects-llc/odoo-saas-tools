@@ -11,7 +11,9 @@
     'external_dependencies': {
         'python': ['oauthlib'],
     },
-    'data': [],
+    'data': [
+        'security/ir.model.access.csv',
+    ],
     'installable': True,
 
     'description': '''

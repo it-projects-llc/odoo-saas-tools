@@ -376,7 +376,7 @@ class SaasPortalDatabase(models.Model):
         return self._delete_database_server(**kwargs)
 
     @api.one
-    def _delete_database_server(self, force_delete=False):
+    def _delete_database_server(self, force_delete=True):
         state = {
             'd': self.name,
             'client_id': self.client_id,

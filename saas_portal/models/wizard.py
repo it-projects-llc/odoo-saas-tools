@@ -101,7 +101,7 @@ class SaasConfigParam(models.TransientModel):
             ('saas_client.max_users', 'Max Users'),
         ]
 
-    key = fields.Selection(selection=_get_keys, string='Key', required=1, size=64)
+    key = fields.Char(string='Key', required=1, size=64)
     value = fields.Char('Value', required=1, size=64)
     config_id = fields.Many2one('saas.config', 'Config')
     hidden = fields.Boolean('Hidden parameter', default=True)

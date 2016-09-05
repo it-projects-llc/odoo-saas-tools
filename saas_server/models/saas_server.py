@@ -272,7 +272,7 @@ class SaasServerClient(models.Model):
         # 4. Run fixes
         fixes = post.get('fixes', [])
         for model, method in fixes:
-            getattr(request.registry[model], method)()
+            getattr(client_env[model], method)()
 
         # 5. update parameters
         params = post.get('params', [])

@@ -305,6 +305,7 @@
                              <tree editable="bottom">
                                  <field name="key" />
                                  <field name="value" />
+                                 <field name="hidden" />
                              </tree>
                          </field>
                      </page>

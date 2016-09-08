@@ -195,7 +195,7 @@ def main():
         if args.get('portal_create'):
             print '\n\n\n\n\n     ------ ====== THE SAAS SYSTEM IS READY ===== -----     \n\n\n\n\n'
 
-        cmd = get_cmd()
+        cmd = get_cmd(run_cron=True)
         exec_cmd(cmd)
 
 
@@ -403,7 +403,7 @@ def local_pgadmin_cursor():
 # ----------------------------------------------------------
 # OS Tools
 # ----------------------------------------------------------
-def get_cmd(dbname='', workers=3):
+def get_cmd(dbname='', workers=3, run_cron=False):
     cmd = [
         args.get('odoo_script'),
         "--xmlrpc-port=%s" % xmlrpc_port,
@@ -411,6 +411,8 @@ def get_cmd(dbname='', workers=3):
         "--db-filter=%s" % args.get('db_filter'),
         "--workers=%s" % workers,
     ]
+    if not run_cron:
+        cmd += ["--max-cron-threads=0"]
 
     if args.get('odoo_config'):
         cmd += ['--config=%s' % args.get('odoo_config')]

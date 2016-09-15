@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #!/usr/bin/env python
 
 ODOO_VERSION = 9
@@ -10,7 +11,6 @@ import argparse
 import contextlib
 import datetime
 import fcntl
-import json
 import re
 import os
 import psycopg2
@@ -53,8 +53,10 @@ settings_group.add_argument('--odoo-data-dir', dest='odoo_data_dir', help='Path 
 settings_group.add_argument('--odoo-xmlrpc-port', dest='xmlrpc_port', default=None)
 settings_group.add_argument('--odoo-log-db', dest='log_db', help='Logging database. The same as odoo parameter')
 settings_group.add_argument("--odoo-addons-path", dest="addons_path",
-                 help="specify additional addons paths (separated by commas).")
+                            help="specify additional addons paths (separated by commas).")
 settings_group.add_argument('--odoo-db-filter', dest='db_filter', default='%h')
+settings_group.add_argument('--odoo-test-enable', dest='test_enable', action='store_true')
+settings_group.add_argument('--odoo-without-demo', dest='without_demo', action='store_true', default=False)
 settings_group.add_argument('--admin-password', dest='admin_password', help='Password for admin user. It\'s used for all databases.', default='admin')
 settings_group.add_argument('--base-domain', dest='base_domain', help='Base domain. Used for system that work with --db-filter=%d')
 settings_group.add_argument('--install-modules', dest='install_modules', help='Comma-separated list of modules to install. They will be automatically installed on appropriate database (Portal or Server)', default='saas_portal_start,saas_portal_sale_online')
@@ -89,7 +91,7 @@ args = vars(parser.parse_args())
 # format vars
 suffix = args['suffix']
 for a in args:
-    if type(args[a]) == str:
+    if isinstance(args[a], str):
         args[a] = args[a].format(suffix=suffix)
 
 
@@ -113,6 +115,7 @@ odoo_config = get_odoo_config()
 datadir = args.get('odoo_data_dir') or odoo_config.get('data_dir')
 xmlrpc_port = args.get('xmlrpc_port') or odoo_config.get('xmlrpc_port') or '8069'
 
+
 def filter_modules(s, regexp):
     return set([m for m in s.split(',') if re.match(regexp, m)])
 
@@ -127,6 +130,8 @@ server_modules.add('saas_server')
 # ----------------------------------------------------------
 # Main
 # ----------------------------------------------------------
+
+
 def main():
     if args.get('print_local_hosts'):
         host_line = '127.0.0.1 %s'
@@ -178,7 +183,7 @@ def main():
             rpc_run_tests(args.get('portal_db_name'), plan_id)
             log('SaaS tests were passed successfully')
 
-    except Exception, e:
+    except Exception as e:
         error = e
         traceback.print_exc()
     kill(pid)
@@ -190,19 +195,22 @@ def main():
         if args.get('portal_create'):
             print '\n\n\n\n\n     ------ ====== THE SAAS SYSTEM IS READY ===== -----     \n\n\n\n\n'
 
-        cmd = get_cmd()
+        cmd = get_cmd(run_cron=True)
         exec_cmd(cmd)
 
 
 # ----------------------------------------------------------
 # Tools
 # ----------------------------------------------------------
-def createdb(dbname, install_modules=['base'], without_demo=True):
+def createdb(dbname, install_modules=['base']):
+    without_demo = args.get('without_demo')
     pg_dropdb(dbname)
     pg_createdb(dbname, without_demo=without_demo)
 
-    cmd = get_cmd(dbname)
+    cmd = get_cmd(dbname, workers=0)
     cmd += ['-i', ','.join(install_modules)]
+    if args.get('test_enable'):
+        cmd += ['--test-enable']
     if without_demo:
         cmd += ['--without-demo=all']
 
@@ -213,7 +221,7 @@ def createdb(dbname, install_modules=['base'], without_demo=True):
 def dropdb(dbname):
     pg_dropdb(dbname)
     # cleanup filestore
-    #paths = [os.path.join(datadir, pn, 'filestore', dbname) for pn in 'OpenERP Odoo'.split()]
+    # paths = [os.path.join(datadir, pn, 'filestore', dbname) for pn in 'OpenERP Odoo'.split()]
     paths = [os.path.join(datadir, 'filestore', dbname)]
     exec_cmd(['rm', '-rf'] + paths)
 
@@ -298,7 +306,7 @@ def rpc_add_server_to_portal(portal_db_name):
     auth = rpc_auth(portal_db_name, admin_password=args.get('admin_password'))
     server_db_name = args.get('server_db_name')
     uuid = rpc_get_uuid(server_db_name)
-    rpc_execute_kw(auth, 'saas_portal.server', 'create', [{'name': server_db_name, 'client_id': uuid, 'local_port': xmlrpc_port, 'local_host':'localhost'}])
+    rpc_execute_kw(auth, 'saas_portal.server', 'create', [{'name': server_db_name, 'client_id': uuid, 'local_port': xmlrpc_port, 'local_host': 'localhost'}])
 
 
 def rpc_get_uuid(dbname):
@@ -342,6 +350,7 @@ def rpc_create_plan(portal_db_name):
     rpc_execute_kw(auth, 'saas_portal.plan', 'create_template', [[plan_id]])
     return plan_id
 
+
 def rpc_run_tests(portal_db_name, plan_id):
     auth = rpc_auth(portal_db_name, admin_password=args.get('admin_password'))
     create_new_database = rpc_execute_kw(auth, 'saas_portal.plan', 'create_new_database', [[plan_id]])
@@ -352,6 +361,8 @@ def rpc_run_tests(portal_db_name, plan_id):
 # ----------------------------------------------------------
 # DB Tools
 # ----------------------------------------------------------
+
+
 def pg_createdb(dbname, without_demo=True):
     log('Creating empty database %s' % dbname)
     if args.get('simulate'):
@@ -368,6 +379,7 @@ def pg_dropdb(dbname):
     with local_pgadmin_cursor() as local_cr:
         local_cr.execute('DROP DATABASE IF EXISTS "%s"' % dbname)
         log('Result: %s' % local_cr.statusmessage)
+
 
 def find_databases(root_database):
     with local_pgadmin_cursor() as local_cr:
@@ -391,14 +403,17 @@ def local_pgadmin_cursor():
 # ----------------------------------------------------------
 # OS Tools
 # ----------------------------------------------------------
-def get_cmd(dbname=''):
+def get_cmd(dbname='', workers=3, run_cron=False):
     cmd = [
         args.get('odoo_script'),
         "--xmlrpc-port=%s" % xmlrpc_port,
         "--database=%s" % dbname,
         "--db-filter=%s" % args.get('db_filter'),
-        "--workers=3",
+        "--workers=%s" % workers,
     ]
+    if not run_cron:
+        cmd += ["--max-cron-threads=0"]
+
     if args.get('odoo_config'):
         cmd += ['--config=%s' % args.get('odoo_config')]
 
@@ -419,7 +434,7 @@ def exec_cmd(cmd):
 
 
 def spawn_cmd(cmd, cpu_limit=None, shell=False):
-    log('Spawn',  ' '.join(cmd))
+    log('Spawn', ' '.join(cmd))
     if args.get('simulate'):
         return
 
@@ -433,12 +448,12 @@ def spawn_cmd(cmd, cpu_limit=None, shell=False):
             resource.setrlimit(resource.RLIMIT_CPU, (cpu_time + cpu_limit, hard))
         # close parent files
         os.closerange(3, os.sysconf("SC_OPEN_MAX"))
-        #lock(lock_path)
-    #out=open(log_path,"w")
-    #_logger.debug("spawn: %s stdout: %s", ' '.join(cmd), log_path)
+        # lock(lock_path)
+    # out=open(log_path,"w")
+    # _logger.debug("spawn: %s stdout: %s", ' '.join(cmd), log_path)
     p = subprocess.Popen(cmd,
-                         #stdout=out,
-                         #stderr=out,
+                         # stdout=out,
+                         # stderr=out,
                          preexec_fn=preexec_fn,
                          shell=shell)
     log('Spawn pid: %s' % p.pid)
@@ -486,13 +501,13 @@ def wait_net_service(server, port, timeout=None):
 
             s.connect((server, port))
 
-        except socket.timeout, err:
+        except socket.timeout as err:
             # this exception occurs only if timeout is set
             if timeout:
                 log('Port timeout')
                 return False
 
-        except socket.error, err:
+        except socket.error as err:
             pass
         else:
             s.close()

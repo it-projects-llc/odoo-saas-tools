@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 {
     'name': 'SaaS Server Backup S3',
     'version': '1.0.0',
@@ -13,6 +14,6 @@
     'depends': ['saas_server'],
     'data': [
         'views/res_config.xml',
-        ],
+    ],
     'installable': True,
 }

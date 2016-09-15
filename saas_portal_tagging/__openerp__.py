@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 {
     'name': 'SaaS Portal Tagging',
     'summary': "Ability to tag client databases",
@@ -10,6 +11,6 @@
     'data': [
         'views/saas_portal_tagging_views.xml',
         'views/wizard.xml'
-        ],
+    ],
     'installable': True,
 }

@@ -27,10 +27,10 @@ def get_market_dbs(with_templates=True):
     if with_templates:
         sp = request.registry.get('saas_portal.plan')
         data = sp.search_read(request.cr, SI, [('state', '=', 'confirmed')],
-                               ['template'])
+                              ['template'])
         dbs += [d['template'] for d in data]
     icp = request.registry.get('ir.config_parameter')
     bd = icp.get_param(request.cr, SI, 'saas_portal.base_saas_domain')
     dbs += [db for db in http.db_list(force=True)
-                if db.endswith('_%s' % bd.replace('.', '_'))]
+            if db.endswith('_%s' % bd.replace('.', '_'))]
     return dbs

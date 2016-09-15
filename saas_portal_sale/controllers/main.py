@@ -25,4 +25,3 @@ class SaasPortalSale(SaasPortal):
                 return werkzeug.utils.redirect(url)
 
         return super(SaasPortalSale, self).add_new_client(**post)
-

@@ -6,14 +6,14 @@ $(document).ready(function () {
     var height = $(window).innerHeight();
     var headerHeight = $('header').innerHeight();
     if ($('#oe_main_menu_navbar').length)
-        headerHeight += $('#oe_main_menu_navbar').innerHeight()
+        headerHeight += $('#oe_main_menu_navbar').innerHeight();
     $('.odoo_secondary_A').css('height', height);
     window.scrollTo(0, headerHeight);
 
 
     /* ======== START TRIAL WIDGET ======== */
-    var plan_id = $("input[name='plan_id']").attr('value')
-    var base_saas_domain = $("input[name='base_saas_domain']").attr('value')
+    var plan_id = $("input[name='plan_id']").attr('value');
+    var base_saas_domain = $("input[name='base_saas_domain']").attr('value');
 
     var db_sel = 'input.odoo_db_name';
     var getUrlVars= function() {
@@ -25,7 +25,7 @@ $(document).ready(function () {
             vars[hash[0]] = hash[1];
         }
         return vars;
-    }
+    };
     var url_params = getUrlVars();
     var check_database = function($input) {
         var error = false;
@@ -69,8 +69,8 @@ $(document).ready(function () {
             var request = $.ajax(payload).done(
                 function(response, textStatus, jqXhr) {
                     if (!response.result.error) {
-                        var app = $input.attr('data-app') || url_params['app'] || '';
-                        var cta_from = $input.attr('data-cta_from') || url_params['cta_from'] || false;
+                        var app = $input.attr('data-app') || url_params.app || '';
+                        var cta_from = $input.attr('data-cta_from') || url_params.cta_from || false;
 
                         // Google analytics for goal
                         if (cta_from) {
@@ -84,7 +84,7 @@ $(document).ready(function () {
                         window.dispatchEvent(ce);
 
                         var lang = 'en_US';
-                        var hosting = $input.attr('data-hosting') || url_params['hosting'] || '';
+                        var hosting = $input.attr('data-hosting') || url_params.hosting || '';
                         var offset = -(new Date().getTimezoneOffset());
                         // _.str.sprintf()'s zero front padding is buggy with signed decimals, so doing it manually
                         var browser_offset = (offset < 0) ? "-" : "+";
@@ -108,17 +108,17 @@ $(document).ready(function () {
         }
     };
 
-	$('button#create_instance').on('click', function(event) {
-	    event.preventDefault();
-	    var $self = $(this);
-	    var $db_input = $self.parent().parent().find(db_sel);
-	    check_database($db_input)
-	});
+    $('button#create_instance').on('click', function(event) {
+        event.preventDefault();
+        var $self = $(this);
+        var $db_input = $self.parent().parent().find(db_sel);
+        check_database($db_input);
+    });
 
-	$(db_sel).popover({html: true});
-	$(db_sel).on('keyup', function() {
+    $(db_sel).popover({html: true});
+    $(db_sel).on('keyup', function() {
         var $input = $(this);
         $input.popover('hide');
     });
 
-})
+});

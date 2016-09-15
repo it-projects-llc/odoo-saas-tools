@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from openerp.addons.saas_base.tools import get_size
 import time
 import openerp
@@ -21,11 +22,11 @@ class SaasServerClient(models.Model):
     client_id = fields.Char('Database UUID', readonly=True, select=True)
     expiration_datetime = fields.Datetime(readonly=True)
     state = fields.Selection([('template', 'Template'),
-                              ('draft','New'),
-                              ('open','In Progress'),
+                              ('draft', 'New'),
+                              ('open', 'In Progress'),
                               ('cancelled', 'Cancelled'),
-                              ('pending','Pending'),
-                              ('deleted','Deleted')],
+                              ('pending', 'Pending'),
+                              ('deleted', 'Deleted')],
                              'State', default='draft', track_visibility='onchange')
 
     _sql_constraints = [
@@ -65,6 +66,7 @@ class SaasServerClient(models.Model):
         with self.registry()[0].cursor() as cr:
             env = api.Environment(cr, SUPERUSER_ID, self._context)
             self._install_addons(env, addons)
+
     @api.one
     def disable_mail_servers(self):
         '''
@@ -74,7 +76,7 @@ class SaasServerClient(models.Model):
         incoming_mail_servers = self.env['fetchmail.server'].search([])
         if len(incoming_mail_servers):
             incoming_mail_servers.write({'active': False})
-            
+
         # let's disable outgoing mailservers too
         outgoing_mail_servers = self.env['ir.mail_server'].search([])
         if len(outgoing_mail_servers):
@@ -121,7 +123,7 @@ class SaasServerClient(models.Model):
             client_env['ir.config_parameter'].set_param(key, value)
 
         # set web.base.url config
-        client_env['ir.config_parameter'].set_param('web.base.url', '%s://%s' % (server_requests_scheme, self.name)) 
+        client_env['ir.config_parameter'].set_param('web.base.url', '%s://%s' % (server_requests_scheme, self.name))
 
         # saas_client must be already installed
         oauth_provider = client_env.ref('saas_client.saas_oauth_provider')
@@ -174,7 +176,6 @@ class SaasServerClient(models.Model):
                 'oauth_uid': owner_user['user_id'],
                 'oauth_access_token': access_token
             })
-
 
     @api.model
     def update_all(self):
@@ -232,7 +233,6 @@ class SaasServerClient(models.Model):
         with self.registry()[0].cursor() as cr:
             env = api.Environment(cr, SUPERUSER_ID, self._context)
             return self._upgrade_database(env, **kwargs)[0]
-
 
     @api.one
     def _upgrade_database(self, client_env, data):
@@ -377,8 +377,8 @@ class SaasServerClient(models.Model):
             try:
                 database_obj._transport_backup(dump_db, filename=filename)
                 data['status'] = 'success'
-            except Exception, e:
-                _logger.exception('An error happened during database %s backup' %(database_obj.name))
+            except Exception as e:
+                _logger.exception('An error happened during database %s backup' % (database_obj.name))
                 data['status'] = 'fail'
                 data['message'] = str(e)
 

@@ -1,15 +1,12 @@
 # -*- coding: utf-8 -*-
 import functools
 import datetime
-import openerp
 from openerp import api, SUPERUSER_ID
 from openerp import http
 from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
 from openerp.tools.translate import _
 from openerp.addons.web.http import request
 from openerp.addons.auth_oauth.controllers.main import fragment_to_query_string
-from openerp.addons.web.controllers.main import login_and_redirect
-from openerp.addons.saas_utils import connector
 
 import werkzeug.utils
 import simplejson
@@ -18,15 +15,17 @@ import simplejson
 import logging
 _logger = logging.getLogger(__name__)
 
+
 def webservice(f):
     @functools.wraps(f)
     def wrap(*args, **kw):
         try:
             return f(*args, **kw)
-        except Exception, e:
+        except Exception as e:
             _logger.exception(str(e))
             return http.Response(response=str(e), status=500)
     return wrap
+
 
 class SaasServer(http.Controller):
 
@@ -68,10 +67,10 @@ class SaasServer(http.Controller):
         client.update_registry()
         client.prepare_database(
             tz=tz,
-            owner_user = owner_user,
-            is_template_db = is_template_db,
-            access_token = access_token,
-            server_requests_scheme = request.httprequest.scheme)
+            owner_user=owner_user,
+            is_template_db=is_template_db,
+            access_token=access_token,
+            server_requests_scheme=request.httprequest.scheme)
 
         if is_template_db:
             res = [{
@@ -95,7 +94,7 @@ class SaasServer(http.Controller):
                 'd': new_db,
                 'p': oauth_provider_id,
                 'a': action_id
-                }),
+            }),
         })
 
     @http.route('/saas_server/edit_database', type='http', auth='public', website=True)
@@ -194,7 +193,7 @@ class SaasServer(http.Controller):
         state['d'] = request.db
         params['state'] = simplejson.dumps(state)
         # FIXME: server doesn't have auth data for admin (server is created manually currently)
-        #return werkzeug.utils.redirect('/auth_oauth/signin?%s' % werkzeug.url_encode(params))
+        # return werkzeug.utils.redirect('/auth_oauth/signin?%s' % werkzeug.url_encode(params))
         return werkzeug.utils.redirect('/web')
 
     @http.route(['/saas_server/ab/css/<dbuuid>.css'], type='http', auth='public')
@@ -224,7 +223,7 @@ class SaasServer(http.Controller):
 }
 
 .announcement_bar {
-    color: #ffffff;
+    color: # ffffff;
     height: 30px;
     vertical-align: middle !important;
     text-align: center !important;
@@ -234,7 +233,7 @@ class SaasServer(http.Controller):
     margin: 0 !important;
     padding: 8px !important;
 
-    background-color: #8785C0;
+    background-color: # 8785C0;
     background-image: -webkit-linear-gradient(135deg, rgba(255, 255, 255, 0.05) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.05) 50%, rgba(255, 255, 255, 0.05) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0) 100% );
     background-size: 40px 40px;
     -webkit-transition: all 350ms ease;
@@ -245,7 +244,7 @@ class SaasServer(http.Controller):
 
 .announcement_bar a {
     font-weight: bold;
-    color: #d3ffb0 !important;
+    color: # d3ffb0 !important;
     text-decoration: none !important;
     border-radius: 3px;
     padding: 5px 8px;
@@ -255,7 +254,6 @@ class SaasServer(http.Controller):
         '''
             content = content.replace('%s', message)
         return http.Response(content, mimetype='text/css')
-
 
     @http.route(['/saas_server/sync_server'], type='http', auth='public')
     @webservice
@@ -287,7 +285,7 @@ class SaasServer(http.Controller):
                 'total_storage_limit': client.total_storage_limit,
             })
         return simplejson.dumps(res)
-    
+
     def _get_port(self):
         host_parts = request.httprequest.host.split(':')
         return len(host_parts) > 1 and host_parts[1] or 80

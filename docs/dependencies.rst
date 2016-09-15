@@ -23,9 +23,9 @@ Amazon services
 
 Used by
 
-* `saas_server_backup_rotate_s3 <../saas_server_backup_rotate_s3/>`_
-* `saas_sysadmin_route53 <../saas_sysadmin_route53/>`_
-* `saas_server_backup_s3 <../saas_server_backup_s3/>`_
+* `saas_server_backup_rotate_s3 <../saas_server_backup_rotate_s3/>`__
+* `saas_sysadmin_route53 <../saas_sysadmin_route53/>`__
+* `saas_server_backup_s3 <../saas_server_backup_s3/>`__
 
 FTP
 ===
@@ -36,7 +36,7 @@ FTP
  
 Used by
 
-* `saas_server_backup_ftp <../saas_server_backup_ftp/>`_
+* `saas_server_backup_ftp <../saas_server_backup_ftp/>`__
 
 Addons
 ======
@@ -50,7 +50,7 @@ website_sale_require_login
  
 Used by
 
-* `saas_portal_sale_online <../saas_portal_sale_online/>`_
+* `saas_portal_sale_online <../saas_portal_sale_online/>`__
   
 access_limit_records_number
 ---------------------------

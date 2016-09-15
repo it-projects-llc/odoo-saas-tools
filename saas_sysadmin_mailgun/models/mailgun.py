@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import requests
-import os, string
+import os
+import string
+
 
 def random_password(length=10):
     chars = string.ascii_uppercase + string.digits + string.ascii_lowercase
@@ -8,6 +10,7 @@ def random_password(length=10):
     for i in range(length):
         password += chars[ord(os.urandom(1)) % len(chars)]
     return password
+
 
 def add_domain(api_key=None, domain_name=None, smtp_password=None):
     """Adding a domain.
@@ -64,8 +67,7 @@ def add_domain(api_key=None, domain_name=None, smtp_password=None):
     return requests.post(
         "https://api.mailgun.net/v3/domains",
         auth=("api", api_key),
-        data={'name':domain_name, 'smtp_password':smtp_password})
-
+        data={'name': domain_name, 'smtp_password': smtp_password})
 
 
 def get_domains(api_key=None):
@@ -199,6 +201,7 @@ def create_credentials(api_key=None, domain=None):
         auth=("api", "YOUR_API_KEY"),
         data={"login": "alice@YOUR_DOMAIN_NAME",
               "password": "secret"})
+
 
 def create_store_route(api_key=None, domain=None, mail_domain=None, request_scheme='http'):
     """Create a route for message storing and notification"""

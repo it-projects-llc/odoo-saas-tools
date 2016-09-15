@@ -1,2 +1,3 @@
-import saas_server
-import res_config
+# -*- coding: utf-8 -*-
+from . import saas_server
+from . import res_config

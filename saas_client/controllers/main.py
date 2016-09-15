@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import werkzeug
-import openerp
-from openerp import http, SUPERUSER_ID
+from openerp import http
 from openerp.http import request
 import simplejson
 from openerp.addons.auth_oauth.controllers.main import OAuthLogin as Home
@@ -22,6 +21,7 @@ class SaasClient(http.Controller):
 
 
 class SaaSClientLogin(Home):
+
     @http.route()
     def web_login(self, redirect=None, **kw):
         ensure_db()

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 {
     'name': 'SaaS Portal Sign Up',
     'version': '1.0.0',

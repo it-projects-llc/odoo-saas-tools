@@ -9,8 +9,8 @@
     "author": "IT-Projects LLC, Ildar Nasyrov",
     "website": "https://it-projects.info",
     "license": "LGPL-3",
-    #"price": 9.00,
-    #"currency": "EUR",
+    # "price": 9.00,
+    # "currency": "EUR",
 
     "depends": [
         "saas_sysadmin",

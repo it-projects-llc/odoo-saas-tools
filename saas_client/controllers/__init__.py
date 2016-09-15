@@ -1,2 +1,3 @@
-import main
-import web_settings_dashboard
+# -*- coding: utf-8 -*-
+from . import main
+from . import web_settings_dashboard

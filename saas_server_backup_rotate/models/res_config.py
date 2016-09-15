@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from openerp import models, fields, api
 
 
@@ -28,7 +29,6 @@ class SaasServerWizard(models.TransientModel):
         'Hourly Count',
         description='Set the number of hourly backups to preserve during rotation'
     )
-
 
     @api.model
     def get_default_backup_rotate_strategy(self, fields):

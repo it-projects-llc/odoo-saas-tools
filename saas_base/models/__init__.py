@@ -1,2 +1,2 @@
-import saas_base
-
+# -*- coding: utf-8 -*-
+from . import saas_base

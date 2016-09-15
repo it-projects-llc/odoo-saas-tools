@@ -1,4 +1,5 @@
-import product
-import account_invoice
-import saas_portal
-import wizard
+# -*- coding: utf-8 -*-
+from . import product
+from . import account_invoice
+from . import saas_portal
+from . import wizard

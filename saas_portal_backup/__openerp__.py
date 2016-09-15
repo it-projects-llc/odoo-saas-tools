@@ -9,6 +9,6 @@
     'depends': ['saas_portal'],
     'data': [
         'views/saas_portal_views.xml',
-        ],
+    ],
     'installable': True,
 }

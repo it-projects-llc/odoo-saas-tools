@@ -1,16 +1,19 @@
+# -*- coding: utf-8 -*-
 {
-    'name' : 'OAuth2 provider',
-    'version' : '1.0.0',
-    'author' : 'Ivan Yelizariev',
+    'name': 'OAuth2 provider',
+    'version': '1.0.0',
+    'author': 'Ivan Yelizariev',
     'license': 'LGPL-3',
-    'category' : 'SaaS',
-    'website' : 'https://it-projects.info',
+    'category': 'SaaS',
+    'website': 'https://it-projects.info',
 
-    'depends' : ['web'],
+    'depends': ['web'],
     'external_dependencies': {
-        'python' : ['oauthlib'],
+        'python': ['oauthlib'],
     },
-    'data':[],
+    'data': [
+        'security/ir.model.access.csv',
+    ],
     'installable': True,
 
     'description': '''

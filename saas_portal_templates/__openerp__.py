@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 {
     'name': 'SaaS Portal - templates',
     'version': '1.0.0',
@@ -8,6 +9,6 @@
     'depends': ['saas_portal'],
     'data': [
         'views/website.xml',
-        ],
+    ],
     'installable': True,
 }

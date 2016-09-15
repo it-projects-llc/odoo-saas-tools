@@ -12,6 +12,7 @@ except:
     _logger.critical('SAAS Route53 Requires the python library Boto which is not \
     found on your installation')
 
+
 def _get_route53_conn(env):
     ir_params = env['ir.config_parameter']
     aws_access_key_id = ir_params.get_param('saas_route53.saas_route53_aws_accessid')
@@ -29,7 +30,7 @@ class SaasRoute53Zone(models.Model):
     hosted_zone_ID = fields.Char('Hosted Zone ID', readonly=True)
 
     @api.model
-    @api.returns('self', lambda value:value.id)
+    @api.returns('self', lambda value: value.id)
     def create(self, vals):
         zone = super(SaasRoute53Zone, self).create(vals)
         if zone.create_zone:
@@ -38,8 +39,8 @@ class SaasRoute53Zone(models.Model):
             zone_name = vals.get('name')
             res = conn.create_zone(zone_name)
             zone.write({
-                       'name' : zone_name,
-                       'hosted_zone_ID' : res.id,  # TODO check if right
+                       'name': zone_name,
+                       'hosted_zone_ID': res.id,  # TODO check if right
                        })
         return zone
 
@@ -64,7 +65,7 @@ class SaasPortalServer(models.Model):
         add, update, delete records
         '''
         assert type in ('cname', 'a', 'txt', 'mx')
-        if action in ('add', 'write') and value == None:
+        if action in ('add', 'write') and value is None:
             raise Warning('This operation requires a supplied value')
         conn = _get_route53_conn(self.env)
         zone = conn.get_zone(self.aws_hosted_zone_id.name)
@@ -83,18 +84,16 @@ class SaasPortalServer(models.Model):
                     getattr(zone, method)(name, value)
             except Exception as e:
                 _logger.exception('Error modifying AWS hosted zone')
-                pass
         elif action == 'delete':
             try:
                 getattr(zone, method)(name)
             except Exception as e:
                 _logger.exception('Error modifying AWS hosted zone')
-                pass
         else:
             raise Warning('Supported zone operation!')
 
     @api.model
-    @api.returns('self', lambda value:value.id)
+    @api.returns('self', lambda value: value.id)
     def create(self, vals):
         server = super(SaasPortalServer, self).create(vals)
         if server.aws_hosted_zone_id:

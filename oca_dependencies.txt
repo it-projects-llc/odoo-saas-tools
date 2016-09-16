@@ -1,1 +1,2 @@
 e-commerce
+access-addons https://github.com/it-projects-llc/access-addons 9.0

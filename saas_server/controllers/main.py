@@ -296,7 +296,7 @@ class SaasServer(http.Controller):
         message = False
         domain = [('client_id', '=', dbuuid)]
         client = request.env['saas_server.client'].sudo().search(domain)
-        if client:
+        if client and client.expiration_datetime:
             diff = datetime.datetime.strptime(client.expiration_datetime, DEFAULT_SERVER_DATETIME_FORMAT) - datetime.datetime.now()
             hours_remaining = diff.seconds / 3600 + 1
             plural = hours_remaining > 1 and 's' or ''

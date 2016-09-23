@@ -10,6 +10,7 @@ url: http://shikherverma.com #only used in disque comments for now
 disqus_url: shikherverma.com # disque comments are broken if you send http:// along with url
 github_username:  shikherverma
 facebook_username:  shikherverma1
+stackoverflow_username: 6764571/shikher-verma
 collections:
   - portfolio
 

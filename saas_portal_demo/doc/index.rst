@@ -2,26 +2,6 @@
  Demo datatabases
 ==================
 
-New parameters in __openerp__.py for demonstraton
-=================================================
-
-Put this in your module __openerp__.py file.
-
-Use format below (example for `reminder modules<https://apps.odoo.com/apps/modules/category/reminders%20and%20agenda/browse?author=IT-Projects%20LLC>`_)
-
-.. code-block:: python
-
-   ...
-        "demo_demonstrative": True,
-        "demo_url": "reminders-and-agenda",
-        "demo_addons":  ["reminder_crm_next_action", "reminder_phonecall"],
-        "demo_addons_hidden":  ["website"],
-    }
-
-* ``"demo_demonstrative"`` - indicates that database should be created on server to demonstrate this module 
-* ``"demo_addons"`` - additional addons to be demostrated
-* ``"demo_addons_hidden"`` - additional addons to be installed, but without noticing in Demo Page
-
 Configuration
 =============
 
@@ -29,8 +9,23 @@ SaaS Servers
 ------------
 
 You need at least one SaaS Server per each odoo version (e.g. server-8, server-9).
+Install the ``saas_server_demo`` module on your server database.
+See in ``saas_server_demo/doc/index.rst`` how to modify ``__openerp__.py`` file for demo modules.
+There are new parameters are introduced for demo purposes.
 
+Saas Portal
+-----------
 
+There are new buttons introduced on saas_portal.server view.
+
+* Open ``SaaS / SaaS / Servers``
+
+  * click ``[Generate Demo Plans]`` to generate demo plans based on information in ``__openerp__.py``
+  files in your demo modules on selected server.
+  * click ``[Generate Demo Template DBs]`` to create template databases for demonstration sets.
+  * click ``[Update Repositories]`` to invoke ``git pull`` command for each repositories that are defined
+  in demo repositories list on your server. See ``saas_server_demo/doc/index.rst`` for additional information.
+  * click ``[Restart Server]``. Each time you update demo repositories you shoud restart the servers.
 
 Automatic Plans generation
 --------------------------

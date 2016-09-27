@@ -32,7 +32,7 @@
     "qweb": [
     ],
     "demo": [
-        "demo/saas_portal_plan.xml",
+        # "demo/saas_portal_plan.xml",
     ],
 
     "post_load": None,

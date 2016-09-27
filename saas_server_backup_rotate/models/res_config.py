@@ -1,9 +1,9 @@
+# -*- coding: utf-8 -*-
 from openerp import models, fields, api
 
 
 class SaasServerWizard(models.TransientModel):
-    _name = 'saas_server.config.settings'
-    _inherit = 'res.config.settings'
+    _inherit = 'saas_server.config.settings'
 
     backup_rotate_unlimited = fields.Boolean(
         'Unlimited Backup',
@@ -29,7 +29,6 @@ class SaasServerWizard(models.TransientModel):
         'Hourly Count',
         description='Set the number of hourly backups to preserve during rotation'
     )
-
 
     @api.model
     def get_default_backup_rotate_strategy(self, fields):

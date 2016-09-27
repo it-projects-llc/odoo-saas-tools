@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 {
     'name': 'SaaS Client',
     'version': '1.0.0',

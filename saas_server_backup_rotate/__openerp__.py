@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 {
     'name': 'SaaS Server Rotate Backup',
     'version': '1.0.0',
@@ -9,6 +10,6 @@
     'data': [
         'data/ir_cron.xml',
         'views/res_config.xml',
-        ],
+    ],
     'installable': True,
 }

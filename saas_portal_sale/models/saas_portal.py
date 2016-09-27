@@ -14,13 +14,13 @@ class SaasPortalPlan(models.Model):
     @api.multi
     def _create_new_database(self, dbname=None, client_id=None, partner_id=None, user_id=None, notify_user=False, trial=False, support_team_id=None, async=None):
         res = super(SaasPortalPlan, self)._create_new_database(dbname=dbname,
-                                                              client_id=client_id,
-                                                              partner_id=partner_id,
-                                                              user_id=user_id,
-                                                              notify_user=notify_user,
-                                                              trial=trial,
-                                                              support_team_id=support_team_id,
-                                                              async=async)
+                                                               client_id=client_id,
+                                                               partner_id=partner_id,
+                                                               user_id=user_id,
+                                                               notify_user=notify_user,
+                                                               trial=trial,
+                                                               support_team_id=support_team_id,
+                                                               async=async)
         if not partner_id:
             return res
         if trial and self.non_trial_instances != 'from_trial':
@@ -84,7 +84,6 @@ class SaasPortalClient(models.Model):
             attribute_value_obj = product_obj.attribute_value_ids.filtered(lambda r: r.attribute_id.saas_code == 'STORAGE_LIMIT')
             if attribute_value_obj and attribute_value_obj[0].saas_code_value:
                 params.append({'key': 'saas_client.total_storage_limit', 'value': attribute_value_obj[0].saas_code_value, 'hidden': True})
-
 
             res['params'].extend(params)
         return res

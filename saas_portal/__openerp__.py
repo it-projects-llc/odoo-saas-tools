@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 {
     'name': 'SaaS Portal',
     'version': '1.0.0',
@@ -20,6 +21,7 @@
         'data/res_users.xml',
         'data/base_action_rule.xml',
         'views/try_trial_template.xml',
-        ],
+        'security/ir.model.access.csv',
+    ],
     'installable': True,
 }

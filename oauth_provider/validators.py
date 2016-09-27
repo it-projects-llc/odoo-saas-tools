@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # some code taken from https://github.com/evonove/django-oauth-toolkit/
 
 from openerp import SUPERUSER_ID
@@ -5,13 +6,15 @@ import logging
 try:
     from oauthlib.oauth2 import RequestValidator, MobileApplicationServer
 except:
-    pass
+    RequestValidator = object
+    MobileApplicationServer = False
 from datetime import datetime, timedelta
-from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT, DEFAULT_SERVER_DATE_FORMAT
+from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
 
 log = _logger = logging.getLogger(__name__)
 
 from openerp.http import request as request
+
 
 class OAuth2Validator(RequestValidator):
 
@@ -62,7 +65,7 @@ class OAuth2Validator(RequestValidator):
         Remember that this method is NOT RECOMMENDED and SHOULD be limited to clients unable to
         directly utilize the HTTP Basic authentication scheme. See rfc:`2.3.1` for more details.
         """
-        #TODO: check if oauthlib has already unquoted client_id and client_secret
+        # TODO: check if oauthlib has already unquoted client_id and client_secret
         client_id = req.client_id
         client_secret = req.client_secret
 
@@ -85,11 +88,11 @@ class OAuth2Validator(RequestValidator):
         """
         if not req.client:
             app_obj = request.registry['oauth.application']
-            app_id = app_obj.search(request.cr, SUPERUSER_ID, [('client_id','=',client_id)])
+            app_id = app_obj.search(request.cr, SUPERUSER_ID, [('client_id', '=', client_id)])
             if app_id:
                 app_id = app_id[0]
             elif create:
-                app_id = app_obj.create(request.cr, SUPERUSER_ID, {'client_id':client_id})
+                app_id = app_obj.create(request.cr, SUPERUSER_ID, {'client_id': client_id})
             if app_id:
                 req.client = app_obj.browse(request.cr, SUPERUSER_ID, app_id)
         return req.client
@@ -101,17 +104,17 @@ class OAuth2Validator(RequestValidator):
     def validate_redirect_uri(self, client_id, redirect_uri, req, *args, **kwargs):
         # Is the client allowed to use the supplied redirect_uri? i.e. has
         # the client previously registered this EXACT redirect uri.
-        return True #TODO
+        return True  # TODO
 
     def validate_scopes(self, client_id, scopes, client, req, *args, **kwargs):
         # Is the client allowed to access the requested scopes?
-        return True #TODO
+        return True  # TODO
 
     def validate_response_type(self, client_id, response_type, client, req, *args, **kwargs):
         # Clients should only be allowed to use one type of response type, the
         # one associated with their one allowed grant type.
         # In this case it must be "code".
-        return response_type=='token'
+        return response_type == 'token'
 
     def authenticate_client(self, req, *args, **kwargs):
         """
@@ -153,15 +156,15 @@ class OAuth2Validator(RequestValidator):
         # access_token and the refresh_token and set expiration for the
         # access_token to now + expires_in seconds.
 
-        #if req.refresh_token:
+        # if req.refresh_token:
         #    # remove used refresh token
         #    try:
         #        RefreshToken.objects.get(token=req.refresh_token).delete()
         #    except RefreshToken.DoesNotExist:
         #        assert()  # TODO though being here would be very strange, at least log the error
-        ACCESS_TOKEN_EXPIRE_SECONDS = 60*60
+        ACCESS_TOKEN_EXPIRE_SECONDS = 60 * 60
         expires = datetime.now() + timedelta(seconds=ACCESS_TOKEN_EXPIRE_SECONDS)
-        #if req.grant_type == 'client_credentials':
+        # if req.grant_type == 'client_credentials':
         #    req.user = req.client.user
 
         access_token_obj = request.registry['oauth.access_token']
@@ -173,7 +176,7 @@ class OAuth2Validator(RequestValidator):
             'application_id': req.client.id
         })
 
-        #if 'refresh_token' in token:
+        # if 'refresh_token' in token:
         #    refresh_token = RefreshToken(
         #        user=req.user,
         #        token=token['refresh_token'],
@@ -194,7 +197,7 @@ class OAuth2Validator(RequestValidator):
 
         access_token_obj = request.registry['oauth.access_token']
         access_token_id = access_token_obj.search(request.cr, SUPERUSER_ID,
-                                               [('token','=',token)])
+                                                  [('token', '=', token)])
         if not access_token_id:
             return False
         access_token_id = access_token_id[0]
@@ -209,4 +212,6 @@ class OAuth2Validator(RequestValidator):
 
 
 validator = OAuth2Validator()
-server = MobileApplicationServer(validator)
+server = None
+if MobileApplicationServer:
+    server = MobileApplicationServer(validator)

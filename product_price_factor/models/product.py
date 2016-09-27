@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from openerp import models
 from openerp.osv import osv, fields
 import openerp.addons.decimal_precision as dp
 
@@ -33,7 +32,7 @@ class ProductAttributeValue(osv.osv):
                 'product_tmpl_id': context['active_id'],
                 'value_id': id,
                 'price_factor': value,
-                }, context=context)
+            }, context=context)
 
     _columns = {
         'price_factor': fields.function(_get_price_factor, type='float', string='Attribute Price Factor',

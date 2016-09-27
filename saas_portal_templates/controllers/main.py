@@ -1,15 +1,11 @@
 # -*- coding: utf-8 -*-
-import openerp
-from openerp import SUPERUSER_ID
 from openerp.addons.web import http
 from openerp.addons.web.http import request
-from openerp.addons.auth_oauth.controllers import main as oauth
 from openerp.addons.web.controllers.main import login_redirect
 from openerp.addons.saas_portal.controllers.main import SaasPortal as saas_portal_controller
 
 import werkzeug
 import simplejson
-import random
 
 
 class SaasPortalTemplates(saas_portal_controller):

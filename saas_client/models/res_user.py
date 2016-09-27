@@ -18,7 +18,10 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
-from openerp import models, fields, api, SUPERUSER_ID as SI, exceptions
+from openerp import SUPERUSER_ID as SI
+from openerp import api
+from openerp import exceptions
+from openerp import models
 from openerp.tools.translate import _
 from openerp.addons.saas_base.exceptions import SuspendedDBException
 
@@ -28,8 +31,9 @@ class ResUsers(models.Model):
     _inherit = 'res.users'
 
     _defaults = {
-        'oauth_provider_id': lambda self,cr,uid,ctx=None: self.pool['ir.model.data'].xmlid_to_res_id(cr, SI, 'saas_server.saas_oauth_provider')
+        'oauth_provider_id': lambda self, cr, uid, ctx=None: self.pool['ir.model.data'].xmlid_to_res_id(cr, SI, 'saas_client.saas_oauth_provider')
     }
+
     @api.model
     def create(self, vals):
         max_users = self.env["ir.config_parameter"].sudo().get_param("saas_client.max_users")
@@ -37,7 +41,7 @@ class ResUsers(models.Model):
             max_users = int(max_users)
             cur_users = self.env['res.users'].search_count([('share', '=', False), ('id', '!=', SI)])
             if cur_users >= max_users:
-                raise exceptions.Warning(_('Maximimum allowed users is %(max_users)s, while you already have %(cur_users)s') % {'max_users':max_users, 'cur_users': cur_users})
+                raise exceptions.Warning(_('Maximimum allowed users is %(max_users)s, while you already have %(cur_users)s') % {'max_users': max_users, 'cur_users': cur_users})
         return super(ResUsers, self).create(vals)
 
     def check(self, db, uid, passwd):

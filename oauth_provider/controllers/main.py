@@ -1,16 +1,11 @@
-import functools
+# -*- coding: utf-8 -*-
 import logging
 import simplejson
 import traceback
 
-import openerp
 from openerp import SUPERUSER_ID
 from openerp import http
 from openerp.http import request
-from openerp.addons.web.controllers.main import ensure_db, set_cookie_and_redirect, login_and_redirect
-from openerp.addons.auth_signup.controllers.main import AuthSignupHome as Home
-from openerp.modules.registry import RegistryManager
-from openerp.tools.translate import _
 import werkzeug
 
 _logger = logging.getLogger(__name__)
@@ -22,11 +17,13 @@ try:
     from oauthlib.common import urlencode, urlencoded, quote
 except:
     pass
-from urlparse import urlparse, parse_qs, urlunparse
+from urlparse import urlparse
+from urlparse import urlunparse
 
 
 # see https://oauthlib.readthedocs.org/en/latest/oauth2/server.html
 class OAuth2(http.Controller):
+
     def __init__(self):
         self._server = server
 
@@ -100,11 +97,11 @@ class OAuth2(http.Controller):
             scope = kw.get('scope')
             params = {'mode': 'login',
                       'scope': scope,
-                      #'debug':1,
-                      #'login':?,
-                      #'redirect_hostname':TODO,
+                      # 'debug':1,
+                      # 'login':?,
+                      # 'redirect_hostname':TODO,
                       'redirect': '/oauth2/auth?%s' % werkzeug.url_encode(kw)
-            }
+                      }
             url = '/web/login'
             if 'trial' in scope.split(' '):
                 url = '/web/signup'
@@ -113,7 +110,7 @@ class OAuth2(http.Controller):
             credentials.update({'user': user})
             try:
                 headers, body, status = self._server.create_authorization_response(
-                uri, http_method, body, headers, scopes, credentials)
+                    uri, http_method, body, headers, scopes, credentials)
                 return self._response(headers, body, status)
             except errors.FatalClientError as e:
                 return self._response_from_error(e)

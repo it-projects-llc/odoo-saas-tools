@@ -1,2 +1,2 @@
-import res_config
-import saas_sysdamin_route53
+# -*- coding: utf-8 -*-
+from . import saas_sysdamin_route53

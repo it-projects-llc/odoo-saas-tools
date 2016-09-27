@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
-	<data>
-		<record model="ir.ui.view" id="view_saas_server_config_settings">
-			<field name="name">saas_server.config.settings.inherit</field>
-			<field name="model">saas_server.config.settings</field>
-			<field name="inherit_id"
-				ref="saas_server.view_saas_server_config_settings" />
-			<field name="arch" type="xml">
-				<header position="after">
-					<div>
+    <data>
+        <record model="ir.ui.view" id="view_saas_server_config_settings">
+            <field name="name">saas_server.config.settings.inherit</field>
+            <field name="model">saas_server.config.settings</field>
+            <field name="inherit_id"
+                ref="saas_server.view_saas_server_config_settings" />
+            <field name="arch" type="xml">
+                <header position="after">
+                    <div>
 
-						<group string="AWS S3 Access">
-							<field name="saas_s3_aws_accessid" />
-							<field name="saas_s3_aws_accesskey" />
-							<field name="saas_s3_aws_bucket" />
-						</group>
-					</div>
-				</header>
-			</field>
-		</record>
-	</data>
+                        <group string="AWS S3 Access">
+                            <field name="saas_s3_aws_accessid" />
+                            <field name="saas_s3_aws_accesskey" />
+                            <field name="saas_s3_aws_bucket" />
+                        </group>
+                    </div>
+                </header>
+            </field>
+        </record>
+    </data>
 </openerp>

@@ -1,4 +1,3 @@
-#import saas_portal
-import saas_portal_demo
-import product
-
+# -*- coding: utf-8 -*-
+from . import saas_portal_demo
+from . import product

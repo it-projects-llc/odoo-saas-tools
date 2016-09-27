@@ -75,10 +75,11 @@ class SaasPortal(http.Controller):
         if arg0:
             arg0 = literal_eval(arg0)
         messages = []
-        return simplejson.dumps({'messages':messages})
+        return simplejson.dumps({'messages': messages})
 
 
 class SaasPortalSale(http.Controller):
+
     @http.route('/trial', auth='public', type='http', website=True)
     def index(self, **kw):
         uid = request.session.uid

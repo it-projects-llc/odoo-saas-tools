@@ -20,13 +20,13 @@ class SaasServerClient(models.Model):
         path = self.env['ir.config_parameter'].get_param('saas_server.sftp_path', None)
 
         srv = pysftp.Connection(host=server, username=username, password=password)
-        #set keepalive to prevent socket closed / connection dropped error
+        # set keepalive to prevent socket closed / connection dropped error
         srv._transport.set_keepalive(30)
 
         try:
             srv.chdir(path)
         except IOError:
-            #Create directory and subdirs if they do not exist.
+            # Create directory and subdirs if they do not exist.
             currentDir = ''
             for dirElement in path.split('/'):
                 currentDir += dirElement + '/'
@@ -37,7 +37,6 @@ class SaasServerClient(models.Model):
                     # Make directory and then navigate into it
                     srv.mkdir(currentDir, mode=777)
                     srv.chdir(currentDir)
-                    pass
 
         srv.chdir(path)
         with tempfile.TemporaryFile() as t:

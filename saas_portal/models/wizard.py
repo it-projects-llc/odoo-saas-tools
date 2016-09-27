@@ -1,15 +1,12 @@
 # -*- coding: utf-8 -*-
 import requests
 import werkzeug
-import datetime
 import simplejson
 
-import openerp
-from openerp.addons.saas_utils import connector, database
 from openerp.addons.web.http import request
-from openerp.tools import config
-from openerp import models, fields, api, SUPERUSER_ID
-from openerp import http
+from openerp import api
+from openerp import fields
+from openerp import models
 
 
 class SaasConfig(models.TransientModel):
@@ -19,7 +16,7 @@ class SaasConfig(models.TransientModel):
         return self._context.get('active_ids')
 
     action = fields.Selection([('edit', 'Edit'), ('upgrade', 'Configure'), ('delete', 'Delete')],
-                                'Action')
+                              'Action')
     database_ids = fields.Many2many('saas_portal.client', string='Database', default=_default_database_ids)
     update_addons_list = fields.Boolean('Update Addon List', default=True)
     update_addons = fields.Char('Update Addons', size=256)
@@ -82,9 +79,10 @@ class SaasConfig(models.TransientModel):
             state=state,
         )
         res = requests.Session().send(req, **req_kwargs)
-        if res.ok != True:
+        if not res.ok:
             raise Warning('Reason: %s \n Message: %s' % (res.reason, res.content))
         return res.text
+
 
 class SaasConfigFix(models.TransientModel):
     _name = 'saas.config.fix'
@@ -92,6 +90,7 @@ class SaasConfigFix(models.TransientModel):
     model = fields.Char('Model', required=1, size=64)
     method = fields.Char('Method', required=1, size=64)
     config_id = fields.Many2one('saas.config', 'Config')
+
 
 class SaasConfigParam(models.TransientModel):
     _name = 'saas.config.param'
@@ -107,6 +106,7 @@ class SaasConfigParam(models.TransientModel):
     value = fields.Char('Value', required=1, size=64)
     config_id = fields.Many2one('saas.config', 'Config')
     hidden = fields.Boolean('Hidden parameter', default=True)
+
 
 class SaasPortalCreateClient(models.TransientModel):
     _name = 'saas_portal.create_client'
@@ -167,7 +167,7 @@ class SaasPortalDuplicateClient(models.TransientModel):
             client = self.env['saas_portal.client'].browse(client_id)
             return client.partner_id
         return ''
-    
+
     def _default_expiration(self):
         client_id = self._default_client_id()
         if client_id:

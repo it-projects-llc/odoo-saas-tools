@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from openerp.addons.saas_base.tools import get_size
 import time
 import openerp
@@ -21,11 +22,11 @@ class SaasServerClient(models.Model):
     client_id = fields.Char('Database UUID', readonly=True, select=True)
     expiration_datetime = fields.Datetime(readonly=True)
     state = fields.Selection([('template', 'Template'),
-                              ('draft','New'),
-                              ('open','In Progress'),
+                              ('draft', 'New'),
+                              ('open', 'In Progress'),
                               ('cancelled', 'Cancelled'),
-                              ('pending','Pending'),
-                              ('deleted','Deleted')],
+                              ('pending', 'Pending'),
+                              ('deleted', 'Deleted')],
                              'State', default='draft', track_visibility='onchange')
 
     _sql_constraints = [
@@ -65,6 +66,7 @@ class SaasServerClient(models.Model):
         with self.registry()[0].cursor() as cr:
             env = api.Environment(cr, SUPERUSER_ID, self._context)
             self._install_addons(env, addons)
+
     @api.one
     def disable_mail_servers(self):
         '''
@@ -74,7 +76,7 @@ class SaasServerClient(models.Model):
         incoming_mail_servers = self.env['fetchmail.server'].search([])
         if len(incoming_mail_servers):
             incoming_mail_servers.write({'active': False})
-            
+
         # let's disable outgoing mailservers too
         outgoing_mail_servers = self.env['ir.mail_server'].search([])
         if len(outgoing_mail_servers):
@@ -100,7 +102,7 @@ class SaasServerClient(models.Model):
         return ['saas_client.ab_location', 'saas_client.ab_register']
 
     @api.one
-    def _prepare_database(self, client_env, owner_user=None, is_template_db=False, addons=[], access_token=None, tz=None):
+    def _prepare_database(self, client_env, owner_user=None, is_template_db=False, addons=[], access_token=None, tz=None, server_requests_scheme='http'):
         client_id = self.client_id
 
         # update saas_server.client state
@@ -120,25 +122,21 @@ class SaasServerClient(models.Model):
             value = self.env['ir.config_parameter'].get_param(key, default='')
             client_env['ir.config_parameter'].set_param(key, value)
 
-        # copy auth provider from saas_server
-        saas_oauth_provider = self.env.ref('saas_server.saas_oauth_provider')
-        oauth_provider = None
-        if is_template_db and not client_env.ref('saas_server.saas_oauth_provider', raise_if_not_found=False):
+        # set web.base.url config
+        client_env['ir.config_parameter'].set_param('web.base.url', '%s://%s' % (server_requests_scheme, self.name))
+
+        # saas_client must be already installed
+        oauth_provider = client_env.ref('saas_client.saas_oauth_provider')
+        if is_template_db:
+            # copy auth provider from saas_server
+            saas_oauth_provider = self.env.ref('saas_server.saas_oauth_provider')
+
             oauth_provider_data = {'enabled': False, 'client_id': client_id}
             for attr in ['name', 'auth_endpoint', 'scope', 'validation_endpoint', 'data_endpoint', 'css_class', 'body', 'enabled']:
                 oauth_provider_data[attr] = getattr(saas_oauth_provider, attr)
-            oauth_provider = client_env['auth.oauth.provider'].create(oauth_provider_data)
-            client_env['ir.model.data'].create({
-                'name': 'saas_oauth_provider',
-                'module': 'saas_server',
-                'noupdate': True,
-                'model': 'auth.oauth.provider',
-                'res_id': oauth_provider.id,
-            })
-        if not oauth_provider:
-            oauth_provider = client_env.ref('saas_server.saas_oauth_provider')
-
-        if not is_template_db:
+            oauth_provider = client_env.ref('saas_client.saas_oauth_provider')
+            oauth_provider.write(oauth_provider_data)
+        else:
             oauth_provider.client_id = client_id
 
         # prepare users
@@ -171,13 +169,13 @@ class SaasServerClient(models.Model):
                 user = client_env['res.users'].browse(SUPERUSER_ID)
             user.write({
                 'login': owner_user['login'],
+                'password': owner_user['password'],
                 'name': owner_user['name'],
                 'email': owner_user['email'],
                 'oauth_provider_id': oauth_provider.id,
                 'oauth_uid': owner_user['user_id'],
                 'oauth_access_token': access_token
             })
-
 
     @api.model
     def update_all(self):
@@ -235,7 +233,6 @@ class SaasServerClient(models.Model):
         with self.registry()[0].cursor() as cr:
             env = api.Environment(cr, SUPERUSER_ID, self._context)
             return self._upgrade_database(env, **kwargs)[0]
-
 
     @api.one
     def _upgrade_database(self, client_env, data):
@@ -355,8 +352,8 @@ class SaasServerClient(models.Model):
             try:
                 database_obj._transport_backup(dump_db, filename=filename)
                 data['status'] = 'success'
-            except Exception, e:
-                _logger.exception('An error happened during database %s backup' %(database_obj.name))
+            except Exception as e:
+                _logger.exception('An error happened during database %s backup' % (database_obj.name))
                 data['status'] = 'fail'
                 data['message'] = str(e)
 

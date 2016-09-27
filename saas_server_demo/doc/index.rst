@@ -8,6 +8,10 @@ Usage
 Add demo repositories
 ---------------------
 
+From SaaS Portal you can automatically update your repositories.
+Only selected repositories will be updated.
+Configurate repositories to be updated automatically.
+
 * Open ``SaaS Server / Configuration / Repositories``
 * Create new record
 

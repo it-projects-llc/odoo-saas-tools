@@ -22,17 +22,71 @@ class SaasPortalServer(models.Model):
 
         return db, uid, password, xmlrpclib.ServerProxy('{}/xmlrpc/2/object'.format(url))
 
+    def _prepare_module(self, module, plan):
+        server_domain = self.name.split('.', 1)[1]
+        attachment_name = 'addon_' + self.odoo_version + '_' + module['name'] + '.' + server_domain
+        ir_attachment = self.env['ir.attachment'].create({'name': attachment_name, 'type': 'binary', 'db_datas': module.get('icon_image')})
+        return {
+            'technical_name': module.get('name'),
+            'demo_plan_id': plan.id,
+            'shortdesc': module.get('shortdesc'),
+            'author': module.get('author'),
+            'icon_attachment_id': ir_attachment.id,
+            'summary': module.get('summary'),
+            'price': module.get('price'),
+            'currency': module.get('currency'),
+        }
+
     @api.multi
-    def generate_demo_plans(self):
-        ir_attachment_obj = self.env['ir.attachment']
-        plan_obj = self.env['saas_portal.plan']
+    def _create_demo_plan(self, demo_module):
+        self.ensure_one()
+
         template_obj = self.env['saas_portal.database']
-        demo_plan_module_obj = self.env['saas_portal.demo_plan_module']
-        demo_plan_hidden_module_obj = self.env['saas_portal.hidden_demo_plan_module']
+        plan_obj = self.env['saas_portal.plan']
+        server_domain = self.name.split('.', 1)[1]
+        template_name = 'template_' + self.odoo_version + '_' + demo_module['name'] + '.' + server_domain
+        plan_name = 'Demo ' + self.odoo_version + ' ' + demo_module['display_name']
+
+        if template_obj.search_count([('name', '=', template_name)]) == 0:
+            template = template_obj.create({'name': template_name, 'server_id': self.id})
+            if plan_obj.search_count([('name', '=', plan_name)]) == 0:
+                plan = plan_obj.create({'name': plan_name, 'server_id': self.id, 'template_id': template.id})
+                return plan
+        else:
+            return None
+
+    @api.multi
+    def _create_demo_product(self, demo_module, plan):
+        self.ensure_one()
+
         product_template_obj = self.env['product.template']
         product_product_obj = self.env['product.product']
         product_attribute_line_obj = self.env['product.attribute.line']
-        base_saas_domain = self.env['ir.config_parameter'].get_param('saas_portal.base_saas_domain')
+
+        product_template_name = demo_module['demo_title']
+        product_template = product_template_obj.search([('module_name', '=', demo_module['name'])], limit=1)
+
+        if not product_template:
+            product_template = product_template_obj.create({'name': product_template_name,
+                                                            'module_name': demo_module['name'],
+                                                            'seo_url': demo_module.get('demo_url'),
+                                                            'description': demo_module.get('demo_summary'),
+                                                            'type': 'service'})
+            product_attribute_line = product_attribute_line_obj.create({'product_tmpl_id': product_template.id,
+                                                                        'attribute_id': self.env.ref('saas_portal_demo.odoo_version_product_attribute').id,
+                                                                        'value_ids': [(6, 0, [self.env.ref('saas_portal_demo.product_attribute_value_8').id,
+                                                                                              self.env.ref('saas_portal_demo.product_attribute_value_9').id])],
+                                                                    })
+        product_product = product_product_obj.create({
+            'product_tmpl_id': product_template.id,
+            'attribute_value_ids': [(4, self.env.ref('saas_portal_demo.product_attribute_value_%s' % self.odoo_version).id)],
+            'variant_plan_id': plan.id,
+        })
+
+    @api.multi
+    def generate_demo_plans(self):
+        demo_plan_module_obj = self.env['saas_portal.demo_plan_module']
+        demo_plan_hidden_module_obj = self.env['saas_portal.hidden_demo_plan_module']
         for record in self:
             db, uid, password, models = record._get_xmlrpc_object()
             ids = models.execute_kw(db, uid, password, 'ir.module.module', 'search',
@@ -40,60 +94,25 @@ class SaasPortalServer(models.Model):
                                     )
             modules = models.execute_kw(db, uid, password, 'ir.module.module', 'read', [ids])
             for module in modules:
-                template_name = 'template_' + record.odoo_version + '_' + module['name'] + '.' + base_saas_domain
-                plan_name = 'Demo ' + record.odoo_version + ' ' + module['display_name']
-                product_template_name = module['demo_title']
-                if template_obj.search_count([('name', '=', template_name)]) == 0:
-                    template = template_obj.create({'name': template_name, 'server_id': record.id})
-                    if plan_obj.search_count([('name', '=', plan_name)]) == 0:
-                        plan = plan_obj.create({'name': plan_name, 'server_id': record.id, 'template_id': template.id})
-                        ir_attachment = ir_attachment_obj.create({'name': template_name, 'type': 'binary', 'db_datas': module.get('icon_image')})
-                        demo_plan_module_obj.create({'technical_name': module.get('name'),
-                                                     'demo_plan_id': plan.id,
-                                                     'shortdesc': module.get('shortdesc'),
-                                                     'author': module.get('author'),
-                                                     'icon_attachment_id': ir_attachment.id,
-                                                     'summary': module.get('summary'),
-                                                     'price': module.get('price'),
-                                                     'currency': module.get('currency'),
-                                                     })
-                        product_template = product_template_obj.search([('module_name', '=', module['name'])], limit=1)
-                        if not product_template:
-                            product_template = product_template_obj.create({'name': product_template_name,
-                                                                            'module_name': module['name'],
-                                                                            'seo_url': module.get('demo_url'),
-                                                                            'description': module.get('demo_summary'),
-                                                                            'type': 'service'})
-                            product_attribute_line = product_attribute_line_obj.create({'product_tmpl_id': product_template.id,
-                                                                                        'attribute_id': self.env.ref('saas_portal_demo.odoo_version_product_attribute').id,
-                                                                                        'value_ids': [(6, 0, [self.env.ref('saas_portal_demo.product_attribute_value_8').id,
-                                                                                                              self.env.ref('saas_portal_demo.product_attribute_value_9').id])],
-                                                                                    })
-                        product_product = product_product_obj.create({
-                                                                      'product_tmpl_id': product_template.id,
-                                                                      'attribute_value_ids': [(4, self.env.ref('saas_portal_demo.product_attribute_value_%s' % record.odoo_version).id)],
-                                                                      'variant_plan_id': plan.id,
-                                                                  })
-                        if module.get('demo_addons'):
-                            ids = models.execute_kw(db, uid, password, 'ir.module.module', 'search',
-                                                    [[['name', 'in', module['demo_addons'].split(',')]]],
-                                                    {'limit': 10})
-                            addon_modules = models.execute_kw(db, uid, password, 'ir.module.module', 'read', [ids])
-                            for addon in addon_modules:
-                                attachment_name = 'addon_' + record.odoo_version + '_' + addon['name'] + '.' + base_saas_domain
-                                ir_attachment = ir_attachment_obj.create({'name': attachment_name, 'type': 'binary', 'db_datas': addon['icon_image']})
-                                demo_plan_module_obj.create({'technical_name': addon.get('name'),
-                                                             'demo_plan_id': plan.id,
-                                                             'shortdesc': addon.get('shortdesc'),
-                                                             'author': addon.get('author'),
-                                                             'icon_attachment_id': ir_attachment.id,
-                                                             'summary': addon.get('summary'),
-                                                             'price': addon.get('price'),
-                                                             'currency': addon.get('currency'),
-                                                         })
-                        if module.get('demo_addons_hidden'):
-                            for addon in module['demo_addons_hidden'].split(','):
-                                demo_plan_hidden_module_obj.create({'technical_name': addon, 'demo_plan_id': plan.id})
+                plan = record._create_demo_plan(module)
+
+                if not plan:
+                    return None
+
+                vals = record._prepare_module(module, plan)
+                demo_plan_module_obj.create(vals)
+                record._create_demo_product(module, plan)
+                if module.get('demo_addons'):
+                    ids = models.execute_kw(db, uid, password, 'ir.module.module', 'search',
+                                            [[['name', 'in', module['demo_addons'].split(',')]]],
+                                            {'limit': 10})
+                    addon_modules = models.execute_kw(db, uid, password, 'ir.module.module', 'read', [ids])
+                    for addon in addon_modules:
+                        vals = record._prepare_module(addon, plan)
+                        demo_plan_module_obj.create(vals)
+                if module.get('demo_addons_hidden'):
+                    for addon in module['demo_addons_hidden'].split(','):
+                        demo_plan_hidden_module_obj.create({'technical_name': addon, 'demo_plan_id': plan.id})
 
         return None
 

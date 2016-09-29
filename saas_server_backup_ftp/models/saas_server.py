@@ -18,8 +18,17 @@ class SaasServerClient(models.Model):
         username = self.env['ir.config_parameter'].get_param('saas_server.sftp_username', None)
         password = self.env['ir.config_parameter'].get_param('saas_server.sftp_password', None)
         path = self.env['ir.config_parameter'].get_param('saas_server.sftp_path', None)
+        sftp_rsa_key_path = self.env['ir.config_parameter'].get_param(
+            'saas_server.sftp_rsa_key_path', None)
 
-        srv = pysftp.Connection(host=server, username=username, password=password)
+        if sftp_rsa_key_path:
+            srv = pysftp.Connection(host=server, username=username,
+                                    private_key=sftp_rsa_key_path,
+                                    private_key_pass=password)
+        else:
+            srv = pysftp.Connection(host=server, username=username,
+                                    password=password)
+
         # set keepalive to prevent socket closed / connection dropped error
         srv._transport.set_keepalive(30)
 

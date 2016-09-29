@@ -17,7 +17,25 @@ class SaasPortalConfigWizard(models.TransientModel):
     sftp_username = fields.Char(string='Username on SFTP Server', help="The username where the SFTP connection should be made with. This is the user on the external server.")
     sftp_password = fields.Char(string='Password User SFTP Server', help="The password from the user where the SFTP connection should be made with. This is the password from the user on the external server.")
     sftp_path = fields.Char(string='Path external server', help="The location to the folder where the dumps should be written to. For example /odoo/backups/.\nFiles will then be written to /odoo/backups/ on your remote server.")
+    sftp_rsa_key_path = fields.Char(
+        string='Path rsa key',
+        help="The location to the folder where the rsa key is saved. "
+             "For example /opt/odoo/.ssh/id_rsa.")
 
+    # sftp_rsa_key_path
+    def get_default_sftp_rsa_key_path(self, cr, uid, ids, context=None):
+        sftp_rsa_key_path = self.pool.get("ir.config_parameter").get_param(
+            cr, uid, "saas_server.sftp_rsa_key_path", default=None,
+            context=context)
+        return {'sftp_rsa_key_path': sftp_rsa_key_path or False}
+
+    def set_sftp_rsa_key_path(self, cr, uid, ids, context=None):
+        config_parameters = self.pool.get("ir.config_parameter")
+        for record in self.browse(cr, uid, ids, context=context):
+            config_parameters.set_param(cr, uid,
+                                        "saas_server.sftp_rsa_key_path",
+                                        record.sftp_rsa_key_path or '',
+                                        context=context)
     # sftp_server
     def get_default_sftp_server(self, cr, uid, ids, context=None):
         sftp_server = self.pool.get("ir.config_parameter").get_param(cr, uid, "saas_server.sftp_server", default=None, context=context)
@@ -63,13 +81,20 @@ class SaasPortalConfigWizard(models.TransientModel):
         username = self.pool.get("ir.config_parameter").get_param(cr, uid, "saas_server.sftp_username", default=None, context=context)
         password = self.pool.get("ir.config_parameter").get_param(cr, uid, "saas_server.sftp_password", default=None, context=context)
         path = self.pool.get("ir.config_parameter").get_param(cr, uid, "saas_server.sftp_path", default=None, context=context)
+        sftp_rsa_key_path = self.env['ir.config_parameter'].get_param(
+            'saas_server.sftp_rsa_key_path', None)
 
         messageTitle = ""
         messageContent = ""
 
         try:
             # Connect with external server over SFTP, so we know sure that everything works.
-            srv = pysftp.Connection(host=server, username=username, password=password)
+            if sftp_rsa_key_path:
+                srv = pysftp.Connection(host=server, username=username,
+                                        private_key=sftp_rsa_key_path,
+                                        private_key_pass=password)
+            else:
+                srv = pysftp.Connection(host=server, username=username, password=password)
             srv.close()
             # We have a success.
             messageTitle = "Connection Test Succeeded!"

@@ -81,8 +81,9 @@ class SaasPortalConfigWizard(models.TransientModel):
         username = self.pool.get("ir.config_parameter").get_param(cr, uid, "saas_server.sftp_username", default=None, context=context)
         password = self.pool.get("ir.config_parameter").get_param(cr, uid, "saas_server.sftp_password", default=None, context=context)
         path = self.pool.get("ir.config_parameter").get_param(cr, uid, "saas_server.sftp_path", default=None, context=context)
-        sftp_rsa_key_path = self.env['ir.config_parameter'].get_param(
-            'saas_server.sftp_rsa_key_path', None)
+        sftp_rsa_key_path = self.pool.get("ir.config_parameter").get_param(
+            cr, uid, 'saas_server.sftp_rsa_key_path',
+            default=None, context=context)
 
         messageTitle = ""
         messageContent = ""

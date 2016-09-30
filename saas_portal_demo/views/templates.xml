@@ -9,7 +9,7 @@
 
     <template id="demo_addons" inherit_id="website_sale.product">
       <xpath expr="//div[@class='row'][2]" position="after">
-        <div class="row">
+        <div class="row" style="padding-top:20px;">
           <div class="col-xs-12">
             <div class="row">
               <t t-foreach="product.product_variant_ids" t-as="product_variant">

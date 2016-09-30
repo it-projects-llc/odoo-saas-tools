@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-from openerp import models, fields, api
+from openerp import models, fields, api, tools
 from openerp.addons.base.module.module import module as A
+from openerp.modules import get_module_resource
 
 
 class ModuleDemo(models.Model):
@@ -13,6 +14,8 @@ class ModuleDemo(models.Model):
     demo_summary = fields.Char(string='Demo set summary')
     price = fields.Float(string='Price', default=0)
     currency = fields.Char("Currency", help="The currency the field is expressed in.")
+    demo_image_url = fields.Char('Demo image URL')
+    demo_image = fields.Binary(compute="_compute_demo_image")
 
     @staticmethod
     def get_values_from_terp(terp):
@@ -27,3 +30,14 @@ class ModuleDemo(models.Model):
                     'currency': terp.get('currency', False),
                     })
         return res
+
+    @api.multi
+    def _compute_demo_image(self):
+        for record in self:
+            path = get_module_resource(record.name, 'static', 'description', 'demo_image.png')
+            if path:
+                image_file = tools.file_open(path, 'rb')
+                try:
+                    record.demo_image = image_file.read().encode('base64')
+                finally:
+                    image_file.close()

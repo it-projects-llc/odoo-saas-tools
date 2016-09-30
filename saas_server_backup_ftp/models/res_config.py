@@ -106,4 +106,4 @@ class SaasPortalConfigWizard(models.TransientModel):
         if "Failed" in messageTitle:
             raise osv.except_osv(_(messageTitle), _(messageContent + "%s") % tools.ustr(e))
         else:
-            raise osv.except_osv(_(messageTitle), _(messageContent))
+            _logger.info(_(messageTitle), _(messageContent))

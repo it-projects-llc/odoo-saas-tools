@@ -41,7 +41,7 @@ $(document).ready(function () {
         } else if (db_name.length < 4) {
             $input.attr('data-content', "Your domain must be at least 4 characters long");
             error = true;
-        } else if(!/^([a-z][a-z0-9-]{2,})$/.test(db_name)) {
+        } else if(!/^([a-z][a-z0-9]{2,})$/.test(db_name)) {
             $input.attr('data-content', "Special characters are not allowed in domain names");
             error = true;
         }

@@ -333,10 +333,14 @@ class SaasPortalPlan(models.Model):
     def create_template(self):
         assert len(self) == 1, 'This method is applied only for single record'
         plan = self[0]
+        addons_module = []
+        for addons in plan.app_store_module_ids:
+            # print addons.name,addons.technical_name
+            addons_module.append(addons.technical_name)
         state = {
             'd': plan.template_id.name,
             'demo': plan.demo and 1 or 0,
-            'addons': [],
+            'addons': addons_module or [],
             'lang': plan.lang,
             'tz': plan.tz,
             'is_template_db': 1,
@@ -429,9 +433,9 @@ class SaasPortalDatabase(models.Model):
         if not res.ok:
             raise Warning('Reason: %s \n Message: %s' % (res.reason, res.content))
         data = simplejson.loads(res.text)
-        if not isinstance(data, dict):
-            raise Warning(data)
-        if data['status'] != 'success':
+        if not isinstance(data[0], dict):
+            raise Warning(data[0])
+        if data[0]['status'] != 'success':
             warning = data[0].get('message', 'Could not backup database; please check your logs')
             raise Warning(warning)
         return True

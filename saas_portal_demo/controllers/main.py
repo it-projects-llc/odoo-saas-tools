@@ -41,4 +41,3 @@ class website_sale_custom(website_sale):
             return werkzeug.utils.redirect(url)
 
         return super(website_sale_custom, self).product(product=product, category=category, search=search, **kwargs)
-

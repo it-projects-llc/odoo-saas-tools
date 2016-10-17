@@ -3,6 +3,7 @@ import requests
 from openerp import models, fields, api
 import xmlrpclib
 import openerp.addons.decimal_precision as dp
+from openerp.exceptions import Warning
 
 
 class SaasPortalServer(models.Model):
@@ -45,6 +46,8 @@ class SaasPortalServer(models.Model):
         template_obj = self.env['saas_portal.database']
         plan_obj = self.env['saas_portal.plan']
         server_domain = self.name.split('.', 1)[1]
+        if not self.odoo_version:
+            raise Warning('You should define odoo version for the server: 8 for 8.0 or 9 for 9.0')
         template_name = 'template_' + self.odoo_version + '_' + demo_module['name'] + '.' + server_domain
         plan_name = 'Demo ' + self.odoo_version + ' ' + demo_module['display_name']
 

@@ -22,8 +22,9 @@
                             <p class="loempia_panel_summary"><t t-esc="module.summary"/></p>
                           </t>
                           <div class="loempia_panel_thumbnail_icon">
-                            <img class="pull-left" t-attf-src="/web/binary/saveas?id=#{module.icon_attachment_id.id}&amp;model=ir.attachment&amp;field=datas&amp;fieldname_field=datas_fname" height="64">
-                            </img>
+                            <!-- <img class="pull-left" t-attf-src="/web/binary/saveas?id=#{module.icon_attachment_id.id}&amp;model=ir.attachment&amp;field=datas&amp;fieldname_field=datas_fname" height="64"> -->
+                            <!-- </img> -->
+                            <span itemprop="image" t-field="module.icon" t-field-options='{"widget": "image", "style": "height:64px"}' />
                           </div>
                           <p class="loempia_panel_short_desc"><t t-esc="module.shortdesc"/></p>
                         </div>
@@ -36,7 +37,7 @@
                           </div>
                           <div class="col-xs-4 text-right loempia_card_price">
                             <b>
-                              <!-- <span><span class="oe_currency_value">9.00</span>&nbsp;€</span> -->
+                              <span><span class="oe_currency_value"><t t-esc="module.price"/></span> €</span>
                             </b>
                           </div>
                         </div>
@@ -54,6 +55,12 @@
         <t t-if="not product.module_name">
           <t t-call="website_sale.product_price"/>
         </t>
+      </xpath>
+
+      <xpath expr="//div[@class='col-sm-5 col-md-5 col-lg-4 col-lg-offset-1']/p[@class='text-muted']" position="replace">
+        <p class="text-muted">
+         Prices are quoted without depending modules prices
+        </p>
       </xpath>
 
     </template>

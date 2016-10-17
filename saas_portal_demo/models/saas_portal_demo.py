@@ -16,7 +16,7 @@ class SaasPortalServer(models.Model):
         db = self.name
         username = 'admin'
         password = 'admin'
-        #TODO: store username and password in saas_portal.server model
+        # TODO: store username and password in saas_portal.server model
         common = xmlrpclib.ServerProxy('{}/xmlrpc/2/common'.format(url))
         uid = common.authenticate(db, username, password, {})
 
@@ -32,6 +32,7 @@ class SaasPortalServer(models.Model):
             'shortdesc': module.get('shortdesc'),
             'author': module.get('author'),
             'icon_attachment_id': ir_attachment.id,
+            'icon': module.get('icon_image'),
             'summary': module.get('summary'),
             'price': module.get('price'),
             'currency': module.get('currency'),
@@ -154,6 +155,7 @@ class SaaSPortalDemoPlanModule(models.Model):
     shortdesc = fields.Char('Module Name', readonly=True, translate=True)
     author = fields.Char("Author", readonly=True)
     icon_attachment_id = fields.Many2one('ir.attachment', ondelete='restrict')
+    icon = fields.Binary()
     summary = fields.Char('Summary', readonly=True)
     price = fields.Float(string='Price')
     currency = fields.Char("Currency")

@@ -54,7 +54,10 @@ class SaasPortalServer(models.Model):
         if template_obj.search_count([('name', '=', template_name)]) == 0:
             template = template_obj.create({'name': template_name, 'server_id': self.id})
             if plan_obj.search_count([('name', '=', plan_name)]) == 0:
-                plan = plan_obj.create({'name': plan_name, 'server_id': self.id, 'template_id': template.id})
+                plan = plan_obj.create({'name': plan_name,
+                                        'server_id': self.id,
+                                        'dbname_template': 'Demo-%i-' + self.odoo_version + '_' + demo_module['name'] + '.' + server_domain,
+                                        'template_id': template.id})
                 return plan
         else:
             return None

@@ -73,6 +73,7 @@ class SaasPortalServer(models.Model):
                                                             'seo_url': demo_module.get('demo_url'),
                                                             'description': demo_module.get('demo_summary'),
                                                             'image': demo_module.get('demo_image'),
+                                                            'sale_on_website': False,
                                                             'type': 'service'})
             product_attribute_line = product_attribute_line_obj.create({'product_tmpl_id': product_template.id,
                                                                         'attribute_id': self.env.ref('saas_portal_demo.odoo_version_product_attribute').id,

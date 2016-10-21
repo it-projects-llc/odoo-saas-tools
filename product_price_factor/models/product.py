@@ -1,41 +1,40 @@
 # -*- coding: utf-8 -*-
-from openerp import models, fields
+from openerp import models, fields, api
 import openerp.addons.decimal_precision as dp
 
 
 class ProductAttributeValue(models.Model):
     _inherit = "product.attribute.value"
 
-    def _get_price_factor(self, cr, uid, ids, name, args, context=None):
-        result = dict.fromkeys(ids, 0)
-        if not context.get('active_id'):
-            return result
+    @api.multi
+    def _get_price_factor(self):
+        active_id = self.env.context.get('active_id')
+        if not active_id:
+            return
 
-        for obj in self.browse(cr, uid, ids, context=context):
+        for obj in self:
             for price_id in obj.price_ids:
-                if price_id.product_tmpl_id.id == context.get('active_id'):
-                    result[obj.id] = price_id.price_factor
-                    break
-        return result
+                if price_id.product_tmpl_id.id == active_id:
+                    obj.price_factor = price_id.price_factor
 
-    def _set_price_factor(self, cr, uid, id, name, value, args, context=None):
-        if context is None:
-            context = {}
-        if 'active_id' not in context:
-            return None
-        p_obj = self.pool['product.attribute.price']
-        p_ids = p_obj.search(cr, uid, [('value_id', '=', id), ('product_tmpl_id', '=', context['active_id'])], context=context)
+    def _set_price_factor(self, value):
+        active_id = self.env.context.get('active_id')
+        if not active_id:
+            return
+
+        p_obj = self.env['product.attribute.price']
+        p_ids = p_obj.search([('value_id', '=', id), ('product_tmpl_id', '=', active_id)])
         if p_ids:
-            p_obj.write(cr, uid, p_ids, {'price_factor': value}, context=context)
+            p_ids.write({'price_factor': value})
         else:
-            p_obj.create(cr, uid, {
-                'product_tmpl_id': context['active_id'],
+            p_obj.create({
+                'product_tmpl_id': active_id,
                 'value_id': id,
                 'price_factor': value,
-            }, context=context)
+            })
 
     price_factor = fields.Float(compute="_get_price_factor", string='Attribute Price Factor',
-                                        fnct_inv=_set_price_factor,
+                                        inverse=_set_price_factor,
                                         digits_compute=dp.get_precision('Product Price')),
 
 
@@ -96,12 +95,12 @@ class ProductAttributeLine(models.Model):
     _inherit = "product.attribute.line"
     _order = 'sequence'
 
-    def _default_sequence(self, cr, uid, context=None):
+    def _default_sequence(self):
         # without this function there was a bug when attributes were created
         # from Product Variants tab. If several attributes were created without pushing the save button
         # sequence got the same value for their attribute lines. And if there was no lines before
         # sequence got False for the first attribute
-        num = self.search_count(cr, uid, [], context=context) + 1
+        num = self.search_count([]) + 1
         return num
 
     sequence = fields.Integer('Sequence', help="Determine the display order", required=True, default=_default_sequence)

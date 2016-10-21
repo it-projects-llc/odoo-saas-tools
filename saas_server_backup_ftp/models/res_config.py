@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from openerp import models, fields
 from openerp import tools, _
-from openerp.osv import osv
+from openerp.exceptions import Warning as UserError
+
 import logging
 _logger = logging.getLogger(__name__)
 try:
@@ -104,6 +105,6 @@ class SaasPortalConfigWizard(models.TransientModel):
             messageTitle = "Connection Test Failed!"
             messageContent += "Here is what we got instead:\n"
         if "Failed" in messageTitle:
-            raise osv.except_osv(_(messageTitle), _(messageContent + "%s") % tools.ustr(e))
+            raise UserError(_(messageTitle), _(messageContent + "%s") % tools.ustr(e))
         else:
             _logger.info(_(messageTitle), _(messageContent))

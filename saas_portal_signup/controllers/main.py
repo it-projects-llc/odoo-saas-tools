@@ -18,18 +18,13 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
 
     def get_auth_signup_qcontext(self):
         qcontext = super(AuthSignupHome, self).get_auth_signup_qcontext()
-        context = request.context
         if qcontext.get('token', False):
             qcontext['reset'] = True
         if not qcontext.get('plans', False):
-            sp = request.registry.get('saas_portal.plan')
-            plan_ids = sp.search(request.cr, SUPERUSER_ID, [], context=context)
-            qcontext['plans'] = sp.browse(request.cr, SUPERUSER_ID, plan_ids, context=context)
+            qcontext['plans'] = request.env['saas_portal.plan'].search([])
+
         if not qcontext.get('countries', False):
-            orm_country = request.registry.get('res.country')
-            country_ids = orm_country.search(request.cr, SUPERUSER_ID, [], context=context)
-            countries = orm_country.browse(request.cr, SUPERUSER_ID, country_ids, context=context)
-            qcontext['countries'] = countries
+            qcontext['countries'] = request.env['res.country'].search([])
         if not qcontext.get('base_saas_domain', False):
             qcontext['base_saas_domain'] = self.get_saas_domain()
         return qcontext

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-from openerp.osv import osv, fields
+from openerp import models, fields
 import openerp.addons.decimal_precision as dp
 
 
-class ProductAttributeValue(osv.osv):
+class ProductAttributeValue(models.Model):
     _inherit = "product.attribute.value"
 
     def _get_price_factor(self, cr, uid, ids, name, args, context=None):
@@ -41,7 +41,7 @@ class ProductAttributeValue(osv.osv):
     }
 
 
-class ProductAttributePrice(osv.osv):
+class ProductAttributePrice(models.Model):
     _inherit = "product.attribute.price"
     _columns = {
         'price_factor': fields.float('Price Factor', digits_compute=dp.get_precision('Product Price')),
@@ -52,7 +52,7 @@ class ProductAttributePrice(osv.osv):
     }
 
 
-class ProductTemplate(osv.osv):
+class ProductTemplate(models.Model):
     _inherit = "product.template"
 
     def _price_get(self, cr, uid, products, ptype='list_price', context=None):
@@ -99,7 +99,7 @@ class ProductTemplate(osv.osv):
         return res
 
 
-class ProductAttributeLine(osv.osv):
+class ProductAttributeLine(models.Model):
     _inherit = "product.attribute.line"
     _order = 'sequence'
 

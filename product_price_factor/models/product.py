@@ -35,7 +35,7 @@ class ProductAttributeValue(models.Model):
 
     price_factor = fields.Float(compute="_get_price_factor", string='Attribute Price Factor',
                                         inverse=_set_price_factor,
-                                        digits_compute=dp.get_precision('Product Price')),
+                                        digits_compute=dp.get_precision('Product Price'))
 
 
 class ProductAttributePrice(models.Model):

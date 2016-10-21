@@ -17,7 +17,8 @@ class ProductAttributeValue(models.Model):
                 if price_id.product_tmpl_id.id == active_id:
                     obj.price_factor = price_id.price_factor
 
-    def _set_price_factor(self, value):
+    def _set_price_factor(self):
+        value = self.price_factor
         active_id = self.env.context.get('active_id')
         if not active_id:
             return

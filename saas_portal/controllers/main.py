@@ -3,8 +3,8 @@ from ast import literal_eval
 import openerp
 from openerp import SUPERUSER_ID, exceptions
 from openerp.tools.translate import _
-from openerp.addons.web import http
-from openerp.addons.web.http import request
+from odoo import http
+from odoo.http import request
 from openerp.addons.saas_base.exceptions import MaximumDBException, MaximumTrialDBException
 import werkzeug
 import simplejson

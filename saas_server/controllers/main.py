@@ -5,7 +5,7 @@ from openerp import api, SUPERUSER_ID
 from openerp import http
 from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
 from openerp.tools.translate import _
-from openerp.addons.web.http import request
+from odoo.http import request
 from openerp.addons.auth_oauth.controllers.main import fragment_to_query_string
 
 import werkzeug.utils

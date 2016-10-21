@@ -3,7 +3,7 @@ import requests
 import werkzeug
 import simplejson
 
-from openerp.addons.web.http import request
+from odoo.http import request
 from openerp import api
 from openerp import fields
 from openerp import models

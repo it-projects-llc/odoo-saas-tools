@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import openerp
 from openerp import SUPERUSER_ID
-from openerp.addons.web import http
-from openerp.addons.web.http import request
+from odoo import http
+from odoo.http import request
 from openerp.addons import auth_signup
 import re
 

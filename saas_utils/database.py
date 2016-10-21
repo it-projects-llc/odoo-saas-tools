@@ -19,7 +19,7 @@
 #
 ##############################################################################
 from openerp import http, SUPERUSER_ID as SI
-from openerp.addons.web.http import request
+from odoo.http import request
 
 
 def get_market_dbs(with_templates=True):

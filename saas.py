@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
 
-ODOO_VERSION = 9
+ODOO_VERSION = 10
 SUPERUSER_ID = 1
 SAAS_PORTAL_MODULES_REGEXP = '(saas_portal.*|saas_sysadmin.*)'
 SAAS_SERVER_MODULES_REGEXP = '(saas_server.*)'
@@ -317,7 +317,11 @@ def rpc_get_uuid(dbname):
 
 def rpc_xmlid_to_object(auth, xmlid, model):
     res_id = rpc_execute_kw(auth, 'ir.model.data', 'xmlid_to_res_id', [xmlid])
-    return rpc_execute_kw(auth, model, 'read', [res_id])
+    read = rpc_execute_kw(auth, model, 'read', [res_id])
+    if read:
+        return read[0]
+    else:
+        return None
 
 
 def rpc_create_plan(portal_db_name):

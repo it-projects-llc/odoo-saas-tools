@@ -34,22 +34,15 @@ class ProductAttributeValue(models.Model):
                 'price_factor': value,
             }, context=context)
 
-    _columns = {
-        'price_factor': fields.function(_get_price_factor, type='float', string='Attribute Price Factor',
+    price_factor = fields.Float(compute="_get_price_factor", string='Attribute Price Factor',
                                         fnct_inv=_set_price_factor,
                                         digits_compute=dp.get_precision('Product Price')),
-    }
 
 
 class ProductAttributePrice(models.Model):
     _inherit = "product.attribute.price"
-    _columns = {
-        'price_factor': fields.float('Price Factor', digits_compute=dp.get_precision('Product Price')),
-    }
 
-    _defaults = {
-        'price_factor': 1.0,
-    }
+    price_factor = fields.Float('Price Factor', digits_compute=dp.get_precision('Product Price'), default=1.0)
 
 
 class ProductTemplate(models.Model):
@@ -103,11 +96,7 @@ class ProductAttributeLine(models.Model):
     _inherit = "product.attribute.line"
     _order = 'sequence'
 
-    _columns = {
-        'sequence': fields.integer('Sequence', help="Determine the display order", required=True),
-    }
-
-    def _get_default_sequence(self, cr, uid, context=None):
+    def _default_sequence(self, cr, uid, context=None):
         # without this function there was a bug when attributes were created
         # from Product Variants tab. If several attributes were created without pushing the save button
         # sequence got the same value for their attribute lines. And if there was no lines before
@@ -115,6 +104,4 @@ class ProductAttributeLine(models.Model):
         num = self.search_count(cr, uid, [], context=context) + 1
         return num
 
-    _defaults = {
-        'sequence': _get_default_sequence,
-    }
+    sequence = fields.Integer('Sequence', help="Determine the display order", required=True, default=_default_sequence)

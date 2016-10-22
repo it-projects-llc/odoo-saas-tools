@@ -42,6 +42,7 @@ class ResUsers(models.Model):
                 raise exceptions.Warning(_('Maximimum allowed users is %(max_users)s, while you already have %(cur_users)s') % {'max_users': max_users, 'cur_users': cur_users})
         return super(ResUsers, self).create(vals)
 
+    @classmethod
     def check(cls, db, uid, passwd):
         res = super(ResUsers, cls).check(db, uid, passwd)
         cr = cls.pool.cursor()

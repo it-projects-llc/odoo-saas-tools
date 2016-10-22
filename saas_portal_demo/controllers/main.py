@@ -2,7 +2,7 @@
 import werkzeug
 from odoo import http
 from odoo.http import request
-from openerp.addons.saas_portal.controllers.main import SaasPortal
+from odoo.addons.saas_portal.controllers.main import SaasPortal
 
 
 def signup_redirect():

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from openerp import models, fields
-from openerp import tools, _
-from openerp.exceptions import Warning as UserError
+from odoo import models, fields
+from odoo import tools, _
+from odoo.exceptions import Warning as UserError
 
 import logging
 _logger = logging.getLogger(__name__)

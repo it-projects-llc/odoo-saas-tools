@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from openerp import models, api, tools, SUPERUSER_ID
+from odoo import models, api, tools, SUPERUSER_ID
 
 
 class IrConfigParameter(models.Model):

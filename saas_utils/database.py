@@ -18,7 +18,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
-from openerp import http, SUPERUSER_ID as SI
+from odoo import http, SUPERUSER_ID as SI
 from odoo.http import request
 
 

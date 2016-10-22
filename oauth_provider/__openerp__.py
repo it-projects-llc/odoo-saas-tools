@@ -17,7 +17,7 @@
     'installable': True,
 
     'description': '''
-Addon allows to users to login in openerp databases via master database
+Addon allows to users to login in odoo databases via master database
 
 INSTALLATION
 ============
@@ -34,8 +34,8 @@ Terms
 -----
 
 * User -- a human
-* Master -- an openerp database where this module is installed
-* Client -- an openerp database where you need to authenticate user and where module auth_oauth module is installed
+* Master -- an odoo database where this module is installed
+* Client -- an odoo database where you need to authenticate user and where module auth_oauth module is installed
 
 
 Steps

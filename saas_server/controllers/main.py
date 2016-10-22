@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 import functools
 import datetime
-from openerp import api, SUPERUSER_ID
-from openerp import http
-from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
-from openerp.tools.translate import _
+from odoo import api, SUPERUSER_ID
+from odoo import http
+from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
+from odoo.tools.translate import _
 from odoo.http import request
-from openerp.addons.auth_oauth.controllers.main import fragment_to_query_string
+from odoo.addons.auth_oauth.controllers.main import fragment_to_query_string
 
 import werkzeug.utils
 import simplejson
@@ -202,7 +202,7 @@ class SaasServer(http.Controller):
         message = self._get_message(dbuuid)
         if message:
             content = '''
-.openerp .announcement_bar{
+.odoo .announcement_bar{
         display:block;
 }
 

@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-from openerp.addons.saas_base.tools import get_size
+from odoo.addons.saas_base.tools import get_size
 import time
-import openerp
+import odoo
 from datetime import datetime
-from openerp.service import db
-from openerp import api, models, fields, SUPERUSER_ID, exceptions
-from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
+from odoo.service import db
+from odoo import api, models, fields, SUPERUSER_ID, exceptions
+from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 import psycopg2
 import random
 import string
@@ -37,16 +37,16 @@ class SaasServerClient(models.Model):
     def create_database(self, template_db=None, demo=False, lang='en_US'):
         new_db = self.name
         if template_db:
-            openerp.service.db._drop_conn(self.env.cr, template_db)
-            openerp.service.db.exp_duplicate_database(template_db, new_db)
+            odoo.service.db._drop_conn(self.env.cr, template_db)
+            odoo.service.db.exp_duplicate_database(template_db, new_db)
         else:
             password = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(32))
-            openerp.service.db.exp_create_database(new_db, demo, lang, user_password=password)
+            odoo.service.db.exp_create_database(new_db, demo, lang, user_password=password)
         self.state = 'open'
 
     @api.one
     def registry(self, new=False, **kwargs):
-        m = openerp.modules.registry.RegistryManager
+        m = odoo.modules.registry.RegistryManager
         if new:
             return m.new(self.name, **kwargs)
         else:
@@ -205,7 +205,7 @@ class SaasServerClient(models.Model):
         suspended = param_obj.get_param('saas_client.suspended', '0').strip()
         total_storage_limit = param_obj.get_param('saas_client.total_storage_limit', '0').strip()
         users_len = len(users)
-        data_dir = openerp.tools.config['data_dir']
+        data_dir = odoo.tools.config['data_dir']
 
         file_storage = get_size('%s/filestore/%s' % (data_dir, self.name))
         file_storage = int(file_storage / (1024 * 1024))
@@ -344,12 +344,12 @@ class SaasServerClient(models.Model):
 
     @api.one
     def delete_database(self):
-        openerp.service.db.exp_drop(self.name)
+        odoo.service.db.exp_drop(self.name)
         self.write({'state': 'deleted'})
 
     @api.one
     def rename_database(self, new_dbname):
-        openerp.service.db.exp_rename(self.name, new_dbname)
+        odoo.service.db.exp_rename(self.name, new_dbname)
         self.name = new_dbname
 
     @api.model

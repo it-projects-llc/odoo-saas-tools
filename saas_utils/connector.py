@@ -18,12 +18,12 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
-import openerp
-from openerp import SUPERUSER_ID
+import odoo
+from odoo import SUPERUSER_ID
 
 
 def call(dbname, model, method, *args, **kwargs):
-    instance = openerp.registry(dbname)
+    instance = odoo.registry(dbname)
     with instance.cursor() as cr:
         obj = instance.get(model)
         if hasattr(obj, method):

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import tempfile
-from openerp import api, models
+from odoo import api, models
 import logging
 _logger = logging.getLogger(__name__)
 try:

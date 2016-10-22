@@ -47,7 +47,7 @@ Local usage:
 
 settings_group = parser.add_argument_group('Common settings')
 settings_group.add_argument('--suffix', dest='suffix', default=ODOO_VERSION, help='suffix for names')
-settings_group.add_argument('--odoo-script', dest='odoo_script', help='Path to openerp-server', default='./openerp-server')
+settings_group.add_argument('--odoo-script', dest='odoo_script', help='Path to odoo-server', default='./odoo-server')
 settings_group.add_argument('--odoo-config', dest='odoo_config', help='Path to odoo configuration file')
 settings_group.add_argument('--odoo-data-dir', dest='odoo_data_dir', help='Path to odoo data dir', default=None)
 settings_group.add_argument('--odoo-xmlrpc-port', dest='xmlrpc_port', default=None)

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from openerp.models import AbstractModel
-from openerp.tools.config import config
+from odoo.models import AbstractModel
+from odoo.tools.config import config
 
 
 class publisher_warranty_contract(AbstractModel):

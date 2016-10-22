@@ -1,23 +1,23 @@
 # -*- coding: utf-8 -*-
-from openerp import api
-from openerp import exceptions
-from openerp import fields
-from openerp import models
-from openerp.tools import scan_languages
-from openerp.tools.translate import _
-from openerp.addons.base.res.res_partner import _tz_get
+from odoo import api
+from odoo import exceptions
+from odoo import fields
+from odoo import models
+from odoo.tools import scan_languages
+from odoo.tools.translate import _
+from odoo.addons.base.res.res_partner import _tz_get
 from datetime import datetime, timedelta
-from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
+from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 import simplejson
 import werkzeug
 import requests
 import random
 
 from datetime import datetime, timedelta
-from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
-from openerp.addons.saas_base.exceptions import MaximumDBException, MaximumTrialDBException
+from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
+from odoo.addons.saas_base.exceptions import MaximumDBException, MaximumTrialDBException
 
-from openerp.addons.saas_base.exceptions import MaximumDBException
+from odoo.addons.saas_base.exceptions import MaximumDBException
 from werkzeug.exceptions import Forbidden
 
 import logging
@@ -582,7 +582,7 @@ class SaasPortalClient(models.Model):
             # user_ids = user_model.search(to_search2)
             # if user_ids:
             #    user_model.unlink(user_ids)
-            # openerp.service.db.exp_drop(obj.name)
+            # odoo.service.db.exp_drop(obj.name)
         return super(SaasPortalClient, self).unlink()
 
     @api.multi

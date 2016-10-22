@@ -18,12 +18,12 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
-from openerp import SUPERUSER_ID as SI
-from openerp import api
-from openerp import exceptions
-from openerp import models
-from openerp.tools.translate import _
-from openerp.addons.saas_base.exceptions import SuspendedDBException
+from odoo import SUPERUSER_ID as SI
+from odoo import api
+from odoo import exceptions
+from odoo import models
+from odoo.tools.translate import _
+from odoo.addons.saas_base.exceptions import SuspendedDBException
 
 
 class ResUsers(models.Model):

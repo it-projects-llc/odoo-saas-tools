@@ -4,9 +4,9 @@ import werkzeug
 import simplejson
 
 from odoo.http import request
-from openerp import api
-from openerp import fields
-from openerp import models
+from odoo import api
+from odoo import fields
+from odoo import models
 
 
 class SaasConfig(models.TransientModel):

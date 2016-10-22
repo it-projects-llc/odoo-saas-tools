@@ -3,9 +3,9 @@ import logging
 import simplejson
 import traceback
 
-from openerp import SUPERUSER_ID
-from openerp import http
-from openerp.http import request
+from odoo import SUPERUSER_ID
+from odoo import http
+from odoo.http import request
 import werkzeug
 
 _logger = logging.getLogger(__name__)
@@ -31,7 +31,7 @@ class OAuth2(http.Controller):
         """
         Django considers "safe" some characters that aren't so for oauthlib. We have to search for
         them and properly escape.
-        TODO: is it correct for openerp?
+        TODO: is it correct for odoo?
         """
         parsed = list(urlparse(request.httprequest.path))
         unsafe = set(c for c in parsed[4]).difference(urlencoded)

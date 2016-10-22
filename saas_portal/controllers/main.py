@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 from ast import literal_eval
-import openerp
-from openerp import SUPERUSER_ID, exceptions
-from openerp.tools.translate import _
+import odoo
+from odoo import SUPERUSER_ID, exceptions
+from odoo.tools.translate import _
 from odoo import http
 from odoo.http import request
-from openerp.addons.saas_base.exceptions import MaximumDBException, MaximumTrialDBException
+from odoo.addons.saas_base.exceptions import MaximumDBException, MaximumTrialDBException
 import werkzeug
 import simplejson
 from datetime import datetime, timedelta
-from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
+from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 
 
 class SignupError(Exception):
@@ -83,7 +83,7 @@ class SaasPortal(http.Controller):
 
     def exists_database(self, dbname):
         full_dbname = self.get_full_dbname(dbname)
-        return openerp.service.db.exp_db_exist(full_dbname)
+        return odoo.service.db.exp_db_exist(full_dbname)
 
     @http.route(['/publisher-warranty/'], type='http', auth='public', website=True)
     def publisher_warranty(self, **post):

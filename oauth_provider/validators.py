@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # some code taken from https://github.com/evonove/django-oauth-toolkit/
 
-from openerp import SUPERUSER_ID
+from odoo import SUPERUSER_ID
 import logging
 try:
     from oauthlib.oauth2 import RequestValidator, MobileApplicationServer
@@ -9,11 +9,11 @@ except:
     RequestValidator = object
     MobileApplicationServer = False
 from datetime import datetime, timedelta
-from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
+from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
+
+from odoo.http import request
 
 log = _logger = logging.getLogger(__name__)
-
-from openerp.http import request as request
 
 
 class OAuth2Validator(RequestValidator):

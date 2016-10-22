@@ -8,10 +8,10 @@ import base64
 from tempfile import NamedTemporaryFile
 import math
 
-from openerp import _
-from openerp import api
-from openerp import exceptions
-from openerp import models
+from odoo import _
+from odoo import api
+from odoo import exceptions
+from odoo import models
 import psycopg2
 
 import logging

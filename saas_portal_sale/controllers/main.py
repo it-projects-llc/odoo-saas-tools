@@ -2,7 +2,7 @@
 from odoo import http
 from odoo.http import request
 import werkzeug
-from openerp.addons.saas_portal.controllers.main import SaasPortal
+from odoo.addons.saas_portal.controllers.main import SaasPortal
 
 
 class SaasPortalSale(SaasPortal):

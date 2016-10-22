@@ -21,7 +21,7 @@
 from odoo import SUPERUSER_ID as SI
 from odoo import api
 from odoo import exceptions
-from odoo import models
+from odoo import models, fields
 from odoo.tools.translate import _
 from odoo.addons.saas_base.exceptions import SuspendedDBException
 
@@ -30,9 +30,7 @@ class ResUsers(models.Model):
     _name = 'res.users'
     _inherit = 'res.users'
 
-    _defaults = {
-        'oauth_provider_id': lambda self, cr, uid, ctx=None: self.pool['ir.model.data'].xmlid_to_res_id(cr, SI, 'saas_client.saas_oauth_provider')
-    }
+    oauth_provider_id = fields.Many2one('auth.oauth.provider', default=lambda self: self.env.ref('saas_client.saas_oauth_provider').id)
 
     @api.model
     def create(self, vals):

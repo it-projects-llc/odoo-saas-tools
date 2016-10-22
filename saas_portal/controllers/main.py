@@ -60,9 +60,9 @@ class SaasPortal(http.Controller):
         return werkzeug.utils.redirect(url)
 
     def get_config_parameter(self, param):
-        config = request.registry['ir.config_parameter']
+        config = request.env['ir.config_parameter']
         full_param = 'saas_portal.%s' % param
-        return config.get_param(request.cr, SUPERUSER_ID, full_param)
+        return config.get_param(full_param)
 
     def get_full_dbname(self, dbname):
         if not dbname:
@@ -71,15 +71,13 @@ class SaasPortal(http.Controller):
         return full_dbname.replace('www.', '')
 
     def get_plan(self, plan_id=None):
-        plan = request.registry['saas_portal.plan']
         if not plan_id:
             domain = [('state', '=', 'confirmed')]
-            plan_ids = request.registry['saas_portal.plan'].search(request.cr, SUPERUSER_ID, domain)
-            if plan_ids:
-                plan_id = plan_ids[0]
+            plans = request.env['saas_portal.plan'].search(domain)
+            if plans:
+                return plans[0]
             else:
                 raise exceptions.Warning(_('There is no plan configured'))
-        return plan.browse(request.cr, SUPERUSER_ID, plan_id)
 
     def exists_database(self, dbname):
         full_dbname = self.get_full_dbname(dbname)

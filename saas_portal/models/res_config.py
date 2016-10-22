@@ -18,57 +18,57 @@ class SaasPortalConfigWizard(models.TransientModel):
     module_saas_portal_sale_online = fields.Boolean(string='Sale SaaS from website shop', help='Use saas_portal_sale_online module')
 
     # base_saas_domain
-    def get_default_base_saas_domain(self, cr, uid, ids, context=None):
-        base_saas_domain = self.pool.get("ir.config_parameter").get_param(cr, uid, "saas_portal.base_saas_domain", default=None, context=context)
+    def get_default_base_saas_domain(self):
+        base_saas_domain = self.env["ir.config_parameter"].get_param("saas_portal.base_saas_domain", default=None)
         if base_saas_domain is None:
-            domain = self.pool.get("ir.config_parameter").get_param(cr, uid, "web.base.url", context=context)
+            domain = self.env["ir.config_parameter"].get_param("web.base.url")
             try:
                 base_saas_domain = urlparse.urlsplit(domain).netloc.split(':')[0]
             except Exception:
                 pass
         return {'base_saas_domain': base_saas_domain or False}
 
-    def set_base_saas_domain(self, cr, uid, ids, context=None):
-        config_parameters = self.pool.get("ir.config_parameter")
-        for record in self.browse(cr, uid, ids, context=context):
-            config_parameters.set_param(cr, uid, "saas_portal.base_saas_domain", record.base_saas_domain or '', context=context)
+    def set_base_saas_domain(self):
+        config_parameters = self.env["ir.config_parameter"]
+        for record in self:
+            config_parameters.set_param("saas_portal.base_saas_domain", record.base_saas_domain or '')
 
     # page_for_maximumdb
-    def get_default_page_for_maximumdb(self, cr, uid, ids, context=None):
-        page_for_maximumdb = self.pool.get("ir.config_parameter").get_param(cr, uid, "saas_portal.page_for_maximumdb", default='/', context=context)
+    def get_default_page_for_maximumdb(self):
+        page_for_maximumdb = self.env["ir.config_parameter"].get_param("saas_portal.page_for_maximumdb", default='/')
         return {'page_for_maximumdb': page_for_maximumdb or '/'}
 
-    def set_page_for_maxumumdb(self, cr, uid, ids, context=None):
-        config_parameters = self.pool.get("ir.config_parameter")
-        for record in self.browse(cr, uid, ids, context=context):
-            config_parameters.set_param(cr, uid, "saas_portal.page_for_maximumdb", record.page_for_maximumdb or '/', context=context)
+    def set_page_for_maxumumdb(self):
+        config_parameters = self.env["ir.config_parameter"]
+        for record in self:
+            config_parameters.set_param("saas_portal.page_for_maximumdb", record.page_for_maximumdb or '/')
 
     # page_for_maximumtrialdb
-    def get_default_page_for_maximumtrialdb(self, cr, uid, ids, context=None):
-        page_for_maximumtrialdb = self.pool.get("ir.config_parameter").get_param(cr, uid, "saas_portal.page_for_maximumtrialdb", default='/', context=context)
+    def get_default_page_for_maximumtrialdb(self):
+        page_for_maximumtrialdb = self.env["ir.config_parameter"].get_param("saas_portal.page_for_maximumtrialdb", default='/')
         return {'page_for_maximumtrialdb': page_for_maximumtrialdb or '/'}
 
-    def set_page_for_maxumumtrialdb(self, cr, uid, ids, context=None):
-        config_parameters = self.pool.get("ir.config_parameter")
-        for record in self.browse(cr, uid, ids, context=context):
-            config_parameters.set_param(cr, uid, "saas_portal.page_for_maximumtrialdb", record.page_for_maximumtrialdb or '/', context=context)
+    def set_page_for_maxumumtrialdb(self):
+        config_parameters = self.env["ir.config_parameter"]
+        for record in self:
+            config_parameters.set_param("saas_portal.page_for_maximumtrialdb", record.page_for_maximumtrialdb or '/')
 
     # page_for_nonfree_subdomains
-    def get_default_page_for_nonfree_subdomains(self, cr, uid, ids, context=None):
-        page_for_nonfree_subdomains = self.pool.get("ir.config_parameter").get_param(cr, uid, "saas_portal.page_for_nonfree_subdomains", default='/', context=context)
+    def get_default_page_for_nonfree_subdomains(self):
+        page_for_nonfree_subdomains = self.env["ir.config_parameter"].get_param("saas_portal.page_for_nonfree_subdomains", default='/')
         return {'page_for_nonfree_subdomains': page_for_nonfree_subdomains or '/'}
 
-    def set_page_for_nonfree_subdomains(self, cr, uid, ids, context=None):
-        config_parameters = self.pool.get("ir.config_parameter")
-        for record in self.browse(cr, uid, ids, context=context):
-            config_parameters.set_param(cr, uid, "saas_portal.page_for_nonfree_subdomains", record.page_for_nonfree_subdomains or '/', context=context)
+    def set_page_for_nonfree_subdomains(self):
+        config_parameters = self.env["ir.config_parameter"]
+        for record in self:
+            config_parameters.set_param("saas_portal.page_for_nonfree_subdomains", record.page_for_nonfree_subdomains or '/')
 
     # expiration_notify_in_advance
-    def get_default_expiration_notify_in_advance(self, cr, uid, ids, context=None):
-        expiration_notify_in_advance = self.pool.get("ir.config_parameter").get_param(cr, uid, "saas_portal.expiration_notify_in_advance", default='0', context=context)
+    def get_default_expiration_notify_in_advance(self):
+        expiration_notify_in_advance = self.env["ir.config_parameter"].get_param("saas_portal.expiration_notify_in_advance", default='0')
         return {'expiration_notify_in_advance': expiration_notify_in_advance or '0'}
 
-    def set_expiration_notify_in_advance(self, cr, uid, ids, context=None):
-        config_parameters = self.pool.get("ir.config_parameter")
-        for record in self.browse(cr, uid, ids, context=context):
-            config_parameters.set_param(cr, uid, "saas_portal.expiration_notify_in_advance", record.expiration_notify_in_advance or '0', context=context)
+    def set_expiration_notify_in_advance(self):
+        config_parameters = self.env["ir.config_parameter"]
+        for record in self:
+            config_parameters.set_param("saas_portal.expiration_notify_in_advance", record.expiration_notify_in_advance or '0')

@@ -49,17 +49,14 @@ class ProductAttributePrice(models.Model):
 class ProductTemplate(models.Model):
     _inherit = "product.template"
 
-    def _price_get(self, cr, uid, products, ptype='list_price', context=None):
-        if context is None:
-            context = {}
-
+    def _price_get(self, products, ptype='list_price'):
+        context = self.env.context
         if 'currency_id' in context:
-            pricetype_obj = self.pool.get('product.price.type')
-            price_type_id = pricetype_obj.search(cr, uid, [('field', '=', ptype)])[0]
-            price_type_currency_id = pricetype_obj.browse(cr, uid, price_type_id).currency_id.id
+            pricetype_obj = self.env['product.price.type']
+            price_type_id = pricetype_obj.search([('field', '=', ptype)])[0]
+            price_type_currency_id = pricetype_obj.browse(price_type_id).currency_id.id
 
         res = {}
-        product_uom_obj = self.pool.get('product.uom')
         for product in products:
             # standard_price field can only be seen by users in base.group_user
             # Thus, in order to compute the sale price from the cost price for users not in this group
@@ -81,14 +78,13 @@ class ProductTemplate(models.Model):
 
             if 'uom' in context:
                 uom = product.uom_id or product.uos_id
-                res[product.id] = product_uom_obj._compute_price(cr, uid,
-                                                                 uom.id, res[product.id], context['uom'])
+                res[product.id] = uom._compute_price(res[product.id], context['uom'])
             # Convert from price_type currency to asked one
             if 'currency_id' in context:
                 # Take the price_type currency from the product field
                 # This is right cause a field cannot be in more than one currency
-                res[product.id] = self.pool.get('res.currency').compute(cr, uid, price_type_currency_id,
-                                                                        context['currency_id'], res[product.id], context=context)
+                res[product.id] = self.env['res.currency'].compute(price_type_currency_id,
+                                                                        context['currency_id'], res[product.id])
 
         return res
 

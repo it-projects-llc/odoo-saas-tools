@@ -529,6 +529,7 @@ class SaasPortalClient(models.Model):
     block_on_storage_exceed = fields.Boolean('Block clients on storage exceed', default=False)
     storage_exceed = fields.Boolean('Storage limit has been exceed', default=False)
 
+    # TODO: use new api for tracking
     _track = {
         'expired': {
             'saas_portal.mt_expired':

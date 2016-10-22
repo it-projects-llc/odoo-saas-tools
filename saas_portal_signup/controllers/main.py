@@ -30,9 +30,9 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
         return qcontext
 
     def get_saas_domain(self):
-        config = request.registry['ir.config_parameter']
+        config = request.env['ir.config_parameter']
         full_param = 'saas_portal.base_saas_domain'
-        base_saas_domain = config.get_param(request.cr, SUPERUSER_ID, full_param)
+        base_saas_domain = config.get_param(full_param)
         return base_saas_domain
 
     def do_signup(self, qcontext):

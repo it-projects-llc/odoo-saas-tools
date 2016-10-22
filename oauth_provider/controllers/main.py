@@ -129,6 +129,6 @@ class OAuth2(http.Controller):
         return self._response(headers, body, status)
 
     def get_user(self, kw):
-        user_obj = request.registry['res.users']
+        user_obj = request.env['res.users'].sudo()
         uid = kw.get('uid', False) or request.uid
-        return user_obj.browse(request.cr, SUPERUSER_ID, int(uid))
+        return user_obj.browse(int(uid))

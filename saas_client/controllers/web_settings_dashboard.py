@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-import openerp
-from openerp import http, SUPERUSER_ID
-from openerp.http import request
-from openerp.addons.web_settings_dashboard.controllers.main import WebSettingsDashboard
-from openerp.addons.saas_base.tools import get_size
+import odoo
+from odoo import http, SUPERUSER_ID
+from odoo.http import request
+from odoo.addons.web_settings_dashboard.controllers.main import WebSettingsDashboard
+from odoo.addons.saas_base.tools import get_size
 import pytz
 from pytz import timezone
 from datetime import datetime
-from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
+from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 
 
 class SaaSWebSettingsDashboard(WebSettingsDashboard):
@@ -28,7 +28,7 @@ class SaaSWebSettingsDashboard(WebSettingsDashboard):
             user_timezone = timezone(user_obj.tz)
             datetime_obj = pytz.utc.localize(datetime_obj)
             datetime_obj = datetime_obj.astimezone(user_timezone)
-        data_dir = openerp.tools.config['data_dir']
+        data_dir = odoo.tools.config['data_dir']
 
         file_storage = get_size('%s/filestore/%s' % (data_dir, request.env.cr.dbname))
         file_storage = int(file_storage / (1024 * 1024))

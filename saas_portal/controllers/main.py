@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 from ast import literal_eval
-import openerp
-from openerp import SUPERUSER_ID, exceptions
-from openerp.tools.translate import _
-from openerp.addons.web import http
-from openerp.addons.web.http import request
-from openerp.addons.saas_base.exceptions import MaximumDBException, MaximumTrialDBException
+import odoo
+from odoo import SUPERUSER_ID, exceptions
+from odoo.tools.translate import _
+from odoo import http
+from odoo.http import request
+from odoo.addons.saas_base.exceptions import MaximumDBException, MaximumTrialDBException
 import werkzeug
 import simplejson
 from datetime import datetime, timedelta
-from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
+from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 
 
 class SignupError(Exception):
@@ -60,9 +60,9 @@ class SaasPortal(http.Controller):
         return werkzeug.utils.redirect(url)
 
     def get_config_parameter(self, param):
-        config = request.registry['ir.config_parameter']
+        config = request.env['ir.config_parameter']
         full_param = 'saas_portal.%s' % param
-        return config.get_param(request.cr, SUPERUSER_ID, full_param)
+        return config.get_param(full_param)
 
     def get_full_dbname(self, dbname):
         if not dbname:
@@ -71,19 +71,17 @@ class SaasPortal(http.Controller):
         return full_dbname.replace('www.', '')
 
     def get_plan(self, plan_id=None):
-        plan = request.registry['saas_portal.plan']
         if not plan_id:
             domain = [('state', '=', 'confirmed')]
-            plan_ids = request.registry['saas_portal.plan'].search(request.cr, SUPERUSER_ID, domain)
-            if plan_ids:
-                plan_id = plan_ids[0]
+            plans = request.env['saas_portal.plan'].search(domain)
+            if plans:
+                return plans[0]
             else:
                 raise exceptions.Warning(_('There is no plan configured'))
-        return plan.browse(request.cr, SUPERUSER_ID, plan_id)
 
     def exists_database(self, dbname):
         full_dbname = self.get_full_dbname(dbname)
-        return openerp.service.db.exp_db_exist(full_dbname)
+        return odoo.service.db.exp_db_exist(full_dbname)
 
     @http.route(['/publisher-warranty/'], type='http', auth='public', website=True)
     def publisher_warranty(self, **post):

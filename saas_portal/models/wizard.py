@@ -3,10 +3,10 @@ import requests
 import werkzeug
 import simplejson
 
-from openerp.addons.web.http import request
-from openerp import api
-from openerp import fields
-from openerp import models
+from odoo.http import request
+from odoo import api
+from odoo import fields
+from odoo import models
 
 
 class SaasConfig(models.TransientModel):

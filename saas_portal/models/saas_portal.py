@@ -1,23 +1,23 @@
 # -*- coding: utf-8 -*-
-from openerp import api
-from openerp import exceptions
-from openerp import fields
-from openerp import models
-from openerp.tools import scan_languages
-from openerp.tools.translate import _
-from openerp.addons.base.res.res_partner import _tz_get
+from odoo import api
+from odoo import exceptions
+from odoo import fields
+from odoo import models
+from odoo.tools import scan_languages
+from odoo.tools.translate import _
+from odoo.addons.base.res.res_partner import _tz_get
 from datetime import datetime, timedelta
-from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
+from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 import simplejson
 import werkzeug
 import requests
 import random
 
 from datetime import datetime, timedelta
-from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
-from openerp.addons.saas_base.exceptions import MaximumDBException, MaximumTrialDBException
+from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
+from odoo.addons.saas_base.exceptions import MaximumDBException, MaximumTrialDBException
 
-from openerp.addons.saas_base.exceptions import MaximumDBException
+from odoo.addons.saas_base.exceptions import MaximumDBException
 from werkzeug.exceptions import Forbidden
 
 import logging
@@ -376,15 +376,15 @@ class OauthApplication(models.Model):
     template_db_ids = fields.One2many('saas_portal.database', 'oauth_application_id', string='Template Database')
     client_db_ids = fields.One2many('saas_portal.client', 'oauth_application_id', string='Client Database')
 
-    @api.one
+    @api.multi
     def _get_last_connection(self):
-        oat = self.pool.get('oauth.access_token')
-        to_search = [('application_id', '=', self.id)]
-        access_token_ids = oat.search(self.env.cr, self.env.uid, to_search)
-        if access_token_ids:
-            access_token = oat.browse(self.env.cr, self.env.uid,
-                                      access_token_ids[0])
-            self.last_connection = access_token.user_id.login_date
+        for r in self:
+            oat = self.env['oauth.access_token']
+            to_search = [('application_id', '=', self.id)]
+            access_tokens = oat.search(to_search)
+            if access_tokens:
+                access_token = access_tokens[0]
+                r.last_connection = access_token.user_id.login_date
 
 
 class SaasPortalDatabase(models.Model):
@@ -529,6 +529,7 @@ class SaasPortalClient(models.Model):
     block_on_storage_exceed = fields.Boolean('Block clients on storage exceed', default=False)
     storage_exceed = fields.Boolean('Storage limit has been exceed', default=False)
 
+    # TODO: use new api for tracking
     _track = {
         'expired': {
             'saas_portal.mt_expired':
@@ -572,21 +573,18 @@ class SaasPortalClient(models.Model):
                 template = self.env.ref('saas_portal.email_template_expiration_notify')
                 record.with_context(days=notification_delta).message_post_with_template(template.id, composition_mode='comment')
 
-    def unlink(self, cr, uid, ids, context=None):
-        user_model = self.pool.get('res.users')
-        token_model = self.pool.get('oauth.access_token')
-        for obj in self.browse(cr, uid, ids):
+    def unlink(self):
+        for obj in self:
             to_search1 = [('application_id', '=', obj.id)]
-            tk_ids = token_model.search(cr, uid, to_search1, context=context)
-            if tk_ids:
-                token_model.unlink(cr, uid, tk_ids)
+            tokens = self.env['oauth.access_token'].search(to_search1)
+            tokens.unlink()
             # TODO: it seems we don't need stuff below
             # to_search2 = [('database', '=', obj.name)]
-            # user_ids = user_model.search(cr, uid, to_search2, context=context)
+            # user_ids = user_model.search(to_search2)
             # if user_ids:
-            #    user_model.unlink(cr, uid, user_ids)
-            # openerp.service.db.exp_drop(obj.name)
-        return super(SaasPortalClient, self).unlink(cr, uid, ids, context)
+            #    user_model.unlink(user_ids)
+            # odoo.service.db.exp_drop(obj.name)
+        return super(SaasPortalClient, self).unlink()
 
     @api.multi
     def rename_database(self, new_dbname):

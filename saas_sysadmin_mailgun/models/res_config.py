@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from openerp import models, fields
+from odoo import models, fields
 
 
 class SaasPortalConfigWizard(models.TransientModel):
@@ -7,11 +7,11 @@ class SaasPortalConfigWizard(models.TransientModel):
 
     saas_mailgun_api_key = fields.Char('Mailgun API Key')
 
-    def get_default_saas_mailgun_api_key(self, cr, uid, ids, context=None):
-        saas_mailgun_api_key = self.pool.get("ir.config_parameter").get_param(cr, uid, "saas_mailgun.saas_mailgun_api_key", default=None, context=context)
+    def get_default_saas_mailgun_api_key(self):
+        saas_mailgun_api_key = self.env["ir.config_parameter"].get_param("saas_mailgun.saas_mailgun_api_key", default=None)
         return {'saas_mailgun_api_key': saas_mailgun_api_key or False}
 
-    def set_saas_mailgun_api_key(self, cr, uid, ids, context=None):
-        config_parameters = self.pool.get("ir.config_parameter")
-        for record in self.browse(cr, uid, ids, context=context):
-            config_parameters.set_param(cr, uid, "saas_mailgun.saas_mailgun_api_key", record.saas_mailgun_api_key or '', context=context)
+    def set_saas_mailgun_api_key(self):
+        config_parameters = self.env["ir.config_parameter"]
+        for record in self:
+            config_parameters.set_param("saas_mailgun.saas_mailgun_api_key", record.saas_mailgun_api_key or '')

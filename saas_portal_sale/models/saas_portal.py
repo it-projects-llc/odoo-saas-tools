@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from openerp import models, fields, api
+from odoo import models, fields, api
 from datetime import datetime, timedelta
-from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
+from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 
 
 class SaasPortalPlan(models.Model):

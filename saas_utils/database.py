@@ -18,8 +18,8 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
-from openerp import http, SUPERUSER_ID as SI
-from openerp.addons.web.http import request
+from odoo import http, SUPERUSER_ID as SI
+from odoo.http import request
 
 
 def get_market_dbs(with_templates=True):

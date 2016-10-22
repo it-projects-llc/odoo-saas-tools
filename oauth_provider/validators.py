@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # some code taken from https://github.com/evonove/django-oauth-toolkit/
 
-from openerp import SUPERUSER_ID
+from odoo import SUPERUSER_ID
 import logging
 try:
     from oauthlib.oauth2 import RequestValidator, MobileApplicationServer
@@ -9,11 +9,11 @@ except:
     RequestValidator = object
     MobileApplicationServer = False
 from datetime import datetime, timedelta
-from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
+from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
+
+from odoo.http import request
 
 log = _logger = logging.getLogger(__name__)
-
-from openerp.http import request as request
 
 
 class OAuth2Validator(RequestValidator):
@@ -87,14 +87,14 @@ class OAuth2Validator(RequestValidator):
         in req.client
         """
         if not req.client:
-            app_obj = request.registry['oauth.application']
-            app_id = app_obj.search(request.cr, SUPERUSER_ID, [('client_id', '=', client_id)])
-            if app_id:
-                app_id = app_id[0]
+            app_obj = request.env['oauth.application'].sudo()
+            app = app_obj.search([('client_id', '=', client_id)])
+            if app:
+                app = app[0]
             elif create:
-                app_id = app_obj.create(request.cr, SUPERUSER_ID, {'client_id': client_id})
-            if app_id:
-                req.client = app_obj.browse(request.cr, SUPERUSER_ID, app_id)
+                app = app_obj.create({'client_id': client_id})
+            if app:
+                req.client = app
         return req.client
 
     def validate_client_id(self, client_id, req, *args, **kwargs):
@@ -167,8 +167,8 @@ class OAuth2Validator(RequestValidator):
         # if req.grant_type == 'client_credentials':
         #    req.user = req.client.user
 
-        access_token_obj = request.registry['oauth.access_token']
-        access_token = access_token_obj.create(request.cr, SUPERUSER_ID, {
+        access_token_obj = request.env['oauth.access_token'].sudo()
+        access_token = access_token_obj.create({
             'user_id': req.user.id,
             'scope': token['scope'],
             'expires': expires.strftime(DEFAULT_SERVER_DATETIME_FORMAT),
@@ -195,13 +195,12 @@ class OAuth2Validator(RequestValidator):
         if not token:
             return False
 
-        access_token_obj = request.registry['oauth.access_token']
-        access_token_id = access_token_obj.search(request.cr, SUPERUSER_ID,
-                                                  [('token', '=', token)])
-        if not access_token_id:
+        access_token_obj = request.env['oauth.access_token'].sudo()
+        access_token = access_token_obj.search([('token', '=', token)])
+        if not access_token:
             return False
-        access_token_id = access_token_id[0]
-        access_token = access_token_obj.browse(request.cr, SUPERUSER_ID, access_token_id)
+        access_token = access_token[0]
+
         if access_token.is_valid(scopes):
             req.client = access_token.application_id
             req.user = access_token.user_id

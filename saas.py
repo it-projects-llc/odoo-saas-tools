@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
 
-ODOO_VERSION = 9
+ODOO_VERSION = 10
 SUPERUSER_ID = 1
 SAAS_PORTAL_MODULES_REGEXP = '(saas_portal.*|saas_sysadmin.*)'
 SAAS_SERVER_MODULES_REGEXP = '(saas_server.*)'
@@ -47,7 +47,7 @@ Local usage:
 
 settings_group = parser.add_argument_group('Common settings')
 settings_group.add_argument('--suffix', dest='suffix', default=ODOO_VERSION, help='suffix for names')
-settings_group.add_argument('--odoo-script', dest='odoo_script', help='Path to openerp-server', default='./openerp-server')
+settings_group.add_argument('--odoo-script', dest='odoo_script', help='Path to odoo-server', default='./odoo-server')
 settings_group.add_argument('--odoo-config', dest='odoo_config', help='Path to odoo configuration file')
 settings_group.add_argument('--odoo-data-dir', dest='odoo_data_dir', help='Path to odoo data dir', default=None)
 settings_group.add_argument('--odoo-xmlrpc-port', dest='xmlrpc_port', default=None)
@@ -317,7 +317,11 @@ def rpc_get_uuid(dbname):
 
 def rpc_xmlid_to_object(auth, xmlid, model):
     res_id = rpc_execute_kw(auth, 'ir.model.data', 'xmlid_to_res_id', [xmlid])
-    return rpc_execute_kw(auth, model, 'read', [res_id])
+    read = rpc_execute_kw(auth, model, 'read', [res_id])
+    if read:
+        return read[0]
+    else:
+        return None
 
 
 def rpc_create_plan(portal_db_name):

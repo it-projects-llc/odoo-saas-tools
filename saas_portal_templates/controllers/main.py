@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from openerp.addons.web import http
-from openerp.addons.web.http import request
-from openerp.addons.web.controllers.main import login_and_redirect
-from openerp.addons.saas_portal.controllers.main import SaasPortal as saas_portal_controller
+from odoo import http
+from odoo.http import request
+from odoo.addons.web.controllers.main import login_and_redirect
+from odoo.addons.saas_portal.controllers.main import SaasPortal as saas_portal_controller
 
 
 class SaasPortalTemplates(saas_portal_controller):

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 import werkzeug
-from openerp import http
-from openerp.http import request
+from odoo import http
+from odoo.http import request
 import simplejson
-from openerp.addons.auth_oauth.controllers.main import OAuthLogin as Home
-from openerp.addons.web.controllers.main import ensure_db
+from odoo.addons.auth_oauth.controllers.main import OAuthLogin as Home
+from odoo.addons.web.controllers.main import ensure_db
 
 
 class SaasClient(http.Controller):

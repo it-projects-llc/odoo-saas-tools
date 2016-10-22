@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import werkzeug
-from openerp.addons.web import http
-from openerp.addons.web.http import request
-from openerp.addons.saas_portal.controllers.main import SaasPortal
+from odoo import http
+from odoo.http import request
+from odoo.addons.saas_portal.controllers.main import SaasPortal
 
 
 def signup_redirect():

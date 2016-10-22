@@ -1,4 +1,4 @@
-from openerp import models, fields, api
+from odoo import models, fields, api
 
 
 class BaseConfigSettings(models.TransientModel):
@@ -10,12 +10,12 @@ class BaseConfigSettings(models.TransientModel):
     domain_change_link = fields.Html(readonly=True)
 
     # current_domain
-    def get_default_current_domain(self, cr, uid, ids, context=None):
-        current_domain = self.pool.get("ir.config_parameter").get_param(cr, uid, 'web.base.url', default=None, context=context)
+    def get_default_current_domain(self):
+        current_domain = self.env["ir.config_parameter"].get_param('web.base.url', default=None)
         return {'current_domain': current_domain or False}
 
     # domain_change_link
-    def get_default_domain_change_link(self, cr, uid, ids, context=None):
-        link = self.pool.get("ir.config_parameter").get_param(cr, uid, 'saas_client.saas_dashboard', default=None, context=context)
+    def get_default_domain_change_link(self):
+        link = self.env["ir.config_parameter"].get_param('saas_client.saas_dashboard', default=None)
         html = link and '<a href=' + link + '>' + 'You can change your domain name here' + '</a>' or False
         return {'domain_change_link': html}

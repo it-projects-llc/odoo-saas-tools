@@ -1,71 +1,62 @@
 # -*- coding: utf-8 -*-
-from openerp.osv import osv, fields
-import openerp.addons.decimal_precision as dp
+from odoo import models, fields, api
+import odoo.addons.decimal_precision as dp
 
 
-class ProductAttributeValue(osv.osv):
+class ProductAttributeValue(models.Model):
     _inherit = "product.attribute.value"
 
-    def _get_price_factor(self, cr, uid, ids, name, args, context=None):
-        result = dict.fromkeys(ids, 0)
-        if not context.get('active_id'):
-            return result
+    @api.multi
+    def _get_price_factor(self):
+        active_id = self.env.context.get('active_id')
+        if not active_id:
+            return
 
-        for obj in self.browse(cr, uid, ids, context=context):
+        for obj in self:
             for price_id in obj.price_ids:
-                if price_id.product_tmpl_id.id == context.get('active_id'):
-                    result[obj.id] = price_id.price_factor
-                    break
-        return result
+                if price_id.product_tmpl_id.id == active_id:
+                    obj.price_factor = price_id.price_factor
 
-    def _set_price_factor(self, cr, uid, id, name, value, args, context=None):
-        if context is None:
-            context = {}
-        if 'active_id' not in context:
-            return None
-        p_obj = self.pool['product.attribute.price']
-        p_ids = p_obj.search(cr, uid, [('value_id', '=', id), ('product_tmpl_id', '=', context['active_id'])], context=context)
+    def _set_price_factor(self):
+        value = self.price_factor
+        id = self.id
+        active_id = self.env.context.get('active_id')
+        if not active_id:
+            return
+
+        p_obj = self.env['product.attribute.price']
+        p_ids = p_obj.search([('value_id', '=', id), ('product_tmpl_id', '=', active_id)])
         if p_ids:
-            p_obj.write(cr, uid, p_ids, {'price_factor': value}, context=context)
+            p_ids.write({'price_factor': value})
         else:
-            p_obj.create(cr, uid, {
-                'product_tmpl_id': context['active_id'],
+            p_obj.create({
+                'product_tmpl_id': active_id,
                 'value_id': id,
                 'price_factor': value,
-            }, context=context)
+            })
 
-    _columns = {
-        'price_factor': fields.function(_get_price_factor, type='float', string='Attribute Price Factor',
-                                        fnct_inv=_set_price_factor,
-                                        digits_compute=dp.get_precision('Product Price')),
-    }
+    price_factor = fields.Float(compute="_get_price_factor", string='Attribute Price Factor',
+                                        inverse=_set_price_factor,
+                                        digits_compute=dp.get_precision('Product Price'))
 
 
-class ProductAttributePrice(osv.osv):
+class ProductAttributePrice(models.Model):
     _inherit = "product.attribute.price"
-    _columns = {
-        'price_factor': fields.float('Price Factor', digits_compute=dp.get_precision('Product Price')),
-    }
 
-    _defaults = {
-        'price_factor': 1.0,
-    }
+    price_factor = fields.Float('Price Factor', digits_compute=dp.get_precision('Product Price'), default=1.0)
 
 
-class ProductTemplate(osv.osv):
+class ProductTemplate(models.Model):
     _inherit = "product.template"
 
-    def _price_get(self, cr, uid, products, ptype='list_price', context=None):
-        if context is None:
-            context = {}
-
+    def _price_get(self, products, ptype='list_price'):
+        context = self.env.context
         if 'currency_id' in context:
-            pricetype_obj = self.pool.get('product.price.type')
-            price_type_id = pricetype_obj.search(cr, uid, [('field', '=', ptype)])[0]
-            price_type_currency_id = pricetype_obj.browse(cr, uid, price_type_id).currency_id.id
+            pricetype_obj = self.env['product.price.type']
+            price_type_id = pricetype_obj.search([('field', '=', ptype)])[0]
+            price_type_currency_id = pricetype_obj.browse(price_type_id).currency_id.id
 
         res = {}
-        product_uom_obj = self.pool.get('product.uom')
         for product in products:
             # standard_price field can only be seen by users in base.group_user
             # Thus, in order to compute the sale price from the cost price for users not in this group
@@ -87,34 +78,27 @@ class ProductTemplate(osv.osv):
 
             if 'uom' in context:
                 uom = product.uom_id or product.uos_id
-                res[product.id] = product_uom_obj._compute_price(cr, uid,
-                                                                 uom.id, res[product.id], context['uom'])
+                res[product.id] = uom._compute_price(res[product.id], context['uom'])
             # Convert from price_type currency to asked one
             if 'currency_id' in context:
                 # Take the price_type currency from the product field
                 # This is right cause a field cannot be in more than one currency
-                res[product.id] = self.pool.get('res.currency').compute(cr, uid, price_type_currency_id,
-                                                                        context['currency_id'], res[product.id], context=context)
+                res[product.id] = self.env['res.currency'].compute(price_type_currency_id,
+                                                                        context['currency_id'], res[product.id])
 
         return res
 
 
-class ProductAttributeLine(osv.osv):
+class ProductAttributeLine(models.Model):
     _inherit = "product.attribute.line"
     _order = 'sequence'
 
-    _columns = {
-        'sequence': fields.integer('Sequence', help="Determine the display order", required=True),
-    }
-
-    def _get_default_sequence(self, cr, uid, context=None):
+    def _default_sequence(self):
         # without this function there was a bug when attributes were created
         # from Product Variants tab. If several attributes were created without pushing the save button
         # sequence got the same value for their attribute lines. And if there was no lines before
         # sequence got False for the first attribute
-        num = self.search_count(cr, uid, [], context=context) + 1
+        num = self.search_count([]) + 1
         return num
 
-    _defaults = {
-        'sequence': _get_default_sequence,
-    }
+    sequence = fields.Integer('Sequence', help="Determine the display order", required=True, default=_default_sequence)

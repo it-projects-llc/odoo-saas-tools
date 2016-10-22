@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 import datetime
 
-from openerp import http
-from openerp.http import request
+from odoo import http
+from odoo.http import request
 
-from openerp.addons.website_portal.controllers.main import website_account
+from odoo.addons.website_portal.controllers.main import website_account
 
 
 class WebsiteSaasDashboard(website_account):

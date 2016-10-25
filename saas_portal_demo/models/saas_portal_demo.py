@@ -10,11 +10,11 @@ class SaasPortalServer(models.Model):
     _inherit = 'saas_portal.server'
 
     @api.multi
-    def _get_xmlrpc_object(self):
+    def _get_xmlrpc_object(self, db_name):
         self.ensure_one()
 
-        url = self.local_request_scheme + '://' + self.name
-        db = self.name
+        url = self.local_request_scheme + '://' + db_name
+        db = db_name
         username = 'admin'
         password = 'admin'
         # TODO: store username and password in saas_portal.server model
@@ -97,7 +97,7 @@ class SaasPortalServer(models.Model):
         demo_plan_module_obj = self.env['saas_portal.demo_plan_module']
         demo_plan_hidden_module_obj = self.env['saas_portal.hidden_demo_plan_module']
         for record in self:
-            db, uid, password, models = record._get_xmlrpc_object()
+            db, uid, password, models = record._get_xmlrpc_object(record.name)
             ids = models.execute_kw(db, uid, password, 'ir.module.module', 'search',
                                     [[['demo_url', '!=', False]]],
                                     )
@@ -141,15 +141,25 @@ class SaasPortalServer(models.Model):
     @api.multi
     def update_repositories(self):
         for record in self:
-            db, uid, password, models = record._get_xmlrpc_object()
+            db, uid, password, models = record._get_xmlrpc_object(record.name)
             ids = models.execute_kw(db, uid, password, 'saas_server.repository', 'search', [[]],)
             models.execute_kw(db, uid, password, 'saas_server.repository', 'update', [ids])
 
     @api.multi
     def restart_server(self):
         for record in self:
-            db, uid, password, models = record._get_xmlrpc_object()
+            db, uid, password, models = record._get_xmlrpc_object(record.name)
             models.execute_kw(db, uid, password, 'saas_server.client', 'restart_server', [])
+
+    @api.multi
+    def update_templates(self):
+        for record in self:
+            plans = self.env['saas_portal.plan'].search([('server_id', '=', record.id),
+                                                         ('demo_plan_module_ids', '!=', False),
+                                                         ('template_id.state', '=', 'template')])
+            for plan in plans:
+                db, uid, password, models = record._get_xmlrpc_object(plan.template_id.name)
+
 
 
 class SaaSPortalDemoPlanModule(models.Model):

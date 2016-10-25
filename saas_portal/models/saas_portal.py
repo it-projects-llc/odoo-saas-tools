@@ -350,6 +350,12 @@ class SaasPortalPlan(models.Model):
 
         if not res.ok:
             raise Warning('Error on request: %s\nReason: %s \n Message: %s' % (req.url, res.reason, res.content))
+        try:
+            data = simplejson.loads(res.text)
+        except:
+            _logger.error('Error on parsing response: %s\n%s' % ([req.url, req.headers, req.body], res.text))
+            raise
+
         if self._context.get('skip_sync_server'):
             return
         return self.action_sync_server()

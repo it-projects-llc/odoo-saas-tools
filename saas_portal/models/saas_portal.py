@@ -356,6 +356,8 @@ class SaasPortalPlan(models.Model):
             _logger.error('Error on parsing response: %s\n%s' % ([req.url, req.headers, req.body], res.text))
             raise
 
+        plan.template_id.password = data.get('init_password')
+
         if self._context.get('skip_sync_server'):
             return
         return self.action_sync_server()
@@ -419,6 +421,7 @@ class SaasPortalDatabase(models.Model):
                               ],
                              'State', default='draft', track_visibility='onchange')
     host = fields.Char('Host', compute=_compute_host)
+    password = fields.Char()
 
     @api.multi
     def _backup(self):

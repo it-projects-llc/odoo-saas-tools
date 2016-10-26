@@ -28,6 +28,7 @@
         "views/saas_portal_demo.xml",
         "views/product.xml",
         "data/product.xml",
+        "data/ir_cron.xml",
     ],
     "qweb": [
     ],

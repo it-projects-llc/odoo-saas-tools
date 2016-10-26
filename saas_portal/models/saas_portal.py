@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import xmlrpclib
 from openerp import api
 from openerp import exceptions
 from openerp import fields
@@ -422,6 +423,17 @@ class SaasPortalDatabase(models.Model):
                              'State', default='draft', track_visibility='onchange')
     host = fields.Char('Host', compute=_compute_host)
     password = fields.Char()
+
+    @api.multi
+    def _get_xmlrpc_object(self):
+        self.ensure_one()
+        url = self.server_id.local_request_scheme + '://' + self.host
+        db = self.name
+        username = 'admin'
+        password = self.password
+        common = xmlrpclib.ServerProxy('{}/xmlrpc/2/common'.format(url))
+        uid = common.authenticate(db, username, password, {})
+        return db, uid, password, xmlrpclib.ServerProxy('{}/xmlrpc/2/object'.format(url))
 
     @api.multi
     def _backup(self):

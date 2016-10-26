@@ -158,8 +158,10 @@ class SaasPortalServer(models.Model):
                                                          ('demo_plan_module_ids', '!=', False),
                                                          ('template_id.state', '=', 'template')])
             for plan in plans:
-                db, uid, password, models = record._get_xmlrpc_object(plan.template_id.name)
-
+                db, uid, password, models = plan.template_id._get_xmlrpc_object()
+                id = models.execute_kw(db, uid, password, 'ir.module.module', 'search',
+                                        [[['name', 'in', ['base']]]])
+                models.execute_kw(db, uid, password, 'ir.module.module', 'button_upgrade', [id])
 
 
 class SaaSPortalDemoPlanModule(models.Model):

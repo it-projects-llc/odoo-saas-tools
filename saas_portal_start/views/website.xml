@@ -4,7 +4,7 @@
 
 
     <template id="theme" inherit_id="website.assets_frontend" name="saas portal assets">
-      <xpath expr="//link[@href='/website/static/src/css/website.css']" position="before">
+      <xpath expr="//link[last()]" position="after">
         <link rel='stylesheet' href='/saas_portal_start/static/src/css/odoo.css' t-ignore="true"/>
       </xpath>
     </template>

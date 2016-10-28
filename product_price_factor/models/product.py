@@ -37,13 +37,13 @@ class ProductAttributeValue(models.Model):
 
     price_factor = fields.Float(compute="_get_price_factor", string='Attribute Price Factor',
                                         inverse=_set_price_factor,
-                                        digits_compute=dp.get_precision('Product Price'))
+                                        digits=dp.get_precision('Product Price'))
 
 
 class ProductAttributePrice(models.Model):
     _inherit = "product.attribute.price"
 
-    price_factor = fields.Float('Price Factor', digits_compute=dp.get_precision('Product Price'), default=1.0)
+    price_factor = fields.Float('Price Factor', digits=dp.get_precision('Product Price'), default=1.0)
 
 
 class ProductProduct(models.Model):

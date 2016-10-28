@@ -46,47 +46,43 @@ class ProductAttributePrice(models.Model):
     price_factor = fields.Float('Price Factor', digits_compute=dp.get_precision('Product Price'), default=1.0)
 
 
-class ProductTemplate(models.Model):
-    _inherit = "product.template"
+class ProductProduct(models.Model):
+    _inherit = "product.product"
 
-    def _price_get(self, products, ptype='list_price'):
-        context = self.env.context
-        if 'currency_id' in context:
-            pricetype_obj = self.env['product.price.type']
-            price_type_id = pricetype_obj.search([('field', '=', ptype)])[0]
-            price_type_currency_id = pricetype_obj.browse(price_type_id).currency_id.id
+    @api.multi
+    def price_compute(self, price_type, uom=False, currency=False, company=False):
+        # TDE FIXME: delegate to template or not ? fields are reencoded here ...
+        # compatibility about context keys used a bit everywhere in the code
+        if not uom and self._context.get('uom'):
+            uom = self.env['product.uom'].browse(self._context['uom'])
+        if not currency and self._context.get('currency'):
+            currency = self.env['res.currency'].browse(self._context['currency'])
 
-        res = {}
-        for product in products:
+        products = self
+        if price_type == 'standard_price':
             # standard_price field can only be seen by users in base.group_user
-            # Thus, in order to compute the sale price from the cost price for users not in this group
+            # Thus, in order to compute the sale price from the cost for users not in this group
             # We fetch the standard price as the superuser
-            if ptype != 'standard_price':
-                res[product.id] = product[ptype] or 0.0
-            else:
-                company_id = product.env.user.company_id.id
-                product = product.with_context(force_company=company_id)
-                res[product.id] = res[product.id] = product.sudo()[ptype]
-            if ptype == 'list_price':
-                if product._name == "product.product":
-                    for attribute_line_obj in product.product_tmpl_id.attribute_line_ids:
-                        for value_obj in product.attribute_value_ids:
-                            if value_obj.attribute_id.id == attribute_line_obj.attribute_id.id:
-                                for price_id in value_obj.price_ids:
-                                    if price_id.product_tmpl_id.id == product.product_tmpl_id.id:
-                                        res[product.id] = (res[product.id] + price_id.price_extra) * price_id.price_factor
+            products = self.with_context(force_company=company and company.id or self._context.get('force_company', self.env.user.company_id.id)).sudo()
 
-            if 'uom' in context:
-                uom = product.uom_id or product.uos_id
-                res[product.id] = uom._compute_price(res[product.id], context['uom'])
-            # Convert from price_type currency to asked one
-            if 'currency_id' in context:
-                # Take the price_type currency from the product field
-                # This is right cause a field cannot be in more than one currency
-                res[product.id] = self.env['res.currency'].compute(price_type_currency_id,
-                                                                        context['currency_id'], res[product.id])
+        prices = dict.fromkeys(self.ids, 0.0)
+        for product in products:
+            prices[product.id] = product[price_type] or 0.0
+            if price_type == 'list_price':
+                for line in product.product_tmpl_id.attribute_line_ids:
+                    for value in product.attribute_value_ids.filtered(lambda r: r.attribute_id == line.attribute_id):
+                        for price in value.price_ids.filtered(lambda r: r.product_tmpl_id == product.product_tmpl_id):
+                            prices[product.id] = (prices[product.id] + price.price_extra) * price.price_factor
 
-        return res
+            if uom:
+                prices[product.id] = product.uom_id._compute_price(prices[product.id], uom)
+
+            # Convert from current user company currency to asked one
+            # This is right cause a field cannot be in more than one currency
+            if currency:
+                prices[product.id] = product.currency_id.compute(prices[product.id], currency)
+
+        return prices
 
 
 class ProductAttributeLine(models.Model):

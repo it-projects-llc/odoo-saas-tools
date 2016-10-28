@@ -20,7 +20,7 @@ class OauthApplication(models.Model):
     def generate_client_id(self):
         return str(uuid.uuid1())
 
-    client_id = fields.Char('Client ID', select=True, required=True, default=generate_client_id)
+    client_id = fields.Char('Client ID', index=True, required=True, default=generate_client_id)
     token_ids = fields.One2many('oauth.access_token', 'application_id', 'Tokens')
 
     _sql_constraints = [

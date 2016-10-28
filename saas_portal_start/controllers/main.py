@@ -13,4 +13,4 @@ class SaasPortalStart(SaasPortal):
             'base_saas_domain': base_saas_domain,
             'plan_id': post.get('plan_id')
         }
-        return request.website.render("website.start", values)
+        return request.render("website.start", values)

@@ -380,7 +380,7 @@ class OauthApplication(models.Model):
     def _get_last_connection(self):
         for r in self:
             oat = self.env['oauth.access_token']
-            to_search = [('application_id', '=', self.id)]
+            to_search = [('application_id', '=', r.id)]
             access_tokens = oat.search(to_search)
             if access_tokens:
                 access_token = access_tokens[0]

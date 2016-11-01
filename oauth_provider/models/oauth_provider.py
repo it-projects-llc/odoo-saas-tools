@@ -73,12 +73,12 @@ class OauthAccessToken(models.Model):
         :param scopes: An iterable containing the scopes to check or None
         """
         self.ensure_one()
-        return self.is_expired() and self._allow_scopes(scopes)
+        return not self.is_expired() and self._allow_scopes(scopes)
 
     @api.multi
     def is_expired(self):
         self.ensure_one()
-        return datetime.now() < datetime.strptime(self.expires, DEFAULT_SERVER_DATETIME_FORMAT)
+        return datetime.now() > datetime.strptime(self.expires, DEFAULT_SERVER_DATETIME_FORMAT)
 
     @api.multi
     def _allow_scopes(self, scopes):

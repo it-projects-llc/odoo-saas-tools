@@ -62,7 +62,7 @@
     </t>
   </template>
 
-  <template id="account" name="Account" inherit_id="website_portal.account">
+  <template id="account" name="Account" inherit_id="website_portal.portal_layout">
     <xpath expr="//div[contains(@class,'o_my_documents')]" position="inside">
       <t t-call="saas_portal_portal.stats" />
     </xpath>

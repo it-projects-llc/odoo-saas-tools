@@ -531,6 +531,7 @@ class SaasPortalClient(models.Model):
     support_team_id = fields.Many2one('saas_portal.support_team', 'Support Team')
     expiration_datetime_sent = fields.Datetime(help='updates every time send_expiration_info is executed')
     active = fields.Boolean(default=True, compute='_compute_active', store=True)
+    public_url = fields.Char(compute='_compute_public_url', store=True)
     block_on_expiration = fields.Boolean('Block clients on expiration', default=False)
     block_on_storage_exceed = fields.Boolean('Block clients on storage exceed', default=False)
     storage_exceed = fields.Boolean('Storage limit has been exceed', default=False)
@@ -547,6 +548,15 @@ class SaasPortalClient(models.Model):
     def _compute_active(self):
         for record in self:
             record.active = record.state != 'deleted'
+
+    @api.multi
+    @api.depends('server_id.request_port', 'server_id.request_scheme', 'host')
+    def _compute_public_url(self):
+        for record in self:
+            public_url = "%s://%s" % (record.server_id.request_scheme, record.host)
+            if record.server_id.request_port and record.server_id.request_port != 80:
+                public_url = public_url + ':' + str(record.server_id.request_port)
+            record.public_url = public_url
 
     @api.model
     def _cron_suspend_expired_clients(self):

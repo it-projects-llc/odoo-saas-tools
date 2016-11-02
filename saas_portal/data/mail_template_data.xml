@@ -11,7 +11,7 @@
             <field name="body_html"><![CDATA[
 
             <p>Web:
-            <a href="http://${object.host}">http://${object.host}</a>
+            <a href="${object.public_url}">${object.public_url}</a>
             </p>
 
             ]]></field>

@@ -270,7 +270,7 @@ class SaasPortalPlan(models.Model):
         state = {
             'd': client.name,
             'e': trial and trial_expiration_datetime or client.create_date,
-            'r': client.public_url + '/web',
+            'r': client.public_url + 'web/',
             'owner_user': owner_user_data,
             't': client.trial,
         }
@@ -552,7 +552,7 @@ class SaasPortalClient(models.Model):
             public_url = "%s://%s" % (scheme, host)
             if scheme == 'http' and port != 80 or scheme == 'https' and port != 443:
                 public_url = public_url + ':' + str(port)
-            record.public_url = public_url
+            record.public_url = public_url + '/'
 
     @api.model
     def _cron_suspend_expired_clients(self):

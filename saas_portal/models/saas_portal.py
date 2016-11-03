@@ -253,13 +253,6 @@ class SaasPortalPlan(models.Model):
         else:
             client = self.env['saas_portal.client'].create(vals)
         client_id = client.client_id
-        scheme = server.request_scheme
-        port = server.request_port
-        port_str = str(port)
-        if scheme == 'http' and port_str == '80' or scheme == 'https' and port_str == '443':
-            port_str = ''
-        else:
-            port_str = ':' + port_str
 
         if user_id:
             owner_user = self.env['res.users'].browse(user_id)
@@ -277,7 +270,7 @@ class SaasPortalPlan(models.Model):
         state = {
             'd': client.name,
             'e': trial and trial_expiration_datetime or client.create_date,
-            'r': '%s://%s%s/web' % (scheme, client.host, port_str),
+            'r': client.public_url + '/web',
             'owner_user': owner_user_data,
             't': client.trial,
         }
@@ -553,9 +546,12 @@ class SaasPortalClient(models.Model):
     @api.depends('server_id.request_port', 'server_id.request_scheme', 'host')
     def _compute_public_url(self):
         for record in self:
-            public_url = "%s://%s" % (record.server_id.request_scheme, record.host)
-            if record.server_id.request_port and record.server_id.request_port != 80:
-                public_url = public_url + ':' + str(record.server_id.request_port)
+            scheme = record.server_id.request_scheme
+            host = record.host
+            port = record.server_id.request_port
+            public_url = "%s://%s" % (scheme, host)
+            if scheme == 'http' and port != 80 or scheme == 'https' and port != 443:
+                public_url = public_url + ':' + str(port)
             record.public_url = public_url
 
     @api.model

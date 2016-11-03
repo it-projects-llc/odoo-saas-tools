@@ -270,7 +270,7 @@ class SaasPortalPlan(models.Model):
         state = {
             'd': client.name,
             'e': trial and trial_expiration_datetime or client.create_date,
-            'r': client.public_url + 'web/',
+            'r': client.public_url + 'web',
             'owner_user': owner_user_data,
             't': client.trial,
         }

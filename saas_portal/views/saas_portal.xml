@@ -21,10 +21,10 @@
                     <field name="trial"/>
                     <field name="expiration_datetime"/>
                     <field name="expired" invisible="1"/>
-                    <button name="edit_database" type="object" icon="gtk-connect" attrs="{'invisible':[('state', 'in', ['deleted', 'draft'])]}"
+                    <button name="edit_database" type="object" icon="fa-sign-in" attrs="{'invisible':[('state', 'in', ['deleted', 'draft'])]}"
                             help="Log in client database. Make sure that your browser allows popup windows from SaaS Portal"/>
-                    <button name="show_upgrade_wizard" attrs="{'invisible':[('state', 'in', ['deleted'])]}" type="object" icon="gtk-execute" help="Configure client database"/>
-                    <button name="delete_database_server" type="object" attrs="{'invisible':[('state', 'not in', ['pending'])]}" icon="gtk-delete" help="Delete client database"
+                    <button name="show_upgrade_wizard" attrs="{'invisible':[('state', 'in', ['deleted'])]}" type="object" icon="fa-cogs" help="Configure client database"/>
+                    <button name="delete_database_server" type="object" attrs="{'invisible':[('state', 'not in', ['pending'])]}" icon="fa-eraser" help="Delete client database"
                     confirm="Are you sure to delete this database?"/>
                 </tree>
             </field>
@@ -39,11 +39,11 @@
                     <field name="expired" invisible="1"/>
                     <header>
                       <button string="Log in" name="edit_database" type="object" attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}"
-                              icon="gtk-connect" class="oe_highlight" help="Make sure that your browser allows popup windows from SaaS Portal"/>
-                        <button string="Configure" name="show_upgrade_wizard" type="object" attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}" icon="gtk-execute" />
-                        <button string="Delete" name="delete_database_server" type="object" attrs="{'invisible':['|',('state', 'not in', ['pending'])]}" icon="gtk-delete" 
+                              icon="fa-sign-in" class="oe_highlight" help="Make sure that your browser allows popup windows from SaaS Portal"/>
+                        <button string="Configure" name="show_upgrade_wizard" type="object" attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}" icon="fa-cogs" />
+                        <button string="Delete" name="delete_database_server" type="object" attrs="{'invisible':['|',('state', 'not in', ['pending'])]}" icon="gtk-eraser" 
                         confirm="Are you sure to delete this database?"/>
-                        <button string="Sync server" type="object" name="action_sync_server" icon="gtk-refresh"/>
+                        <button string="Sync server" type="object" name="action_sync_server" icon="fa-refresh"/>
                         <button name="%(saas_portal.action_rename_database)d" string="Rename Database" type="action"/>
                         <field name="state" widget="statusbar" statusbar_visible="open,pending,deleted" clickable="False"/>
                     </header>
@@ -147,8 +147,8 @@
                         <button string="Create Server" name="%(action_create_server
 )d" type="action" class="oe_highlight" states="draft"/>
                         -->
-                        <button string="Open Server" name="action_redirect_to_server" type="object" icon="gtk-connect" class="oe_highlight" attrs="{'invisible': [('id', '=', False)]}"/>
-                        <button name="action_sync_server" type="object" string="Sync server" icon="gtk-refresh" attrs="{'invisible': [('id', '=', False)]}"/>
+                        <button string="Open Server" name="action_redirect_to_server" type="object" icon="fa-sign-in" class="oe_highlight" attrs="{'invisible': [('id', '=', False)]}"/>
+                        <button name="action_sync_server" type="object" string="Sync server" icon="fa-refresh" attrs="{'invisible': [('id', '=', False)]}"/>
                         <field name="id" invisible="1" />
                     </header>
                     <sheet>
@@ -218,12 +218,12 @@
             <field name="arch" type="xml">
                 <form string="plans">
                     <header>
-                        <button string="Create template DB" name="create_template" type="object" attrs="{'invisible':['|', '|', ('state','not in', ['draft']), ('server_id','=',False), ('template_id','=',False)]}" icon="gtk-apply" class="oe_highlight"/>
-                        <button string="Log in to template DB" name="edit_template" type="object" states="confirmed" icon="gtk-edit"
+                        <button string="Create template DB" name="create_template" type="object" attrs="{'invisible':['|', '|', ('state','not in', ['draft']), ('server_id','=',False), ('template_id','=',False)]}" icon="fa-play" class="oe_highlight"/>
+                        <button string="Log in to template DB" name="edit_template" type="object" states="confirmed" icon="fa-edit"
                                 help="Make sure that your browser allows popup windows from SaaS Portal" class="oe_highlight"/>
-                        <!--<button string="Configure template DB" name="upgrade_template" type="object" states="confirmed" icon="gtk-execute" />-->
-                        <button string="Delete template DB" name="delete_template" type="object" states="confirmed" icon="gtk-cancel" />
-                        <button string="Sync server" type="object" name="action_sync_server" icon="gtk-refresh" attrs="{'invisible': [('id', '=', False)]}"/>
+                        <!--<button string="Configure template DB" name="upgrade_template" type="object" states="confirmed" icon="fa-play" />-->
+                        <button string="Delete template DB" name="delete_template" type="object" states="confirmed" icon="fa-undo" />
+                        <button string="Sync server" type="object" name="action_sync_server" icon="fa-refresh" attrs="{'invisible': [('id', '=', False)]}"/>
                         <button string="Create Client" type="action" name="%(action_create_client)d" states="confirmed"/>
                         <field name="state" widget="statusbar"/>
                         <field name="id" invisible="1" />

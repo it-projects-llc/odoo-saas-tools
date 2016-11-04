@@ -217,7 +217,7 @@ class SaasServer(http.Controller):
 .announcement_bar .close {
     height: 15px;
     width: 15px;
-    background : url(/web/static/src/img/icons/gtk-close.png) no-repeat;
+    background : url(/web/static/src/img/icons/fa-close.png) no-repeat;
     background-size : 15px 15px;
     opacity: 1;
 }

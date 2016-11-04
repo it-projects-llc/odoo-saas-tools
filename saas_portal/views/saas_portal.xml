@@ -41,7 +41,7 @@
                       <button string="Log in" name="edit_database" type="object" attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}"
                               icon="fa-sign-in" class="oe_highlight" help="Make sure that your browser allows popup windows from SaaS Portal"/>
                         <button string="Configure" name="show_upgrade_wizard" type="object" attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}" icon="fa-cogs" />
-                        <button string="Delete" name="delete_database_server" type="object" attrs="{'invisible':['|',('state', 'not in', ['pending'])]}" icon="gtk-eraser" 
+                        <button string="Delete" name="delete_database_server" type="object" attrs="{'invisible':['|',('state', 'not in', ['pending'])]}" icon="fa-eraser" 
                         confirm="Are you sure to delete this database?"/>
                         <button string="Sync server" type="object" name="action_sync_server" icon="fa-refresh"/>
                         <button name="%(saas_portal.action_rename_database)d" string="Rename Database" type="action"/>

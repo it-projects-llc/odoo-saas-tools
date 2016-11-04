@@ -14,7 +14,7 @@
                             <field name="sftp_password" password="True" />
               <field name="sftp_path" />
                             <field name="sftp_rsa_key_path" />
-              <button name="test_sftp_connection" type="object" string="Test SFTP Connection" icon="gtk-network"/>
+              <button name="test_sftp_connection" type="object" string="Test SFTP Connection" icon="fa-server"/>
               <separator string="Help" colspan="2" />
               <div>
                             This configures the sftp server for store backups of client databases.

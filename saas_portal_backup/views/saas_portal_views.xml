@@ -7,7 +7,7 @@
       <field name="inherit_id" ref="saas_portal.view_clients_form" />
       <field name="arch" type="xml">
         <button name="action_sync_server" position="after">
-          <button string="Backup DB" name="action_backup" type="object" attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}" icon="gtk-execute" />
+          <button string="Backup DB" name="action_backup" type="object" attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}" icon="fa-cogs" />
         </button>
         <xpath expr="//form/sheet/group[2]" position="after">
           <group string="Database settings">

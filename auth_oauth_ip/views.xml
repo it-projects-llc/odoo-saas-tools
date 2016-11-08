@@ -8,7 +8,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//sheet" position="inside">
                     <group>
-                        <field name="local_ip"/>
+                        <field name="local_host"/>
                         <field name="local_port"/>
                     </group>
                 </xpath>

@@ -291,7 +291,7 @@ def rpc_init_server(server_db_name, new_admin_password=None):
     vals = {
         'auth_endpoint': oauth_provider.get('auth_endpoint').replace('odoo.local', portal_host),
         'validation_endpoint': oauth_provider.get('validation_endpoint').replace('odoo.local', portal_host),
-        'local_ip': 'localhost',
+        'local_host': 'localhost',
         'local_port': local_xmlrpc_port,
     }
     oauth_provider = rpc_execute_kw(auth, 'auth.oauth.provider', 'write', [[oauth_provider.get('id')], vals])

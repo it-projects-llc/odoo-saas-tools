@@ -52,7 +52,7 @@ class SaasServer(http.Controller):
 
         client_id = post['client_id']
         saas_oauth_provider = request.registry['ir.model.data'].xmlid_to_object(request.cr, SUPERUSER_ID, 'saas_server.saas_oauth_provider')
-        saas_portal_user = request.registry['res.users']._auth_oauth_rpc(request.cr, SUPERUSER_ID, saas_oauth_provider.validation_endpoint, access_token, local_ip=saas_oauth_provider.local_ip, local_port=saas_oauth_provider.local_port)
+        saas_portal_user = request.registry['res.users']._auth_oauth_rpc(request.cr, SUPERUSER_ID, saas_oauth_provider.validation_endpoint, access_token, local_host=saas_oauth_provider.local_host, local_port=saas_oauth_provider.local_port)
         if saas_portal_user.get('user_id') != 1:
             raise Exception('auth error')
         if saas_portal_user.get("error"):
@@ -125,7 +125,7 @@ class SaasServer(http.Controller):
         access_token = post['access_token']
         saas_oauth_provider = request.registry['ir.model.data'].xmlid_to_object(request.cr, SUPERUSER_ID, 'saas_server.saas_oauth_provider')
 
-        saas_portal_user = request.registry['res.users']._auth_oauth_rpc(request.cr, SUPERUSER_ID, saas_oauth_provider.validation_endpoint, access_token, local_ip=saas_oauth_provider.local_ip, local_port=saas_oauth_provider.local_port)
+        saas_portal_user = request.registry['res.users']._auth_oauth_rpc(request.cr, SUPERUSER_ID, saas_oauth_provider.validation_endpoint, access_token, local_host=saas_oauth_provider.local_host, local_port=saas_oauth_provider.local_port)
         if saas_portal_user.get('user_id') != 1:
             raise Exception('auth error')
         if saas_portal_user.get("error"):
@@ -148,7 +148,7 @@ class SaasServer(http.Controller):
         saas_oauth_provider = request.registry['ir.model.data'].xmlid_to_object(request.cr, SUPERUSER_ID, 'saas_server.saas_oauth_provider')
 
         access_token = post['access_token']
-        user_data = request.registry['res.users']._auth_oauth_rpc(request.cr, SUPERUSER_ID, saas_oauth_provider.validation_endpoint, access_token, local_ip=saas_oauth_provider.local_ip, local_port=saas_oauth_provider.local_port)
+        user_data = request.registry['res.users']._auth_oauth_rpc(request.cr, SUPERUSER_ID, saas_oauth_provider.validation_endpoint, access_token, local_host=saas_oauth_provider.local_host, local_port=saas_oauth_provider.local_port)
         if user_data.get('user_id') != 1:
             raise Exception('auth error')
         if user_data.get("error"):
@@ -169,7 +169,7 @@ class SaasServer(http.Controller):
         access_token = post['access_token']
         saas_oauth_provider = request.registry['ir.model.data'].xmlid_to_object(request.cr, SUPERUSER_ID, 'saas_server.saas_oauth_provider')
 
-        user_data = request.registry['res.users']._auth_oauth_rpc(request.cr, SUPERUSER_ID, saas_oauth_provider.validation_endpoint, access_token, local_ip=saas_oauth_provider.local_ip, local_port=saas_oauth_provider.local_port)
+        user_data = request.registry['res.users']._auth_oauth_rpc(request.cr, SUPERUSER_ID, saas_oauth_provider.validation_endpoint, access_token, local_host=saas_oauth_provider.local_host, local_port=saas_oauth_provider.local_port)
         if user_data.get('user_id') != 1:
             raise Exception('auth error')
         if user_data.get("error"):
@@ -265,7 +265,7 @@ class SaasServer(http.Controller):
         access_token = post['access_token']
         saas_oauth_provider = request.registry['ir.model.data'].xmlid_to_object(request.cr, SUPERUSER_ID, 'saas_server.saas_oauth_provider')
 
-        user_data = request.registry['res.users']._auth_oauth_rpc(request.cr, SUPERUSER_ID, saas_oauth_provider.validation_endpoint, access_token, local_ip=saas_oauth_provider.local_ip, local_port=saas_oauth_provider.local_port)
+        user_data = request.registry['res.users']._auth_oauth_rpc(request.cr, SUPERUSER_ID, saas_oauth_provider.validation_endpoint, access_token, local_host=saas_oauth_provider.local_host, local_port=saas_oauth_provider.local_port)
         if user_data.get("error"):
             raise Exception(user_data['error'])
 
@@ -311,7 +311,7 @@ class SaasServer(http.Controller):
         access_token = post['access_token']
         saas_oauth_provider = request.registry['ir.model.data'].xmlid_to_object(request.cr, SUPERUSER_ID, 'saas_server.saas_oauth_provider')
 
-        user_data = request.registry['res.users']._auth_oauth_rpc(request.cr, SUPERUSER_ID, saas_oauth_provider.validation_endpoint, access_token, local_ip=saas_oauth_provider.local_ip, local_port=saas_oauth_provider.local_port)
+        user_data = request.registry['res.users']._auth_oauth_rpc(request.cr, SUPERUSER_ID, saas_oauth_provider.validation_endpoint, access_token, local_host=saas_oauth_provider.local_host, local_port=saas_oauth_provider.local_port)
         if user_data.get("error"):
             raise Exception(user_data['error'])
 

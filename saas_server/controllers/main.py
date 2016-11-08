@@ -52,7 +52,7 @@ class SaasServer(http.Controller):
 
         client_id = post['client_id']
         saas_oauth_provider = request.env.ref('saas_server.saas_oauth_provider').sudo()
-        saas_portal_user = request.env['res.users'].sudo()._auth_oauth_rpc(saas_oauth_provider.validation_endpoint, access_token, local_ip=saas_oauth_provider.local_ip, local_port=saas_oauth_provider.local_port)
+        saas_portal_user = request.env['res.users'].sudo()._auth_oauth_rpc(saas_oauth_provider.validation_endpoint, access_token, local_host=saas_oauth_provider.local_host, local_port=saas_oauth_provider.local_port)
         if saas_portal_user.get('user_id') != 1:
             raise Exception('auth error')
         if saas_portal_user.get("error"):
@@ -125,7 +125,7 @@ class SaasServer(http.Controller):
         access_token = post['access_token']
         saas_oauth_provider = request.env.ref('saas_server.saas_oauth_provider').sudo()
 
-        saas_portal_user = request.env['res.users'].sudo()._auth_oauth_rpc(saas_oauth_provider.validation_endpoint, access_token, local_ip=saas_oauth_provider.local_ip, local_port=saas_oauth_provider.local_port)
+        saas_portal_user = request.env['res.users'].sudo()._auth_oauth_rpc(saas_oauth_provider.validation_endpoint, access_token, local_host=saas_oauth_provider.local_host, local_port=saas_oauth_provider.local_port)
         if saas_portal_user.get('user_id') != 1:
             raise Exception('auth error')
         if saas_portal_user.get("error"):
@@ -149,7 +149,7 @@ class SaasServer(http.Controller):
         saas_oauth_provider = request.env.ref('saas_server.saas_oauth_provider').sudo()
 
         access_token = post['access_token']
-        user_data = request.env['res.users'].sudo()._auth_oauth_rpc(saas_oauth_provider.validation_endpoint, access_token, local_ip=saas_oauth_provider.local_ip, local_port=saas_oauth_provider.local_port)
+        user_data = request.env['res.users'].sudo()._auth_oauth_rpc(saas_oauth_provider.validation_endpoint, access_token, local_host=saas_oauth_provider.local_host, local_port=saas_oauth_provider.local_port)
         if user_data.get('user_id') != 1:
             raise Exception('auth error')
         if user_data.get("error"):
@@ -170,7 +170,7 @@ class SaasServer(http.Controller):
         access_token = post['access_token']
         saas_oauth_provider = request.env.ref('saas_server.saas_oauth_provider').sudo()
 
-        user_data = request.env['res.users'].sudo()._auth_oauth_rpc(saas_oauth_provider.validation_endpoint, access_token, local_ip=saas_oauth_provider.local_ip, local_port=saas_oauth_provider.local_port)
+        user_data = request.env['res.users'].sudo()._auth_oauth_rpc(saas_oauth_provider.validation_endpoint, access_token, local_host=saas_oauth_provider.local_host, local_port=saas_oauth_provider.local_port)
         if user_data.get('user_id') != 1:
             raise Exception('auth error')
         if user_data.get("error"):
@@ -266,7 +266,7 @@ class SaasServer(http.Controller):
         access_token = post['access_token']
         saas_oauth_provider = request.env.ref('saas_server.saas_oauth_provider').sudo()
 
-        user_data = request.env['res.users'].sudo()._auth_oauth_rpc(saas_oauth_provider.validation_endpoint, access_token, local_ip=saas_oauth_provider.local_ip, local_port=saas_oauth_provider.local_port)
+        user_data = request.env['res.users'].sudo()._auth_oauth_rpc(saas_oauth_provider.validation_endpoint, access_token, local_host=saas_oauth_provider.local_host, local_port=saas_oauth_provider.local_port)
         if user_data.get("error"):
             raise Exception(user_data['error'])
 
@@ -319,7 +319,7 @@ class SaasServer(http.Controller):
         access_token = post['access_token']
         saas_oauth_provider = request.env.ref('saas_server.saas_oauth_provider').sudo()
 
-        user_data = request.env['res.users'].sudo()._auth_oauth_rpc(saas_oauth_provider.validation_endpoint, access_token, local_ip=saas_oauth_provider.local_ip, local_port=saas_oauth_provider.local_port)
+        user_data = request.env['res.users'].sudo()._auth_oauth_rpc(saas_oauth_provider.validation_endpoint, access_token, local_host=saas_oauth_provider.local_host, local_port=saas_oauth_provider.local_port)
         if user_data.get("error"):
             raise Exception(user_data['error'])
 

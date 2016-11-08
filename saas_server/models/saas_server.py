@@ -132,7 +132,7 @@ class SaasServerClient(models.Model):
             saas_oauth_provider = self.env.ref('saas_server.saas_oauth_provider')
 
             oauth_provider_data = {'enabled': False, 'client_id': client_id}
-            for attr in ['name', 'auth_endpoint', 'scope', 'validation_endpoint', 'data_endpoint', 'css_class', 'body', 'enabled']:
+            for attr in ['name', 'auth_endpoint', 'scope', 'validation_endpoint', 'data_endpoint', 'css_class', 'body', 'enabled', 'local_ip', 'local_host']:
                 oauth_provider_data[attr] = getattr(saas_oauth_provider, attr)
             oauth_provider = client_env.ref('saas_client.saas_oauth_provider')
             oauth_provider.write(oauth_provider_data)

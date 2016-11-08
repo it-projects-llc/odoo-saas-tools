@@ -63,6 +63,7 @@ settings_group.add_argument('--base-domain', dest='base_domain', help='Base doma
 settings_group.add_argument('--install-modules', dest='install_modules', help='Comma-separated list of modules to install. They will be automatically installed on appropriate database (Portal or Server)', default='saas_portal_start,saas_portal_sale_online')
 #settings_group.add_argument('--db_user', dest='db_user', help='database user name')
 settings_group.add_argument('-s', '--simulate', dest='simulate', action='store_true', help='Don\'t make actual changes. Just show what script is going to do.')
+settings_group.add_argument('--drop-databases', dest='drop_databases', help='Drop existed databases before creating portal or server', action='store_true', default=False)
 
 
 portal_group = parser.add_argument_group('Portal creation')
@@ -205,8 +206,14 @@ def main():
 # ----------------------------------------------------------
 def createdb(dbname, install_modules=['base']):
     without_demo = args.get('without_demo')
-    pg_dropdb(dbname)
-    pg_createdb(dbname, without_demo=without_demo)
+    if args.get('drop_databases'):
+        pg_dropdb(dbname)
+
+    # create db if not exist
+    try:
+        pg_createdb(dbname, without_demo=without_demo)
+    except Exception, e:
+        log('pg_createdb error:', e)
 
     cmd = get_cmd(dbname, workers=0)
     cmd += ['-i', ','.join(install_modules)]

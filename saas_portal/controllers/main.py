@@ -71,6 +71,7 @@ class SaasPortal(http.Controller):
         return full_dbname.replace('www.', '')
 
     def get_plan(self, plan_id=None):
+        plan_obj = request.env['saas_portal.plan']
         if not plan_id:
             domain = [('state', '=', 'confirmed')]
             plans = request.env['saas_portal.plan'].search(domain)
@@ -78,6 +79,7 @@ class SaasPortal(http.Controller):
                 return plans[0]
             else:
                 raise exceptions.Warning(_('There is no plan configured'))
+        return plan_obj.sudo().browse(plan_id)
 
     def exists_database(self, dbname):
         full_dbname = self.get_full_dbname(dbname)

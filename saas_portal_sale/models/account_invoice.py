@@ -23,7 +23,7 @@ class AccountInvoice(models.Model):
         return res
 
     @api.multi
-    def confirm_paid(self):
+    def action_invoice_paid(self):
         for record in self:
             client_plan_id_list = [client.plan_id.id for client in self.env['saas_portal.client'].search([('partner_id', '=', record.partner_id.id),
                                                                                                           '|', '&',
@@ -38,7 +38,7 @@ class AccountInvoice(models.Model):
                 template = self.env.ref('saas_portal_sale.email_template_create_saas')
                 self.with_context(saas_domain=self.env['ir.config_parameter'].get_param('saas_portal.base_saas_domain'),
                                   plans=plans).message_post_with_template(template.id, compositon_mode='comment')
-            return super(AccountInvoice, self).confirm_paid()
+            return super(AccountInvoice, self).action_invoice_paid()
 
 
 class AccountInvoiceLine(models.Model):

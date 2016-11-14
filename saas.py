@@ -51,7 +51,7 @@ settings_group.add_argument('--odoo-script', dest='odoo_script', help='Path to o
 settings_group.add_argument('--odoo-config', dest='odoo_config', help='Path to odoo configuration file')
 settings_group.add_argument('--odoo-data-dir', dest='odoo_data_dir', help='Path to odoo data dir', default=None)
 settings_group.add_argument('--odoo-xmlrpc-port', dest='xmlrpc_port', default='8069', help='Port to run odoo temporarly')
-settings_group.add_argument('--odoo-lonpolling-port', dest='longpolling_port', default='8072', help='Port to run odoo temporarly')
+settings_group.add_argument('--odoo-longpolling-port', dest='longpolling_port', default='8072', help='Port to run odoo temporarly')
 settings_group.add_argument('--local-xmlrpc-port', dest='local_xmlrpc_port', default=None, help='Port to be used for server-wide requests')
 settings_group.add_argument('--odoo-log-db', dest='log_db', help='Logging database. The same as odoo parameter')
 settings_group.add_argument("--odoo-addons-path", dest="addons_path",

@@ -50,7 +50,8 @@ settings_group.add_argument('--suffix', dest='suffix', default=ODOO_VERSION, hel
 settings_group.add_argument('--odoo-script', dest='odoo_script', help='Path to openerp-server', default='./openerp-server')
 settings_group.add_argument('--odoo-config', dest='odoo_config', help='Path to odoo configuration file')
 settings_group.add_argument('--odoo-data-dir', dest='odoo_data_dir', help='Path to odoo data dir', default=None)
-settings_group.add_argument('--odoo-xmlrpc-port', dest='xmlrpc_port', default=None, help='Port to run odoo temporarly')
+settings_group.add_argument('--odoo-xmlrpc-port', dest='xmlrpc_port', default='8069', help='Port to run odoo temporarly')
+settings_group.add_argument('--odoo-lonpolling-port', dest='longpolling_port', default='8072', help='Port to run odoo temporarly')
 settings_group.add_argument('--local-xmlrpc-port', dest='local_xmlrpc_port', default=None, help='Port to be used for server-wide requests')
 settings_group.add_argument('--odoo-log-db', dest='log_db', help='Logging database. The same as odoo parameter')
 settings_group.add_argument("--odoo-addons-path", dest="addons_path",
@@ -117,6 +118,7 @@ odoo_config = get_odoo_config()
 datadir = args.get('odoo_data_dir') or odoo_config.get('data_dir')
 xmlrpc_port = args.get('xmlrpc_port') or odoo_config.get('xmlrpc_port') or '8069'
 local_xmlrpc_port = args.get('local_xmlrpc_port') or odoo_config.get('xmlrpc_port') or '8069'
+longpolling_port = args.get('longpolling_port') or odoo_config.get('longpolling_port') or '8072'
 
 def filter_modules(s, regexp):
     return set([m for m in s.split(',') if re.match(regexp, m)])
@@ -452,6 +454,7 @@ def get_cmd(dbname='', workers=3, run_cron=False):
     cmd = [
         args.get('odoo_script'),
         "--xmlrpc-port=%s" % xmlrpc_port,
+        "--longpolling-port=%s" % longpolling_port,
         "--database=%s" % dbname,
         "--db-filter=%s" % args.get('db_filter'),
         "--workers=%s" % workers,

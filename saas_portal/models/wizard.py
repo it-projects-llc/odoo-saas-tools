@@ -226,3 +226,26 @@ class SaasPortalRenameDatabase(models.TransientModel):
         return {
             'type': 'ir.actions.act_window_close',
         }
+
+
+class SaasPortalEditDatabase(models.TransientModel):
+    _name = 'saas_portal.edit_database'
+
+    name = fields.Char(readonly=True)
+    active_id = fields.Char()
+    active_model = fields.Char()
+    edit_database_url = fields.Char(readonly=True)
+
+    @api.model
+    def default_get(self, fields):
+        res = super(SaasPortalEditDatabase, self).default_get(fields)
+        print 'default_get', self._context
+        res['active_model'] = self._context.get('active_model')
+        res['active_id'] = self._context.get('active_id')
+
+        active_record = self.env[res['active_model']].browse(res['active_id'])
+        if res['active_model'] == 'saas_portal.plan':
+            active_record = active_record.template_id
+        res['name'] = active_record.name
+        res['edit_database_url'] = active_record._request_url('/saas_server/edit_database')
+        return res

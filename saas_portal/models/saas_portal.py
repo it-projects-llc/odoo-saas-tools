@@ -443,7 +443,7 @@ class SaasPortalDatabase(models.Model):
         }
 
     @api.multi
-    def _request(self, path):
+    def _request_url(self, path):
         r = self[0]
         state = {
             'd': r.name,
@@ -451,10 +451,16 @@ class SaasPortalDatabase(models.Model):
             'client_id': r.client_id,
         }
         url = r.server_id._request(path=path, state=state, client_id=r.client_id)
+        return url
+
+    @api.multi
+    def _request(self, path):
+        url = self._request_url(path)
         return self._proceed_url(url)
 
     @api.multi
     def edit_database(self):
+        """Obsolete. Use saas_portal.edit_database widget instead"""
         for database_obj in self:
             return database_obj._request('/saas_server/edit_database')
 

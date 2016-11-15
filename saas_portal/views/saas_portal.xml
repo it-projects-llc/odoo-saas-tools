@@ -21,8 +21,9 @@
                     <field name="trial"/>
                     <field name="expiration_datetime"/>
                     <field name="expired" invisible="1"/>
-                    <button name="edit_database" type="object" icon="fa-sign-in" attrs="{'invisible':[('state', 'in', ['deleted', 'draft'])]}"
-                            help="Log in client database. Make sure that your browser allows popup windows from SaaS Portal"/>
+                    <button name="%(action_edit_database)d" type="action"
+                            icon="fa-sign-in" attrs="{'invisible':[('state', 'in', ['deleted', 'draft'])]}"
+                            help="Log in to client database."/>
                     <button name="show_upgrade_wizard" attrs="{'invisible':[('state', 'in', ['deleted'])]}" type="object" icon="fa-cogs" help="Configure client database"/>
                     <button name="delete_database_server" type="object" attrs="{'invisible':[('state', 'not in', ['pending'])]}" icon="fa-eraser" help="Delete client database"
                     confirm="Are you sure to delete this database?"/>
@@ -38,8 +39,11 @@
                 <form string="Clients" create="false" delete="false" edit="true">
                     <field name="expired" invisible="1"/>
                     <header>
-                      <button string="Log in" name="edit_database" type="object" attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}"
-                              icon="fa-sign-in" class="oe_highlight" help="Make sure that your browser allows popup windows from SaaS Portal"/>
+                        <button string="Log in" name="%(action_edit_database)d" type="action"
+                                attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}"
+                                icon="fa-sign-in" class="oe_highlight"
+                                help="Log in to client database."
+                                />
                         <button string="Configure" name="show_upgrade_wizard" type="object" attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}" icon="fa-cogs" />
                         <button string="Delete" name="delete_database_server" type="object" attrs="{'invisible':['|',('state', 'not in', ['pending'])]}" icon="fa-eraser" 
                         confirm="Are you sure to delete this database?"/>
@@ -219,8 +223,9 @@
                 <form string="plans">
                     <header>
                         <button string="Create template DB" name="create_template" type="object" attrs="{'invisible':['|', '|', ('state','not in', ['draft']), ('server_id','=',False), ('template_id','=',False)]}" icon="fa-play" class="oe_highlight"/>
-                        <button string="Log in to template DB" name="edit_template" type="object" states="confirmed" icon="fa-edit"
-                                help="Make sure that your browser allows popup windows from SaaS Portal" class="oe_highlight"/>
+                        <button string="Log in to template DB" name="%(action_edit_database)d"
+                                type="action" states="confirmed" icon="fa-edit"
+                                class="oe_highlight"/>
                         <!--<button string="Configure template DB" name="upgrade_template" type="object" states="confirmed" icon="fa-play" />-->
                         <button string="Delete template DB" name="delete_template" type="object" states="confirmed" icon="fa-undo" />
                         <button string="Sync server" type="object" name="action_sync_server" icon="fa-refresh" attrs="{'invisible': [('id', '=', False)]}"/>

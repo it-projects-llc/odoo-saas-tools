@@ -317,13 +317,13 @@ class SaasPortalPlan(models.Model):
         return self.dbname_template.replace('%i', sequence)
 
     @api.multi
-    def create_template(self, addons=None):
+    def create_template(self):
         assert len(self) == 1, 'This method is applied only for single record'
         plan = self[0]
         state = {
             'd': plan.template_id.name,
             'demo': plan.demo and 1 or 0,
-            'addons': addons or [],
+            'addons': [],
             'lang': plan.lang,
             'tz': plan.tz,
             'is_template_db': 1,

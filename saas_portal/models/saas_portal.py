@@ -316,22 +316,24 @@ class SaasPortalPlan(models.Model):
         sequence = self.env['ir.sequence'].get('saas_portal.plan')
         return self.dbname_template.replace('%i', sequence)
 
-    @api.multi
     def create_template(self):
-        assert len(self) == 1, 'This method is applied only for single record'
-        plan = self[0]
+        return self._create_template(addons=None)
+
+    @api.multi
+    def _create_template(self, addons=None):
+        self.ensure_one()
         state = {
-            'd': plan.template_id.name,
-            'demo': plan.demo and 1 or 0,
-            'addons': [],
-            'lang': plan.lang,
-            'tz': plan.tz,
+            'd': self.template_id.name,
+            'demo': self.demo and 1 or 0,
+            'addons': addons or [],
+            'lang': self.lang,
+            'tz': self.tz,
             'is_template_db': 1,
         }
-        client_id = plan.template_id.client_id
-        plan.template_id.server_id = plan.server_id
+        self.template_id.server_id = self.server_id
 
-        req, req_kwargs = self.server_id._request_server(path='/saas_server/new_database', state=state, client_id=client_id)
+        req, req_kwargs = self.server_id._request_server(path='/saas_server/new_database',
+                                                         state=state, client_id=self.template_id.client_id)
         res = requests.Session().send(req, **req_kwargs)
 
         if not res.ok:

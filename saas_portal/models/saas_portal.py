@@ -317,7 +317,7 @@ class SaasPortalPlan(models.Model):
         return self.dbname_template.replace('%i', sequence)
 
     def create_template(self):
-        self._create_template()
+        return self._create_template()
 
     @api.multi
     def _create_template(self, addons=None):

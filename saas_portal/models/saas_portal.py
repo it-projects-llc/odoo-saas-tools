@@ -269,6 +269,7 @@ class SaasPortalPlan(models.Model):
                                                        DEFAULT_SERVER_DATETIME_FORMAT) + timedelta(hours=self.expiration)).strftime(DEFAULT_SERVER_DATETIME_FORMAT)  # for trial
         state = {
             'd': client.name,
+            'public_url': client.public_url,
             'e': trial and trial_expiration_datetime or client.create_date,
             'r': client.public_url + 'web',
             'owner_user': owner_user_data,
@@ -448,6 +449,7 @@ class SaasPortalDatabase(models.Model):
         state = {
             'd': r.name,
             'host': r.host,
+            'public_url': r.public_url,
             'client_id': r.client_id,
         }
         url = r.server_id._request(path=path, state=state, client_id=r.client_id)

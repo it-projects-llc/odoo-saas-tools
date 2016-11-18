@@ -317,7 +317,8 @@ class SaasPortalPlan(models.Model):
         return self.dbname_template.replace('%i', sequence)
 
     def create_template(self):
-        return self._create_template()
+        self._create_template()
+        return self.action_sync_server()
 
     @api.multi
     def _create_template(self, addons=None):
@@ -339,7 +340,12 @@ class SaasPortalPlan(models.Model):
 
         if not res.ok:
             raise Warning('Error on request: %s\nReason: %s \n Message: %s' % (req.url, res.reason, res.content))
-        return self.action_sync_server()
+        try:
+            data = simplejson.loads(res.text)
+        except:
+            _logger.error('Error on parsing response: %s\n%s' % ([req.url, req.headers, req.body], res.text))
+            raise
+        return data
 
     @api.multi
     def action_sync_server(self):

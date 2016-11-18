@@ -316,8 +316,11 @@ class SaasPortalPlan(models.Model):
         sequence = self.env['ir.sequence'].get('saas_portal.plan')
         return self.dbname_template.replace('%i', sequence)
 
+    def create_template(self):
+        return self._create_template()
+
     @api.multi
-    def create_template(self, addons=None):
+    def _create_template(self, addons=None):
         assert len(self) == 1, 'This method is applied only for single record'
         plan = self[0]
         state = {

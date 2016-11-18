@@ -60,7 +60,7 @@ class SaasServer(http.Controller):
 
         client_data = {'name': new_db, 'client_id': client_id, 'expiration_datetime': expiration_db, 'trial': trial}
         client = request.env['saas_server.client'].sudo().create(client_data)
-        client.create_database(template_db, demo, lang)
+        res = client.create_database(template_db, demo, lang)
         client.install_addons(addons=addons, is_template_db=is_template_db)
         if disable_mail_server:
             client.disable_mail_servers()
@@ -73,11 +73,11 @@ class SaasServer(http.Controller):
             server_requests_scheme=request.httprequest.scheme)
 
         if is_template_db:
-            res = [{
+            res.update({
                 'name': client.name,
                 'state': client.state,
                 'client_id': client.client_id
-            }]
+            })
             return simplejson.dumps(res)
 
         with client.registry()[0].cursor() as cr:

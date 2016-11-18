@@ -37,16 +37,20 @@ class SaasServerClient(models.Model):
         ('client_id_uniq', 'unique (client_id)', 'client_id should be unique!'),
     ]
 
-    @api.one
+    @api.multi
     def create_database(self, template_db=None, demo=False, lang='en_US'):
+        self.ensure_one()
         new_db = self.name
+        res = {}
         if template_db:
             odoo.service.db._drop_conn(self.env.cr, template_db)
             odoo.service.db.exp_duplicate_database(template_db, new_db)
         else:
             password = random_password()
+            res.update({'superuser_password': password})
             odoo.service.db.exp_create_database(new_db, demo, lang, user_password=password)
         self.state = 'open'
+        return res
 
     @api.one
     def registry(self, new=False, **kwargs):

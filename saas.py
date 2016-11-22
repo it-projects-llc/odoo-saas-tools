@@ -169,12 +169,18 @@ def main():
         createdb(args.get('server_db_name'), server_modules)
 
     # run odoo to make updates via rpc
-    cmd = get_cmd()
-    pid = spawn_cmd(cmd)
     error = None
     plan_id = None
+    pid = None
+
+    port_is_open = wait_net_service('127.0.0.1', int(xmlrpc_port), 3)
+    if port_is_open:
+        log('Port is used. Probably, odoo is already running. Let\'s try to use it. It it will fail, you need either stop odoo or pass another port to saas.py via --xmlrpc-port arg')
+    else:
+        cmd = get_cmd()
+        pid = spawn_cmd(cmd)
     try:
-        wait_net_service('127.0.0.1', int(xmlrpc_port), 10)
+        port_is_open or wait_net_service('127.0.0.1', int(xmlrpc_port), 30)
 
         if args.get('portal_create'):
             rpc_init_db(args.get('portal_db_name'), new_admin_password=args.get('admin_password'))
@@ -204,7 +210,8 @@ def main():
     except Exception as e:
         error = e
         traceback.print_exc()
-    kill(pid)
+    if pid:
+        kill(pid)
 
     if error:
         return

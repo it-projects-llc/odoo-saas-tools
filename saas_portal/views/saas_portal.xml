@@ -12,6 +12,7 @@
             <field name="arch" type="xml">
                 <tree string="Clients" colors="red:expired" create="false" delete="false" edit="false">
                     <field name="name"/>
+                    <field name="plan_id"/>
                     <field name="state"/>
                     <field name="last_connection"/>
                     <field name="users_len"/>

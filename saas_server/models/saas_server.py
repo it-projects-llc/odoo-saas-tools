@@ -14,6 +14,10 @@ import logging
 _logger = logging.getLogger(__name__)
 
 
+def random_password(len=32):
+    return ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(len))
+
+
 class SaasServerClient(models.Model):
     _name = 'saas_server.client'
     _inherit = ['mail.thread', 'saas_base.client']
@@ -33,16 +37,20 @@ class SaasServerClient(models.Model):
         ('client_id_uniq', 'unique (client_id)', 'client_id should be unique!'),
     ]
 
-    @api.one
+    @api.multi
     def create_database(self, template_db=None, demo=False, lang='en_US'):
+        self.ensure_one()
         new_db = self.name
+        res = {}
         if template_db:
             openerp.service.db._drop_conn(self.env.cr, template_db)
             openerp.service.db.exp_duplicate_database(template_db, new_db)
         else:
-            password = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(32))
+            password = random_password()
+            res.update({'superuser_password': password})
             openerp.service.db.exp_create_database(new_db, demo, lang, user_password=password)
         self.state = 'open'
+        return res
 
     @api.one
     def registry(self, new=False, **kwargs):

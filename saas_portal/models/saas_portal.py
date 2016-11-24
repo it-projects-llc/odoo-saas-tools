@@ -325,7 +325,13 @@ class SaasPortalPlan(models.Model):
 
     @api.multi
     def create_template(self):
-        self._create_template()
+        try:
+            self._create_template()
+        except:
+            raise
+        else:
+            pass
+
         return self.action_sync_server()
 
     @api.multi

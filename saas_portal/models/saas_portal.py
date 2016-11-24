@@ -325,14 +325,9 @@ class SaasPortalPlan(models.Model):
 
     @api.multi
     def create_template(self):
-        try:
-            self._create_template()
-        except:
-            raise
-        else:
-            pass
+        res = self._create_template()
+        self.template_id.state = res.get('state')
 
-        return self.action_sync_server()
 
     @api.multi
     def _create_template(self, addons=None):

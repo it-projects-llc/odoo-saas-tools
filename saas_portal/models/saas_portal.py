@@ -325,12 +325,17 @@ class SaasPortalPlan(models.Model):
 
     @api.multi
     def create_template(self):
+        self._create_template()
+        return self.action_sync_server()
+
+    @api.multi
+    def _create_template(self, addons=None):
         assert len(self) == 1, 'This method is applied only for single record'
         plan = self[0]
         state = {
             'd': plan.template_id.name,
             'demo': plan.demo and 1 or 0,
-            'addons': [],
+            'addons': addons or [],
             'lang': plan.lang,
             'tz': plan.tz,
             'is_template_db': 1,
@@ -343,7 +348,12 @@ class SaasPortalPlan(models.Model):
 
         if not res.ok:
             raise Warning('Error on request: %s\nReason: %s \n Message: %s' % (req.url, res.reason, res.content))
-        return self.action_sync_server()
+        try:
+            data = simplejson.loads(res.text)
+        except:
+            _logger.error('Error on parsing response: %s\n%s' % ([req.url, req.headers, req.body], res.text))
+            raise
+        return data
 
     @api.multi
     def action_sync_server(self):

@@ -226,7 +226,7 @@
             <field name="arch" type="xml">
                 <form string="plans">
                     <header>
-                        <button string="Create template DB" name="create_template" type="object" attrs="{'invisible':['|', '|', ('state','not in', ['draft']), ('server_id','=',False), ('template_id','=',False)]}" icon="gtk-apply" class="oe_highlight"/>
+                        <button string="Create template DB" name="create_template_button" type="object" attrs="{'invisible':['|', '|', ('state','not in', ['draft']), ('server_id','=',False), ('template_id','=',False)]}" icon="gtk-apply" class="oe_highlight"/>
                         <button string="Log in to template DB" name="%(action_edit_database)d"
                                 type="action" states="confirmed" icon="gtk-edit"
                                 class="oe_highlight"/>

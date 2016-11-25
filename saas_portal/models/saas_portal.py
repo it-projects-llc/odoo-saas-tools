@@ -415,6 +415,19 @@ class SaasPortalDatabase(models.Model):
                               ],
                              'State', default='draft', track_visibility='onchange')
     host = fields.Char('Host', compute=_compute_host)
+    public_url = fields.Char(compute='_compute_public_url', store=True)
+
+    @api.multi
+    @api.depends('server_id.request_port', 'server_id.request_scheme', 'host')
+    def _compute_public_url(self):
+        for record in self:
+            scheme = record.server_id.request_scheme
+            host = record.host
+            port = record.server_id.request_port
+            public_url = "%s://%s" % (scheme, host)
+            if scheme == 'http' and port != 80 or scheme == 'https' and port != 443:
+                public_url = public_url + ':' + str(port)
+            record.public_url = public_url + '/'
 
     @api.multi
     def _backup(self):
@@ -543,7 +556,6 @@ class SaasPortalClient(models.Model):
     support_team_id = fields.Many2one('saas_portal.support_team', 'Support Team')
     expiration_datetime_sent = fields.Datetime(help='updates every time send_expiration_info is executed')
     active = fields.Boolean(default=True, compute='_compute_active', store=True)
-    public_url = fields.Char(compute='_compute_public_url', store=True)
     block_on_expiration = fields.Boolean('Block clients on expiration', default=False)
     block_on_storage_exceed = fields.Boolean('Block clients on storage exceed', default=False)
     storage_exceed = fields.Boolean('Storage limit has been exceed', default=False)
@@ -560,18 +572,6 @@ class SaasPortalClient(models.Model):
     def _compute_active(self):
         for record in self:
             record.active = record.state != 'deleted'
-
-    @api.multi
-    @api.depends('server_id.request_port', 'server_id.request_scheme', 'host')
-    def _compute_public_url(self):
-        for record in self:
-            scheme = record.server_id.request_scheme
-            host = record.host
-            port = record.server_id.request_port
-            public_url = "%s://%s" % (scheme, host)
-            if scheme == 'http' and port != 80 or scheme == 'https' and port != 443:
-                public_url = public_url + ':' + str(port)
-            record.public_url = public_url + '/'
 
     @api.model
     def _cron_suspend_expired_clients(self):

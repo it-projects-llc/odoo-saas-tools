@@ -353,7 +353,8 @@ class SaasPortalPlan(models.Model):
         except:
             _logger.error('Error on parsing response: %s\n%s' % ([req.url, req.headers, req.body], res.text))
             raise
-        self.template_id.state = data.get('state')
+        else:
+            self.template_id.state = data.get('state')
         return data
 
     @api.multi

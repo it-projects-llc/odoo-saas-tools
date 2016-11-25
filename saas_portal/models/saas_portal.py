@@ -324,13 +324,12 @@ class SaasPortalPlan(models.Model):
         return self.dbname_template.replace('%i', sequence)
 
     @api.multi
-    def create_template(self):
-        res = self._create_template()
-        self.template_id.state = res.get('state')
+    def create_template_button(self):
+        res = self.create_template()
 
 
     @api.multi
-    def _create_template(self, addons=None):
+    def create_template(self, addons=None):
         assert len(self) == 1, 'This method is applied only for single record'
         plan = self[0]
         state = {
@@ -354,6 +353,7 @@ class SaasPortalPlan(models.Model):
         except:
             _logger.error('Error on parsing response: %s\n%s' % ([req.url, req.headers, req.body], res.text))
             raise
+        self.template_id.state = res.get('state')
         return data
 
     @api.multi

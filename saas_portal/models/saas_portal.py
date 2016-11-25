@@ -503,7 +503,7 @@ class SaasPortalDatabase(models.Model):
         if payload is not None:
             # maybe use multiprocessing here
             for database_obj in self:
-                res.append(config_obj.do_upgrade_database(payload.copy(), database_obj.id))
+                res.append(config_obj.do_upgrade_database(payload.copy(), database_obj))
         return res
 
     @api.one

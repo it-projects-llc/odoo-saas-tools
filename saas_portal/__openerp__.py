@@ -11,7 +11,7 @@
         'data/mail_template_data.xml',
         'data/plan_sequence.xml',
         'data/cron.xml',
-        'views/wizard.xml',
+        'wizard/config_wizard.xml',
         'views/saas_portal.xml',
         'views/res_config.xml',
         'data/ir_config_parameter.xml',

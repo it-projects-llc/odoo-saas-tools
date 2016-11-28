@@ -19,6 +19,8 @@ class AccountInvoice(models.Model):
             if len(client_obj) == 1:
                 line.saas_portal_client_id = client_obj.id
                 client_obj.subscription_start = client_obj.subscription_start or fields.Datetime.now()
+                # TODO: get rid of 'subscription_start' field - always use
+                # 'create_date' field of saas_portal.client for this purpose
         return res
 
     @api.multi

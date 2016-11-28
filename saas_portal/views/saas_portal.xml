@@ -28,6 +28,8 @@
                     <button name="show_upgrade_wizard" attrs="{'invisible':[('state', 'in', ['deleted'])]}" type="object" icon="gtk-execute" help="Configure client database"/>
                     <button name="delete_database_server" type="object" attrs="{'invisible':[('state', 'not in', ['pending'])]}" icon="gtk-delete" help="Delete client database"
                     confirm="Are you sure to delete this database?"/>
+                    <button name="%(action_view_subscription_wizard)d" string="Manage subscription"
+                      type="action" context="{'default_client_id': id, 'default_expiration': expiration_datetime}"/>
                 </tree>
             </field>
         </record>
@@ -50,6 +52,8 @@
                         confirm="Are you sure to delete this database?"/>
                         <button string="Sync server" type="object" name="action_sync_server" icon="gtk-refresh"/>
                         <button name="%(saas_portal.action_rename_database)d" string="Rename Database" type="action"/>
+                        <button name="%(action_view_subscription_wizard)d" string="Manage subscription"
+                          type="action" context="{'default_client_id': id, 'default_expiration': expiration_datetime}"/>
                         <field name="state" widget="statusbar" statusbar_visible="open,pending,deleted" clickable="False"/>
                     </header>
                     <sheet>
@@ -70,6 +74,7 @@
                         </group>
                         <group name="subscription">
                             <field name="trial"/>
+                            <field string='Subscription start' name="create_date"/>
                             <field name="expiration_datetime"/>
                             <field name="expired"/>
                         </group>
@@ -89,6 +94,15 @@
                             </field>
                         </page>
                         -->
+                      <page string="Subscription Log (manual changes only)">
+                        <field name="subscription_log_ids" widget="one2many_list" colspan="4" nolabel="1" mode="tree" attrs="{'readonly': 1}">
+                          <tree string="Subsctiption Log" create="0" delete="false">
+                            <field name="expiration"/>
+                            <field name="expiration_new"/>
+                            <field name="reason"/>
+                          </tree>
+                        </field>
+                      </page>
                     </notebook>
                     </sheet>
                     <div class="oe_chatter">

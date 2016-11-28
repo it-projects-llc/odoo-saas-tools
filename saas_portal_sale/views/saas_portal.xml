@@ -43,9 +43,6 @@
             <field name="inherit_id" ref="saas_portal.view_clients_form"/>
             <field name="arch" type="xml">
                 <data>
-                    <xpath expr="//group[@name='subscription']/field[@name='expiration_datetime']" position="before">
-                        <field name="subscription_start"/>
-                    </xpath>
                     <xpath expr="//notebook" position="inside">
                         <page string='Invoice Lines'>
                             <field name="invoice_lines">

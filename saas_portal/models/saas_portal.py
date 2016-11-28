@@ -559,6 +559,15 @@ class SaasPortalClient(models.Model):
     block_on_expiration = fields.Boolean('Block clients on expiration', default=False)
     block_on_storage_exceed = fields.Boolean('Block clients on storage exceed', default=False)
     storage_exceed = fields.Boolean('Storage limit has been exceed', default=False)
+    expiration_datetime = fields.Datetime(string="Expiration", compute='_compute_expiration',
+                                          store=True)
+    period = fields.Integer('Subscribed period (paid and manual)',
+                            compute='_compute_period',
+                            store=True)
+    period_manual = fields.Integer('Manual days',
+                                   help='Subsription days that were set maually',
+                                   readonly=True)
+    subscription_log_ids = fields.One2many('saas_portal.subscription_log', 'client_id')
 
     _track = {
         'expired': {
@@ -566,6 +575,19 @@ class SaasPortalClient(models.Model):
             lambda self, cr, uid, obj, ctx=None: obj.expired
         }
     }
+
+    @api.multi
+    @api.depends('period', 'create_date')
+    def _compute_expiration(self):
+        for record in self:
+            start = record.create_date
+            record.expiration_datetime = fields.Datetime.from_string(start) + timedelta(record.period)
+
+    @api.multi
+    @api.depends('period_manual')
+    def _compute_period(self):
+        for record in self:
+            record.period = record.period_manual
 
     @api.multi
     @api.depends('state')

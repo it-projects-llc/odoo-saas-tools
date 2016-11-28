@@ -74,7 +74,7 @@
                         </group>
                         <group name="subscription">
                             <field name="trial"/>
-                            <field string='Subscription start' name="create_date"/>
+                            <field name="subscription_start"/>
                             <field name="expiration_datetime"/>
                             <field name="expired"/>
                         </group>

@@ -23,7 +23,6 @@ class SaasSubscriptionWizard(models.TransientModel):
             expiration = fields.Datetime.from_string(self.expiration)
             expiration_new = fields.Datetime.from_string(self.expiration_new)
             self.client_id.period_manual += (expiration_new - expiration).days
-            print '\n\n\n', 'in change_expiration ', 'period_manual ', self.client_id.period_manual, '\n\n\n'
             log_obj = self.env['saas_portal.subscription_log']
             log_obj.create({
                             'client_id': self.client_id.id,
@@ -31,6 +30,3 @@ class SaasSubscriptionWizard(models.TransientModel):
                             'expiration_new': self.expiration_new,
                             'reason': self.reason,
                           })
-
-
-

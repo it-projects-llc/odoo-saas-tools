@@ -6,11 +6,14 @@ from datetime import datetime
 from odoo.service import db
 from odoo import api, models, fields, SUPERUSER_ID, exceptions
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
+from odoo.tools import config
+
 import psycopg2
 import random
 import string
-
+from distutils.dir_util import copy_tree
 import logging
+
 _logger = logging.getLogger(__name__)
 
 
@@ -41,6 +44,12 @@ class SaasServerClient(models.Model):
     def create_database(self, template_db=None, demo=False, lang='en_US'):
         self.ensure_one()
         new_db = self.name
+        path_file_store = config.filestore(template_db)
+        parent_paths = path_file_store.split(template_db)
+        if len(parent_paths) > 1:
+            parent_path = parent_paths[0]
+            new_db_filstore_path = parent_path + new_db
+            copy_tree(path_file_store, new_db_filstore_path)
         res = {}
         if template_db:
             odoo.service.db._drop_conn(self.env.cr, template_db)

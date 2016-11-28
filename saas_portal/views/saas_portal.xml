@@ -54,7 +54,7 @@
                         <button name="%(saas_portal.action_rename_database)d" string="Rename Database" type="action"/>
                         <button name="%(action_view_subscription_wizard)d" string="Manage subscription"
                           type="action" context="{'default_client_id': id, 'default_expiration': expiration_datetime}"/>
-                        <field name="state" widget="statusbar" statusbar_visible="open,pending,deleted" clickable="False"/>
+                        <field name="state" widget="statusbar" statusbar_visible="open,pending,deleted" clickable=""/>
                     </header>
                     <sheet>
                     <group>

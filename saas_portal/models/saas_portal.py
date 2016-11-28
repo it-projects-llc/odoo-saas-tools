@@ -597,7 +597,7 @@ class SaasPortalClient(models.Model):
                 composer = self.env['mail.compose.message'].with_context(email_ctx).create({})
                 composer.send_mail()
 
-                self.env['saas.config'].do_upgrade_database(payload, record.id)
+                self.env['saas.config'].do_upgrade_database(payload, record)
 
     @api.model
     def _cron_notify_expired_clients(self):
@@ -696,7 +696,7 @@ class SaasPortalClient(models.Model):
 
                 payload = record.get_upgrade_database_payload()
                 if payload:
-                    self.env['saas.config'].do_upgrade_database(payload, record.id)
+                    self.env['saas.config'].do_upgrade_database(payload, record)
 
                 record.send_expiration_info_to_partner()
                 # expiration date has been changed, flush expiration notification flag
@@ -717,7 +717,7 @@ class SaasPortalClient(models.Model):
                            {'key': 'saas_client.expiration_datetime', 'value': record.expiration_datetime, 'hidden': True},
                            {'key': 'saas_client.total_storage_limit', 'value': record.total_storage_limit, 'hidden': True}],
             }
-            self.env['saas.config'].do_upgrade_database(payload, record.id)
+            self.env['saas.config'].do_upgrade_database(payload, record)
 
     @api.multi
     def send_expiration_info_to_partner(self):
@@ -739,7 +739,7 @@ class SaasPortalClient(models.Model):
         if 'expiration_datetime' in vals and vals['expiration_datetime']:
             self.env['saas.config'].do_upgrade_database(
                 {'params': [{'key': 'saas_client.expiration_datetime', 'value': vals['expiration_datetime'], 'hidden': True}]},
-                self.id)
+                self)
         return super(SaasPortalClient, self).write(vals)
 
     @api.multi
@@ -762,7 +762,7 @@ class SaasPortalClient(models.Model):
                 composer.send_mail()
 
                 if r.block_on_storage_exceed:
-                    self.env['saas.config'].do_upgrade_database(payload, r.id)
+                    self.env['saas.config'].do_upgrade_database(payload, r)
             if r.total_storage_limit >= r.file_storage + r.db_storage and r.storage_exceed is True:
                 r.write({'storage_exceed': False})
 

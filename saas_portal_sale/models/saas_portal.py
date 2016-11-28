@@ -34,7 +34,7 @@ class SaasPortalPlan(models.Model):
             client_obj.subscription_start = client_obj.create_date
 
         payload = client_obj.get_upgrade_database_payload()
-        self.env['saas.config'].do_upgrade_database(payload, client_obj.id)
+        self.env['saas.config'].do_upgrade_database(payload, client_obj)
 
         return res
 

@@ -38,6 +38,7 @@ class SaasServer(http.Controller):
         state = simplejson.loads(post.get('state'))
         owner_user = state.get('owner_user')
         new_db = state.get('d')
+        public_url = state.get('public_url')
         trial = state.get('t')
         expiration_db = state.get('e')
         template_db = state.get('db_template')
@@ -60,7 +61,7 @@ class SaasServer(http.Controller):
 
         client_data = {'name': new_db, 'client_id': client_id, 'expiration_datetime': expiration_db, 'trial': trial}
         client = request.env['saas_server.client'].sudo().create(client_data)
-        client.create_database(template_db, demo, lang)
+        res = client.create_database(template_db, demo, lang)
         client.install_addons(addons=addons, is_template_db=is_template_db)
         if disable_mail_server:
             client.disable_mail_servers()
@@ -73,11 +74,11 @@ class SaasServer(http.Controller):
             server_requests_scheme=request.httprequest.scheme)
 
         if is_template_db:
-            res = [{
+            res.update({
                 'name': client.name,
                 'state': client.state,
                 'client_id': client.client_id
-            }]
+            })
             return simplejson.dumps(res)
 
         with client.registry()[0].cursor() as cr:
@@ -85,9 +86,7 @@ class SaasServer(http.Controller):
             oauth_provider_id = client_env.ref('saas_client.saas_oauth_provider').id
             action_id = client_env.ref(action).id
 
-        scheme = request.httprequest.scheme
-        port = self._get_port_str(scheme)
-        url = '{scheme}://{domain}{port}/saas_client/new_database'.format(scheme=scheme, domain=new_db, port=port)
+        url = '{public_url}saas_client/new_database'.format(public_url=public_url)
         return simplejson.dumps({
             'url': url,
             'state': simplejson.dumps({
@@ -103,17 +102,15 @@ class SaasServer(http.Controller):
     def edit_database(self, **post):
         _logger.info('edit_database post: %s', post)
 
-        scheme = request.httprequest.scheme
-        port = self._get_port_str(scheme)
         state = simplejson.loads(post.get('state'))
-        domain = state.get('host')
+        public_url = state.get('public_url')
 
         params = {
             'access_token': post['access_token'],
             'state': simplejson.dumps(state),
         }
-        url = '{scheme}://{domain}{port}/saas_client/edit_database?{params}'
-        url = url.format(scheme=scheme, domain=domain, port=port, params=werkzeug.url_encode(params))
+        url = '{public_url}saas_client/edit_database?{params}'
+        url = url.format(public_url=public_url, params=werkzeug.url_encode(params))
         return werkzeug.utils.redirect(url)
 
     @http.route('/saas_server/upgrade_database', type='http', auth='public')
@@ -286,17 +283,6 @@ class SaasServer(http.Controller):
             })
         return simplejson.dumps(res)
 
-    def _get_port(self):
-        host_parts = request.httprequest.host.split(':')
-        return len(host_parts) > 1 and host_parts[1] or 80
-
-    def _get_port_str(self, scheme):
-        port = str(self._get_port())
-        if scheme == 'http' and port == '80' or scheme == 'https' and port == '443':
-            return ''
-        else:
-            return ':' + port
-    
     def _get_message(self, dbuuid):
         message = False
         domain = [('client_id', '=', dbuuid)]

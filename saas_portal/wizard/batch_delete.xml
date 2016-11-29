@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+
+    <record id="batch_delete_wizard_view_form" model="ir.ui.view">
+      <field name="name">Batch delete</field>
+      <field name="model">saas_portal.batch_delete_wizard</field>
+      <field name="arch" type="xml">
+        <form string="Batch delete">
+          <sheet>
+            <div>
+              <p class="oe_view_nocontent_create">
+                Selected databases will be deleted from the server
+              </p>
+            </div>
+            <group>
+              <field name="client_ids" nolabel="1" widget="many2many_tags" options="{'no_create' : True, 'no_open': True}"/>
+            </group>
+          </sheet>
+          <footer>
+            <button name="delete_from_server" string="Delete" type="object"
+              confirm="Are you sure?"/>
+            <button string="Cancel" class="btn-default" special="cancel"/>
+          </footer>
+        </form>
+      </field>
+    </record>
+
+    <record id="action_view_batch_delete_wizard" model="ir.actions.act_window">
+      <field name="name">Delete databases</field>
+      <field name="type">ir.actions.act_window</field>
+      <field name="res_model">saas_portal.batch_delete_wizard</field>
+      <field name="view_type">form</field>
+      <field name="view_mode">form</field>
+      <field name="target">new</field>
+    </record>
+
+  </data>
+</openerp>

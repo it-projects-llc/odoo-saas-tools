@@ -72,14 +72,13 @@ class SaasConfig(models.TransientModel):
         }
 
     @api.model
-    def do_upgrade_database(self, payload, saas_portal_client_id):
-        client = self.env['saas_portal.client'].browse(saas_portal_client_id)
+    def do_upgrade_database(self, payload, database_record):
         state = {
             'data': payload,
         }
-        req, req_kwargs = client.server_id._request_server(
+        req, req_kwargs = database_record.server_id._request_server(
             path='/saas_server/upgrade_database',
-            client_id=client.client_id,
+            client_id = database_record.client_id,
             state=state,
         )
         res = requests.Session().send(req, **req_kwargs)

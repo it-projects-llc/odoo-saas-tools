@@ -272,6 +272,7 @@ class SaasPortalPlan(models.Model):
                                                        DEFAULT_SERVER_DATETIME_FORMAT) + timedelta(hours=self.expiration)).strftime(DEFAULT_SERVER_DATETIME_FORMAT)  # for trial
         state = {
             'd': client.name,
+            'public_url': client.public_url,
             'e': trial and trial_expiration_datetime or client.create_date,
             'r': client.public_url + 'web',
             'owner_user': owner_user_data,
@@ -316,12 +317,13 @@ class SaasPortalPlan(models.Model):
         sequence = self.env['ir.sequence'].get('saas_portal.plan')
         return self.dbname_template.replace('%i', sequence)
 
-    def create_template(self):
-        self._create_template()
-        return self.action_sync_server()
+    @api.multi
+    def create_template_button(self):
+        res = self.create_template()
+
 
     @api.multi
-    def _create_template(self, addons=None):
+    def create_template(self, addons=None):
         assert len(self) == 1, 'This method is applied only for single record'
         plan = self[0]
         state = {
@@ -345,6 +347,7 @@ class SaasPortalPlan(models.Model):
         except:
             _logger.error('Error on parsing response: %s\n%s' % ([req.url, req.headers, req.body], res.text))
             raise
+        self.template_id.state = data.get('state')
         return data
 
     @api.multi
@@ -406,6 +409,19 @@ class SaasPortalDatabase(models.Model):
                               ],
                              'State', default='draft', track_visibility='onchange')
     host = fields.Char('Host', compute=_compute_host)
+    public_url = fields.Char(compute='_compute_public_url', store=True)
+
+    @api.multi
+    @api.depends('server_id.request_port', 'server_id.request_scheme', 'host')
+    def _compute_public_url(self):
+        for record in self:
+            scheme = record.server_id.request_scheme
+            host = record.host
+            port = record.server_id.request_port
+            public_url = "%s://%s" % (scheme, host)
+            if scheme == 'http' and port != 80 or scheme == 'https' and port != 443:
+                public_url = public_url + ':' + str(port)
+            record.public_url = public_url + '/'
 
     @api.multi
     def _backup(self):
@@ -451,6 +467,7 @@ class SaasPortalDatabase(models.Model):
         state = {
             'd': r.name,
             'host': r.host,
+            'public_url': r.public_url,
             'client_id': r.client_id,
         }
         url = r.server_id._request(path=path, state=state, client_id=r.client_id)
@@ -480,7 +497,7 @@ class SaasPortalDatabase(models.Model):
         if payload is not None:
             # maybe use multiprocessing here
             for database_obj in self:
-                res.append(config_obj.do_upgrade_database(payload.copy(), database_obj.id))
+                res.append(config_obj.do_upgrade_database(payload.copy(), database_obj))
         return res
 
     @api.one
@@ -533,10 +550,19 @@ class SaasPortalClient(models.Model):
     support_team_id = fields.Many2one('saas_portal.support_team', 'Support Team')
     expiration_datetime_sent = fields.Datetime(help='updates every time send_expiration_info is executed')
     active = fields.Boolean(default=True, compute='_compute_active', store=True)
-    public_url = fields.Char(compute='_compute_public_url', store=True)
     block_on_expiration = fields.Boolean('Block clients on expiration', default=False)
     block_on_storage_exceed = fields.Boolean('Block clients on storage exceed', default=False)
     storage_exceed = fields.Boolean('Storage limit has been exceed', default=False)
+    subscription_start = fields.Datetime(string="Subscription start", track_visibility='onchange')
+    expiration_datetime = fields.Datetime(string="Expiration", compute='_compute_expiration',
+                                          store=True)
+    period = fields.Integer('Subscribed period (paid and manual)',
+                            compute='_compute_period',
+                            store=True)
+    period_manual = fields.Integer('Manual days',
+                                   help='Subsription days that were set maually',
+                                   readonly=True)
+    subscription_log_ids = fields.One2many('saas_portal.subscription_log', 'client_id')
 
     # TODO: use new api for tracking
     _track = {
@@ -547,22 +573,23 @@ class SaasPortalClient(models.Model):
     }
 
     @api.multi
+    @api.depends('period', 'create_date')
+    def _compute_expiration(self):
+        for record in self:
+            start = record.subscription_start or record.create_date
+            record.expiration_datetime = fields.Datetime.from_string(start) + timedelta(record.period)
+
+    @api.multi
+    @api.depends('period_manual')
+    def _compute_period(self):
+        for record in self:
+            record.period = record.period_manual
+
+    @api.multi
     @api.depends('state')
     def _compute_active(self):
         for record in self:
             record.active = record.state != 'deleted'
-
-    @api.multi
-    @api.depends('server_id.request_port', 'server_id.request_scheme', 'host')
-    def _compute_public_url(self):
-        for record in self:
-            scheme = record.server_id.request_scheme
-            host = record.host
-            port = record.server_id.request_port
-            public_url = "%s://%s" % (scheme, host)
-            if scheme == 'http' and port != 80 or scheme == 'https' and port != 443:
-                public_url = public_url + ':' + str(port)
-            record.public_url = public_url + '/'
 
     @api.model
     def _cron_suspend_expired_clients(self):
@@ -580,7 +607,7 @@ class SaasPortalClient(models.Model):
                 template = self.env.ref('saas_portal.email_template_has_expired_notify')
                 record.message_post_with_template(template.id, composition_mode='comment')
 
-                self.env['saas.config'].do_upgrade_database(payload, record.id)
+                self.env['saas.config'].do_upgrade_database(payload, record)
 
     @api.model
     def _cron_notify_expired_clients(self):
@@ -676,7 +703,7 @@ class SaasPortalClient(models.Model):
 
                 payload = record.get_upgrade_database_payload()
                 if payload:
-                    self.env['saas.config'].do_upgrade_database(payload, record.id)
+                    self.env['saas.config'].do_upgrade_database(payload, record)
 
                 record.send_expiration_info_to_partner()
                 # expiration date has been changed, flush expiration notification flag
@@ -697,7 +724,7 @@ class SaasPortalClient(models.Model):
                            {'key': 'saas_client.expiration_datetime', 'value': record.expiration_datetime, 'hidden': True},
                            {'key': 'saas_client.total_storage_limit', 'value': record.total_storage_limit, 'hidden': True}],
             }
-            self.env['saas.config'].do_upgrade_database(payload, record.id)
+            self.env['saas.config'].do_upgrade_database(payload, record)
 
     @api.multi
     def send_expiration_info_to_partner(self):
@@ -711,7 +738,7 @@ class SaasPortalClient(models.Model):
         if 'expiration_datetime' in vals and vals['expiration_datetime']:
             self.env['saas.config'].do_upgrade_database(
                 {'params': [{'key': 'saas_client.expiration_datetime', 'value': vals['expiration_datetime'], 'hidden': True}]},
-                self.id)
+                self)
         return super(SaasPortalClient, self).write(vals)
 
     @api.multi
@@ -726,7 +753,7 @@ class SaasPortalClient(models.Model):
                 r.message_post_with_template(template.id, composition_mode='comment')
 
                 if r.block_on_storage_exceed:
-                    self.env['saas.config'].do_upgrade_database(payload, r.id)
+                    self.env['saas.config'].do_upgrade_database(payload, r)
             if r.total_storage_limit >= r.file_storage + r.db_storage and r.storage_exceed is True:
                 r.write({'storage_exceed': False})
 

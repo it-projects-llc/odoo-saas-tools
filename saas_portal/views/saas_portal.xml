@@ -26,7 +26,7 @@
                             icon="gtk-connect" attrs="{'invisible':[('state', 'in', ['deleted', 'draft'])]}"
                             help="Log in to client database."/>
                     <button name="show_upgrade_wizard" attrs="{'invisible':[('state', 'in', ['deleted'])]}" type="object" icon="gtk-execute" help="Configure client database"/>
-                    <button name="delete_database_server" type="object" attrs="{'invisible':[('state', 'not in', ['pending'])]}" icon="gtk-delete" help="Delete client database"
+                    <button name="delete_database_server" type="object" attrs="{'invisible':[('state', 'in', ['draft', 'deleted'])]}" icon="gtk-delete" help="Delete client database"
                     confirm="Are you sure to delete this database?"/>
                     <button name="%(action_view_subscription_wizard)d" string="Manage subscription"
                       type="action" context="{'default_client_id': id, 'default_expiration': expiration_datetime}"/>
@@ -48,7 +48,7 @@
                                 help="Log in to client database."
                                 />
                         <button string="Configure" name="show_upgrade_wizard" type="object" attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}" icon="gtk-execute" />
-                        <button string="Delete" name="delete_database_server" type="object" attrs="{'invisible':['|',('state', 'not in', ['pending'])]}" icon="gtk-delete" 
+                        <button string="Delete" name="delete_database_server" type="object" attrs="{'invisible':['|',('state', 'in', ['draft', 'deleted'])]}" icon="gtk-delete" 
                         confirm="Are you sure to delete this database?"/>
                         <button string="Sync server" type="object" name="action_sync_server" icon="gtk-refresh"/>
                         <button name="%(saas_portal.action_rename_database)d" string="Rename Database" type="action"/>
@@ -410,6 +410,14 @@
             <field name="model">saas.config</field>
             <field name="value_unpickle" eval="'ir.actions.act_window,'+str(action_updb)"/>
         </record>
+
+        <act_window
+        id="act_delete_batch_clients"
+        name="Delete Clients"
+        res_model="saas_portal.batch_delete_wizard"
+        key2="client_action_multi"
+        src_model="saas_portal.client"
+        view_mode="form" target="new" view_type="form" />
 
         <record id="view_support_team_tree" model="ir.ui.view">
             <field name="name">saas_portal.support_team.tree</field>

@@ -12,6 +12,7 @@
         'data/plan_sequence.xml',
         'data/cron.xml',
         'wizard/config_wizard.xml',
+        'wizard/batch_delete.xml',
         'wizard/subscription_wizard.xml',
         'views/saas_portal.xml',
         'views/res_config.xml',

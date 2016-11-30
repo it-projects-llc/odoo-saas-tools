@@ -697,7 +697,10 @@ class SaasPortalClient(models.Model):
     @api.multi
     def send_expiration_info(self):
         for record in self:
-            if record.expiration_datetime_sent and record.expiration_datetime and record.expiration_datetime_sent != record.expiration_datetime:
+            if record.state not in ['draft', 'deleted'] and \
+                    record.expiration_datetime_sent and \
+                    record.expiration_datetime and \
+                    record.expiration_datetime_sent != record.expiration_datetime:
                 record.expiration_datetime_sent = record.expiration_datetime
 
                 payload = record.get_upgrade_database_payload()

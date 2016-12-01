@@ -268,8 +268,9 @@ class SaasPortalPlan(models.Model):
             'name': owner_user.name,
             'email': owner_user.email,
         }
-        trial_expiration_datetime = (datetime.strptime(client.create_date,
-                                                       DEFAULT_SERVER_DATETIME_FORMAT) + timedelta(hours=self.expiration)).strftime(DEFAULT_SERVER_DATETIME_FORMAT)  # for trial
+
+        client.period_initial = trial and self.expiration
+        trial_expiration_datetime = (fields.Datetime.from_string(client.create_date) + timedelta(hours=client.period_initial)).strftime(DEFAULT_SERVER_DATETIME_FORMAT)
         state = {
             'd': client.name,
             'public_url': client.public_url,
@@ -300,8 +301,6 @@ class SaasPortalPlan(models.Model):
             template = self.env.ref('saas_portal.email_template_create_saas')
             client.message_post_with_template(template.id, composition_mode='comment')
 
-        if trial:
-            client.expiration_datetime = trial_expiration_datetime
         client.send_params_to_client_db()
         # TODO make async call of action_sync_server here
         # client.server_id.action_sync_server()
@@ -544,7 +543,7 @@ class SaasPortalClient(models.Model):
     name = fields.Char(required=True)
     partner_id = fields.Many2one('res.partner', string='Partner', track_visibility='onchange', readonly=True)
     plan_id = fields.Many2one('saas_portal.plan', string='Plan', track_visibility='onchange', ondelete='restrict', readonly=True)
-    expired = fields.Boolean('Expired', default=False, readonly=True)
+    expired = fields.Boolean('Expired', compute='_compute_expiration', store=True)
     user_id = fields.Many2one('res.users', default=lambda self: self.env.user, string='Salesperson')
     notification_sent = fields.Boolean(default=False, readonly=True, help='notification about oncoming expiration has sent')
     support_team_id = fields.Many2one('saas_portal.support_team', 'Support Team')
@@ -562,6 +561,9 @@ class SaasPortalClient(models.Model):
     period_manual = fields.Integer('Manual days',
                                    help='Subsription days that were set maually',
                                    readonly=True)
+    period_initial = fields.Integer('Initial period for trial (hours)',
+                                   help='Subsription initial period in hours for trials',
+                                   readonly=True)
     subscription_log_ids = fields.One2many('saas_portal.subscription_log', 'client_id')
 
     _track = {
@@ -572,11 +574,16 @@ class SaasPortalClient(models.Model):
     }
 
     @api.multi
-    @api.depends('period', 'create_date')
+    @api.depends('period', 'create_date', 'subscription_start', 'period_initial', 'trial')
     def _compute_expiration(self):
         for record in self:
             start = record.subscription_start or record.create_date
-            record.expiration_datetime = fields.Datetime.from_string(start) + timedelta(record.period)
+            expiration_datetime = fields.Datetime.from_string(start) + timedelta(record.period)
+            if record.trial:
+                expiration_datetime = expiration_datetime + timedelta(hours=record.period_initial)
+            record.expiration_datetime = expiration_datetime
+            now = fields.Datetime.from_string(fields.Datetime.now())
+            record.expired = expiration_datetime < now
 
     @api.multi
     @api.depends('period_manual')
@@ -606,7 +613,9 @@ class SaasPortalClient(models.Model):
                 template = self.env.ref('saas_portal.email_template_has_expired_notify')
                 record.message_post_with_template(template.id, composition_mode='comment')
 
-                self.env['saas.config'].do_upgrade_database(payload, record)
+                record.upgrade(payload)
+                # if upgraded without exceptions then change the state
+                record.state = 'pending'
 
     @api.model
     def _cron_notify_expired_clients(self):

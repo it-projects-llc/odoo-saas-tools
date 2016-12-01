@@ -623,7 +623,9 @@ class SaasPortalClient(models.Model):
                 composer = self.env['mail.compose.message'].with_context(email_ctx).create({})
                 composer.send_mail()
 
-                self.env['saas.config'].do_upgrade_database(payload, record)
+                record.upgrade(payload)
+                # if upgraded without exceptions then change the state
+                record.state = 'pending'
 
     @api.model
     def _cron_notify_expired_clients(self):

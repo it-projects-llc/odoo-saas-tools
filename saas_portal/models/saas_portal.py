@@ -265,8 +265,9 @@ class SaasPortalPlan(models.Model):
             'name': owner_user.name,
             'email': owner_user.email,
         }
-        trial_expiration_datetime = (datetime.strptime(client.create_date,
-                                                       DEFAULT_SERVER_DATETIME_FORMAT) + timedelta(hours=self.expiration)).strftime(DEFAULT_SERVER_DATETIME_FORMAT)  # for trial
+
+        client.period_initial = trial and self.expiration
+        trial_expiration_datetime = (fields.Datetime.from_string(client.create_date) + timedelta(hours=client.period_initial)).strftime(DEFAULT_SERVER_DATETIME_FORMAT)
         state = {
             'd': client.name,
             'public_url': client.public_url,
@@ -306,8 +307,6 @@ class SaasPortalPlan(models.Model):
             composer = self.env['mail.compose.message'].with_context(email_ctx).create({})
             composer.send_mail()
 
-        if trial:
-            client.expiration_datetime = trial_expiration_datetime
         client.send_params_to_client_db()
         # TODO make async call of action_sync_server here
         # client.server_id.action_sync_server()
@@ -568,6 +567,9 @@ class SaasPortalClient(models.Model):
     period_manual = fields.Integer('Manual days',
                                    help='Subsription days that were set maually',
                                    readonly=True)
+    period_initial = fields.Integer('Initial period for trial (hours)',
+                                   help='Subsription initial period in hours for trials',
+                                   readonly=True)
     subscription_log_ids = fields.One2many('saas_portal.subscription_log', 'client_id')
 
     _track = {
@@ -578,11 +580,13 @@ class SaasPortalClient(models.Model):
     }
 
     @api.multi
-    @api.depends('period', 'create_date')
+    @api.depends('period', 'create_date', 'subscription_start', 'period_initial', 'trial')
     def _compute_expiration(self):
         for record in self:
             start = record.subscription_start or record.create_date
             expiration_datetime = fields.Datetime.from_string(start) + timedelta(record.period)
+            if record.trial:
+                expiration_datetime = expiration_datetime + timedelta(hours=record.period_initial)
             record.expiration_datetime = expiration_datetime
             now = fields.Datetime.from_string(fields.Datetime.now())
             record.expired = expiration_datetime < now

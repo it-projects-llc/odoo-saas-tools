@@ -43,7 +43,7 @@ class SaasPortalClient(models.Model):
     _inherit = 'saas_portal.client'
 
     invoice_lines = fields.One2many('account.invoice.line', 'saas_portal_client_id')
-    trial = fields.Boolean('Trial', help='indication of trial clients', default=False, store=True, readonly=True, compute='_compute_period_paid')
+    trial = fields.Boolean('Trial', help='indication of trial clients', compute='_compute_period_paid', store=True)
     period_paid = fields.Integer('Paid days',
                                  help='Subsription days that were paid',
                                  compute='_compute_period_paid',

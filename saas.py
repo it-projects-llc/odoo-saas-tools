@@ -218,12 +218,6 @@ def createdb(dbname, install_modules=['base']):
     if args.get('drop_databases'):
         pg_dropdb(dbname)
 
-    # create db if not exist
-    try:
-        pg_createdb(dbname, without_demo=without_demo)
-    except Exception, e:
-        log('pg_createdb error:', e)
-
     cmd = get_cmd(dbname, workers=0)
     cmd += ['-i', ','.join(install_modules)]
     if args.get('test_enable'):

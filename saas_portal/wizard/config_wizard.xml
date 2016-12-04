@@ -9,6 +9,7 @@
                      <group>
                         <field name="name"/>
                         <field name="plan_id"/>
+                        <field name="trial"/>
                         <field name="user_id" class="oe_inline"/>
                         <field name="partner_id" class="oe_inline"/>
                         <field name="notify_user" class="oe_inline"/>

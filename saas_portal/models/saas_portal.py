@@ -561,12 +561,7 @@ class SaasPortalClient(models.Model):
     subscription_start = fields.Datetime(string="Subscription start", track_visibility='onchange')
     expiration_datetime = fields.Datetime(string="Expiration", compute='_compute_expiration',
                                           store=True)
-    period = fields.Integer('Subscribed period (paid and manual)',
-                            compute='_compute_period',
-                            store=True)
-    period_manual = fields.Integer('Manual days',
-                                   help='Subsription days that were set maually',
-                                   readonly=True)
+    period_paid = fields.Integer('Subscribed period (paid days)', readonly=True)
     period_initial = fields.Integer('Initial period for trial (hours)',
                                    help='Subsription initial period in hours for trials',
                                    readonly=True)
@@ -580,22 +575,27 @@ class SaasPortalClient(models.Model):
     }
 
     @api.multi
-    @api.depends('period', 'create_date', 'subscription_start', 'period_initial', 'trial')
+    def get_manual_timedelta(self):
+        self.ensure_one()
+        td = timedelta()
+        for log_record in self.subscription_log_ids:
+            td += fields.Datetime.from_string(log_record.expiration_new) - \
+                    fields.Datetime.from_string(log_record.expiration)
+        return td
+
+    @api.multi
+    @api.depends('period_paid', 'create_date', 'subscription_start', 'period_initial', 'trial', 'subscription_log_ids')
     def _compute_expiration(self):
         for record in self:
             start = record.subscription_start or record.create_date
-            expiration_datetime = fields.Datetime.from_string(start) + timedelta(record.period)
+
+            expiration_datetime = fields.Datetime.from_string(start) + \
+                    timedelta(record.period_paid) + get_manual_timedelta()
             if record.trial:
                 expiration_datetime = expiration_datetime + timedelta(hours=record.period_initial)
             record.expiration_datetime = expiration_datetime
             now = fields.Datetime.from_string(fields.Datetime.now())
             record.expired = expiration_datetime < now
-
-    @api.multi
-    @api.depends('period_manual')
-    def _compute_period(self):
-        for record in self:
-            record.period = record.period_manual
 
     @api.multi
     @api.depends('state')

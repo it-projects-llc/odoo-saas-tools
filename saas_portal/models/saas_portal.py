@@ -590,7 +590,7 @@ class SaasPortalClient(models.Model):
             start = record.subscription_start or record.create_date
 
             expiration_datetime = fields.Datetime.from_string(start) + \
-                    timedelta(record.period_paid) + get_manual_timedelta()
+                    timedelta(record.period_paid) + record.get_manual_timedelta()
             if record.trial:
                 expiration_datetime = expiration_datetime + timedelta(hours=record.period_initial)
             record.expiration_datetime = expiration_datetime

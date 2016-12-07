@@ -62,12 +62,6 @@ class SaasPortalClient(models.Model):
             client_obj.trial = not bool(days)
 
     @api.multi
-    @api.depends('period_manual', 'period_paid')
-    def _compute_period(self):
-        for record in self:
-            record.period = record.period_manual + record.period_paid
-
-    @api.multi
     def get_upgrade_database_payload(self):
         res = super(SaasPortalClient, self).get_upgrade_database_payload()
 

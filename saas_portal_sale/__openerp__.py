@@ -12,6 +12,7 @@
         'views/product_view.xml',
         'views/saas_portal.xml',
         'views/account_invoice.xml',
+        'views/config_wizard.xml',
         'data/mail_template_data.xml',
         'data/ir_config_parameter.xml',
     ],

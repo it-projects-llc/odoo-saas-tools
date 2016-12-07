@@ -22,7 +22,6 @@ class SaasSubscriptionWizard(models.TransientModel):
             # raise an exception i.e. the request has sacceeded
             expiration = fields.Datetime.from_string(self.expiration)
             expiration_new = fields.Datetime.from_string(self.expiration_new)
-            self.client_id.period_manual += (expiration_new - expiration).days
             log_obj = self.env['saas_portal.subscription_log']
             log_obj.create({
                             'client_id': self.client_id.id,

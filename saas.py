@@ -486,6 +486,9 @@ def get_cmd(dbname='', workers=3, run_cron=False):
     if args.get('addons_path'):
         cmd += ['--addons-path=%s' % args.get('addons_path')]
 
+    if os.getenv('SAAS_ODOO_PARAMS'):
+        cmd += os.getenv('SAAS_ODOO_PARAMS').split(' ')
+
     return cmd
 
 

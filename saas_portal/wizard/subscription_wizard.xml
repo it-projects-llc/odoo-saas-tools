@@ -21,7 +21,7 @@
             </group>
           </sheet>
           <footer>
-            <button name="change_expiration" string="Apply" type="object"/>
+            <button name="apply_changes" string="Apply" type="object"/>
             <button string="Cancel" class="btn-default" special="cancel"/>
           </footer>
         </form>

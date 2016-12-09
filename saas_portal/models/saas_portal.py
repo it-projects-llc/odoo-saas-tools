@@ -575,6 +575,27 @@ class SaasPortalClient(models.Model):
     }
 
     @api.multi
+    def change_subscription(self, expiration=None, reason=None):
+        if expiration:
+            expiration_dt = fields.Datetime.from_string(expiration)
+            log_obj = self.env['saas_portal.subscription_log']
+            for record in self:
+                record_expiration_dt = record.expiration_datetime and \
+                        fields.Datetime.from_string(record.expiration_datetime)
+                if record_expiration_dt != expiration_dt:
+                    record.upgrade(payload={'params':
+                                            [{'key': 'saas_client.expiration_datetime',
+                                                'value': expiration, 'hidden': True}]})
+                    # after expiration_datetime is computed on subscription_log_ids change
+                    # base.action.rule triggers send_expiration_info with record.upgrade but not in 8.0
+                    log_obj.create({
+                        'client_id': record.id,
+                        'expiration': record.expiration_datetime,
+                        'expiration_new': expiration,
+                        'reason': reason,
+                        })
+
+    @api.multi
     def get_manual_timedelta(self):
         self.ensure_one()
         td = timedelta()

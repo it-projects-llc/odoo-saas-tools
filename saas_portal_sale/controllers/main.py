@@ -19,7 +19,7 @@ class SaasPortalSale(SaasPortal):
                 user = request.env['res.users'].browse(user_id)
                 partner_id = user.partner_id.id
 
-            lines = request.env['saas_portal.find_payments_wizard'].find_partner_payments(partner_id=partner_id, plan_id=plan.id)
+            lines = request.env['saas_portal.subscription_wizard'].find_partner_payments(partner_id=partner_id, plan_id=plan.id)
             if len(lines) == 0:
                 url = request.env['ir.config_parameter'].sudo().get_param('saas_portal.page_for_nonfree_subdomains', '/')
                 return werkzeug.utils.redirect(url)

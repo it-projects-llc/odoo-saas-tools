@@ -21,7 +21,7 @@
             </group>
           </sheet>
           <footer>
-            <button name="change_expiration" string="Apply" type="object"/>
+            <button name="apply_changes" string="Apply" type="object"/>
             <button string="Cancel" class="btn-default" special="cancel"/>
           </footer>
         </form>
@@ -29,7 +29,7 @@
     </record>
 
     <record id="action_view_subscription_wizard" model="ir.actions.act_window">
-      <field name="name">Manage subsription manually</field>
+      <field name="name">Manage subsription</field>
       <field name="type">ir.actions.act_window</field>
       <field name="res_model">saas_portal.subscription_wizard</field>
       <field name="view_type">form</field>

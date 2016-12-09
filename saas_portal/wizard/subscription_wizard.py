@@ -11,6 +11,15 @@ class SaasSubscriptionWizard(models.TransientModel):
     expiration_new = fields.Datetime('New expiration', help='set new expiration here')
     reason = fields.Text(string='Reason of new expiration', help='The reason of expiration change')
 
+    @api.model
+    def default_get(self, fields):
+        result = super(SaasSubscriptionWizard, self).default_get(fields)
+        client = self.env['saas_portal.client'].browse(self.env.context.get('active_id'))
+        result['client_id'] = client.id
+        result['expiration'] = client.expiration_datetime
+        result['expiration_new'] = client.expiration_datetime
+        return result
+
     @api.multi
     def change_expiration(self):
         if self.expiration_new:

@@ -1,41 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
-        <record id="saas_portal_find_payments_form" model="ir.ui.view">
-            <field name="name">saas_portal.find_payments.form</field>
-            <field name="model">saas_portal.find_payments_wizard</field>
-            <field name="arch" type="xml">
-                <form string="Find the payments">
-                    <sheet>
-                        <field name="invoice_lines">
-                            <tree>
-                                <field name="create_date"/>
-                                <field name="write_date"/>
-                                <field name="product_id"/>
-                                <field name="plan_id"/>
-                                <field name="period"/>
-                                <field name="price_unit"/>
-                                <field name="state"/>
-                            </tree>
-                        </field>
-                        <footer>
-                            <button name="apply_invoice_lines" string="apply" type="object" class="oe_highlight"/>
-                            or
-                            <button string="Close" class="oe_link" special="cancel"/>
-                        </footer>
-                    </sheet>
-                </form>
-            </field>
-        </record>
-
-        <record id="saas_portal_find_payments_action" model="ir.actions.act_window">
-            <field name="name">Find the payments</field>
-            <field name="res_model">saas_portal.find_payments_wizard</field>
-            <field name="view_mode">form</field>
-            <field name="view_type">form</field>
-            <field name="view_id" ref="saas_portal_find_payments_form"/>
-            <field name="target">new</field>
-        </record>
 
         <record id="view_clients_form" model="ir.ui.view">
             <field name="name">saas_portal.client.form</field>
@@ -57,9 +22,6 @@
                                 </tree>
                             </field>
                         </page>
-                    </xpath>
-                    <xpath expr="//field[@name='state']" position="before">
-                        <button name="%(saas_portal_find_payments_action)d" type="action" string="Find the payments"/>
                     </xpath>
                 </data>
             </field>

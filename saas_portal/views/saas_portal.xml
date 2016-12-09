@@ -28,8 +28,7 @@
                     <button name="show_upgrade_wizard" attrs="{'invisible':[('state', 'in', ['deleted'])]}" type="object" icon="gtk-execute" help="Configure client database"/>
                     <button name="delete_database_server" type="object" attrs="{'invisible':[('state', 'in', ['draft', 'deleted'])]}" icon="gtk-delete" help="Delete client database"
                     confirm="Are you sure to delete this database?"/>
-                    <button name="%(action_view_subscription_wizard)d" string="Manage subscription"
-                      type="action" context="{'default_client_id': id, 'default_expiration': expiration_datetime}"/>
+                    <button name="%(action_view_subscription_wizard)d" string="Manage subscription" type="action"/>
                 </tree>
             </field>
         </record>

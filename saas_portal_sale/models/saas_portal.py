@@ -26,7 +26,7 @@ class SaasPortalPlan(models.Model):
         if trial and self.non_trial_instances != 'from_trial':
             return res
 
-        lines = self.env['saas_portal.find_payments_wizard'].find_partner_payments(partner_id=partner_id, plan_id=self.id)
+        lines = self.env['saas_portal.subscription_wizard'].find_partner_payments(partner_id=partner_id, plan_id=self.id)
         client_obj = self.env['saas_portal.client'].browse(res.get('id'))
         lines.write({'saas_portal_client_id': client_obj.id})
 

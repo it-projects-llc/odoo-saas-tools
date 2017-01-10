@@ -11,9 +11,11 @@ Rename to `username.github.io`
 Modify the _config file
 Replace all the posts and images with your data
 
-## Bugs and Issues
+In depth description of how to use this template is [here](http://shikherverma.com/blog/Yet-Another-Jekyll-Blog)
 
-Have a bug or an issue with this template? [Open a new issue](https://github.com/ShikherVerma/shikherverma.github.io/issues) here on GitHub
+## Questions, Bugs and Issues
+
+Have a question about this template ? Or want to report a bug or an issue with this template? [Open a new issue](https://github.com/ShikherVerma/shikherverma.github.io/issues) here on GitHub
 
 ## Copyright and License
 

@@ -2,10 +2,11 @@
  Saas Server Demo
 ==================
 
-This module implements additional parameters for __openerp__.py
-so that the modules with these parameters
+This module introduces additional parameters for __openerp__.py
+so that modules with these parameters
 can be demonstrated in automatically generated databases.
-It also controls repositories with these modules.
+It also makes possible to automatically update the modules' Git repositories and restart the Server with command from SaaS Portal after the update
+so new demo databases would be created with latest updates in the demonstrated modules.
 
 Contributors
 ------------

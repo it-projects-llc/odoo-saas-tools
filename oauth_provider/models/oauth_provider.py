@@ -65,24 +65,24 @@ class OauthAccessToken(models.Model):
     expires = fields.Datetime('Expires', required=True)
     scope = fields.Char('Scope')
 
-    def is_valid(self, cr, uid, ids, scopes=None, context=None):
+    @api.multi
+    def is_valid(self, scopes=None):
         """
         Checks if the access token is valid.
 
         :param scopes: An iterable containing the scopes to check or None
         """
-        res = {}
-        for t in self.browse(cr, uid, ids, context=context):
-            res[t.id] = t.is_expired() and self._allow_scopes(cr, uid, t, scopes)
-        return res
+        self.ensure_one()
+        return not self.is_expired() and self._allow_scopes(scopes)
 
-    def is_expired(self, cr, uid, ids, context=None):
-        res = {}
-        for t in self.browse(cr, uid, ids, context=context):
-            res[t.id] = datetime.now() < datetime.strptime(t.expires, DEFAULT_SERVER_DATETIME_FORMAT)
-        return res
+    @api.multi
+    def is_expired(self):
+        self.ensure_one()
+        return datetime.now() > datetime.strptime(self.expires, DEFAULT_SERVER_DATETIME_FORMAT)
 
-    def _allow_scopes(self, cr, uid, token, scopes, context=None):
+    @api.multi
+    def _allow_scopes(self, scopes):
+        self.ensure_one()
         if not scopes:
             return True
 
@@ -90,14 +90,3 @@ class OauthAccessToken(models.Model):
         resource_scopes = set(scopes)
 
         return resource_scopes.issubset(provided_scopes)
-
-    def allow_scopes(self, cr, uid, ids, scopes, context=None):
-        """
-        Check if the token allows the provided scopes
-
-        :param scopes: An iterable containing the scopes to check
-        """
-        res = {}
-        for t in self.browse(cr, uid, ids, context=context):
-            res[t.id] = self._allow_scopes(cr, uid, t, scopes, context=context)
-        return res

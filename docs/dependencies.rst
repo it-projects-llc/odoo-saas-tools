@@ -50,3 +50,14 @@ The module can be found here: https://github.com/OCA/e-commerce/tree/8.0/website
 Used by
 
 * `saas_portal_sale_online <../saas_portal_sale_online/>`__
+
+
+access_limit_records_number
+---------------------------
+
+Repo: https://github.com/it-projects-llc/access-addons
+
+Used by
+
+* `saas_client <../saas_client/>`__
+

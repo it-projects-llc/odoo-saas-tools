@@ -255,13 +255,6 @@ class SaasPortalPlan(models.Model):
         else:
             client = self.env['saas_portal.client'].create(vals)
         client_id = client.client_id
-        scheme = server.request_scheme
-        port = server.request_port
-        port_str = str(port)
-        if scheme == 'http' and port_str == '80' or scheme == 'https' and port_str == '443':
-            port_str = ''
-        else:
-            port_str = ':' + port_str
 
         if user_id:
             owner_user = self.env['res.users'].browse(user_id)
@@ -274,12 +267,14 @@ class SaasPortalPlan(models.Model):
             'name': owner_user.name,
             'email': owner_user.email,
         }
-        trial_expiration_datetime = (datetime.strptime(client.create_date,
-                                                       DEFAULT_SERVER_DATETIME_FORMAT) + timedelta(hours=self.expiration)).strftime(DEFAULT_SERVER_DATETIME_FORMAT)  # for trial
+
+        client.period_initial = trial and self.expiration
+        trial_expiration_datetime = (fields.Datetime.from_string(client.create_date) + timedelta(hours=client.period_initial)).strftime(DEFAULT_SERVER_DATETIME_FORMAT)
         state = {
             'd': client.name,
+            'public_url': client.public_url,
             'e': trial and trial_expiration_datetime or client.create_date,
-            'r': '%s://%s%s/web' % (scheme, client.host, port_str),
+            'r': client.public_url + 'web',
             'owner_user': owner_user_data,
             't': client.trial,
         }
@@ -314,8 +309,6 @@ class SaasPortalPlan(models.Model):
             composer = self.env['mail.compose.message'].with_context(email_ctx).create({})
             composer.send_mail()
 
-        if trial:
-            client.expiration_datetime = trial_expiration_datetime
         client.send_params_to_client_db()
         # TODO make async call of action_sync_server here
         # client.server_id.action_sync_server()
@@ -332,13 +325,18 @@ class SaasPortalPlan(models.Model):
         return self.dbname_template.replace('%i', sequence)
 
     @api.multi
-    def create_template(self):
+    def create_template_button(self):
+        res = self.create_template()
+
+
+    @api.multi
+    def create_template(self, addons=None):
         assert len(self) == 1, 'This method is applied only for single record'
         plan = self[0]
         state = {
             'd': plan.template_id.name,
             'demo': plan.demo and 1 or 0,
-            'addons': [],
+            'addons': addons or [],
             'lang': plan.lang,
             'tz': plan.tz,
             'is_template_db': 1,
@@ -357,11 +355,9 @@ class SaasPortalPlan(models.Model):
             _logger.error('Error on parsing response: %s\n%s' % ([req.url, req.headers, req.body], res.text))
             raise
 
-        plan.template_id.password = data.get('init_password')
-
-        if self._context.get('skip_sync_server'):
-            return
-        return self.action_sync_server()
+        plan.template_id.password = data.get('superuser_password')
+        self.template_id.state = data.get('state')
+        return data
 
     @api.multi
     def action_sync_server(self):
@@ -394,15 +390,15 @@ class OauthApplication(models.Model):
     template_db_ids = fields.One2many('saas_portal.database', 'oauth_application_id', string='Template Database')
     client_db_ids = fields.One2many('saas_portal.client', 'oauth_application_id', string='Client Database')
 
-    @api.one
+    @api.multi
     def _get_last_connection(self):
-        oat = self.pool.get('oauth.access_token')
-        to_search = [('application_id', '=', self.id)]
-        access_token_ids = oat.search(self.env.cr, self.env.uid, to_search)
-        if access_token_ids:
-            access_token = oat.browse(self.env.cr, self.env.uid,
-                                      access_token_ids[0])
-            self.last_connection = access_token.user_id.login_date
+        for r in self:
+            oat = self.env['oauth.access_token']
+            to_search = [('application_id', '=', r.id)]
+            access_tokens = oat.search(to_search)
+            if access_tokens:
+                access_token = access_tokens[0]
+                r.last_connection = access_token.user_id.login_date
 
 
 class SaasPortalDatabase(models.Model):
@@ -422,18 +418,20 @@ class SaasPortalDatabase(models.Model):
                               ],
                              'State', default='draft', track_visibility='onchange')
     host = fields.Char('Host', compute=_compute_host)
+    public_url = fields.Char(compute='_compute_public_url', store=True)
     password = fields.Char()
 
     @api.multi
-    def _get_xmlrpc_object(self):
-        self.ensure_one()
-        url = self.server_id.local_request_scheme + '://' + self.host
-        db = self.name
-        username = 'admin'
-        password = self.password
-        common = xmlrpclib.ServerProxy('{}/xmlrpc/2/common'.format(url))
-        uid = common.authenticate(db, username, password, {})
-        return db, uid, password, xmlrpclib.ServerProxy('{}/xmlrpc/2/object'.format(url))
+    @api.depends('server_id.request_port', 'server_id.request_scheme', 'host')
+    def _compute_public_url(self):
+        for record in self:
+            scheme = record.server_id.request_scheme
+            host = record.host
+            port = record.server_id.request_port
+            public_url = "%s://%s" % (scheme, host)
+            if scheme == 'http' and port != 80 or scheme == 'https' and port != 443:
+                public_url = public_url + ':' + str(port)
+            record.public_url = public_url + '/'
 
     @api.multi
     def _backup(self):
@@ -474,18 +472,25 @@ class SaasPortalDatabase(models.Model):
         }
 
     @api.multi
-    def _request(self, path):
+    def _request_url(self, path):
         r = self[0]
         state = {
             'd': r.name,
             'host': r.host,
+            'public_url': r.public_url,
             'client_id': r.client_id,
         }
         url = r.server_id._request(path=path, state=state, client_id=r.client_id)
+        return url
+
+    @api.multi
+    def _request(self, path):
+        url = self._request_url(path)
         return self._proceed_url(url)
 
     @api.multi
     def edit_database(self):
+        """Obsolete. Use saas_portal.edit_database widget instead"""
         for database_obj in self:
             return database_obj._request('/saas_server/edit_database')
 
@@ -549,7 +554,7 @@ class SaasPortalClient(models.Model):
     name = fields.Char(required=True)
     partner_id = fields.Many2one('res.partner', string='Partner', track_visibility='onchange', readonly=True)
     plan_id = fields.Many2one('saas_portal.plan', string='Plan', track_visibility='onchange', ondelete='restrict', readonly=True)
-    expired = fields.Boolean('Expired', default=False, readonly=True)
+    expired = fields.Boolean('Expired', compute='_compute_expiration', store=True)
     user_id = fields.Many2one('res.users', default=lambda self: self.env.user, string='Salesperson')
     notification_sent = fields.Boolean(default=False, readonly=True, help='notification about oncoming expiration has sent')
     support_team_id = fields.Many2one('saas_portal.support_team', 'Support Team')
@@ -558,6 +563,14 @@ class SaasPortalClient(models.Model):
     block_on_expiration = fields.Boolean('Block clients on expiration', default=False)
     block_on_storage_exceed = fields.Boolean('Block clients on storage exceed', default=False)
     storage_exceed = fields.Boolean('Storage limit has been exceed', default=False)
+    subscription_start = fields.Datetime(string="Subscription start", track_visibility='onchange', readonly=True)
+    expiration_datetime = fields.Datetime(string="Expiration", compute='_compute_expiration',
+                                          store=True)
+    period_paid = fields.Integer('Subscribed period (paid days)', readonly=True)
+    period_initial = fields.Integer('Initial period for trial (hours)',
+                                   help='Subsription initial period in hours for trials',
+                                   readonly=True)
+    subscription_log_ids = fields.One2many('saas_portal.subscription_log', 'client_id')
 
     _track = {
         'expired': {
@@ -565,6 +578,50 @@ class SaasPortalClient(models.Model):
             lambda self, cr, uid, obj, ctx=None: obj.expired
         }
     }
+
+    @api.multi
+    def change_subscription(self, expiration=None, reason=None):
+        if expiration:
+            expiration_dt = fields.Datetime.from_string(expiration)
+            log_obj = self.env['saas_portal.subscription_log']
+            for record in self:
+                record_expiration_dt = record.expiration_datetime and \
+                        fields.Datetime.from_string(record.expiration_datetime)
+                if record_expiration_dt != expiration_dt:
+                    record.upgrade(payload={'params':
+                                            [{'key': 'saas_client.expiration_datetime',
+                                                'value': expiration, 'hidden': True}]})
+                    # after expiration_datetime is computed on subscription_log_ids change
+                    # base.action.rule triggers send_expiration_info with record.upgrade but not in 8.0
+                    log_obj.create({
+                        'client_id': record.id,
+                        'expiration': record.expiration_datetime,
+                        'expiration_new': expiration,
+                        'reason': reason,
+                        })
+
+    @api.multi
+    def get_manual_timedelta(self):
+        self.ensure_one()
+        td = timedelta()
+        for log_record in self.subscription_log_ids:
+            td += fields.Datetime.from_string(log_record.expiration_new) - \
+                    fields.Datetime.from_string(log_record.expiration)
+        return td
+
+    @api.multi
+    @api.depends('period_paid', 'create_date', 'subscription_start', 'period_initial', 'trial', 'subscription_log_ids')
+    def _compute_expiration(self):
+        for record in self:
+            start = record.subscription_start or record.create_date
+
+            expiration_datetime = fields.Datetime.from_string(start) + \
+                    timedelta(record.period_paid) + record.get_manual_timedelta()
+            if record.trial:
+                expiration_datetime = expiration_datetime + timedelta(hours=record.period_initial)
+            record.expiration_datetime = expiration_datetime
+            now = fields.Datetime.from_string(fields.Datetime.now())
+            record.expired = expiration_datetime < now
 
     @api.multi
     @api.depends('state')
@@ -596,7 +653,9 @@ class SaasPortalClient(models.Model):
                 composer = self.env['mail.compose.message'].with_context(email_ctx).create({})
                 composer.send_mail()
 
-                self.env['saas.config'].do_upgrade_database(payload, record)
+                record.upgrade(payload)
+                # if upgraded without exceptions then change the state
+                record.state = 'pending'
 
     @api.model
     def _cron_notify_expired_clients(self):
@@ -619,21 +678,18 @@ class SaasPortalClient(models.Model):
                 composer = self.env['mail.compose.message'].with_context(email_ctx).create({})
                 composer.send_mail()
 
-    def unlink(self, cr, uid, ids, context=None):
-        user_model = self.pool.get('res.users')
-        token_model = self.pool.get('oauth.access_token')
-        for obj in self.browse(cr, uid, ids):
+    def unlink(self):
+        for obj in self:
             to_search1 = [('application_id', '=', obj.id)]
-            tk_ids = token_model.search(cr, uid, to_search1, context=context)
-            if tk_ids:
-                token_model.unlink(cr, uid, tk_ids)
+            tokens = self.env['oauth.access_token'].search(to_search1)
+            tokens.unlink()
             # TODO: it seems we don't need stuff below
             # to_search2 = [('database', '=', obj.name)]
-            # user_ids = user_model.search(cr, uid, to_search2, context=context)
+            # user_ids = user_model.search(to_search2)
             # if user_ids:
-            #    user_model.unlink(cr, uid, user_ids)
+            #    user_model.unlink(user_ids)
             # openerp.service.db.exp_drop(obj.name)
-        return super(SaasPortalClient, self).unlink(cr, uid, ids, context)
+        return super(SaasPortalClient, self).unlink()
 
     @api.multi
     def rename_database(self, new_dbname):
@@ -693,7 +749,10 @@ class SaasPortalClient(models.Model):
     @api.multi
     def send_expiration_info(self):
         for record in self:
-            if record.expiration_datetime_sent and record.expiration_datetime and record.expiration_datetime_sent != record.expiration_datetime:
+            if record.state not in ['draft', 'deleted'] and \
+                    record.expiration_datetime_sent and \
+                    record.expiration_datetime and \
+                    record.expiration_datetime_sent != record.expiration_datetime:
                 record.expiration_datetime_sent = record.expiration_datetime
 
                 payload = record.get_upgrade_database_payload()

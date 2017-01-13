@@ -47,7 +47,7 @@ class SaasServerClient(models.Model):
             openerp.service.db.exp_duplicate_database(template_db, new_db)
         else:
             password = random_password()
-            res.update({'init_password': password})
+            res.update({'superuser_password': password})
             openerp.service.db.exp_create_database(new_db, demo, lang, user_password=password)
         self.state = 'open'
         return res
@@ -140,7 +140,7 @@ class SaasServerClient(models.Model):
             saas_oauth_provider = self.env.ref('saas_server.saas_oauth_provider')
 
             oauth_provider_data = {'enabled': False, 'client_id': client_id}
-            for attr in ['name', 'auth_endpoint', 'scope', 'validation_endpoint', 'data_endpoint', 'css_class', 'body', 'enabled']:
+            for attr in ['name', 'auth_endpoint', 'scope', 'validation_endpoint', 'data_endpoint', 'css_class', 'body', 'enabled', 'local_host', 'local_port']:
                 oauth_provider_data[attr] = getattr(saas_oauth_provider, attr)
             oauth_provider = client_env.ref('saas_client.saas_oauth_provider')
             oauth_provider.write(oauth_provider_data)

@@ -12,6 +12,7 @@
             <field name="arch" type="xml">
                 <tree string="Clients" colors="red:expired" create="false" delete="false" edit="false">
                     <field name="name"/>
+                    <field name="plan_id"/>
                     <field name="state"/>
                     <field name="last_connection"/>
                     <field name="users_len"/>
@@ -21,11 +22,13 @@
                     <field name="trial"/>
                     <field name="expiration_datetime"/>
                     <field name="expired" invisible="1"/>
-                    <button name="edit_database" type="object" icon="gtk-connect" attrs="{'invisible':[('state', 'in', ['deleted', 'draft'])]}"
-                            help="Log in client database. Make sure that your browser allows popup windows from SaaS Portal"/>
+                    <button name="%(action_edit_database)d" type="action"
+                            icon="gtk-connect" attrs="{'invisible':[('state', 'in', ['deleted', 'draft'])]}"
+                            help="Log in to client database."/>
                     <button name="show_upgrade_wizard" attrs="{'invisible':[('state', 'in', ['deleted'])]}" type="object" icon="gtk-execute" help="Configure client database"/>
-                    <button name="delete_database_server" type="object" attrs="{'invisible':[('state', 'not in', ['pending'])]}" icon="gtk-delete" help="Delete client database"
+                    <button name="delete_database_server" type="object" attrs="{'invisible':[('state', 'in', ['draft', 'deleted'])]}" icon="gtk-delete" help="Delete client database"
                     confirm="Are you sure to delete this database?"/>
+                    <button name="%(action_view_subscription_wizard)d" string="Manage subscription" type="action" attrs="{'invisible':[('state', 'not in', ['open', 'pending'])]}"/>
                 </tree>
             </field>
         </record>
@@ -38,14 +41,18 @@
                 <form string="Clients" create="false" delete="false" edit="true">
                     <field name="expired" invisible="1"/>
                     <header>
-                      <button string="Log in" name="edit_database" type="object" attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}"
-                              icon="gtk-connect" class="oe_highlight" help="Make sure that your browser allows popup windows from SaaS Portal"/>
+                        <button string="Log in" name="%(action_edit_database)d" type="action"
+                                attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}"
+                                icon="gtk-connect" class="oe_highlight"
+                                help="Log in to client database."
+                                />
                         <button string="Configure" name="show_upgrade_wizard" type="object" attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}" icon="gtk-execute" />
-                        <button string="Delete" name="delete_database_server" type="object" attrs="{'invisible':['|',('state', 'not in', ['pending'])]}" icon="gtk-delete" 
+                        <button string="Delete" name="delete_database_server" type="object" attrs="{'invisible':['|',('state', 'in', ['draft', 'deleted'])]}" icon="gtk-delete" 
                         confirm="Are you sure to delete this database?"/>
                         <button string="Sync server" type="object" name="action_sync_server" icon="gtk-refresh"/>
-                        <button name="%(saas_portal.action_rename_database)d" string="Rename Database" type="action"/>
-                        <field name="state" widget="statusbar" statusbar_visible="open,pending,deleted" clickable="False"/>
+                        <button name="%(saas_portal.action_rename_database)d" string="Rename Database" type="action" attrs="{'invisible':[('state', 'not in', ['open', 'pending'])]}"/>
+                        <button name="%(action_view_subscription_wizard)d" string="Manage subscription" attrs="{'invisible':[('state', 'not in', ['open', 'pending'])]}" type="action"/>
+                        <field name="state" widget="statusbar" statusbar_visible="open,pending,deleted" clickable=""/>
                     </header>
                     <sheet>
                     <group>
@@ -65,6 +72,7 @@
                         </group>
                         <group name="subscription">
                             <field name="trial"/>
+                            <field name="subscription_start"/>
                             <field name="expiration_datetime"/>
                             <field name="expired"/>
                         </group>
@@ -84,6 +92,15 @@
                             </field>
                         </page>
                         -->
+                      <page string="Subscription Log (manual changes only)">
+                        <field name="subscription_log_ids" widget="one2many_list" colspan="4" nolabel="1" mode="tree" attrs="{'readonly': 1}">
+                          <tree string="Subsctiption Log" create="0" delete="false">
+                            <field name="expiration"/>
+                            <field name="expiration_new"/>
+                            <field name="reason"/>
+                          </tree>
+                        </field>
+                      </page>
                     </notebook>
                     </sheet>
                     <div class="oe_chatter">
@@ -103,6 +120,9 @@
                     <filter string="In Progress" name="current" domain="[('state', '=','open')]"/>
                     <separator/>
                     <field name="partner_id" string="Contact" filter_domain="[('partner_id', 'child_of', self)]"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Plan" domain="[]" context="{'group_by':'plan_id'}"/>
+                    </group>
                 </search>
             </field>
         </record>
@@ -220,9 +240,10 @@
             <field name="arch" type="xml">
                 <form string="plans">
                     <header>
-                        <button string="Create template DB" name="create_template" type="object" attrs="{'invisible':['|', '|', ('state','not in', ['draft']), ('server_id','=',False), ('template_id','=',False)]}" icon="gtk-apply" class="oe_highlight"/>
-                        <button string="Log in to template DB" name="edit_template" type="object" states="confirmed" icon="gtk-edit"
-                                help="Make sure that your browser allows popup windows from SaaS Portal" class="oe_highlight"/>
+                        <button string="Create template DB" name="create_template_button" type="object" attrs="{'invisible':['|', '|', ('state','not in', ['draft']), ('server_id','=',False), ('template_id','=',False)]}" icon="gtk-apply" class="oe_highlight"/>
+                        <button string="Log in to template DB" name="%(action_edit_database)d"
+                                type="action" states="confirmed" icon="gtk-edit"
+                                class="oe_highlight"/>
                         <!--<button string="Configure template DB" name="upgrade_template" type="object" states="confirmed" icon="gtk-execute" />-->
                         <button string="Delete template DB" name="delete_template" type="object" states="confirmed" icon="gtk-cancel" />
                         <button string="Sync server" type="object" name="action_sync_server" icon="gtk-refresh" attrs="{'invisible': [('id', '=', False)]}"/>
@@ -389,6 +410,14 @@
             <field name="model">saas.config</field>
             <field name="value_unpickle" eval="'ir.actions.act_window,'+str(action_updb)"/>
         </record>
+
+        <act_window
+        id="act_delete_batch_clients"
+        name="Delete Clients"
+        res_model="saas_portal.batch_delete_wizard"
+        key2="client_action_multi"
+        src_model="saas_portal.client"
+        view_mode="form" target="new" view_type="form" />
 
         <record id="view_support_team_tree" model="ir.ui.view">
             <field name="name">saas_portal.support_team.tree</field>

@@ -128,6 +128,7 @@ class SaasPortalCreateClient(models.TransientModel):
     notify_user = fields.Boolean(help='Notify user by email when database will have been created', default=False)
     support_team_id = fields.Many2one('saas_portal.support_team', 'Support Team', default=lambda self: self.env.user.support_team_id)
     async_creation = fields.Boolean('Asynchronous', default=False, help='Asynchronous creation of client base')
+    trial = fields.Boolean('Trial')
 
     @api.onchange('user_id')
     def update_partner(self):
@@ -140,7 +141,8 @@ class SaasPortalCreateClient(models.TransientModel):
         res = wizard.plan_id.create_new_database(dbname=wizard.name, partner_id=wizard.partner_id.id, user_id=self.user_id.id,
                                                  notify_user=self.notify_user,
                                                  support_team_id=self.support_team_id.id,
-                                                 async=self.async_creation)
+                                                 async=self.async_creation,
+                                                 trial=self.trial)
         if self.async_creation:
             return
         client = self.env['saas_portal.client'].browse(res.get('id'))
@@ -213,3 +215,26 @@ class SaasPortalRenameDatabase(models.TransientModel):
         return {
             'type': 'ir.actions.act_window_close',
         }
+
+
+class SaasPortalEditDatabase(models.TransientModel):
+    _name = 'saas_portal.edit_database'
+
+    name = fields.Char(readonly=True)
+    active_id = fields.Char()
+    active_model = fields.Char()
+    edit_database_url = fields.Char(readonly=True)
+
+    @api.model
+    def default_get(self, fields):
+        res = super(SaasPortalEditDatabase, self).default_get(fields)
+        print 'default_get', self._context
+        res['active_model'] = self._context.get('active_model')
+        res['active_id'] = self._context.get('active_id')
+
+        active_record = self.env[res['active_model']].browse(res['active_id'])
+        if res['active_model'] == 'saas_portal.plan':
+            active_record = active_record.template_id
+        res['name'] = active_record.name
+        res['edit_database_url'] = active_record._request_url('/saas_server/edit_database')
+        return res

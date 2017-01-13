@@ -50,7 +50,9 @@ settings_group.add_argument('--suffix', dest='suffix', default=ODOO_VERSION, hel
 settings_group.add_argument('--odoo-script', dest='odoo_script', help='Path to openerp-server', default='./openerp-server')
 settings_group.add_argument('--odoo-config', dest='odoo_config', help='Path to odoo configuration file')
 settings_group.add_argument('--odoo-data-dir', dest='odoo_data_dir', help='Path to odoo data dir', default=None)
-settings_group.add_argument('--odoo-xmlrpc-port', dest='xmlrpc_port', default=None)
+settings_group.add_argument('--odoo-xmlrpc-port', dest='xmlrpc_port', default='8069', help='Port to run odoo temporarly')
+settings_group.add_argument('--odoo-longpolling-port', dest='longpolling_port', default='8072', help='Port to run odoo temporarly')
+settings_group.add_argument('--local-xmlrpc-port', dest='local_xmlrpc_port', default=None, help='Port to be used for server-wide requests')
 settings_group.add_argument('--odoo-log-db', dest='log_db', help='Logging database. The same as odoo parameter')
 settings_group.add_argument("--odoo-addons-path", dest="addons_path",
                             help="specify additional addons paths (separated by commas).")
@@ -62,6 +64,7 @@ settings_group.add_argument('--base-domain', dest='base_domain', help='Base doma
 settings_group.add_argument('--install-modules', dest='install_modules', help='Comma-separated list of modules to install. They will be automatically installed on appropriate database (Portal or Server)', default='saas_portal_start,saas_portal_sale_online')
 #settings_group.add_argument('--db_user', dest='db_user', help='database user name')
 settings_group.add_argument('-s', '--simulate', dest='simulate', action='store_true', help='Don\'t make actual changes. Just show what script is going to do.')
+settings_group.add_argument('--drop-databases', dest='drop_databases', help='Drop existed databases before creating portal or server', action='store_true', default=False)
 
 
 portal_group = parser.add_argument_group('Portal creation')
@@ -114,7 +117,8 @@ odoo_config = get_odoo_config()
 
 datadir = args.get('odoo_data_dir') or odoo_config.get('data_dir')
 xmlrpc_port = args.get('xmlrpc_port') or odoo_config.get('xmlrpc_port') or '8069'
-
+local_xmlrpc_port = args.get('local_xmlrpc_port') or odoo_config.get('xmlrpc_port') or '8069'
+longpolling_port = args.get('longpolling_port') or odoo_config.get('longpolling_port') or '8072'
 
 def filter_modules(s, regexp):
     return set([m for m in s.split(',') if re.match(regexp, m)])
@@ -204,8 +208,14 @@ def main():
 # ----------------------------------------------------------
 def createdb(dbname, install_modules=['base']):
     without_demo = args.get('without_demo')
-    pg_dropdb(dbname)
-    pg_createdb(dbname, without_demo=without_demo)
+    if args.get('drop_databases'):
+        pg_dropdb(dbname)
+
+    # create db if not exist
+    try:
+        pg_createdb(dbname, without_demo=without_demo)
+    except Exception, e:
+        log('pg_createdb error:', e)
 
     cmd = get_cmd(dbname, workers=0)
     cmd += ['-i', ','.join(install_modules)]
@@ -290,8 +300,8 @@ def rpc_init_server(server_db_name, new_admin_password=None):
     vals = {
         'auth_endpoint': oauth_provider.get('auth_endpoint').replace('odoo.local', portal_host),
         'validation_endpoint': oauth_provider.get('validation_endpoint').replace('odoo.local', portal_host),
-        'local_ip': 'localhost',
-        'local_port': xmlrpc_port,
+        'local_host': 'localhost',
+        'local_port': local_xmlrpc_port,
     }
     oauth_provider = rpc_execute_kw(auth, 'auth.oauth.provider', 'write', [[oauth_provider.get('id')], vals])
 
@@ -306,7 +316,7 @@ def rpc_add_server_to_portal(portal_db_name):
     auth = rpc_auth(portal_db_name, admin_password=args.get('admin_password'))
     server_db_name = args.get('server_db_name')
     uuid = rpc_get_uuid(server_db_name)
-    rpc_execute_kw(auth, 'saas_portal.server', 'create', [{'name': server_db_name, 'client_id': uuid, 'local_port': xmlrpc_port, 'local_host': 'localhost'}])
+    rpc_execute_kw(auth, 'saas_portal.server', 'create', [{'name': server_db_name, 'client_id': uuid, 'local_port': local_xmlrpc_port, 'local_host': 'localhost'}])
 
 
 def rpc_get_uuid(dbname):
@@ -348,6 +358,7 @@ def rpc_create_plan(portal_db_name):
     #      * wait couple minutes while Database is being created.
     dropdb(plan_template_db_name)
     rpc_execute_kw(auth, 'saas_portal.plan', 'create_template', [[plan_id]])
+
     return plan_id
 
 
@@ -367,7 +378,7 @@ def pg_createdb(dbname, without_demo=True):
     log('Creating empty database %s' % dbname)
     if args.get('simulate'):
         return
-    with local_pgadmin_cursor() as local_cr:
+    with pgadmin_cursor() as local_cr:
         local_cr.execute("""CREATE DATABASE "%s" TEMPLATE template0 LC_COLLATE 'C' ENCODING 'unicode'""" % dbname)
         log('Result: %s' % local_cr.statusmessage)
 
@@ -376,23 +387,59 @@ def pg_dropdb(dbname):
     log('Dropping  database %s' % dbname)
     if args.get('simulate'):
         return
-    with local_pgadmin_cursor() as local_cr:
+    with pgadmin_cursor() as local_cr:
         local_cr.execute('DROP DATABASE IF EXISTS "%s"' % dbname)
         log('Result: %s' % local_cr.statusmessage)
 
 
 def find_databases(root_database):
-    with local_pgadmin_cursor() as local_cr:
+    with pgadmin_cursor() as local_cr:
         local_cr.execute("SELECT datname FROM pg_database WHERE  datname ilike '%%.{root}' OR datname='{root}'".format(root=root_database))
         res = local_cr.fetchall()
     return [row[0] for row in res]
 
 
+def exec_pg_environ():
+    """
+    Force the database PostgreSQL environment variables to the database
+    configuration of Odoo.
+
+    Note: On systems where pg_restore/pg_dump require an explicit password
+    (i.e.  on Windows where TCP sockets are used), it is necessary to pass the
+    postgres user password in the PGPASSWORD environment variable or in a
+    special .pgpass file.
+
+    See also http://www.postgresql.org/docs/8.4/static/libpq-envars.html
+    """
+    env = os.environ.copy()
+    db_user = odoo_config.get('db_user') or os.getenv('DB_ENV_POSTGRES_USER') or os.getenv('RDS_USERNAME')
+    if db_user:
+        env['PGUSER'] = db_user
+    db_host = odoo_config.get('db_host') or os.getenv('DB_PORT_5432_TCP_ADDR') or os.getenv('RDS_HOSTNAME')
+    if db_host:
+        env['PGHOST'] = db_host
+    db_port = odoo_config.get('db_port') or os.getenv('DB_PORT_5432_TCP_PORT') or os.getenv('RDS_PORT')
+    if db_port:
+        env['PGPORT'] = db_port
+
+    db_password = odoo_config.get('db_password') or os.getenv('DB_ENV_POSTGRES_PASSWORD') or os.getenv('RDS_PASSWORD')
+    if db_password:
+        env['PGPASSWORD'] = db_password
+
+    return env
+
+
 @contextlib.contextmanager
-def local_pgadmin_cursor():
+def pgadmin_cursor():
+    env = exec_pg_environ()
     cnx = None
     try:
-        cnx = psycopg2.connect("dbname=postgres")
+        cnx = psycopg2.connect(database="postgres",
+                               user=env.get('PGUSER'),
+                               password=env.get('PGPASSWORD'),
+                               host=env.get('PGHOST'),
+                               port=env.get('PGPORT'),
+                               )
         cnx.autocommit = True  # required for admin commands
         yield cnx.cursor()
     finally:
@@ -407,10 +454,21 @@ def get_cmd(dbname='', workers=3, run_cron=False):
     cmd = [
         args.get('odoo_script'),
         "--xmlrpc-port=%s" % xmlrpc_port,
+        "--longpolling-port=%s" % longpolling_port,
         "--database=%s" % dbname,
         "--db-filter=%s" % args.get('db_filter'),
         "--workers=%s" % workers,
     ]
+    env = exec_pg_environ()
+    for env_key, config_key in \
+        [('PGUSER', '--db_user'),
+         ('PGPASSWORD', '--db_password'),
+         ('PGHOST', '--db_host'),
+         ('PGPORT', '--db_port'),
+         ]:
+        if env.get(env_key):
+            cmd += [config_key + '=' + env.get(env_key)]
+
     if not run_cron:
         cmd += ["--max-cron-threads=0"]
 

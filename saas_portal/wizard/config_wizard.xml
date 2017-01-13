@@ -9,6 +9,7 @@
                      <group>
                         <field name="name"/>
                         <field name="plan_id"/>
+                        <field name="trial"/>
                         <field name="user_id" class="oe_inline"/>
                         <field name="partner_id" class="oe_inline"/>
                         <field name="notify_user" class="oe_inline"/>
@@ -84,6 +85,32 @@
         <act_window id="action_rename_database"
             name="Rename Database"
             res_model="saas_portal.rename_database"
+            view_type="form" view_mode="form"
+            target="new"
+            />
+
+
+        <record id="saas_portal_edit_database_view_form" model="ir.ui.view">
+            <field name="name">saas_portal.edit_database.form</field>
+            <field name="model">saas_portal.edit_database</field>
+            <field name="arch" type="xml">
+                <form string="Edit Database">
+                    <h1>
+                        <field name="name"/>
+                    </h1>
+                    <div>
+                        Use the following link to log in as Administrator:<br/><field class="oe_inline" name="edit_database_url" widget="url"/>
+                    </div>
+                    <footer>
+                        <button string="Close" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <act_window id="action_edit_database"
+            name="Edit Database"
+            res_model="saas_portal.edit_database"
             view_type="form" view_mode="form"
             target="new"
             />

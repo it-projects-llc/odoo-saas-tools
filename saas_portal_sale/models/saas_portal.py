@@ -26,7 +26,7 @@ class SaasPortalPlan(models.Model):
         if trial and self.non_trial_instances != 'from_trial':
             return res
 
-        lines = self.env['saas_portal.find_payments_wizard'].find_partner_payments(partner_id=partner_id, plan_id=self.id)
+        lines = self.env['saas_portal.subscription_wizard'].find_partner_payments(partner_id=partner_id, plan_id=self.id)
         client_obj = self.env['saas_portal.client'].browse(res.get('id'))
         lines.write({'saas_portal_client_id': client_obj.id})
 
@@ -42,23 +42,23 @@ class SaasPortalPlan(models.Model):
 class SaasPortalClient(models.Model):
     _inherit = 'saas_portal.client'
 
-    subscription_start = fields.Datetime(string="Subscription start", track_visibility='onchange')
-    expiration_datetime = fields.Datetime(string="Expiration", compute='_handle_paid_invoices',
-                                          store=True,
-                                          help='Subscription start plus all paid days from related invoices')
     invoice_lines = fields.One2many('account.invoice.line', 'saas_portal_client_id')
-    trial = fields.Boolean('Trial', help='indication of trial clients', default=False, store=True, readonly=True, compute='_handle_paid_invoices')
+    trial = fields.Boolean('Trial', help='indication of trial clients', compute='_compute_period_paid', store=True)
+    period_paid = fields.Integer('Paid days',
+                                 help='Subsription days that were paid',
+                                 compute='_compute_period_paid',
+                                 store=True)
 
     @api.multi
     @api.depends('invoice_lines.invoice_id.state')
-    def _handle_paid_invoices(self):
+    def _compute_period_paid(self):
         for client_obj in self:
             client_obj.expiration_datetime = datetime.strptime(client_obj.create_date, DEFAULT_SERVER_DATETIME_FORMAT) + timedelta(hours=client_obj.plan_id.expiration)  # for trial
             days = 0
             for line in self.env['account.invoice.line'].search([('saas_portal_client_id', '=', client_obj.id), ('invoice_id.state', '=', 'paid')]):
                 days += line.period * line.quantity
             if days != 0:
-                client_obj.expiration_datetime = datetime.strptime(client_obj.subscription_start or client_obj.create_date, DEFAULT_SERVER_DATETIME_FORMAT) + timedelta(days=days)
+                client_obj.period_paid = days
             client_obj.trial = not bool(days)
 
     @api.multi

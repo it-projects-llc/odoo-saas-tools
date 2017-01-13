@@ -28,7 +28,7 @@ Demo databases are automatically destroyed after 3 hours (configurable).
 
 Technically Page is a Plan (``saas_portal.plan``) and demo databases are duplicates from Plan's template.
 
-Plans and database templates and  are generated automatically from ``__demo__.py`` files in the root of modules, but could be created manually too.
+Plans and database templates are generated automatically from ``__demo__.py`` files in the root of modules, but could be created manually too.
 
 Credits
 =======

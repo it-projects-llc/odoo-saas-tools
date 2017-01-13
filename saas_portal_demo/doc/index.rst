@@ -63,6 +63,51 @@ Adding demonstration products for online shop
 Whenever new demonstrative plan is created the new product for demonstration shop is created also.
 For different versions of odoo there will be different product variants, e.g. 8.0, 9.0, etc.
 
+nginx configuration
+-------------------
+
+Name conventions
+
+Template databases are named as follows
+
+{demo_url}-template.odoo-8.demo.{saas_domain} - for odoo 8.0 databases
+{demo_url}-template.odoo-9.demo.{saas_domain} - for odoo 9.0 databases
+{demo_url}-template.odoo-10.demo.{saas_domain} - for odoo 10.0 databases
+
+Here {``demo_url``} is a new parameter in ``__openerp__`` specially introduced by ``saas_server_demo`` module for such purposes,
+{``saas_domain``} - is a base saas domain, i.e. ``it-projects.info``
+
+Customer databases are named as follows
+
+{demo_url}-%i.odoo-8.demo.{saas_domain} - for odoo 8.0 databases
+{demo_url}-%i.odoo-9.demo.{saas_domain} - for odoo 9.0 databases
+{demo_url}-%i.odoo-10.demo.{saas_domain} - for odoo 10.0 databases
+
+Here ``%i`` is a number of demo database
+
+::
+
+ .odoo-8.demo.it-projects.info -> port 8869, 8872
+ .odoo-9.demo.it-projects.info -> port 8969, 8972
+ .odoo-10.demo.it-projects.info -> port 8069, 8072
+
+Sample nginx configuration for odoo 8 demo databases
+
+::
+
+ server {
+        listen 80;
+        server_name .odoo-8.demo.it-projects.info;
+
+        location /longpolling {
+            proxy_pass http://127.0.0.1:8872;
+        }
+
+        location / {
+            proxy_pass http://127.0.0.1:8869;
+        }
+ }
+
 Workflow
 ========
 

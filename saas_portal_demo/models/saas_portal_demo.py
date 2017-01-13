@@ -24,8 +24,9 @@ class SaasPortalServer(models.Model):
         return db, uid, password, xmlrpclib.ServerProxy('{}/xmlrpc/2/object'.format(url))
 
     def _prepare_module(self, module, plan):
-        server_domain = self.name.split('.', 1)[1]
-        attachment_name = 'addon_' + self.odoo_version + '_' + module['name'] + '.' + server_domain
+        attachment_name = 'addon_{0}_{1}.{2}'.format(self.odoo_version,
+                                                     module['name'],
+                                                     self.env['ir.config_parameter'].get_param('saas_portal.base_saas_domain'))
         ir_attachment = self.env['ir.attachment'].create({'name': attachment_name, 'type': 'binary', 'db_datas': module.get('icon_image')})
         return {
             'technical_name': module.get('name'),
@@ -45,18 +46,25 @@ class SaasPortalServer(models.Model):
 
         template_obj = self.env['saas_portal.database']
         plan_obj = self.env['saas_portal.plan']
-        server_domain = self.name.split('.', 1)[1]
         if not self.odoo_version:
             raise Warning('You should define odoo version for the server: 8 for 8.0 or 9 for 9.0')
-        template_name = 'template_' + self.odoo_version + '_' + demo_module['name'] + '.' + server_domain
-        plan_name = 'Demo ' + self.odoo_version + ' ' + demo_module['display_name']
+        namestring = '{0}-{1}.odoo-{2}.demo.{3}'
+        saas_domain = self.env['ir.config_parameter'].get_param('saas_portal.base_saas_domain')
+        template_name = namestring.format(demo_module['demo_url'],
+                                          'template',
+                                          self.odoo_version,
+                                          saas_domain)
+        plan_name = 'Demo for {0}.0 {1}'.format(self.odoo_version, demo_module['demo_url'])
 
         if template_obj.search_count([('name', '=', template_name)]) == 0:
             template = template_obj.create({'name': template_name, 'server_id': self.id})
             if plan_obj.search_count([('name', '=', plan_name)]) == 0:
                 plan = plan_obj.create({'name': plan_name,
                                         'server_id': self.id,
-                                        'dbname_template': 'demo-%i-' + self.odoo_version + '_' + demo_module['name'] + '.' + server_domain,
+                                        'dbname_template': namestring.format(demo_module['demo_url'],
+                                                                             '-%i',
+                                                                             self.odoo_version,
+                                                                             saas_domain),
                                         'template_id': template.id})
                 return plan
         else:

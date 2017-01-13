@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import xmlrpclib
 from openerp import api
 from openerp import exceptions
 from openerp import fields

@@ -201,3 +201,18 @@ class SaasPortalDemoPlan(models.Model):
                                            help="The modules that should be in this demo plan", string='Modules')
     demo_plan_hidden_module_ids = fields.One2many('saas_portal.hidden_demo_plan_module', 'demo_plan_id',
                                            help="The modules that should be in this demo plan", string='Modules')
+
+
+class SaasPortalDatabase(models.Model):
+    _inherit = 'saas_portal.database'
+
+    @api.multi
+    def _get_xmlrpc_object(self):
+        self.ensure_one()
+        url = self.server_id.local_request_scheme + '://' + self.host
+        db = self.name
+        username = 'admin'
+        password = self.password
+        common = xmlrpclib.ServerProxy('{}/xmlrpc/2/common'.format(url))
+        uid = common.authenticate(db, username, password, {})
+        return db, uid, password, xmlrpclib.ServerProxy('{}/xmlrpc/2/object'.format(url))

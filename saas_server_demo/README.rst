@@ -5,8 +5,8 @@
 This module introduces additional parameters for __openerp__.py
 so that modules with these parameters
 can be demonstrated in automatically generated databases.
-It also makes possible to automatically update the modules' Git repositories and restart the Server with command from SaaS Portal after the update
-so new demo databases would be created with latest updates in the demonstrated modules.
+It also makes possible to update the modules' Git repositories and restart the Server through commands from SaaS Portal
+so new demo databases could be created with latest updates in the demonstrated modules.
 
 Contributors
 ------------

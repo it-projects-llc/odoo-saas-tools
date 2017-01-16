@@ -38,6 +38,7 @@ Open *SaaS Server*
   * select the repository from drop-down list of available repositories 
 
 Open *SaaS Portal*
+
 * Open  ``SaaS / SaaS / Servers``
 
   * Switch to some Server

@@ -45,8 +45,7 @@ Open *SaaS Portal*
   * click ``[Generate Demo Plans]``
   * click ``[Create Demo Template DBs]``
 
-* Open  ``SaaS / SaaS / Plans`` -- you see new plans. For example, ``Demo 8 Reminders and Agenda (technical core)``
-for reminder modules in 8.0 server
+* Open  ``SaaS / SaaS / Plans`` -- you see new plans. For example, ``Demo 8 Reminders and Agenda (technical core)`` for reminder modules in 8.0 server
 
 Also, you can activate cron task for recurring checking for updates
 
@@ -79,12 +78,13 @@ Here ``{demo_url}`` is a new parameter in ``__openerp__`` specially introduced b
 
 Customer databases are named as follows
 
-{demo_url}-%i.odoo-8.demo.{saas_domain} - for odoo 8.0 databases
-{demo_url}-%i.odoo-9.demo.{saas_domain} - for odoo 9.0 databases
-{demo_url}-%i.odoo-10.demo.{saas_domain} - for odoo 10.0 databases
+* ``{demo_url}-%i.odoo-8.demo.{saas_domain}`` - for odoo 8.0 databases
+* ``{demo_url}-%i.odoo-9.demo.{saas_domain}`` - for odoo 9.0 databases
+* ``{demo_url}-%i.odoo-10.demo.{saas_domain}`` - for odoo 10.0 databases
 
-Here ``%i`` is a number of demo database
+, where ``%i`` is a number of demo database
 
+After that, you need to configure proxing to corresponded odoo installation, for example 
 ::
 
  .odoo-8.demo.it-projects.info -> port 8869, 8872

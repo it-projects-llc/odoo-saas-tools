@@ -56,9 +56,9 @@ class SaasPortalServer(models.Model):
 
     @api.model
     def create(self, vals):
-        self = super(SaasPortalServer, self).create(vals)
-        self.oauth_application_id._get_access_token(create=True)
-        return self
+        record = super(SaasPortalServer, self).create(vals)
+        record.oauth_application_id._get_access_token(create=True)
+        return record
 
     @api.one
     def _request_params(self, path='/web', scheme=None, port=None, state={}, scope=None, client_id=None):

@@ -20,11 +20,9 @@ There are new buttons introduced on saas_portal.server view.
 
 * Open ``SaaS / SaaS / Servers``
 
-  * click ``[Generate Demo Plans]`` to generate demo plans based on information in ``__openerp__.py``
-  files in your demo modules on selected server.
+  * click ``[Generate Demo Plans]`` to generate demo plans based on information in ``__openerp__.py`` files in your demo modules on selected server.
   * click ``[Generate Demo Template DBs]`` to create template databases for demonstration sets.
-  * click ``[Update Repositories]`` to invoke ``git pull`` command for each repositories that are defined
-  in demo repositories list on your server. See ``saas_server_demo/doc/index.rst`` for additional information.
+  * click ``[Update Repositories]`` to invoke ``git pull`` command for each repositories that are defined in demo repositories list on your server. See ``saas_server_demo/doc/index.rst`` for additional information.
   * click ``[Restart Server]``. Each time you update demo repositories you shoud restart the servers.
 
 Automatic Plans generation
@@ -51,6 +49,7 @@ Open *SaaS Portal*
 for reminder modules in 8.0 server
 
 Also, you can activate cron task for recurring checking for updates
+
 * Open ``Settings / Technical / Automation / Scheduled Actions``
 * Switch to ``Scan for demo databases``
 * Click ``[Edit]``
@@ -71,12 +70,12 @@ Name conventions
 
 Template databases are named as follows
 
-{demo_url}-template.odoo-8.demo.{saas_domain} - for odoo 8.0 databases
-{demo_url}-template.odoo-9.demo.{saas_domain} - for odoo 9.0 databases
-{demo_url}-template.odoo-10.demo.{saas_domain} - for odoo 10.0 databases
+* ``{demo_url}-template.odoo-8.demo.{saas_domain}`` - for odoo 8.0 databases
+* ``{demo_url}-template.odoo-9.demo.{saas_domain}`` - for odoo 9.0 databases
+* ``{demo_url}-template.odoo-10.demo.{saas_domain}`` - for odoo 10.0 databases
 
-Here {``demo_url``} is a new parameter in ``__openerp__`` specially introduced by ``saas_server_demo`` module for such purposes,
-{``saas_domain``} - is a base saas domain, i.e. ``it-projects.info``
+Here ``{demo_url}`` is a new parameter in ``__openerp__`` specially introduced by ``saas_server_demo`` module for such purposes,
+``{saas_domain}`` - is a base saas domain, i.e. ``it-projects.info``
 
 Customer databases are named as follows
 

@@ -83,6 +83,12 @@ plan_group.add_argument('--plan-name', dest='plan_name', default='Plan')
 plan_group.add_argument('--plan-template-db-name', dest='plan_template_db_name', default='template-1.saas-portal-{suffix}.local')
 plan_group.add_argument('--plan-clients', dest='plan_clients', default='client-%i.saas-portal-{suffix}.local', help='Template for new client databases')
 
+saas_demo = parser.add_argument_group('SaaS Demo')
+saas_demo.add_argument('--demo-repositories', dest='demo_repositories',
+                       help="Comma-separated list of path to repositories. "
+                       "These repositories will be added to saas_server.repository table. "
+                       "Note that path has to in addons-path.")
+
 other_group = parser.add_argument_group('Other')
 other_group.add_argument('--print-local-hosts', dest='print_local_hosts', action='store_true', help='Print hosts rules for local usage.')
 other_group.add_argument('--run', dest='run', action='store_true', help='Run server')
@@ -179,6 +185,9 @@ def main():
 
         if args.get('plan_create'):
             plan_id = rpc_create_plan(args.get('portal_db_name'))
+
+        if args.get('demo_repositories'):
+            rpc_add_demo_repositories(args.get('demo_repositories'))
 
         if args.get('test'):
             if not plan_id:
@@ -317,6 +326,17 @@ def rpc_add_server_to_portal(portal_db_name):
     server_db_name = args.get('server_db_name')
     uuid = rpc_get_uuid(server_db_name)
     rpc_execute_kw(auth, 'saas_portal.server', 'create', [{'name': server_db_name, 'client_id': uuid, 'local_port': local_xmlrpc_port, 'local_host': 'localhost'}])
+
+
+def rpc_add_demo_repositories(demo_repositories):
+    demo_repositories = demo_repositories.split(',')
+    server_db_name = args.get('server_db_name')
+    auth = rpc_auth(server_db_name, admin_password=args.get('admin_password'))
+    for repo_path in demo_repositories:
+        vals = {
+            'path': repo_path,
+        }
+        rpc_execute_kw(auth, 'saas_server.repository', 'create', [vals])
 
 
 def rpc_get_uuid(dbname):

@@ -2,7 +2,8 @@
 import os
 import openerp
 from openerp import models, fields, api
-from openerp.exceptions import ValidationError, Warning
+from openerp.exceptions import Warning as UserError
+from openerp.tools.translate import _
 import subprocess
 import tempfile
 
@@ -19,8 +20,9 @@ class SaasServerRepository(models.Model):
         root_path = os.path.abspath(os.path.expanduser(os.path.expandvars(os.path.dirname(openerp.__file__))))
         base_addons = os.path.join(root_path, 'addons')
         main_addons = os.path.abspath(os.path.join(root_path, '../addons'))
-        paths = [(p, os.path.basename(p)) for p in openerp.conf.addons_paths if p not in [base_addons, main_addons] \
-                 and os.path.exists(p + '/.git')]
+        paths = [(p, os.path.basename(p))
+                 for p in openerp.conf.addons_paths
+                 if p not in [base_addons, main_addons] and os.path.exists(p + '/.git')]
         return paths
 
     @api.multi
@@ -32,8 +34,8 @@ class SaasServerRepository(models.Model):
             os.chdir(record.path)
             try:
                 status = subprocess.call(['git', 'pull'], stderr=stderr_fd)
-                os.close(stderr_fd) # ensure flush before reading
-                stderr_fd = None # avoid closing again in finally block
+                os.close(stderr_fd)  # ensure flush before reading
+                stderr_fd = None  # avoid closing again in finally block
                 fobj = open(stderr_path, 'r')
                 error_message = fobj.read()
                 fobj.close()
@@ -42,13 +44,12 @@ class SaasServerRepository(models.Model):
                 else:
                     error_message = 'The following diagnosis message was provided:\n' + error_message
                 if status:
-                    raise Warning("The command 'git pull' failed with error code = %s. Message: %s" % (status, error_message))
+                    raise UserError(_("The command 'git pull' failed with error code = %s. Message: %s" % (status, error_message)))
 
                 ret.append({'record.path': status})
             finally:
                 if stderr_fd is not None:
                     os.close(stderr_fd)
-
 
         os.chdir(cwd)
         return ret

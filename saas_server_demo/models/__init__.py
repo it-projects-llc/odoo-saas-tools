@@ -1,2 +1,2 @@
-import saas_server_demo
-import module
+from . import saas_server_demo
+from . import module

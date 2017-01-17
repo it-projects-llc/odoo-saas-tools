@@ -83,6 +83,14 @@ plan_group.add_argument('--plan-name', dest='plan_name', default='Plan')
 plan_group.add_argument('--plan-template-db-name', dest='plan_template_db_name', default='template-1.saas-portal-{suffix}.local')
 plan_group.add_argument('--plan-clients', dest='plan_clients', default='client-%i.saas-portal-{suffix}.local', help='Template for new client databases')
 
+saas_demo = parser.add_argument_group('SaaS Demo')
+saas_demo.add_argument('--demo-repositories', dest='demo_repositories',
+                       help="Comma-separated list of path to repositories. "
+                       "These repositories will be added to saas_server.repository table. "
+                       "Note that path has to in addons-path.")
+saas_demo.add_argument('--create-demo-templates', dest='create_demo_templates', action='store_true',
+                       help="Create Plans and Templates to publish and demostrate modules")
+
 other_group = parser.add_argument_group('Other')
 other_group.add_argument('--print-local-hosts', dest='print_local_hosts', action='store_true', help='Print hosts rules for local usage.')
 other_group.add_argument('--run', dest='run', action='store_true', help='Run server')
@@ -179,6 +187,12 @@ def main():
 
         if args.get('plan_create'):
             plan_id = rpc_create_plan(args.get('portal_db_name'))
+
+        if args.get('demo_repositories'):
+            rpc_add_demo_repositories(args.get('demo_repositories'))
+
+        if args.get('create_demo_templates'):
+            rpc_create_demo_templates()
 
         if args.get('test'):
             if not plan_id:
@@ -319,6 +333,32 @@ def rpc_add_server_to_portal(portal_db_name):
     rpc_execute_kw(auth, 'saas_portal.server', 'create', [{'name': server_db_name, 'client_id': uuid, 'local_port': local_xmlrpc_port, 'local_host': 'localhost'}])
 
 
+def rpc_add_demo_repositories(demo_repositories):
+    demo_repositories = demo_repositories.split(',')
+    server_db_name = args.get('server_db_name')
+    auth = rpc_auth(server_db_name, admin_password=args.get('admin_password'))
+    for repo_path in demo_repositories:
+        vals = {
+            'path': repo_path,
+        }
+        rpc_execute_kw(auth, 'saas_server.repository', 'create', [vals])
+
+
+def rpc_create_demo_templates():
+    # auth to portal
+    portal_db_name = args.get('portal_db_name')
+    auth = rpc_auth(portal_db_name, admin_password=args.get('admin_password'))
+
+    # find server
+    server_db_name = args.get('server_db_name')
+    server_id = rpc_get_server_id(auth, server_db_name)
+
+    # execute
+    rpc_execute_kw(auth, 'saas_portal.server', 'update_repositories', [[server_id]])
+    rpc_execute_kw(auth, 'saas_portal.server', 'generate_demo_plans', [[server_id]])
+    rpc_execute_kw(auth, 'saas_portal.server', 'create_demo_templates', [[server_id]])
+
+
 def rpc_get_uuid(dbname):
     auth = rpc_auth(dbname, admin_password=args.get('admin_password'))
     res = rpc_execute_kw(auth, 'ir.config_parameter', 'get_param', ['database.uuid'])
@@ -328,6 +368,12 @@ def rpc_get_uuid(dbname):
 def rpc_xmlid_to_object(auth, xmlid, model):
     res_id = rpc_execute_kw(auth, 'ir.model.data', 'xmlid_to_res_id', [xmlid])
     return rpc_execute_kw(auth, model, 'read', [res_id])
+
+
+def rpc_get_server_id(auth, server_db_name):
+    res = rpc_execute_kw(auth, 'saas_portal.server', 'search', [[('name', '=', server_db_name)]])
+    server_id = res[0]
+    return server_id
 
 
 def rpc_create_plan(portal_db_name):
@@ -345,6 +391,7 @@ def rpc_create_plan(portal_db_name):
     #      * set Template DB: type name, e.g. **t1.odoo.local**, and click *Create "__t1.odoo.local__"*
     #      * click [Save]
 
+    # TODO: use rpc_get_server_id
     res = rpc_execute_kw(auth, 'saas_portal.server', 'search', [[]])
     # use last created server
     log('search server', res)

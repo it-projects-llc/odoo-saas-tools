@@ -114,7 +114,7 @@ class SaasPortalServer(models.Model):
                 plan = record._create_demo_plan(module)
 
                 if not plan:
-                    return None
+                    continue
 
                 vals = record._prepare_module(module, plan)
                 demo_plan_module_obj.create(vals)
@@ -131,7 +131,7 @@ class SaasPortalServer(models.Model):
                     for addon in module['demo_addons_hidden'].split(','):
                         demo_plan_hidden_module_obj.create({'technical_name': addon, 'demo_plan_id': plan.id})
 
-        return None
+        return True
 
     @api.multi
     def create_demo_templates(self):
@@ -142,9 +142,11 @@ class SaasPortalServer(models.Model):
                 plan.with_context({'skip_sync_server': True}).create_template()
                 addons = plan.demo_plan_module_ids.mapped('technical_name')
                 addons.extend(plan.demo_plan_hidden_module_ids.mapped('technical_name'))
-                payload = {'install_addons': addons,}
+                payload = {'install_addons': addons}
                 plan.template_id.upgrade(payload=payload)
                 record.action_sync_server()
+
+        return True
 
     @api.multi
     def update_repositories(self):

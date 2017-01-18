@@ -14,7 +14,7 @@
       </field>
     </record>
 
-    <menuitem id="menu_saas_server_repositories" parent="base.menu_config"
+    <menuitem id="menu_saas_server_repositories" parent="saas_server.menu_saas"
               sequence="100" action="action_saas_server_repositories"/>
     <record id='view_saas_server_repository_tree' model='ir.ui.view'>
       <field name="name">saas_server.repository.tree</field>
@@ -39,6 +39,6 @@
         </form>
       </field>
     </record>
-    
+
   </data>
 </openerp>

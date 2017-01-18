@@ -188,6 +188,9 @@
                           <field name="local_host"/>
                           <field name="local_port"/>
                         </group>
+                        <group string="Credentials for rpc">
+                          <field name="password" password="True"/>
+                        </group>
                     </group>
                     <field name="client_ids" readonly="1">
                         <tree>

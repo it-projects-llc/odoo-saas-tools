@@ -23,6 +23,19 @@ class SaasPortalServer(models.Model):
 
         return db, uid, password, xmlrpclib.ServerProxy('{}/xmlrpc/2/object'.format(url))
 
+    @api.multi
+    def _get_odoo_version(self):
+        self.ensure_one()
+        db, uid, password, models = self._get_xmlrpc_object(self.name)
+        ids = models.execute_kw(db, uid, password, 'ir.module.module', 'search',
+                                [[['name', '=', 'base']]],
+                                )
+        base_module = models.execute_kw(db, uid, password,
+                                    'ir.module.module',
+                                    'read', [ids],
+                                    {'fields': ['latest_version']})
+        return base_module[0].get('latest_version')
+
     def _prepare_module(self, module, plan):
         attachment_name = 'addon_{0}_{1}.{2}'.format(self.odoo_version,
                                                      module['name'],
@@ -47,7 +60,9 @@ class SaasPortalServer(models.Model):
         template_obj = self.env['saas_portal.database']
         plan_obj = self.env['saas_portal.plan']
         if not self.odoo_version:
-            raise Warning('You should define odoo version for the server: 8 for 8.0 or 9 for 9.0')
+            version = self._get_odoo_version()
+            if version:
+                self.odoo_version = version.split('.', 1)[0]
         namestring = '{0}-{1}.odoo-{2}.demo.{3}'
         saas_domain = self.env['ir.config_parameter'].get_param('saas_portal.base_saas_domain')
         template_name = namestring.format(demo_module['demo_url'],

@@ -1,16 +1,25 @@
 # Site settings
 title: My Territory
-blog_title: My Territory
-header-img: img/home-bg.jpg
-email: root@shikherverma.com
-copyright_name: ShikherVerma
-description: "Online Territory of Shikher Verma"
-baseurl: "" #base url is for when the site is not at the root but at some subdirectory.
-url: http://shikherverma.com #only used in disque comments for now
-disqus_url: shikherverma.com # disque comments are broken if you send http:// along with url
+description: "Online Territory of Shikher Verma"  # used in site head
+baseurl: ""  # for when the site is not at the root but at some subdirectory
+
+# register on google analytics and replace this token
+google_analytics: UA-75681059-1
+# disque comments are broken if you send http:// along with url, this url is same as the one given on disqus
+disqus_url: shikherverma.com
+disqus_id: shikherverma
+# register on feedburner and replace this url
+feedburner_url: https://feedburner.google.com/fb/a/mailverify?uri=programmer-wannabe&amp;loc=en_US
+
+# footer details
 github_username:  shikherverma
 facebook_username:  shikherverma1
+email: root@shikherverma.com
 stackoverflow_username: 6764571/shikher-verma
+twitter_username : shikherverma42
+copyright_name: Shikher Verma
+
+# used for portfolio on home page
 collections:
   - portfolio
 
@@ -24,7 +33,7 @@ exclude: ["less","node_modules","Gruntfile.js","package.json","README.md"]
 port: 8888
 permalink: /blog/:title
 
-# jekyll-paginate
+# jekyll-paginate. for paginating blog posts.
 paginate: 5
 paginate_path: blog/page:num
 

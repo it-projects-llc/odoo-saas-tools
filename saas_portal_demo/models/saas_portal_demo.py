@@ -16,8 +16,7 @@ class SaasPortalServer(models.Model):
         url = self.local_request_scheme + '://' + db_name
         db = db_name
         username = 'admin'
-        password = 'admin'
-        # TODO: store username and password in saas_portal.server model
+        password = self.password
         common = xmlrpclib.ServerProxy('{}/xmlrpc/2/common'.format(url))
         uid = common.authenticate(db, username, password, {})
 

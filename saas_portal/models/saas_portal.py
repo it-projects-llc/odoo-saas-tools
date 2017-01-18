@@ -52,6 +52,7 @@ class SaasPortalServer(models.Model):
     local_request_scheme = fields.Selection([('http', 'http'), ('https', 'https')], 'Scheme', default='http', required=True)
     host = fields.Char('Host', compute=_compute_host)
     odoo_version = fields.Char('Odoo version', readonly=True)
+    password = fields.Char()
 
     @api.model
     def create(self, vals):

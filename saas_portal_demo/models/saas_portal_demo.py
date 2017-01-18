@@ -98,6 +98,7 @@ class SaasPortalServer(models.Model):
         if not product_template:
             product_template = product_template_obj.create({'name': product_template_name,
                                                             'module_name': demo_module['name'],
+                                                            'website_published': True,
                                                             'seo_url': demo_module.get('demo_url'),
                                                             'description': demo_module.get('demo_summary'),
                                                             'image': demo_module.get('demo_image'),
@@ -128,7 +129,7 @@ class SaasPortalServer(models.Model):
                 plan = record._create_demo_plan(module)
 
                 if not plan:
-                    return None
+                    continue
 
                 vals = record._prepare_module(module, plan)
                 demo_plan_module_obj.create(vals)

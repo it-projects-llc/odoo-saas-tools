@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+import logging
 import openerp
 from openerp import models, fields, api
 from openerp.exceptions import Warning as UserError
@@ -7,6 +8,7 @@ from openerp.tools.translate import _
 import subprocess
 import tempfile
 
+_logger = logging.getLogger(__name__)
 
 class SaasServerRepository(models.Model):
     _name = 'saas_server.repository'
@@ -44,7 +46,7 @@ class SaasServerRepository(models.Model):
                 else:
                     error_message = 'The following diagnosis message was provided:\n' + error_message
                 if status:
-                    raise UserError(_("The command 'git pull' failed with error code = %s. Message: %s" % (status, error_message)))
+                    _logger.exception("The command 'git pull' failed with error code = %s. Message: %s" % (status, error_message))
 
                 ret.append({'record.path': status})
             finally:
@@ -52,4 +54,5 @@ class SaasServerRepository(models.Model):
                     os.close(stderr_fd)
 
         os.chdir(cwd)
+        self.env['ir.module.module'].update_list()
         return ret

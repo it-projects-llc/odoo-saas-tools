@@ -76,7 +76,7 @@ class SaasPortalServer(models.Model):
                 plan = plan_obj.create({'name': plan_name,
                                         'server_id': self.id,
                                         'dbname_template': namestring.format(demo_module['demo_url'],
-                                                                             '-%i',
+                                                                             '%i',
                                                                              self.odoo_version,
                                                                              saas_domain),
                                         'template_id': template.id})

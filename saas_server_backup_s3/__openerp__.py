@@ -5,6 +5,7 @@
     'author': 'Salton Massally<smassally@idtlabs.sl>',
     'license': 'LGPL-3',
     'category': 'SaaS',
+    "support": "apps@it-projects.info",
     'website': 'http://idtlabs.sl',
     'external_dependencies': {
         'python': [

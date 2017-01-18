@@ -5,6 +5,7 @@
     'author': 'Cesar Lage',
     'license': 'LGPL-3',
     'category': 'SaaS',
+    "support": "apps@it-projects.info",
     'website': 'https://it-projects.info',
     'depends': ['auth_signup', 'saas_portal'],
     'data': ['views/signup.xml'],

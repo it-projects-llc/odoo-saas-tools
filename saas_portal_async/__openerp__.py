@@ -3,6 +3,7 @@
     'name': 'SaaS Portal Asynchronous database creation',
     'version': '1.0.0',
     'author': 'IT-Projects LLC',
+    "support": "apps@it-projects.info",
     'website': "https://it-projects.info",
     'license': 'GPL-3',
     'category': 'SaaS',

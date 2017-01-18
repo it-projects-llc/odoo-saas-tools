@@ -4,6 +4,7 @@
     'summary': """Variate your product prices with multiplier""",
     'license': 'LGPL-3',
     'author': "IT-Projects LLC, Ildar Nasyrov",
+    "support": "apps@it-projects.info",
     'website': "https://twitter.com/nasyrov_ildar",
     'category': 'Sales Management',
     'images': ['images/1.png'],

@@ -5,6 +5,7 @@
     'author': 'Salton Masssally',
     'license': 'GPL-3',
     'category': 'SaaS',
+    "support": "apps@it-projects.info",
     'website': 'http://idtlabs.sl',
     'depends': ['saas_server'],
     'data': [

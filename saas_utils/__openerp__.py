@@ -24,6 +24,7 @@
     'version': '0.1',
     'author': 'OpenJAF',
     'license': 'LGPL-3',
+    "support": "apps@it-projects.info",
     'website': 'http://www.openjaf.com',
     'category': 'Base',
     'description': """

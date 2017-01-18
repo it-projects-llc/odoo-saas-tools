@@ -5,6 +5,7 @@
     'author': 'Salton Masssally',
     'license': 'GPL-3',
     'category': 'SaaS',
+    "support": "apps@it-projects.info",
     'website': 'http://idtlabs.sl',
     'depends': ['saas_server', 'saas_server_backup_s3', 'saas_server_backup_rotate'],
     "external_dependencies": {"python": ['boto', 'rotate_backups_s3'], "bin": []},

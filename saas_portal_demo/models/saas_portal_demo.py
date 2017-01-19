@@ -169,12 +169,14 @@ class SaasPortalServer(models.Model):
             db, uid, password, models = record._get_xmlrpc_object(record.name)
             ids = models.execute_kw(db, uid, password, 'saas_server.repository', 'search', [[]],)
             models.execute_kw(db, uid, password, 'saas_server.repository', 'update', [ids])
+        return True
 
     @api.multi
     def restart_server(self):
         for record in self:
             db, uid, password, models = record._get_xmlrpc_object(record.name)
             models.execute_kw(db, uid, password, 'saas_server.client', 'restart_server', [])
+        return True
 
     @api.multi
     def update_templates(self):
@@ -187,6 +189,7 @@ class SaasPortalServer(models.Model):
                 id = models.execute_kw(db, uid, password, 'ir.module.module', 'search',
                                         [[['name', 'in', ['base']]]])
                 models.execute_kw(db, uid, password, 'ir.module.module', 'button_upgrade', [id])
+        return True
 
 
 class SaaSPortalDemoPlanModule(models.Model):

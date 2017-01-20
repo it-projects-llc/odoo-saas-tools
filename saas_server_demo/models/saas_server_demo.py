@@ -35,7 +35,7 @@ class SaasServerRepository(models.Model):
             stderr_fd, stderr_path = tempfile.mkstemp(text=True)
             os.chdir(record.path)
             try:
-                status = subprocess.call(['git', 'pull'], stderr=stderr_fd)
+                status = subprocess.call(['git', 'pull', '--ff-only'], stderr=stderr_fd)
                 os.close(stderr_fd)  # ensure flush before reading
                 stderr_fd = None  # avoid closing again in finally block
                 fobj = open(stderr_path, 'r')

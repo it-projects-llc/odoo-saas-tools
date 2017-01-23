@@ -95,6 +95,9 @@ class SaasPortalServer(models.Model):
         product_template_name = demo_module['demo_title']
         product_template = product_template_obj.search([('module_name', '=', demo_module['name'])], limit=1)
 
+        odoo_version_attrib = self.env.ref('saas_portal_demo.odoo_version_product_attribute')
+        attrib_value = self.env.ref('saas_portal_demo.product_attribute_value_{}'.format(self.odoo_version))
+
         if not product_template:
             product_template = product_template_obj.create({'name': product_template_name,
                                                             'module_name': demo_module['name'],
@@ -103,15 +106,20 @@ class SaasPortalServer(models.Model):
                                                             'description': demo_module.get('demo_summary'),
                                                             'image': demo_module.get('demo_image'),
                                                             'sale_on_website': False,
+                                                            'saas_demo': True,
                                                             'type': 'service'})
+        product_attribute_line = product_attribute_line_obj.search([
+            ('product_tmpl_id', '=', product_template.id),
+            ('attribute_id', '=', odoo_version_attrib.id),
+        ], limit=1)
+        if not product_attribute_line or not product_attribute_line.value_ids.filtered(lambda r: r.id == attrib_value.id):
             product_attribute_line = product_attribute_line_obj.create({'product_tmpl_id': product_template.id,
-                                                                        'attribute_id': self.env.ref('saas_portal_demo.odoo_version_product_attribute').id,
-                                                                        'value_ids': [(6, 0, [self.env.ref('saas_portal_demo.product_attribute_value_8').id,
-                                                                                              self.env.ref('saas_portal_demo.product_attribute_value_9').id])],
-                                                                    })
+                                                                        'attribute_id': odoo_version_attrib.id,
+                                                                        'value_ids': [(4, attrib_value.id, 0)],
+                                                                        })
         product_product = product_product_obj.create({
             'product_tmpl_id': product_template.id,
-            'attribute_value_ids': [(4, self.env.ref('saas_portal_demo.product_attribute_value_%s' % self.odoo_version).id)],
+            'attribute_value_ids': [(4, attrib_value.id)],
             'variant_plan_id': plan.id,
         })
 

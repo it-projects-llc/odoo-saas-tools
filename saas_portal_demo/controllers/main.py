@@ -3,7 +3,7 @@ import werkzeug
 from openerp.addons.web import http
 from openerp.addons.web.http import request
 from openerp.addons.saas_portal.controllers.main import SaasPortal
-from openerp.addons.website_sale.controllers.main import website_sale, QueryURL
+from openerp.addons.website_sale.controllers.main import website_sale
 
 
 def signup_redirect():

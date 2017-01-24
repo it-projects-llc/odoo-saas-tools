@@ -99,24 +99,34 @@ class SaasPortalServer(models.Model):
         attrib_value = self.env.ref('saas_portal_demo.product_attribute_value_{}'.format(self.odoo_version))
 
         if not product_template:
-            product_template = product_template_obj.create({'name': product_template_name,
-                                                            'module_name': demo_module['name'],
-                                                            'website_published': True,
-                                                            'seo_url': demo_module.get('demo_url'),
-                                                            'description': demo_module.get('demo_summary'),
-                                                            'image': demo_module.get('demo_image'),
-                                                            'sale_on_website': False,
-                                                            'saas_demo': True,
-                                                            'type': 'service'})
+            vals = {
+                'name': product_template_name,
+                'module_name': demo_module['name'],
+                'website_published': True,
+                'seo_url': demo_module.get('demo_url'),
+                'description': demo_module.get('demo_summary'),
+                'image': demo_module.get('demo_image'),
+                'sale_on_website': False,
+                'saas_demo': True,
+                'type': 'service',
+            }
+            product_template = product_template_obj.with_context({
+                'create_product_product': False
+            }).create(vals)
+
         product_attribute_line = product_attribute_line_obj.search([
             ('product_tmpl_id', '=', product_template.id),
             ('attribute_id', '=', odoo_version_attrib.id),
         ], limit=1)
-        if not product_attribute_line or not product_attribute_line.value_ids.filtered(lambda r: r.id == attrib_value.id):
+
+        if not product_attribute_line:
             product_attribute_line = product_attribute_line_obj.create({'product_tmpl_id': product_template.id,
                                                                         'attribute_id': odoo_version_attrib.id,
                                                                         'value_ids': [(4, attrib_value.id, 0)],
                                                                         })
+        elif not product_attribute_line.value_ids.filtered(lambda r: r.id == attrib_value.id):
+            product_attribute_line.update({'value_ids': [(4, attrib_value.id, 0)]})
+
         product_product = product_product_obj.create({
             'product_tmpl_id': product_template.id,
             'attribute_value_ids': [(4, attrib_value.id)],

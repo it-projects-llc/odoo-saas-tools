@@ -63,11 +63,11 @@
 
       <xpath expr="//div[@class='col-sm-5 col-md-5 col-lg-4 col-lg-offset-1']/p[@class='text-muted']" position="after">
         <t t-foreach="product.attribute_line_ids" t-as="attribute_line">
-          <t t-if="attribute_line.attribute_id.id == odoo_version_attrib.id">
-            <t t-if="len(attribute_line.value_ids)&gt;1 and len(demo_variants)&gt;1">
+          <t t-if="attribute_line.attribute_id.name == 'Odoo Version'">
+            <t t-if="len(attribute_line.value_ids)&gt;1 and len(product.product_variant_ids.mapped('attribute_value_ids').filtered(lambda r: r.attribute_id.name == 'Odoo Version').ids)&gt;1">
               <p><b>Also available for</b><br/>
               <t t-foreach="attribute_line.value_ids" t-as="value">
-                <t t-if="not (set([value.id]) &amp; attrib_set) and value.id in demo_variants">
+                <t t-if="not (set([value.id]) &amp; attrib_set) and value.id in product.product_variant_ids.mapped('attribute_value_ids').filtered(lambda r: r.attribute_id.name == 'Odoo Version').ids">
                   <a t-attf-href="/shop/product/#{product.seo_url}?attrib=#{attribute_line.attribute_id.id}-#{value.id}">
                     <span><t t-esc="value.name"/></span>
                   </a>

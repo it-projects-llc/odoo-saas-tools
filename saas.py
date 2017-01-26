@@ -412,17 +412,17 @@ def exec_pg_environ():
     See also http://www.postgresql.org/docs/8.4/static/libpq-envars.html
     """
     env = os.environ.copy()
-    db_user = odoo_config.get('db_user') or os.getenv('DB_ENV_POSTGRES_USER') or os.getenv('RDS_USERNAME')
+    db_user = odoo_config.get('db_user') or os.getenv('DB_ENV_POSTGRES_USER') or os.getenv('RDS_USERNAME') or os.getenv('PGUSER') or 'odoo'
     if db_user:
         env['PGUSER'] = db_user
     db_host = odoo_config.get('db_host') or os.getenv('DB_PORT_5432_TCP_ADDR') or os.getenv('RDS_HOSTNAME')
     if db_host:
         env['PGHOST'] = db_host
-    db_port = odoo_config.get('db_port') or os.getenv('DB_PORT_5432_TCP_PORT') or os.getenv('RDS_PORT')
+    db_port = odoo_config.get('db_port') or os.getenv('DB_PORT_5432_TCP_PORT') or os.getenv('RDS_PORT') or os.getenv('PGPORT') or '5432'
     if db_port:
         env['PGPORT'] = db_port
 
-    db_password = odoo_config.get('db_password') or os.getenv('DB_ENV_POSTGRES_PASSWORD') or os.getenv('RDS_PASSWORD')
+    db_password = odoo_config.get('db_password') or os.getenv('DB_ENV_POSTGRES_PASSWORD') or os.getenv('RDS_PASSWORD') or os.getenv('PGPASSWORD') or 'odoo'
     if db_password:
         env['PGPASSWORD'] = db_password
 

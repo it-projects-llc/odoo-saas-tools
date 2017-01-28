@@ -14,7 +14,7 @@ layout: page
 
 {% for post in site.tags[page.tag] %}
 <div class="post-preview">
-    <a href="{{ post.url | prepend: site.baseurl }}">
+    <a href="{{ post.url }}">
         <h3 class="post-subtitle">            
             {{ post.title }}
         </h3>
@@ -26,7 +26,7 @@ layout: page
       {% else %}
         {{ site.title }}
       {% endif %} 
-      on {{ post.date | date: "%B %-d, %Y" }}
+      on {{ post.date | date: "%A, %B %-d, %Y" }}
     </p>
 </div>
 <hr>

@@ -9,7 +9,7 @@ tags: [CodeMonkey, Life] #list of tags that you want to show in description of b
 {% for post in paginator.posts %}
 
 <div class="post-preview">
-    <a href="{{ post.url | prepend: site.baseurl }}">
+    <a href="{{ post.url }}">
         <h2 class="post-title">
             {{ post.title }}
         </h2>
@@ -29,12 +29,12 @@ tags: [CodeMonkey, Life] #list of tags that you want to show in description of b
 <ul class="pager">
     {% if paginator.previous_page %}
     <li class="previous">
-        <a href="{{ paginator.previous_page_path | prepend: site.baseurl | replace: '//', '/' }}">&larr; Newer Posts</a>
+        <a href="{{ paginator.previous_page_path }}">&larr; Newer Posts</a>
     </li>
     {% endif %}
     {% if paginator.next_page %}
     <li class="next">
-        <a href="{{ paginator.next_page_path | prepend: site.baseurl | replace: '//', '/' }}">Older Posts &rarr;</a>
+        <a href="{{ paginator.next_page_path }}">Older Posts &rarr;</a>
     </li>
     {% endif %}
 </ul>

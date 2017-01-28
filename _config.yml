@@ -1,7 +1,6 @@
 # Site settings
 title: My Territory
 description: "Online Territory of Shikher Verma"  # used in site head
-baseurl: ""  # for when the site is not at the root but at some subdirectory
 
 # register on google analytics and replace this token
 google_analytics: UA-75681059-1

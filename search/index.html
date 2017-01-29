@@ -6,7 +6,9 @@ header-img: "img/search-bg.jpg"
 ---
 
 <!-- Html Elements for Search -->
-<input type="text" id="search-input" placeholder="Enter keywords...">
+<input type="text" id="search-input" placeholder="Enter keywords..." class="form-control input-lg">
+<br>
+<br>
 <ul id="results-container" ></ul>    
 
 <!-- Script pointing to jekyll-search.js -->
@@ -17,7 +19,7 @@ header-img: "img/search-bg.jpg"
         searchInput: document.getElementById('search-input'),
         resultsContainer: document.getElementById('results-container'),
         json: '{{ site.baseurl }}/search.json',
-        searchResultTemplate: '<li><a href="{url}" title="{desc}">{title}</a></li>',
+        searchResultTemplate: '<div class="post-preview"><a href="{{ post.url }}"><h3 class="post-subtitle">{title}</h3></a><p class="post-meta">{date}  <i class="fa fa-tag"></i> {tags}</p></div><hr>',
         noResultsText: 'No results found',
         limit: 10,
         fuzzy: true,

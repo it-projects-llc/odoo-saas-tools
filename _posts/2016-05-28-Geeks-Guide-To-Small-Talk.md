@@ -6,7 +6,7 @@ date: 2016-05-28 05:20:26
 author: "Shikher Verma"
 header-img: "img/posts/smalltalk-bg.jpg"
 comments: true
-tags: [ CodeMonkey, Life@IITK ]
+tags: [ Life ]
 ---
 
 After reading this guide you won't ever feel like this.
@@ -47,7 +47,7 @@ conversation by getting a response.
 
 ## The "Daily News"
 Just assume the other person has subscribed to your daily update feed. Don't wait for them to ask "How was your day?"
-The are standing right in front of you, aren't they? Thats sufficient. Start talking about how you woke up early today and
+They are standing right in front of you, aren't they? Thats sufficient. Start talking about how you woke up early today and
 though of going for a run but ended up snoozing and dozed off again. Or how you couldn't find the other matching sock
 and had to wear two different ones. Anything about your day. The "Daily News" is your ace conversation starter. However I
 must warn you that it won't work as a ice breaker, it will only work with people you already know. Then of course apply the

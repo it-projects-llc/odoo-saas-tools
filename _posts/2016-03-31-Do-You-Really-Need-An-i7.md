@@ -6,16 +6,12 @@ date:       2016-03-30 4:17:00
 author:     "Shikher Verma"
 header-img: "img/posts/chip-bg.jpg"
 comments: true
-tags: [ CodeMonkey, Robotics ]
+tags: [ CodeMonkey ]
 ---
 
-## When Raspberry Pi 2 and Odroid U3 fail you 
+## When Raspberry Pi 2 and Odroid U3 fail you. What next ? Back to x64.
 
-## What next ? Back to 64 bit ?
-
-Initially Shikher thought that buying a low power armh processor was a very wise choice. Low power meant lower battery consumption so lighter batteries. Also single chip armh processors like Raspberry Pi and Odroid are way cheaper. The world was good. Until one day OpenCV came along. Initially he seemed like a nice guy. Resourceful. With his awesome HighGUI and slashy high power tools like HoughCircle, Contrast stretching he seemed like a guy Shikher could rely on. But soon Shikher became so dependant on him that he forgot the limited hardware that had to support OpenCV. The world started breaking apart. Shikher was caught up between using powerful tools of OpenCV or betraying our loyal companions odroid u3 and raspberry pi 2. Even then Shikher started looking for stronger boards which could meet the requirements of OpenCV. He soon came across NUC; One of the most powerful boards used in robotics projects. Shikher knew in his heart that he couldn't just leave his old companions behind. After all they were the one because of which his project survived the last one year. But in the end, with a heavy heart Shikher had to pull the trigger on his old companions. Maybe it was not Raspberry and Odroid who fail Shikher; it was Shikher who failed them!
-
-\*wiping forhead\* Phew!! This would have been so difficult if these board were alive.
+Initially Shikher thought that buying a low power armh processor was a very wise choice. Low power meant lower battery consumption so lighter batteries. Also single chip armh processors like Raspberry Pi and Odroid are way cheaper. The world was good. Until one day OpenCV came along. Initially he seemed like a nice guy. Resourceful. With his awesome HighGUI and shiny high power tools like HoughCircle, Contrast stretching he seemed like a guy Shikher could rely on. But soon Shikher became so dependant on him that he forgot the limited hardware that had to support OpenCV. The world started breaking apart. Shikher was caught up between using powerful tools of OpenCV or making the resource requirements low for odroid u3 and raspberry pi 2 boards. Eventually it became clear that there was no other way, Shikher started looking for stronger boards which could meet the requirements of OpenCV. He soon came across NUC; One of the most powerful boards used in robotics projects. Although the specs were great but it came with a big setback to our budget, and using it also meant increased battery consumption. Shikher tried to weigh to pros and cons of it and presented this to my team so that they will go forward with the purchase.
 
 ## Weighing the pros and cons
 Pros:

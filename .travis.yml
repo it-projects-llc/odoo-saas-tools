@@ -5,7 +5,7 @@ install:
   - bundle update
   - bundle install
   - bundle exec jekyll build
-  - bundle exec htmlproofer ./_site --only-4xx --external_only
+  - bundle exec htmlproofer ./_site --only-4xx --external_only --url-ignore "http://github.com/pages/ShikherVerma/Shikherverma.github.io/feed.xml"
 
 script: true
 

@@ -27,11 +27,16 @@ layout: default
 
 <!-- Main Content -->
 <div class="container">
-	<div class="row">
-		<div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
-			{{ content }}
-		</div>
-	</div>
+    <div class="row">
+        <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+            {{ content }}
+            <br>
+            {% if page.comments %}
+                {% include disqus_comments.html %}
+            {% endif %}
+            <br>
+        </div>
+    </div>
 </div>
 
 <hr>

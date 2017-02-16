@@ -5,18 +5,20 @@ description: "Online Territory of Shikher Verma"  # used in site head
 # register on google analytics and replace this token
 google_analytics: UA-75681059-1
 # disque comments are broken if you send http:// along with url, this url is same as the one given on disqus
+# Deleting the value would remove it from footer.
 disqus_url: shikherverma.com
 disqus_id: shikherverma
-# register on feedburner and replace this url
+# register on feedburner and replace this url. Deleting the value will remove it from footer.
 feedburner_url: https://feedburner.google.com/fb/a/mailverify?uri=programmer-wannabe&amp;loc=en_US
 
-# footer details
+# footer details. Deleting the value would remove it from footer.
 github_username:  shikherverma
 facebook_username:  shikherverma42
 email: root@shikherverma.com
 stackoverflow_username: 6764571/shikher-verma
 twitter_username : shikherverma42
 copyright_name: Shikher Verma
+rss : true
 
 # used for portfolio on home page
 collections:

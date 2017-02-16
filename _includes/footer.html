@@ -4,6 +4,7 @@
         <div class="row">
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
                 <ul class="list-inline text-center">
+                    {% if site.rss %}
                     <li>
                         <a href="/feed.xml">
                             <span class="fa-stack fa-lg">
@@ -12,6 +13,7 @@
                             </span>
                         </a>
                     </li>
+                    {% endif %}
                     {% if site.twitter_username %}
                     <li>
                         <a href="https://twitter.com/{{ site.twitter_username }}">
@@ -63,17 +65,23 @@
                     </li>
                     {% endif %}
                 </ul>
-                <p class="copyright text-muted">{% include feedburner_subscribe.html %} <br><br> Copyright &copy; {{ site.copyright_name }} {{ site.time | date: '%Y' }}</p>
+                <p class="copyright text-muted">
+                {% if site.feedburner_url %}
+                    {% include feedburner_subscribe.html %}
+                {% endif %}
+                {% if site.copyright_name %}
+                    <br><br> Copyright &copy; {{ site.copyright_name }} {{ site.time | date: '%Y' }}</p>
+                {% endif %}
             </div>
         </div>
     </div>
 </footer>
 
 <!-- jQuery -->
-<script src="{{ "/js/jquery.min.js "}}"></script>
+<script src="/js/jquery.min.js"></script>
 
 <!-- Bootstrap Core JavaScript -->
-<script src="{{ "/js/bootstrap.min.js " }}"></script>
+<script src="/js/bootstrap.min.js"></script>
 
 <!-- Custom Theme JavaScript -->
-<script src="{{ "/js/clean-blog.min.js " }}"></script>
+<script src="/js/clean-blog.min.js"></script>

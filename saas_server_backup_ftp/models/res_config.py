@@ -107,9 +107,10 @@ class SaasPortalConfigWizard(models.TransientModel):
             messageTitle = "Connection Test Succeeded!"
             messageContent = "Everything seems properly set up for FTP back-ups!"
         except Exception as e:
-            messageTitle = "Connection Test Failed!"
+            messageTitle = "Connection Test Failed!\n"
             messageContent += "Here is what we got instead:\n"
         if "Failed" in messageTitle:
-            raise UserError(_(messageTitle), _(messageContent + "%s") % tools.ustr(e))
+            msg = _('{}{}{}'.format(messageTitle, messageContent, e))
+            raise UserError(msg)
         else:
             _logger.info(_(messageTitle), _(messageContent))

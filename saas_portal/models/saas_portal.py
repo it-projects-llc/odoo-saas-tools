@@ -440,7 +440,7 @@ class SaasPortalDatabase(models.Model):
         if not res.ok:
             raise Warning('Reason: %s \n Message: %s' % (res.reason, res.content))
         data = simplejson.loads(res.text)
-        if not isinstance(data, dict):
+        if not isinstance(data, list):
             raise Warning(data)
         if data['status'] != 'success':
             warning = data[0].get('message', 'Could not backup database; please check your logs')

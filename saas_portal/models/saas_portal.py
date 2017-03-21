@@ -186,6 +186,11 @@ class SaasPortalPlan(models.Model):
     website_description = fields.Html('Website description')
     logo = fields.Binary('Logo')
 
+    on_create = fields.Selection([
+        ('login', 'Log into just created instance'),
+        ('email', 'See information page and check email for credentials')
+    ], string="Workflow on create", default='email')
+
     @api.one
     @api.depends('template_id.state')
     def _get_state(self):
@@ -275,6 +280,7 @@ class SaasPortalPlan(models.Model):
             'r': client.public_url + 'web',
             'owner_user': owner_user_data,
             't': client.trial,
+            'on_create': self.on_create,
         }
         if self.template_id:
             state.update({'db_template': self.template_id.name})

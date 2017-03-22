@@ -302,7 +302,8 @@ class SaasPortalPlan(models.Model):
         url = '{url}?{params}'.format(url=data.get('url'), params=werkzeug.url_encode(params))
 
         # send email
-        if notify_user:
+        # TODO: get rid of such attributes as ``notify_user``, ``trial`` - move them on plan settings (use different plans for trials and non-trials)
+        if notify_user or self.on_create == 'email':
             template = self.env.ref('saas_portal.email_template_create_saas')
             email_ctx = {
                 'default_model': 'saas_portal.client',

@@ -188,8 +188,10 @@ class SaasPortalPlan(models.Model):
 
     on_create = fields.Selection([
         ('login', 'Log into just created instance'),
-        ('email', 'See information page and check email for credentials')
+        ('email', 'Go to information page that says to check email for credentials')
     ], string="Workflow on create", default='email')
+    on_create_email = fields.Many2one('email.template',
+                                      default=lambda self: self.env.ref('saas_portal.email_template_create_saas'))
 
     @api.one
     @api.depends('template_id.state')

@@ -282,7 +282,6 @@ class SaasPortalPlan(models.Model):
             'r': client.public_url + 'web',
             'owner_user': owner_user_data,
             't': client.trial,
-            'on_create': self.on_create,
         }
         if self.template_id:
             state.update({'db_template': self.template_id.name})
@@ -300,6 +299,8 @@ class SaasPortalPlan(models.Model):
             'access_token': client.oauth_application_id._get_access_token(user_id, create=True),
         }
         url = '{url}?{params}'.format(url=data.get('url'), params=werkzeug.url_encode(params))
+        if self.on_create == 'email':
+            url = '/information'
 
         # send email
         # TODO: get rid of such attributes as ``notify_user``, ``trial`` - move them on plan settings (use different plans for trials and non-trials)

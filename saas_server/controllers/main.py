@@ -36,7 +36,6 @@ class SaasServer(http.Controller):
         _logger.info('new_database post: %s', post)
 
         state = simplejson.loads(post.get('state'))
-        on_create = state.get('on_create')
         owner_user = state.get('owner_user')
         new_db = state.get('d')
         public_url = state.get('public_url')
@@ -87,10 +86,7 @@ class SaasServer(http.Controller):
             oauth_provider_id = client_env.ref('saas_client.saas_oauth_provider').id
             action_id = client_env.ref(action).id
 
-        if on_create == 'login':
-            url = '{public_url}saas_client/new_database'.format(public_url=public_url)
-        elif on_create == 'email':
-            url = 'http://saas-portal-8.local/information'
+        url = '{public_url}saas_client/new_database'.format(public_url=public_url)
         return simplejson.dumps({
             'url': url,
             'state': simplejson.dumps({

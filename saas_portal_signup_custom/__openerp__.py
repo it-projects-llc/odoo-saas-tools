@@ -1,37 +1,35 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "saas_portal_signup_custom",
+    "name": """Create databases after signup custom""",
+    "summary": """Create several databases for new customers after signup""",
+    "category": "SaaS",
+    "images": [],
+    "version": "1.0.0",
+    "application": False,
 
-    'summary': """
-        Short (1 phrase/line) summary of the module's purpose, used as
-        subtitle on modules listing or apps.openerp.com""",
+    "author": "IT-Projects LLC, Ildar Nasyrov",
+    "support": "apps@it-projects.info",
+    "website": "https://it-projects.info",
+    "license": "GPL-3",
+    # "price": 9.00,
+    # "currency": "EUR",
 
-    'description': """
-        Long description of module's purpose
-    """,
-
-    'author': "Your Company",
-    'website': "http://www.yourcompany.com",
-
-    # Categories can be used to filter modules in modules listing
-    # Check https://github.com/odoo/odoo/blob/master/openerp/addons/base/module/module_data.xml
-    # for the full list
-    'category': 'Uncategorized',
-    'version': '0.1',
-
-    # any module necessary for this one to work correctly
-    'depends': [
+    "depends": [
         'saas_portal_sale',
-        'saas_portal_signup'
+        'saas_portal_signup',
+    ],
+    "external_dependencies": {"python": [], "bin": []},
+    "data": [
+    ],
+    "qweb": [
+    ],
+    "demo": [
     ],
 
-    # always loaded
-    'data': [
-        'views/product_view.xml',
-        'views/signup.xml',
-        'views/saas_portal.xml',
-    ],
-    # only loaded in demonstration mode
-    'demo': [
-    ],
+    "post_load": None,
+    "pre_init_hook": None,
+    "post_init_hook": None,
+
+    "auto_install": False,
+    "installable": True,
 }

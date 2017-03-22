@@ -21,6 +21,9 @@
     "external_dependencies": {"python": [], "bin": []},
     "data": [
         'security/ir.model.access.csv',
+        'views/product_view.xml',
+        'views/signup.xml',
+        'views/saas_portal.xml',
     ],
     "qweb": [
     ],

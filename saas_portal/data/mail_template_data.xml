@@ -1,7 +1,7 @@
 <openerp>
     <data noupdate="1">
         <record id="email_template_create_saas" model="email.template">
-            <field name="name">Send SaaS credentials to the buyer of the SaaS</field>
+            <field name="name">Send new database credentials to the customer</field>
             <field name="email_from">${(object.user_id.email or '')|safe}</field>
             <field name="subject">Credentials:</field>
             <field name="partner_to">${object.partner_id.id}</field>

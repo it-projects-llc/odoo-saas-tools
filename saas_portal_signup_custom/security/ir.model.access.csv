@@ -1,2 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_saas_portal_signup_custom_saas_portal_signup_custom,saas_portal_signup_custom.saas_portal_signup_custom,model_saas_portal_signup_custom_saas_portal_signup_custom,,1,0,0,0

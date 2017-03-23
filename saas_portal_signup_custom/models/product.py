@@ -5,4 +5,6 @@ from openerp import models, fields
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
-    saas_template_id = fields.Many2one('saas_portal.database', 'Template', ondelete='restrict')
+    plan_ids = fields.Many2many('saas_portal.plan',
+                                string='SaaS Plans',
+                                help='Create db per each selected plan - use the DB Names prefix setting in each selected plans')

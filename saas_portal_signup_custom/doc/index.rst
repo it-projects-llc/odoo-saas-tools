@@ -29,7 +29,7 @@ Configuration
  * Open menu ``Sales >> Products >> Products``
  * Click ``[Create]`` button
  * Fill ``Product Name`` field
- * On ``SaaS`` tab select your template
+ * On ``SaaS`` tab select one or several plans - one db per each plan will be created
  * Click ``[Save]`` button
 
 Usage
@@ -38,4 +38,4 @@ Usage
 * Log out from SaaS portal or open portal in incognito window
 * Click ``Sign in`` and then ``Sign up``
 * Fill the form and click ``[Sign up]`` button
-* Databases will be created - one per each plan of selected product's template
+* Databases will be created - one per each plan selected in your product

@@ -31,9 +31,8 @@ class AuthSaasPortal(SaasPortal):
     def add_new_client(self, **post):
 
         product = request.env['product.template'].browse(int(post.get('product_id')))
-        if product and product.saas_template_id:
-            for plan in request.env['saas_portal.plan'].search([('template_id',
-                                                                 '=', product.saas_template_id.id)]):
+        if product and product.plan_ids:
+            for plan in product.plan_ids:
 
                 kw = post.copy()
                 kw['dbname'] = plan.dbname_prefix and plan.dbname_prefix + post.get('dbname') \

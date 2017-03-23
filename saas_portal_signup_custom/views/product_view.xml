@@ -7,8 +7,11 @@
 	    <field name="inherit_id" ref="saas_portal_sale.product_template_saas"/>
             <field name="arch" type="xml">
 	        <xpath expr="//page[1]/group" position="inside">
-		    <field name="saas_template_id"/>
+		    <field name="plan_ids" widget="many2many_tags"/>
                 </xpath>
+              <xpath expr="//field[@name='plan_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+              </xpath>
             </field>
         </record>
     </data>

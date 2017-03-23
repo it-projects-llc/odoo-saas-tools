@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime, timedelta
 from openerp import models, fields, api
+from openerp.exceptions import ValidationError
 
 
 class SaasSubscriptionWizard(models.TransientModel):
@@ -11,22 +11,23 @@ class SaasSubscriptionWizard(models.TransientModel):
     expiration_new = fields.Datetime('New expiration', help='set new expiration here')
     reason = fields.Text(string='Reason of new expiration', help='The reason of expiration change')
 
+    @api.model
+    def default_get(self, fields):
+        result = super(SaasSubscriptionWizard, self).default_get(fields)
+        client = self.env['saas_portal.client'].browse(self.env.context.get('active_id'))
+        result['client_id'] = client.id
+        result['expiration'] = client.expiration_datetime
+        result['expiration_new'] = client.expiration_datetime
+        return result
+
     @api.multi
-    def change_expiration(self):
+    def apply_changes(self):
         if self.expiration_new:
-            self.client_id.upgrade(payload={'params':
-                                   [{'key': 'saas_client.expiration_datetime',
-                                     'value': self.expiration_new, 'hidden': True}]}
-                            )
-            # the code below will be executed only if client_id.upgrade doesn't
-            # raise an exception i.e. the request has sacceeded
             expiration = fields.Datetime.from_string(self.expiration)
             expiration_new = fields.Datetime.from_string(self.expiration_new)
-            self.client_id.period_manual += (expiration_new - expiration).days
-            log_obj = self.env['saas_portal.subscription_log']
-            log_obj.create({
-                            'client_id': self.client_id.id,
-                            'expiration': self.expiration,
-                            'expiration_new': self.expiration_new,
-                            'reason': self.reason,
-                          })
+            if expiration_new == expiration:
+                return
+            elif not self.reason:
+                raise ValidationError('Please specify the reason of manual changes')
+            else:
+                self.client_id.change_subscription(expiration=self.expiration_new, reason=self.reason)

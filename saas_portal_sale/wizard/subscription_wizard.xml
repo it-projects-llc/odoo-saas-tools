@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+
+    <record id="subscription_wizard_view_form" model="ir.ui.view">
+      <field name="name">Manage subscription</field>
+      <field name="model">saas_portal.subscription_wizard</field>
+      <field name="inherit_id" ref="saas_portal.subscription_wizard_view_form"/>
+      <field name="arch" type="xml">
+        <xpath expr="//sheet[1]" position="inside">
+          <field name="lines_count" invisible="1"/>
+          <div attrs="{'invisible': [('lines_count', '&lt;=', 0)]}">
+            <p class="oe_view_nocontent_create">
+              The following invoice lines can be used for subscription.
+              Delete lines that you don't want to use and apply
+            </p>
+          </div>
+          <field name="invoice_line_ids" attrs="{'invisible': [('lines_count', '&lt;=', 0)]}">
+            <tree>
+              <field name="create_date"/>
+              <field name="write_date"/>
+              <field name="product_id"/>
+              <field name="plan_id"/>
+              <field name="period"/>
+              <field name="price_unit"/>
+              <field name="state"/>
+            </tree>
+          </field>
+        </xpath>
+      </field>
+    </record>
+
+  </data>
+</openerp>

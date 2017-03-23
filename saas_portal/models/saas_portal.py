@@ -552,15 +552,10 @@ class SaasPortalClient(models.Model):
     block_on_expiration = fields.Boolean('Block clients on expiration', default=False)
     block_on_storage_exceed = fields.Boolean('Block clients on storage exceed', default=False)
     storage_exceed = fields.Boolean('Storage limit has been exceed', default=False)
-    subscription_start = fields.Datetime(string="Subscription start", track_visibility='onchange')
+    subscription_start = fields.Datetime(string="Subscription start", track_visibility='onchange', readonly=True)
     expiration_datetime = fields.Datetime(string="Expiration", compute='_compute_expiration',
                                           store=True)
-    period = fields.Integer('Subscribed period (paid and manual)',
-                            compute='_compute_period',
-                            store=True)
-    period_manual = fields.Integer('Manual days',
-                                   help='Subsription days that were set maually',
-                                   readonly=True)
+    period_paid = fields.Integer('Subscribed period (paid days)', readonly=True)
     period_initial = fields.Integer('Initial period for trial (hours)',
                                    help='Subsription initial period in hours for trials',
                                    readonly=True)
@@ -575,22 +570,48 @@ class SaasPortalClient(models.Model):
     }
 
     @api.multi
-    @api.depends('period', 'create_date', 'subscription_start', 'period_initial', 'trial')
+    def change_subscription(self, expiration=None, reason=None):
+        if expiration:
+            expiration_dt = fields.Datetime.from_string(expiration)
+            log_obj = self.env['saas_portal.subscription_log']
+            for record in self:
+                record_expiration_dt = record.expiration_datetime and \
+                        fields.Datetime.from_string(record.expiration_datetime)
+                if record_expiration_dt != expiration_dt:
+                    record.upgrade(payload={'params':
+                                            [{'key': 'saas_client.expiration_datetime',
+                                                'value': expiration, 'hidden': True}]})
+                    # after expiration_datetime is computed on subscription_log_ids change
+                    # base.action.rule triggers send_expiration_info with record.upgrade but not in 8.0
+                    log_obj.create({
+                        'client_id': record.id,
+                        'expiration': record.expiration_datetime,
+                        'expiration_new': expiration,
+                        'reason': reason,
+                        })
+
+    @api.multi
+    def get_manual_timedelta(self):
+        self.ensure_one()
+        td = timedelta()
+        for log_record in self.subscription_log_ids:
+            td += fields.Datetime.from_string(log_record.expiration_new) - \
+                    fields.Datetime.from_string(log_record.expiration)
+        return td
+
+    @api.multi
+    @api.depends('period_paid', 'create_date', 'subscription_start', 'period_initial', 'trial', 'subscription_log_ids')
     def _compute_expiration(self):
         for record in self:
             start = record.subscription_start or record.create_date
-            expiration_datetime = fields.Datetime.from_string(start) + timedelta(record.period)
+
+            expiration_datetime = fields.Datetime.from_string(start) + \
+                    timedelta(record.period_paid) + record.get_manual_timedelta()
             if record.trial:
                 expiration_datetime = expiration_datetime + timedelta(hours=record.period_initial)
             record.expiration_datetime = expiration_datetime
             now = fields.Datetime.from_string(fields.Datetime.now())
             record.expired = expiration_datetime < now
-
-    @api.multi
-    @api.depends('period_manual')
-    def _compute_period(self):
-        for record in self:
-            record.period = record.period_manual
 
     @api.multi
     @api.depends('state')

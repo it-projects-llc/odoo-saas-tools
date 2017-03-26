@@ -177,6 +177,7 @@ class SaasPortalPlan(models.Model):
                              'State', compute='_get_state', store=True)
     expiration = fields.Integer('Expiration (hours)', help='time to delete database. Use for demo')
     _order = 'sequence'
+    grace_period = fields.Integer('Grace period (days)', help='initial days before expiration')
 
     dbname_template = fields.Char('DB Names', help='Used for generating client database domain name. Use %i for numbering. Ignore if you use manually created db names', placeholder='crm-%i.odoo.com')
     server_id = fields.Many2one('saas_portal.server', string='SaaS Server',
@@ -275,10 +276,11 @@ class SaasPortalPlan(models.Model):
 
         client.period_initial = trial and self.expiration
         trial_expiration_datetime = (fields.Datetime.from_string(client.create_date) + timedelta(hours=client.period_initial)).strftime(DEFAULT_SERVER_DATETIME_FORMAT)
+        initial_expiration_datetime = (fields.Datetime.from_string(client.create_date) + timedelta(self.grace_period)).strftime(DEFAULT_SERVER_DATETIME_FORMAT)
         state = {
             'd': client.name,
             'public_url': client.public_url,
-            'e': trial and trial_expiration_datetime or client.create_date,
+            'e': trial and trial_expiration_datetime or initial_expiration_datetime,
             'r': client.public_url + 'web',
             'owner_user': owner_user_data,
             't': client.trial,
@@ -316,6 +318,8 @@ class SaasPortalPlan(models.Model):
             }
             composer = self.env['mail.compose.message'].with_context(email_ctx).create({})
             composer.send_mail()
+
+        client.write({'expiration_datetime': initial_expiration_datetime})
 
         client.send_params_to_client_db()
         # TODO make async call of action_sync_server here
@@ -621,7 +625,8 @@ class SaasPortalClient(models.Model):
             start = record.subscription_start or record.create_date
 
             expiration_datetime = fields.Datetime.from_string(start) + \
-                    timedelta(record.period_paid) + record.get_manual_timedelta()
+                timedelta(record.period_paid) + record.get_manual_timedelta() + \
+                timedelta(record.plan_id.grace_period)
             if record.trial:
                 expiration_datetime = expiration_datetime + timedelta(hours=record.period_initial)
             record.expiration_datetime = expiration_datetime

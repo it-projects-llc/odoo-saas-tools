@@ -12,8 +12,8 @@ class AuthSignupHome(saas_portal_signup.controllers.main.AuthSignupHome):
     def web_auth_signup(self, *args, **kw):
         if kw.get('dbname', False) and kw.get('product_id', False):
             redirect = '/saas_portal/add_new_client'
-            kw['redirect'] = '%s?dbname=%s&product_id=%s' % (
-                redirect, kw['dbname'], kw['product_id'])
+            kw['redirect'] = '%s?dbname=%s&product_id=%s&password=%s' % (
+                redirect, kw['dbname'], kw['product_id'], kw['password'])
         return super(AuthSignupHome, self).web_auth_signup(*args, **kw)
 
     def get_auth_signup_qcontext(self):

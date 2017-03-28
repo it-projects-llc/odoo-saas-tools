@@ -39,4 +39,4 @@ class WebsiteSaasDashboard(website_account):
             'saas_portal_client': saas_portal_client and saas_portal_client[0] or False,
             'base_saas_domain': base_saas_domain,
         }
-        return request.website.render("saas_portal_portal.change_domain", values)
+        return request.render("saas_portal_portal.change_domain", values)

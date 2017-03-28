@@ -12,7 +12,7 @@ class SaasPortalPlan(models.Model):
                                            help='Whether to use trial database or create new one when user make payment', required=True, default='create_new')
 
     @api.multi
-    def _create_new_database(self, dbname=None, client_id=None, partner_id=None, user_id=None, notify_user=False, trial=False, support_team_id=None, async=None):
+    def _create_new_database(self, dbname=None, client_id=None, partner_id=None, user_id=None, notify_user=False, trial=False, support_team_id=None, async=None, owner_password=None):
         res = super(SaasPortalPlan, self)._create_new_database(dbname=dbname,
                                                                client_id=client_id,
                                                                partner_id=partner_id,
@@ -20,7 +20,8 @@ class SaasPortalPlan(models.Model):
                                                                notify_user=notify_user,
                                                                trial=trial,
                                                                support_team_id=support_team_id,
-                                                               async=async)
+                                                               async=async,
+                                                               owner_password=owner_password)
         if not partner_id:
             return res
         if trial and self.non_trial_instances != 'from_trial':

@@ -191,8 +191,8 @@ class SaasPortalPlan(models.Model):
         ('login', 'Log into just created instance'),
         ('email', 'Go to information page that says to check email for credentials')
     ], string="Workflow on create", default='email')
-    on_create_email = fields.Many2one('email.template',
-                                      default=lambda self: self.env.ref('saas_portal.email_template_create_saas'))
+    on_create_email_template = fields.Many2one('email.template',
+                                               default=lambda self: self.env.ref('saas_portal.email_template_create_saas'))
 
     @api.one
     @api.depends('template_id.state')
@@ -307,17 +307,18 @@ class SaasPortalPlan(models.Model):
         # send email
         # TODO: get rid of such attributes as ``notify_user``, ``trial`` - move them on plan settings (use different plans for trials and non-trials)
         if notify_user or self.on_create == 'email':
-            template = self.env.ref('saas_portal.email_template_create_saas')
-            email_ctx = {
-                'default_model': 'saas_portal.client',
-                'default_res_id': client.id,
-                'default_use_template': bool(template),
-                'default_template_id': template.id,
-                'default_composition_mode': 'comment',
+            template = self.on_create_email_template
+            if template:
+                email_ctx = {
+                    'default_model': 'saas_portal.client',
+                    'default_res_id': client.id,
+                    'default_use_template': bool(template),
+                    'default_template_id': template.id,
+                    'default_composition_mode': 'comment',
 
-            }
-            composer = self.env['mail.compose.message'].with_context(email_ctx).create({})
-            composer.send_mail()
+                }
+                composer = self.env['mail.compose.message'].with_context(email_ctx).create({})
+                composer.send_mail()
 
         client.write({'expiration_datetime': initial_expiration_datetime})
 

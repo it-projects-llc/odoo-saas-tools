@@ -9,3 +9,5 @@ class ProductTemplate(models.Model):
                                 string='SaaS Plans',
                                 help='Create db per each selected plan - use the DB Names prefix setting in each selected plans')
     saas_default = fields.Boolean('Use as default SaaS product')
+    on_create_email_template = fields.Many2one('email.template',
+                                               default=lambda self: self.env.ref('saas_portal_signup_custom.email_template_create_saas'))

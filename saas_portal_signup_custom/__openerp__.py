@@ -20,11 +20,11 @@
     ],
     "external_dependencies": {"python": [], "bin": []},
     "data": [
+        'data/email_template.xml',
         'security/ir.model.access.csv',
         'views/product_view.xml',
         'views/signup.xml',
         'views/saas_portal.xml',
-        'data/email_template.xml',
     ],
     "qweb": [
     ],

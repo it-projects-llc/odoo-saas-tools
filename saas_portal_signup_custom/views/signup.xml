@@ -12,7 +12,8 @@
                            t-att-autofocus="'autofocus' if login and not only_passwords else None">
                            <option value=""></option>
                            <t t-foreach="products or []" t-as="product">
-                               <option t-att-value="product.id"><t t-esc="product.name"/></option>
+                               <option t-if="product.saas_default" selected="selected" t-att-value="product.id"><t t-esc="product.name"/></option>
+                               <option t-if="not product.saas_default" t-att-value="product.id"><t t-esc="product.name"/></option>
                            </t>
                        </select>
                    </div>

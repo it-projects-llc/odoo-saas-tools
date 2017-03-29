@@ -30,6 +30,7 @@ Configuration
  * Click ``[Create]`` button
  * Fill ``Product Name`` field
  * On ``SaaS`` tab select one or several plans - one db per each plan will be created
+ * Check ``Use as default SaaS product`` if you want this product to be selected as default on the signup form
  * Click ``[Save]`` button
 
 Usage

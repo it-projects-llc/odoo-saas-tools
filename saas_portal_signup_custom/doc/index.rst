@@ -24,7 +24,7 @@ Configuration
  * Check other settings and clik ``[Save]`` button
  * Do the same steps for the second plan but select the template you have selected for your first plan etc.
 
-* Create product and associate it with your template
+* Create product and associate it with saas plans
 
  * Open menu ``Sales >> Products >> Products``
  * Click ``[Create]`` button

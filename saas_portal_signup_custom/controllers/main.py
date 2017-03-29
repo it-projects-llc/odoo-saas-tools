@@ -22,6 +22,8 @@ class AuthSignupHome(saas_portal_signup.controllers.main.AuthSignupHome):
 
         if not qcontext.get('products', False):
             qcontext['products'] = request.env['product.template'].search([('plan_ids', '!=', False)])
+        if not qcontext.get('sa_country_id', False):
+            qcontext['sa_country_id'] = request.env.ref('base.sa').id
 
         return qcontext
 

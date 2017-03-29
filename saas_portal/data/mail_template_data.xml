@@ -17,6 +17,22 @@
             ]]></field>
         </record>
 
+        <record id="email_template_create_saass" model="email.template">
+            <field name="name">Send new databases credentials to the customer</field>
+            <field name="email_from">${(ctx["from_user"].email or '')|safe}</field>
+            <field name="subject">Credentials:</field>
+            <field name="partner_to">${ctx["partner_to"]}</field>
+            <field name="model_id" ref="product.model_product_template"/>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html"><![CDATA[
+
+            <p>
+		${ctx["dbnames"]}
+            </p>
+
+            ]]></field>
+        </record>
+
         <record id="email_template_expiration_datetime_updated" model="email.template">
             <field name="name">Send information about expiration date update to partner</field>
             <field name="email_from">${(object.user_id.email or '')|safe}</field>

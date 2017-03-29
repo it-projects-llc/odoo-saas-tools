@@ -24,6 +24,7 @@
         'views/product_view.xml',
         'views/signup.xml',
         'views/saas_portal.xml',
+        'data/email_template.xml',
     ],
     "qweb": [
     ],

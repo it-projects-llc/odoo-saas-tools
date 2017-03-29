@@ -9,6 +9,7 @@
 	        <xpath expr="//page[1]/group" position="inside">
 		    <field name="plan_ids" widget="many2many_tags"/>
 		    <field name="saas_default"/>
+		    <field name="on_create_email_template"/>
                 </xpath>
               <xpath expr="//field[@name='plan_id']" position="attributes">
                 <attribute name="invisible">1</attribute>

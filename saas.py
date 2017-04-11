@@ -163,10 +163,10 @@ def main():
 
     # create databases
     if args.get('portal_create'):
-        createdb(args.get('portal_db_name'), portal_modules)
+        new_portal_db_created = createdb(args.get('portal_db_name'), portal_modules)
 
     if args.get('server_create'):
-        createdb(args.get('server_db_name'), server_modules)
+        new_server_db_created = createdb(args.get('server_db_name'), server_modules)
 
     # run odoo to make updates via rpc
     error = None
@@ -183,11 +183,13 @@ def main():
         port_is_open or wait_net_service('127.0.0.1', int(xmlrpc_port), 30)
 
         if args.get('portal_create'):
-            rpc_init_db(args.get('portal_db_name'), new_admin_password=args.get('admin_password'))
+            if new_portal_db_created:
+                rpc_init_db(args.get('portal_db_name'), new_admin_password=args.get('admin_password'))
             rpc_init_portal(args.get('portal_db_name'))
 
         if args.get('server_create'):
-            rpc_init_db(args.get('server_db_name'), new_admin_password=args.get('admin_password'))
+            if new_server_db_created:
+                rpc_init_db(args.get('server_db_name'), new_admin_password=args.get('admin_password'))
             rpc_init_server(args.get('server_db_name'))
             rpc_add_server_to_portal(args.get('portal_db_name'))
 
@@ -233,8 +235,10 @@ def createdb(dbname, install_modules=['base']):
         pg_dropdb(dbname)
 
     # create db if not exist
+    created = False
     try:
         pg_createdb(dbname, without_demo=without_demo)
+        created = True
     except Exception, e:
         log('pg_createdb error:', e)
 
@@ -247,7 +251,7 @@ def createdb(dbname, install_modules=['base']):
 
     cmd += ['--stop-after-init']
     exec_cmd(cmd)
-
+    return created
 
 def dropdb(dbname):
     pg_dropdb(dbname)

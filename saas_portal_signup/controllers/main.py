@@ -11,7 +11,7 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
 
     @http.route()
     def web_auth_signup(self, *args, **kw):
-        if kw.get('dbname', False):
+        if not kw.get('redirect', False) and kw.get('dbname', False):
             redirect = '/saas_portal/add_new_client'
             kw['redirect'] = '%s?dbname=%s' % (redirect, kw['dbname'])
         return super(AuthSignupHome, self).web_auth_signup(*args, **kw)

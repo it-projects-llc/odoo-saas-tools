@@ -37,3 +37,9 @@ It must include
 * odoo addons
 * odoo-saas-tools
 * `dependencies <dependencies.rst>`__
+
+db_user
+=======
+
+Installation script searches for database username in this parameter. In case it isn't set it uses ``odoo`` name as default.
+Make sure that you have this parameter set in your configuration file or have ``odoo`` postgresql role.

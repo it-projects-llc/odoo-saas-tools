@@ -268,6 +268,7 @@
                             <group string="Plan Settings">
                                 <field name="dbname_template"/>
                                 <field name="expiration"/>
+                                <field name="grace_period"/>
                                 <field name="maximum_allowed_dbs_per_partner"/>
                                 <field name="maximum_allowed_trial_dbs_per_partner"/>
                             </group>
@@ -277,6 +278,8 @@
                             <field name="total_storage_limit" class="oe_inline"/>
                             <field name="block_on_expiration" class="oe_inline"/>
                             <field name="block_on_storage_exceed" class="oe_inline"/>
+                            <field name="on_create"/>
+                            <field name="on_create_email_template" attrs="{'invisible': [('on_create', '!=', 'email')]}"/>
                         </group>
                         <separator string="Odoo DB Settings"/>
                         <group col="4">

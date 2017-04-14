@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <record id="view_plans_form" model="ir.ui.view">
+            <field name="name">saas_portal.plans.form</field>
+            <field name="model">saas_portal.plan</field>
+	    <field name="inherit_id" ref="saas_portal.view_plans_form"/>
+	    <field name="arch" type="xml">
+		<xpath expr="//field[@name='dbname_template']" position="after">
+		      <field name="dbname_prefix"/>
+	        </xpath>
+            </field>
+        </record>
+
+    </data>
+</openerp>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+
+        <template id="signup_fields_custom" inherit_id="saas_portal_signup.signup_fields" >
+	    <xpath expr="//label[@for='plan_id']/.." position="replace">
+
+               <t t-if="reset == false">
+                   <div class="form-group field-role">
+                       <label for="product_id" class="control-label">Product</label>
+                       <select name="product_id" class="form-control" required="required" t-att-readonly="'readonly' if only_passwords else None"
+                           t-att-autofocus="'autofocus' if login and not only_passwords else None">
+                           <option value=""></option>
+                           <t t-foreach="products or []" t-as="product">
+                               <option t-if="product.saas_default" selected="selected" t-att-value="product.id"><t t-esc="product.name"/></option>
+                               <option t-if="not product.saas_default" t-att-value="product.id"><t t-esc="product.name"/></option>
+                           </t>
+                       </select>
+                   </div>
+               </t>
+
+            </xpath>
+
+	    <xpath expr="//label[@for='country_id']/.." position="replace">
+               <t t-if="reset == false">
+                   <div t-attf-class="form-group  field-country">
+                         <label class="control-label" for="country_id">Country</label>
+                         <select name="country_id" class="form-control" required="required" t-att-readonly="'readonly' if only_passwords else None">
+                             <option value=""></option>
+                             <t t-foreach="countries or []" t-as="country">
+                                  <option t-if="country.id == sa_country_id" selected="selected" t-att-value="country.id"><t t-esc="country.name"/></option>
+                                  <option t-if="not country.id == sa_country_id" t-att-value="country.id"><t t-esc="country.name"/></option>
+                             </t>
+                         </select>
+                   </div>
+               </t>
+            </xpath>
+        </template>
+
+    </data>
+</openerp>

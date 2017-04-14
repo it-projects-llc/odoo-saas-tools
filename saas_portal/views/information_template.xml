@@ -1,0 +1,20 @@
+<openerp>
+    <data>
+        <template id="information">
+            <t t-call="website.layout">
+                <t t-set="title">Information</t>
+                <div class="oe_structure">
+                    <div class="container" style="text-align: center">
+                      <p>The database is creating...</p>
+                      <p>it takes only a few minutes. Please check your email now for further instructions on how to login.</p>
+                    </div>
+                </div>
+            </t>
+            <script>
+                $(document).ready(function() {
+                $('div.oe_structure div.container').css('height', $(window).innerHeight());
+                });
+            </script>
+        </template>
+    </data>
+</openerp>

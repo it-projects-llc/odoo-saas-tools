@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="product_template_saas" model="ir.ui.view">
+            <field name="name">product.template.saas</field>
+            <field name="model">product.template</field>
+	    <field name="inherit_id" ref="saas_portal_sale.product_template_saas"/>
+            <field name="arch" type="xml">
+	        <xpath expr="//page[1]/group" position="inside">
+		    <field name="plan_ids" widget="many2many_tags"/>
+		    <field name="saas_default"/>
+		    <field name="on_create_email_template"/>
+                </xpath>
+              <xpath expr="//field[@name='plan_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+              </xpath>
+            </field>
+        </record>
+    </data>
+</openerp>

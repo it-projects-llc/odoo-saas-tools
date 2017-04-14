@@ -22,7 +22,7 @@
             ]]></field>
         </record>
 
-        <record id="email_template_create_saass" model="email.template">
+        <record id="email_template_create_saass" model="mail.template">
             <field name="name">Send new databases credentials to the customer</field>
             <field name="email_from">${(ctx["from_user"].email or '')|safe}</field>
             <field name="subject">Your ODOO ERP Application System is Ready</field>

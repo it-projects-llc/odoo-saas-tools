@@ -21,5 +21,49 @@
         </p>
             ]]></field>
         </record>
+
+        <record id="email_template_create_saass" model="mail.template">
+            <field name="name">Send new databases credentials to the customer</field>
+            <field name="email_from">${(ctx["from_user"].email or '')|safe}</field>
+            <field name="subject">Your ODOO ERP Application System is Ready</field>
+            <field name="partner_to">${ctx["partner_to"]}</field>
+            <field name="model_id" ref="product.model_product_template"/>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html"><![CDATA[
+
+            <p>
+                Thank you for registering with us<br />
+                Your new ODOO ERP application platform is ready!<br />
+            </p>
+            <p>
+                % for plan in object.plan_ids:
+                    % if plan.dbname_prefix:
+                        <p>
+                            We have created a testing environment in:<br />
+                            % for dbname in ctx["dbnames"]:
+                                % if dbname.startswith(plan.dbname_prefix):
+                                    <em>${dbname}</em><br />
+                                % endif
+                            % endfor
+                            You can enter with the email and password you registered on our page to start practicing.
+                            Any transactions you make in the test environment, is only for testing so you can practice until you feel ready.
+                        </p>
+
+                        <p>
+                            Once you are ready to start growing your business, you can enter your production environment at:<br />
+                            % for dbname in ctx["dbnames"]:
+                                % if not dbname.startswith(plan.dbname_prefix):
+                                    <em>${dbname}</em><br />
+                                % endif
+                            % endfor
+                            You can enter with the email and password that you registered on our page.
+                        </p>
+                    % endif
+                % endfor
+            </p>
+
+            ]]></field>
+        </record>
+
     </data>
 </openerp>

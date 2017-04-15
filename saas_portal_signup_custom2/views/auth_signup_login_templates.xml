@@ -129,7 +129,7 @@
 
 <template id="saas_portal_signup_custom2.signup_fields_captcha" inherit_id="auth_signup.signup">
 	<xpath expr="//div[@class='clearfix oe_login_buttons']" position="before">
-		<div class="g-recaptcha" t-att-data-sitekey="website.google_recaptcha_site_key"><p>recaptcha</p></div>
+		<div class="g-recaptcha" t-att-data-sitekey="website.google_recaptcha_site_key"></div>
 	</xpath>
 </template>
 

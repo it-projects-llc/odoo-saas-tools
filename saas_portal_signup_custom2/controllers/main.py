@@ -15,6 +15,10 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
         #     redirect = '/saas_portal/add_new_client'
         #     kw['redirect'] = '%s?dbname=%s&product_id=%s&password=%s' % (
         #         redirect, kw['dbname'], kw['product_id'], kw['password'])
+        qcontext = self.get_auth_signup_qcontext()
+        qcontext['error'] = _("Wrong Captcha !!!")
+        if not request.website.recaptcha_siteverify(kw.get('g-recaptcha-response')):
+            return request.render('auth_signup.signup', qcontext)
         return super(AuthSignupHome, self).web_auth_signup(*args, **kw)
 
     def get_auth_signup_qcontext(self):

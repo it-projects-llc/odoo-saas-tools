@@ -6,9 +6,9 @@
 	<xpath expr="//link[last()]" position="after">
 		<link rel="stylesheet" type="text/less" href="/saas_portal_signup_custom2/static/src/less/website.ui.components.less"/>
 	</xpath>
-	<xpath expr="//script[last()]" position="after">
-		<script type="text/javascript" src="https://www.google.com/recaptcha/api.js"></script>
-	</xpath>
+	<!-- <xpath expr="//script[last()]" position="after"> -->
+	<!-- 	<script type="text/javascript" src="https://www.google.com/recaptcha/api.js"></script> -->
+	<!-- </xpath> -->
 
 </template>
 

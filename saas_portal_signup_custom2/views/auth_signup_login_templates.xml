@@ -3,111 +3,107 @@
 
 <template id="saas_portal_signup_custom2.signup_fields" inherit_id="auth_signup.fields">
 
-	<!-- <xpath expr="//div[@class='form-group field-login']" position="before"> -->
+	<xpath expr="//div[@class='form-group field-login']" position="before">
 
-	<!-- 	<div class="row"> -->
-	<!-- 		<div class="col-lg-6 form-group field-company"> -->
-	<!-- 			<label for="company" class="control-label">Company Name</label> -->
-	<!-- 			<input type="text" name="company" t-att-value="company" id="company" class="form-control" t-att-autofocus="'autofocus' if login and not only_passwords else None" -->
-	<!-- 			    autocapitalize="off" required="required" t-att-readonly="'readonly' if only_passwords else None"/> -->
-	<!-- 		</div> -->
-	<!-- 		<div class="col-lg-6 form-group field-address"> -->
-	<!-- 			<label for="address" class="control-label">Address</label> -->
-	<!-- 			<input type="text" name="address" t-att-value="address" id="address" class="form-control" t-att-autofocus="'autofocus' if login and not only_passwords else None" -->
-	<!-- 			    autocapitalize="off" required="required" t-att-readonly="'readonly' if only_passwords else None"/> -->
-	<!-- 		</div> -->
-	<!-- 	</div> -->
-	<!-- 	<div class="row"> -->
-	<!-- 		<div class="col-lg-4 form-group field-city"> -->
-	<!-- 			<label for="city" class="control-label">City</label> -->
-	<!-- 			<input type="text" name="city" t-att-value="city" id="city" class="form-control" t-att-autofocus="'autofocus' if login and not only_passwords else None" -->
-	<!-- 			    autocapitalize="off" required="required" t-att-readonly="'readonly' if only_passwords else None"/> -->
-	<!-- 		</div> -->
-	<!-- 		<div class="col-lg-4 form-group field-state"> -->
-	<!-- 			<label for="state" class="control-label">State</label> -->
-	<!-- 			<input type="text" name="state" t-att-value="state" id="state" class="form-control" t-att-autofocus="'autofocus' if login and not only_passwords else None" -->
-	<!-- 			    autocapitalize="off" t-att-readonly="'readonly' if only_passwords else None"/> -->
-	<!-- 		</div> -->
-	<!-- 		<div class="col-lg-4 form-group field-country"> -->
-	<!-- 			<label class="control-label" for="country_id">Country</label> -->
-	<!-- 			<select name="country_id" class="form-control" required="required" t-att-readonly="'readonly' if only_passwords else None"> -->
-	<!-- 				<option value=""></option> -->
-	<!-- 				<t t-foreach="countries or []" t-as="country"> -->
-	<!-- 					<option t-att-value="country.id"><t t-esc="country.name"/></option> -->
-	<!-- 				</t> -->
-	<!-- 			</select> -->
-	<!-- 		</div> -->
-	<!-- 	</div> -->
-	<!-- 	<div class="row"> -->
-	<!-- 		<div class="col-lg-4 form-group field-company_website"> -->
-	<!-- 			<label for="company_website" class="control-label">Website</label> -->
-	<!-- 			<input type="text" name="company_website" t-att-value="company_website" id="company_website" -->
-	<!-- 				class="form-control" t-att-autofocus="'autofocus' if login and not only_passwords else None" -->
-	<!-- 				autocapitalize="off" t-att-readonly="'readonly' if only_passwords else None"/> -->
-	<!-- 		</div> -->
-	<!-- 		<div class="col-lg-4 form-group field-tel"> -->
-	<!-- 			<label for="tel" class="control-label">Tel.</label> -->
-	<!-- 			<input type="text" name="tel" t-att-value="tel" id="tel" -->
-	<!-- 				class="form-control" t-att-autofocus="'autofocus' if login and not only_passwords else None" -->
-	<!-- 				autocapitalize="off" required="required" t-att-readonly="'readonly' if only_passwords else None"/> -->
-	<!-- 		</div> -->
-	<!-- 		<div class="col-lg-4 form-group field-fax"> -->
-	<!-- 			<label for="fax" class="control-label">Fax</label> -->
-	<!-- 			<input type="text" name="fax" t-att-value="fax" id="fax" -->
-	<!-- 				class="form-control" t-att-autofocus="'autofocus' if login and not only_passwords else None" -->
-	<!-- 				autocapitalize="off" t-att-readonly="'readonly' if only_passwords else None"/> -->
-	<!-- 		</div> -->
-	<!-- 	</div> -->
-	<!-- 	<div class="row"> -->
-	<!-- 		<div class="col-lg-4 form-group field-business_reg_no"> -->
-	<!-- 			<label for="business_reg_no" class="control-label">Business Registration No.</label> -->
-	<!-- 			<input type="text" name="business_reg_no" t-att-value="business_reg_no" id="business_reg_no" -->
-	<!-- 				class="form-control" t-att-autofocus="'autofocus' if login and not only_passwords else None" -->
-	<!-- 				autocapitalize="off" required="required" t-att-readonly="'readonly' if only_passwords else None"/> -->
-	<!-- 		</div> -->
-	<!-- 		<div class="col-lg-4 form-group field-tax_code"> -->
-	<!-- 			<label for="tax_code" class="control-label">Tax code</label> -->
-	<!-- 			<input type="text" name="tax_code" t-att-value="tax_code" id="tax_code" -->
-	<!-- 				class="form-control" t-att-autofocus="'autofocus' if login and not only_passwords else None" -->
-	<!-- 				autocapitalize="off" required="required" t-att-readonly="'readonly' if only_passwords else None"/> -->
-	<!-- 		</div> -->
-	<!-- 		<div class="col-lg-4 form-group field-dnb_number"> -->
-	<!-- 			<label for="dnb_number" class="control-label">D&amp;B Number</label> -->
-	<!-- 			<input type="text" name="dnb_number" t-att-value="dnb_number" id="dnb_number" -->
-	<!-- 				class="form-control" t-att-autofocus="'autofocus' if login and not only_passwords else None" -->
-	<!-- 				autocapitalize="off" t-att-readonly="'readonly' if only_passwords else None"/> -->
-	<!-- 		</div> -->
-	<!-- 	</div> -->
-	<!-- 	<div class="row"> -->
-	<!-- 		<div class="col-lg-12 form-group field-role"> -->
-	<!-- 			<label for="product_id" class="control-label">Product</label> -->
-	<!-- 			<select name="product_id" class="form-control" required="required" t-att-readonly="'readonly' if only_passwords else None" -->
-	<!-- 				t-att-autofocus="'autofocus' if login and not only_passwords else None"> -->
-	<!-- 				<option value=""></option> -->
-	<!-- 				<t t-foreach="products or []" t-as="product"> -->
-	<!-- 					<option t-if="product.saas_default" selected="selected" t-att-value="product.id"><t t-esc="product.name"/></option> -->
-	<!-- 					<option t-if="not product.saas_default" t-att-value="product.id"><t t-esc="product.name"/></option> -->
-	<!-- 				</t> -->
-	<!-- 			</select> -->
-	<!-- 		</div> -->
-	<!-- 	</div> -->
-	<!-- 	<div class="row"> -->
-	<!-- 		<div class="col-lg-12 form-group field-name"> -->
-	<!-- 			<label for="dbname" class="control-label">Desired web address for your system</label> -->
-	<!-- 			<div class="input-group"> -->
-	<!-- 				<input type="text" name="dbname" t-att-value="dbname" id="dbname" class="form-control" placeholder="your-company-name" -->
-	<!-- 					required="required" t-att-readonly="'readonly' if only_passwords else None" -->
-	<!-- 					t-att-autofocus="'autofocus' if login and not only_passwords else None" /> -->
-	<!-- 			<span class="input-group-addon">.<t t-raw="base_saas_domain"/></span> -->
-	<!-- 			</div> -->
-	<!-- 		</div> -->
-	<!-- 	</div> -->
+		<div class="row">
+			<div class="col-lg-6 form-group field-company">
+				<label for="company" class="control-label">Company Name</label>
+				<input type="text" name="company" t-att-value="company" id="company" class="form-control" t-att-autofocus="'autofocus' if login and not only_passwords else None"
+				    autocapitalize="off" required="required" t-att-readonly="'readonly' if only_passwords else None"/>
+			</div>
+			<div class="col-lg-6 form-group field-address">
+				<label for="address" class="control-label">Address</label>
+				<input type="text" name="address" t-att-value="address" id="address" class="form-control" t-att-autofocus="'autofocus' if login and not only_passwords else None"
+				    autocapitalize="off" required="required" t-att-readonly="'readonly' if only_passwords else None"/>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-lg-4 form-group field-city">
+				<label for="city" class="control-label">City</label>
+				<input type="text" name="city" t-att-value="city" id="city" class="form-control" t-att-autofocus="'autofocus' if login and not only_passwords else None"
+				    autocapitalize="off" required="required" t-att-readonly="'readonly' if only_passwords else None"/>
+			</div>
+			<div class="col-lg-4 form-group field-state">
+				<label for="state" class="control-label">State</label>
+				<input type="text" name="state" t-att-value="state" id="state" class="form-control" t-att-autofocus="'autofocus' if login and not only_passwords else None"
+				    autocapitalize="off" t-att-readonly="'readonly' if only_passwords else None"/>
+			</div>
+			<div class="col-lg-4 form-group field-country">
+				<label class="control-label" for="country_id">Country</label>
+				<select name="country_id" class="form-control" required="required" t-att-readonly="'readonly' if only_passwords else None">
+					<option value=""></option>
+					<t t-foreach="countries or []" t-as="country">
+						<option t-att-value="country.id"><t t-esc="country.name"/></option>
+					</t>
+				</select>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-lg-4 form-group field-company_website">
+				<label for="company_website" class="control-label">Website</label>
+				<input type="text" name="company_website" t-att-value="company_website" id="company_website"
+					class="form-control" t-att-autofocus="'autofocus' if login and not only_passwords else None"
+					autocapitalize="off" t-att-readonly="'readonly' if only_passwords else None"/>
+			</div>
+			<div class="col-lg-4 form-group field-tel">
+				<label for="tel" class="control-label">Tel.</label>
+				<input type="text" name="tel" t-att-value="tel" id="tel"
+					class="form-control" t-att-autofocus="'autofocus' if login and not only_passwords else None"
+					autocapitalize="off" required="required" t-att-readonly="'readonly' if only_passwords else None"/>
+			</div>
+			<div class="col-lg-4 form-group field-fax">
+				<label for="fax" class="control-label">Fax</label>
+				<input type="text" name="fax" t-att-value="fax" id="fax"
+					class="form-control" t-att-autofocus="'autofocus' if login and not only_passwords else None"
+					autocapitalize="off" t-att-readonly="'readonly' if only_passwords else None"/>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-lg-4 form-group field-business_reg_no">
+				<label for="business_reg_no" class="control-label">Business Registration No.</label>
+				<input type="text" name="business_reg_no" t-att-value="business_reg_no" id="business_reg_no"
+					class="form-control" t-att-autofocus="'autofocus' if login and not only_passwords else None"
+					autocapitalize="off" required="required" t-att-readonly="'readonly' if only_passwords else None"/>
+			</div>
+			<div class="col-lg-4 form-group field-tax_code">
+				<label for="tax_code" class="control-label">Tax code</label>
+				<input type="text" name="tax_code" t-att-value="tax_code" id="tax_code"
+					class="form-control" t-att-autofocus="'autofocus' if login and not only_passwords else None"
+					autocapitalize="off" required="required" t-att-readonly="'readonly' if only_passwords else None"/>
+			</div>
+			<div class="col-lg-4 form-group field-dnb_number">
+				<label for="dnb_number" class="control-label">D&amp;B Number</label>
+				<input type="text" name="dnb_number" t-att-value="dnb_number" id="dnb_number"
+					class="form-control" t-att-autofocus="'autofocus' if login and not only_passwords else None"
+					autocapitalize="off" t-att-readonly="'readonly' if only_passwords else None"/>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-lg-12 form-group field-role">
+				<label for="product_id" class="control-label">Product</label>
+				<select name="product_id" class="form-control" required="required" t-att-readonly="'readonly' if only_passwords else None"
+					t-att-autofocus="'autofocus' if login and not only_passwords else None">
+					<option value=""></option>
+					<t t-foreach="products or []" t-as="product">
+						<option t-if="product.saas_default" selected="selected" t-att-value="product.id"><t t-esc="product.name"/></option>
+						<option t-if="not product.saas_default" t-att-value="product.id"><t t-esc="product.name"/></option>
+					</t>
+				</select>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-lg-12 form-group field-name">
+				<label for="dbname" class="control-label">Desired web address for your system</label>
+				<div class="input-group">
+					<input type="text" name="dbname" t-att-value="dbname" id="dbname" class="form-control" placeholder="your-company-name"
+						required="required" t-att-readonly="'readonly' if only_passwords else None"
+						t-att-autofocus="'autofocus' if login and not only_passwords else None" />
+				<span class="input-group-addon">.<t t-raw="base_saas_domain"/></span>
+				</div>
+			</div>
+		</div>
 
-	<!-- </xpath> -->
-
-	<!-- <xpath expr="//div[contains(@class, 'form-group')]" position="replace"> -->
-	<!-- 	<div class="row">$0</div> -->
-	<!-- </xpath> -->
+	</xpath>
 
 	<xpath expr="//div[@class='form-group field-login']" position="replace">
 		<div class="row"><div class="col-lg-12">$0</div></div>
@@ -127,16 +123,10 @@
 
 </template>
 
-<template id="saas_portal_signup_custom2.signup_fields_captcha" inherit_id="auth_signup.signup">
+<template id="saas_portal_signup_custom2.signup" inherit_id="auth_signup.signup">
 	<xpath expr="//div[@class='clearfix oe_login_buttons']" position="before">
 		<div class="g-recaptcha" t-att-data-sitekey="website.google_recaptcha_site_key"></div>
 	</xpath>
 </template>
-
-<!-- <template id="saas_portal_signup_custom2.signup" inherit_id="auth_signup.signup" name="Sign up login"> -->
-<!-- 	<xpath expr="//t[@t-call='auth_signup.fields']" position="replace"> -->
-<!-- 		<div class="container">$0</div> -->
-<!-- 	</xpath> -->
-<!-- </template> -->
 
 </odoo>

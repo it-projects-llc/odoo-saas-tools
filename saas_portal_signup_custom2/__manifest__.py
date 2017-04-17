@@ -31,8 +31,8 @@
     'data': [
         # 'security/ir.model.access.csv',
         'data/mail_template.xml',
-        'views/website_templates.xml',
         'views/auth_signup_login_templates.xml',
+        'views/website_templates.xml',
         'views/product_views.xml',
         'views/res_config_views.xml',
     ],

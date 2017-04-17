@@ -75,10 +75,10 @@ class SaasPortal(http.Controller):
         return full_dbname.replace('www.', '')
 
     def get_plan(self, plan_id=None):
-        plan_obj = request.env['saas_portal.plan']
+        plan_obj = request.env['saas_portal.plan'].sudo()
         if not plan_id:
             domain = [('state', '=', 'confirmed')]
-            plans = request.env['saas_portal.plan'].search(domain)
+            plans = plan_obj.search(domain)
             if plans:
                 return plans[0]
             else:

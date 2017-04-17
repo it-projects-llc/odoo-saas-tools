@@ -35,6 +35,7 @@
         'views/website_templates.xml',
         'views/product_views.xml',
         'views/res_config_views.xml',
+        'views/saas_portal.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

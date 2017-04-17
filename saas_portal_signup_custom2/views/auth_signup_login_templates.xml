@@ -6,19 +6,19 @@
 	<xpath expr="//div[@class='form-group field-login']" position="before">
 
 		<div class="row">
-			<div class="col-lg-6 form-group field-company">
+			<div class="col-lg-6 form-group field-company o_signup_form_required">
 				<label for="company" class="control-label">Company Name</label>
 				<input type="text" name="company" t-att-value="company" id="company" class="form-control" t-att-autofocus="'autofocus' if login and not only_passwords else None"
 				    autocapitalize="off" required="required" t-att-readonly="'readonly' if only_passwords else None"/>
 			</div>
-			<div class="col-lg-6 form-group field-address">
+			<div class="col-lg-6 form-group field-address o_signup_form_required">
 				<label for="address" class="control-label">Address</label>
 				<input type="text" name="address" t-att-value="address" id="address" class="form-control" t-att-autofocus="'autofocus' if login and not only_passwords else None"
 				    autocapitalize="off" required="required" t-att-readonly="'readonly' if only_passwords else None"/>
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-lg-4 form-group field-city">
+			<div class="col-lg-4 form-group field-city o_signup_form_required">
 				<label for="city" class="control-label">City</label>
 				<input type="text" name="city" t-att-value="city" id="city" class="form-control" t-att-autofocus="'autofocus' if login and not only_passwords else None"
 				    autocapitalize="off" required="required" t-att-readonly="'readonly' if only_passwords else None"/>
@@ -28,7 +28,7 @@
 				<input type="text" name="state" t-att-value="state" id="state" class="form-control" t-att-autofocus="'autofocus' if login and not only_passwords else None"
 				    autocapitalize="off" t-att-readonly="'readonly' if only_passwords else None"/>
 			</div>
-			<div class="col-lg-4 form-group field-country">
+			<div class="col-lg-4 form-group field-country o_signup_form_required">
 				<label class="control-label" for="country_id">Country</label>
 				<select name="country_id" class="form-control" required="required" t-att-readonly="'readonly' if only_passwords else None">
 					<option value=""></option>
@@ -45,7 +45,7 @@
 					class="form-control" t-att-autofocus="'autofocus' if login and not only_passwords else None"
 					autocapitalize="off" t-att-readonly="'readonly' if only_passwords else None"/>
 			</div>
-			<div class="col-lg-4 form-group field-tel">
+			<div class="col-lg-4 form-group field-tel o_signup_form_required">
 				<label for="tel" class="control-label">Tel.</label>
 				<input type="text" name="tel" t-att-value="tel" id="tel"
 					class="form-control" t-att-autofocus="'autofocus' if login and not only_passwords else None"
@@ -59,13 +59,13 @@
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-lg-4 form-group field-business_reg_no">
+			<div class="col-lg-4 form-group field-business_reg_no o_signup_form_required">
 				<label for="business_reg_no" class="control-label">Business Registration No.</label>
 				<input type="text" name="business_reg_no" t-att-value="business_reg_no" id="business_reg_no"
 					class="form-control" t-att-autofocus="'autofocus' if login and not only_passwords else None"
 					autocapitalize="off" required="required" t-att-readonly="'readonly' if only_passwords else None"/>
 			</div>
-			<div class="col-lg-4 form-group field-tax_code">
+			<div class="col-lg-4 form-group field-tax_code o_signup_form_required">
 				<label for="tax_code" class="control-label">Tax code</label>
 				<input type="text" name="tax_code" t-att-value="tax_code" id="tax_code"
 					class="form-control" t-att-autofocus="'autofocus' if login and not only_passwords else None"

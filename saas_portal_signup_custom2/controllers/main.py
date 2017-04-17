@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
-import odoo
+
 from odoo import http
+import re
 from odoo.http import request
+
+import odoo
 from odoo.tools.translate import _
 from odoo.addons import auth_signup
-import re
+from odoo.addons.saas_portal.controllers.main import SaasPortal
 
 
 class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
@@ -56,3 +59,38 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
         assert values.get('password') == qcontext.get('confirm_password'), "Passwords do not match; please retype them."
         self._signup_with_values(qcontext.get('token'), values)
         request.cr.commit()
+
+
+class AuthSaasPortal(SaasPortal):
+
+    @http.route()
+    def add_new_client(self, **post):
+
+        product = request.env['product.template'].sudo().browse(int(post.get('product_id')))
+        dbnames = []
+        if product and product.plan_ids:
+            for plan in product.plan_ids:
+
+                kw = post.copy()
+                kw['dbname'] = plan.dbname_prefix and plan.dbname_prefix + post.get('dbname') \
+                    or post.get('dbname')
+                kw['plan_id'] = plan.id
+                dbname = self.get_full_dbname(kw['dbname'])
+                res = super(AuthSaasPortal, self).add_new_client(**kw)
+                dbnames.append(dbname)
+
+            template = product.on_create_email_template
+            if template and client:
+                email_ctx = {
+                    'default_model': 'product.template',
+                    'default_res_id': product.id,
+                    'default_use_template': bool(template),
+                    'default_template_id': template.id,
+                    'default_composition_mode': 'comment',
+                    'dbnames': dbnames,
+                    'from_user': request.env['res.users'].sudo().browse(SUPERUSER_ID),
+                    'partner_to': request.env['res.users'].sudo().browse(request.session.uid).partner_id.id,
+                }
+                product.with_context(email_ctx).message_post_with_template(template.id, composition_mode='comment')
+
+            return res

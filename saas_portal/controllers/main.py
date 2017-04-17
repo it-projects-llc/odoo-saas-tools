@@ -83,7 +83,7 @@ class SaasPortal(http.Controller):
                 return plans[0]
             else:
                 raise exceptions.Warning(_('There is no plan configured'))
-        return plan_obj.sudo().browse(plan_id)
+        return plan_obj.browse(plan_id)
 
     def exists_database(self, dbname):
         full_dbname = self.get_full_dbname(dbname)

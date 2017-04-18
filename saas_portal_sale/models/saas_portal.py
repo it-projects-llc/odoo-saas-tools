@@ -12,6 +12,17 @@ class SaasPortalPlan(models.Model):
                                            help='Whether to use trial database or create new one when user make payment', required=True, default='create_new')
 
     @api.multi
+    def _new_database_vals(self, vals):
+        vals = super(SaasPortalPlan, self)._new_database_vals(vals)
+        vals['contract_id'] = self.env['account.analytic.account'].sudo().create({
+            'name': vals['name'],
+            'partner_id': vals['partner_id'],
+            'recurring_invoices': True,
+        }).id
+        return vals
+
+
+    @api.multi
     def create_new_database(self, **kwargs):
         res = super(SaasPortalPlan, self).create_new_database(**kwargs)
 
@@ -44,6 +55,11 @@ class SaasPortalClient(models.Model):
                                  help='Subsription days that were paid',
                                  compute='_compute_period_paid',
                                  store=True)
+    contract_id = fields.Many2one(
+        'account.analytic.account',
+        string='Contract',
+        readonly=True,
+    )
 
     @api.multi
     @api.depends('invoice_lines.invoice_id.state')

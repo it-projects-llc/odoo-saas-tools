@@ -206,8 +206,9 @@ class SaasPortalPlan(models.Model):
         else:
             self.state = 'draft'
 
-    @api.one
+    @api.multi
     def _new_database_vals(self, vals):
+        self.ensure_one()
         vals['max_users'] = self.max_users
         vals['total_storage_limit'] = self.total_storage_limit
         vals['block_on_expiration'] = self.block_on_expiration
@@ -246,7 +247,7 @@ class SaasPortalPlan(models.Model):
             if trial_db_count >= self.maximum_allowed_trial_dbs_per_partner:
                 raise MaximumTrialDBException("Limit of trial databases for this plan is %(maximum)s reached" % {'maximum': self.maximum_allowed_trial_dbs_per_partner})
 
-        vals = {'name': dbname or self.generate_dbname()[0],
+        vals = {'name': dbname or self.generate_dbname(),
                 'server_id': server.id,
                 'plan_id': self.id,
                 'partner_id': partner_id,
@@ -258,7 +259,7 @@ class SaasPortalPlan(models.Model):
             vals['client_id'] = client_id
             client = self.env['saas_portal.client'].search([('client_id', '=', client_id)])
 
-        vals = self._new_database_vals(vals)[0]
+        vals = self._new_database_vals(vals)
 
         if client:
             client.write(vals)
@@ -325,8 +326,9 @@ class SaasPortalPlan(models.Model):
 
         return {'url': url, 'id': client.id, 'client_id': client_id}
 
-    @api.one
+    @api.multi
     def generate_dbname(self, raise_error=True):
+        self.ensure_one()
         if not self.dbname_template:
             if raise_error:
                 raise exceptions.Warning(_('Template for db name is not configured'))
@@ -341,18 +343,17 @@ class SaasPortalPlan(models.Model):
 
     @api.multi
     def create_template(self, addons=None):
-        assert len(self) == 1, 'This method is applied only for single record'
-        plan = self[0]
+        self.ensure_one()
         state = {
-            'd': plan.template_id.name,
-            'demo': plan.demo and 1 or 0,
+            'd': self.template_id.name,
+            'demo': self.demo and 1 or 0,
             'addons': addons or [],
-            'lang': plan.lang,
-            'tz': plan.tz,
+            'lang': self.lang,
+            'tz': self.tz,
             'is_template_db': 1,
         }
-        client_id = plan.template_id.client_id
-        plan.template_id.server_id = plan.server_id
+        client_id = self.template_id.client_id
+        self.template_id.server_id = self.server_id
 
         req, req_kwargs = self.server_id._request_server(path='/saas_server/new_database', state=state, client_id=client_id)
         res = requests.Session().send(req, **req_kwargs)

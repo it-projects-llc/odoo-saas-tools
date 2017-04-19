@@ -10,6 +10,7 @@ class SaasPortalPlan(models.Model):
     free_subdomains = fields.Boolean(help='allow to choose subdomains for trials otherwise allow only after payment', default=True)
     non_trial_instances = fields.Selection([('from_trial', 'From trial'), ('create_new', 'Create new')], string='Non-trial instances',
                                            help='Whether to use trial database or create new one when user make payment', required=True, default='create_new')
+    product_tmpl_id = fields.Many2one('product.template', 'Product')
 
     @api.multi
     def _new_database_vals(self, vals):

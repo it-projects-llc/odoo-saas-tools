@@ -43,6 +43,11 @@
                       <field name="non_trial_instances"/>
                     </xpath>
                 </data>
+                <xpath expr="//field[@name='website_description']/.." position="after">
+                    <group string="Sales" name="sales">
+                        <field name="product_tmpl_id"/>
+                    </group>
+                </xpath>
             </field>
         </record>
 

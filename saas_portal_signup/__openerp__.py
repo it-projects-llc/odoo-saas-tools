@@ -8,7 +8,10 @@
     "support": "apps@it-projects.info",
     'website': 'https://it-projects.info',
     'depends': ['auth_signup', 'saas_portal'],
-    'data': ['views/signup.xml'],
+    'data': [
+        'security/ir.model.access.csv',
+        'views/signup.xml'
+    ],
     'installable': True,
 
     'description': '''

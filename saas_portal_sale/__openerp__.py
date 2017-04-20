@@ -20,7 +20,6 @@
         'views/saas_portal.xml',
         'views/account_invoice.xml',
         'wizard/config_wizard.xml',
-        'wizard/subscription_wizard.xml',
         'data/mail_template_data.xml',
         'data/ir_config_parameter.xml',
     ],

@@ -24,6 +24,7 @@
                 'auth_signup',
                 'saas_portal',
                 'saas_portal_sale',
+                'saas_portal_portal',
                 'website',
                 ],
 

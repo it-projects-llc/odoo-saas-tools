@@ -51,27 +51,11 @@ class SaasPortalClient(models.Model):
 
     invoice_lines = fields.One2many('account.invoice.line', 'saas_portal_client_id')
     trial = fields.Boolean('Trial', help='indication of trial clients', compute='_compute_period_paid', store=True)
-    period_paid = fields.Integer('Paid days',
-                                 help='Subsription days that were paid',
-                                 compute='_compute_period_paid',
-                                 store=True)
     contract_id = fields.Many2one(
         'account.analytic.account',
         string='Contract',
         readonly=True,
     )
-
-    @api.multi
-    @api.depends('invoice_lines.invoice_id.state')
-    def _compute_period_paid(self):
-        for client_obj in self:
-            client_obj.expiration_datetime = datetime.strptime(client_obj.create_date, DEFAULT_SERVER_DATETIME_FORMAT) + timedelta(hours=client_obj.plan_id.expiration)  # for trial
-            days = 0
-            for line in self.env['account.invoice.line'].search([('saas_portal_client_id', '=', client_obj.id), ('invoice_id.state', '=', 'paid')]):
-                days += line.period * line.quantity
-            if days != 0:
-                client_obj.period_paid = days
-            client_obj.trial = not bool(days)
 
     @api.multi
     def get_upgrade_database_payload(self):

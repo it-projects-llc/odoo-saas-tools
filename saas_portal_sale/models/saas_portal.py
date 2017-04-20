@@ -16,19 +16,21 @@ class SaasPortalPlan(models.Model):
     def _new_database_vals(self, vals):
         vals = super(SaasPortalPlan, self)._new_database_vals(vals)
         product = self.product_tmpl_id.product_variant_ids[0]
+        partner = self.env['res.partner'].browse(vals['partner_id'])
+        pricelist = partner.property_product_pricelist and partner.property_product_pricelist.id or False
         vals['contract_id'] = self.env['account.analytic.account'].sudo().create({
             'name': vals['name'],
             'partner_id': vals['partner_id'],
             'recurring_invoices': True,
+            'pricelist_id': partner.property_product_pricelist and partner.property_product_pricelist.id or False,
             'recurring_invoice_line_ids': [(0, 0, {
                 'product_id': product.id,
                 'name': product.name_get()[0][1],
-                'price_unit': product.price,
+                'price_unit': partner.property_product_pricelist and product.with_context(pricelist=partner.property_product_pricelist.id).price or 0.0,
                 'uom_id': product.uom_id.id,
             })],
         }).id
         return vals
-
 
     @api.multi
     def create_new_database(self, **kwargs):

@@ -562,7 +562,7 @@ class SaasPortalClient(models.Model):
     name = fields.Char(required=True)
     partner_id = fields.Many2one('res.partner', string='Partner', track_visibility='onchange', readonly=True)
     plan_id = fields.Many2one('saas_portal.plan', string='Plan', track_visibility='onchange', ondelete='restrict', readonly=True)
-    expiration_datetime = fields.Datetime(string="Expiration")
+    expiration_datetime = fields.Datetime(string="Expiration", readonly=True)
     grace_expiration = fields.Datetime(string="Expiration of grace period")
     expired = fields.Boolean('Expired')
     user_id = fields.Many2one('res.users', default=lambda self: self.env.user, string='Salesperson')

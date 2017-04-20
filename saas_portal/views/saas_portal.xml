@@ -50,7 +50,6 @@
                         confirm="Are you sure to delete this database?"/>
                         <button string="Sync server" type="object" name="action_sync_server" icon="fa-refresh"/>
                         <button name="%(saas_portal.action_rename_database)d" string="Rename Database" type="action"/>
-                          type="action" context="{'default_client_id': id, 'default_expiration': expiration_datetime}"/>
                         <field name="state" widget="statusbar" statusbar_visible="open,pending,deleted" clickable=""/>
                     </header>
                     <sheet>

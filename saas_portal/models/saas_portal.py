@@ -318,7 +318,7 @@ class SaasPortalPlan(models.Model):
             if template:
                 client.message_post_with_template(template.id, composition_mode='comment')
 
-        client.write({'expiration_datetime': initial_expiration_datetime})
+        client.write({'grace_expiration': initial_expiration_datetime})
 
         client.send_params_to_client_db()
         # TODO make async call of action_sync_server here
@@ -563,6 +563,7 @@ class SaasPortalClient(models.Model):
     partner_id = fields.Many2one('res.partner', string='Partner', track_visibility='onchange', readonly=True)
     plan_id = fields.Many2one('saas_portal.plan', string='Plan', track_visibility='onchange', ondelete='restrict', readonly=True)
     expiration_datetime = fields.Datetime(string="Expiration")
+    grace_expiration = fields.Datetime(string="Expiration of grace period")
     expired = fields.Boolean('Expired')
     user_id = fields.Many2one('res.users', default=lambda self: self.env.user, string='Salesperson')
     notification_sent = fields.Boolean(default=False, readonly=True, help='notification about oncoming expiration has sent')

@@ -70,6 +70,7 @@
                             <field name="support_team_id"/>
                         </group>
                         <group name="subscription">
+                            <field name="grace_expiration"/>
                             <field name="expiration_datetime"/>
                         </group>
                     </group>

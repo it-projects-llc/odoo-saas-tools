@@ -14,7 +14,7 @@ layout: page
 
 {% for post in site.tags[page.tag] %}
 <div class="post-preview">
-    <a href="{{ post.url }}">
+    <a href="{{ site.baseurl }}{{ post.url }}">
         <h3 class="post-subtitle">            
             {{ post.title }}
         </h3>

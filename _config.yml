@@ -32,7 +32,7 @@ markdown: kramdown
 highlighter: rouge
 exclude: ["less","node_modules","Gruntfile.js","package.json","README.md"]
 port: 8888
-permalink: /odoo-saas-tools/blog/:title
+permalink: /blog/:title
 
 # jekyll-paginate. for paginating blog posts.
 paginate: 5

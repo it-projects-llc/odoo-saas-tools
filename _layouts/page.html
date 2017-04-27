@@ -3,7 +3,7 @@ layout: default
 ---
 
 <!-- Page Header -->
-<header class="intro-header" style="background-image: url('/odoo-saas-tools/{{ page.header-img }}')">
+<header class="intro-header" style="background-image: url('{{ site.baseurl }}/{{ page.header-img }}')">
     <div class="container">
         <div class="row">
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
@@ -13,7 +13,7 @@ layout: default
                     <span class="subheading">
                         {% if page.description == "!!SHOWTAGSINSTEADOFDESCRIPTION!!" %}
                             {% for tag in page.tags %}
-                                <a href="/odoo-saas-tools/blog/tags/{{ tag }}" style="text-decoration: normal; font-weight: normal; color: #ffffff;"><i class="fa fa-tag"></i>{{ tag }}</a>  
+                                <a href="{{ site.baseurl }}blog/tags/{{ tag }}" style="text-decoration: normal; font-weight: normal; color: #ffffff;"><i class="fa fa-tag"></i>{{ tag }}</a>  
                             {% endfor %}
                         {% else %}
                             {{ page.description }}

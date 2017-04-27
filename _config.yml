@@ -1,23 +1,23 @@
 # Site settings
-title: My Territory
+title: Odoo SaaS Tools
 description: "Online Territory of Shikher Verma"  # used in site head
 
 # register on google analytics and replace this token
-google_analytics: UA-75681059-1
+google_analytics: UA-98177476-1
 # disque comments are broken if you send http:// along with url, this url is same as the one given on disqus
 # Deleting the value would remove it from footer.
-disqus_url: shikherverma.com
-disqus_id: shikherverma
+disqus_url: http://it-projects-llc.github.io/odoo-saas-tools/
+disqus_id: odoo-saas-tools
 # register on feedburner and replace this url. Deleting the value will remove it from footer.
-feedburner_url: https://feedburner.google.com/fb/a/mailverify?uri=programmer-wannabe&amp;loc=en_US
+feedburner_url: https://feedburner.google.com/fb/a/mailverify?uri=odoo-saas-tools&amp;loc=en_US
 
 # footer details. Deleting the value would remove it from footer.
-github_username:  shikherverma
-facebook_username:  shikherverma42
-email: root@shikherverma.com
-stackoverflow_username: 6764571/shikher-verma
-twitter_username : shikherverma42
-copyright_name: Shikher Verma
+github_username:  it-projects-llc
+#facebook_username:  shikherverma42
+email: it@it-projects.info
+#stackoverflow_username: 6764571/shikher-verma
+twitter_username : yelizariev
+copyright_name: IT-Projects LLC
 rss : true
 
 # used for portfolio on home page

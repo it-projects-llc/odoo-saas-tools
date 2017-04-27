@@ -13,7 +13,7 @@ layout: default
                     <span class="subheading">
                         {% if page.description == "!!SHOWTAGSINSTEADOFDESCRIPTION!!" %}
                             {% for tag in page.tags %}
-                                <a href="/blog/tags/{{ tag }}" style="text-decoration: normal; font-weight: normal; color: #ffffff;"><i class="fa fa-tag"></i>{{ tag }}</a>  
+                                <a href="/odoo-saas-tools/blog/tags/{{ tag }}" style="text-decoration: normal; font-weight: normal; color: #ffffff;"><i class="fa fa-tag"></i>{{ tag }}</a>  
                             {% endfor %}
                         {% else %}
                             {{ page.description }}

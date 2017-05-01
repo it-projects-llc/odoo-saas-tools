@@ -12256,6 +12256,9 @@ article.doc-toc .toctree-wrapper > ul > li > span {
   text-align: center;
   white-space: nowrap;
 }
+.o_main_header > .o_main_header_main > .o_primary_nav.pull-left {
+  margin-left: -20px;
+}
 @media (min-width: 768px) {
   .o_main_header > .o_main_header_main > .o_primary_nav {
     height: 100%;
@@ -12941,7 +12944,7 @@ article.doc-toc .toctree-wrapper > ul > li > span {
   transform: translate(0, 0);
 }
 .o_main_header.o_scrolled .o_sub_nav > .container .call-to-action {
-  max-width: 133px;
+  max-width: 173px;
 }
 .o_main_header.o_sub_opened .o_sub_nav {
   display: none;

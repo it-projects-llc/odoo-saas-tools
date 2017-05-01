@@ -1,5 +1,5 @@
-:main-title: Developer Documentation
-:banner: banners/index.jpg
+:main-title: Documentation
+:banner: banners/home-bg.jpg
 
 =====
 Index

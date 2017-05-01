@@ -45,17 +45,17 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'odoo'
-copyright = u'Odoo S.A.'
+project = u'Odoo SaaS Tools'
+copyright = u'IT-Projects LLC.'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
 # The short X.Y version.
-version = '10.0'
+version = '8.0'
 # The full version, including alpha/beta/rc tags.
-release = '10.0'
+release = '8.0'
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:

@@ -14,9 +14,7 @@ Initialization
   * Clone to your machine
   * Install dependencies
 
-    > sudo pip install sphinx sphinx-autobuild
-
-    > sudo pip install sphinx_rtd_theme
+    > sudo pip install -r requirements.txt
 
 Contribution
 ------------

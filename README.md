@@ -5,6 +5,8 @@ odoo-saas-tools
 
 System to sale and manage odoo databases.
 
+https://it-projects-llc.github.io/odoo-saas-tools/
+
 Requirements
 ============
 

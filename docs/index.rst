@@ -1,22 +1,25 @@
-.. Odoo Saas Tools documentation master file, created by
-   sphinx-quickstart on Sat Oct  8 14:11:44 2016.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+:main-title: Documentation
+:banner: banners/home-bg.jpg
 
-Welcome to Odoo Saas Tools's documentation!
-===========================================
+=====
+Index
+=====
 
-Contents:
+.. todo:: what's the documentation's license?
 
+.. rst-class:: index-tree
+.. titlesonly breaks level 3 (~in-document) toc of left navbar, so use
+   maxdepth instead
 .. toctree::
-   :maxdepth: 2
+    :maxdepth: 2
 
+    setup
+    usage           
+    api
+    reference
 
+.. ifconfig:: todo_include_todos
 
-Indices and tables
-==================
+    .. rubric:: Things to add and fix
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
+    .. todolist::

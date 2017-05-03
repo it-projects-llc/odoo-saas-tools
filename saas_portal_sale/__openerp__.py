@@ -11,7 +11,7 @@
         'saas_portal',
         'product_price_factor',
         'saas_portal_start',
-        'account_analytic_analysis',
+        'contract',
     ],
     'data': [
         'views/product_template.xml',

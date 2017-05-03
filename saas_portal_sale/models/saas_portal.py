@@ -12,16 +12,22 @@ class SaasPortalPlan(models.Model):
                                            help='Whether to use trial database or create new one when user make payment', required=True, default='create_new')
 
     @api.multi
-    def _create_new_database(self, dbname=None, client_id=None, partner_id=None, user_id=None, notify_user=False, trial=False, support_team_id=None, async=None, owner_password=None):
-        res = super(SaasPortalPlan, self)._create_new_database(dbname=dbname,
-                                                               client_id=client_id,
-                                                               partner_id=partner_id,
-                                                               user_id=user_id,
-                                                               notify_user=notify_user,
-                                                               trial=trial,
-                                                               support_team_id=support_team_id,
-                                                               async=async,
-                                                               owner_password=owner_password)
+    def _new_database_vals(self, vals):
+        vals = super(SaasPortalPlan, self)._new_database_vals(vals)
+        vals['contract_id'] = self.env['account.analytic.account'].sudo().create({
+            'name': vals['name'],
+            'partner_id': vals['partner_id'],
+            'recurring_invoices': True,
+        }).id
+        return vals
+
+
+    @api.multi
+    def create_new_database(self, **kwargs):
+        res = super(SaasPortalPlan, self).create_new_database(**kwargs)
+
+        partner_id = kwargs.get('partner_id')
+        trial = kwargs.get('trial')
         if not partner_id:
             return res
         if trial and self.non_trial_instances != 'from_trial':
@@ -49,6 +55,11 @@ class SaasPortalClient(models.Model):
                                  help='Subsription days that were paid',
                                  compute='_compute_period_paid',
                                  store=True)
+    contract_id = fields.Many2one(
+        'account.analytic.account',
+        string='Contract',
+        readonly=True,
+    )
 
     @api.multi
     @api.depends('invoice_lines.invoice_id.state')

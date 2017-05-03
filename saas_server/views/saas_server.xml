@@ -2,7 +2,7 @@
 <openerp>
     <data>
         <menuitem name="SaaS Server" id="menu_base_saas" sequence="30" />
-        <menuitem id="menu_saas" parent="menu_base_saas" name="SaaS" sequence="1" />
+        <menuitem id="menu_saas" parent="menu_base_saas" name="SaaS" sequence="1" web_icon="saas_server,static/description/icon.png" />
 
 
         <!-- Client -->

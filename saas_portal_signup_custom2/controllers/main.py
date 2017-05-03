@@ -5,6 +5,7 @@ import re
 from odoo.http import request
 
 import odoo
+from odoo import SUPERUSER_ID
 from odoo.tools.translate import _
 from odoo.addons import auth_signup
 from odoo.addons.saas_portal.controllers.main import SaasPortal

@@ -39,11 +39,11 @@
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-lg-4 form-group field-company_website">
-				<label for="company_website" class="control-label">Website</label>
-				<input type="text" name="company_website" t-att-value="company_website" id="company_website"
-					class="form-control" t-att-autofocus="'autofocus' if login and not only_passwords else None"
-					autocapitalize="off" t-att-readonly="'readonly' if only_passwords else None"/>
+			<div class="col-lg-4 form-group field-state">
+				<label for="state" class="control-label">Postal code</label>
+				<input type="text" name="postal_code" t-att-value="postal_code" id="postal_code" class="form-control"
+					t-att-autofocus="'autofocus' if login and not only_passwords else None"
+				    autocapitalize="off" t-att-readonly="'readonly' if only_passwords else None"/>
 			</div>
 			<div class="col-lg-4 form-group field-tel o_signup_form_required">
 				<label for="tel" class="control-label">Tel.</label>
@@ -71,16 +71,24 @@
 					class="form-control" t-att-autofocus="'autofocus' if login and not only_passwords else None"
 					autocapitalize="off" required="required" t-att-readonly="'readonly' if only_passwords else None"/>
 			</div>
-			<div class="col-lg-4 form-group field-dnb_number">
-				<label for="dnb_number" class="control-label">D&amp;B Number</label>
+			<div class="col-lg-4 form-group field-company_website">
+				<label for="company_website" class="control-label">Website</label>
+				<input type="text" name="company_website" t-att-value="company_website" id="company_website"
+					class="form-control" t-att-autofocus="'autofocus' if login and not only_passwords else None"
+					autocapitalize="off" t-att-readonly="'readonly' if only_passwords else None"/>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-lg-6 form-group field-dnb_number">
+				<label for="dnb_number" class="control-label">D&amp;B Number (<a href="https://www.dandb.com/product/companyupdate/companyupdateRegistration?execution=e1s1">Get a D&amp;B Number</a>)</label>
 				<input type="text" name="dnb_number" t-att-value="dnb_number" id="dnb_number"
 					class="form-control" t-att-autofocus="'autofocus' if login and not only_passwords else None"
 					autocapitalize="off" t-att-readonly="'readonly' if only_passwords else None"/>
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-lg-12 form-group field-role">
-				<label for="product_id" class="control-label">Product</label>
+			<div class="col-lg-6 form-group field-role">
+				<label for="product_id" class="control-label">ERP Package</label>
 				<select name="product_id" class="form-control" required="required" t-att-readonly="'readonly' if only_passwords else None"
 					t-att-autofocus="'autofocus' if login and not only_passwords else None">
 					<option value=""></option>
@@ -90,12 +98,11 @@
 					</t>
 				</select>
 			</div>
-		</div>
-		<div class="row">
-			<div class="col-lg-12 form-group field-name">
+			<div class="col-lg-6 form-group field-name">
 				<label for="dbname" class="control-label">Desired web address for your system</label>
 				<div class="input-group">
-					<input type="text" name="dbname" t-att-value="dbname" id="dbname" class="form-control" placeholder="your-company-name"
+					<input type="text" name="dbname" t-att-value="dbname"
+						id="dbname" class="form-control" placeholder="your-company-name" maxlength="10"
 						required="required" t-att-readonly="'readonly' if only_passwords else None"
 						t-att-autofocus="'autofocus' if login and not only_passwords else None" />
 				<span class="input-group-addon">.<t t-raw="base_saas_domain"/></span>
@@ -108,6 +115,9 @@
 	<xpath expr="//div[@class='form-group field-login']" position="replace">
 		<div class="row"><div class="col-lg-12">$0</div></div>
 	</xpath>
+	<xpath expr="//div[@class='form-group field-login']" position="attributes">
+		<attribute name="class">form-group field-login o_signup_form_required</attribute>
+	</xpath>
 
 	<xpath expr="//div[@class='form-group field-name']" position="replace">
 		<div class="row"><div class="col-lg-12">$0</div></div>
@@ -119,6 +129,33 @@
 
 	<xpath expr="//div[@class='form-group field-confirm_password']" position="replace">
 		<div class="row"><div class="col-lg-12">$0</div></div>
+	</xpath>
+
+	<xpath expr="//div[@class='form-group field-confirm_password']" position="after">
+		<div class="row">
+			<div class="col-lg-6 form-group">
+				<label for="product_id" class="control-label">Terms and Conditions</label>
+				<div class="input-group">
+					<input type="checkbox" required="required" name="option3" value="a3" /> I agree with the
+					<a class="btn btn-link btn" data-toggle="modal" data-target=".modal_terms_and_conditions">Terms and Conditions</a>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade modal_terms_and_conditions" role="dialog" aria-hidden="true">
+			<div class="modal-dialog modal-content">
+				<div class="modal-header alert alert-warning">
+				    <button type="button" class="close" data-dismiss="modal">
+					<span aria-hidden="true">x</span>
+				    </button>
+				    <h4 class="modal-title">Terms and Conditions</h4>
+				</div>
+				<div class="modal-body">
+					<p>
+						Lorem ipsum sodales sapien gravida ultricies sapien lectus ornare amet gravida enim urna integer bibendum ut risus arcu metus sem, proin ut justo eu. Rutrum eu rutrum, massa sodales sit tempus — curabitur non bibendum nulla pellentesque metus. Non, maecenas molestie nulla nam curabitur, nulla justo odio integer ipsum — ultricies pharetra. Enim: in non curabitur sapien molestie in non cursus ornare auctor. Integer, nulla nam malesuada tempus nec quisque duis cursus nec odio rutrum nulla. Rutrum tellus diam ultricies amet proin tellus urna, ut quam sapien orci.
+					</p>
+				</div>
+			</div>
+		</div>
 	</xpath>
 
 </template>

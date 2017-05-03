@@ -80,7 +80,7 @@ class AuthSaasPortal(SaasPortal):
                 dbnames.append(dbname)
 
             template = product.on_create_email_template
-            if template and client:
+            if template:
                 email_ctx = {
                     'default_model': 'product.template',
                     'default_res_id': product.id,

@@ -7,23 +7,11 @@
             <field name="model">saas_portal.client</field>
             <field name="inherit_id" ref="saas_portal.view_clients_form"/>
             <field name="arch" type="xml">
-                <data>
-                    <xpath expr="//notebook/page[1]" position="before">
-                        <page string='Invoice Lines'>
-                            <field name="invoice_lines">
-                                <tree>
-                                    <field name="create_date"/>
-                                    <field name="write_date"/>
-                                    <field name="product_id"/>
-                                    <field name="plan_id"/>
-                                    <field name="period" invisible="1"/>
-                                    <field name="price_unit"/>
-                                    <field name="state"/>
-                                </tree>
-                            </field>
-                        </page>
-                    </xpath>
-                </data>
+                <xpath expr="//group[@name='settings']" position="after">
+                    <group string="Invoicing" name="invoicing">
+                        <field name="contract_id"/>
+                    </group>
+                </xpath>
             </field>
         </record>
 
@@ -38,6 +26,11 @@
                       <field name="non_trial_instances"/>
                     </xpath>
                 </data>
+                <xpath expr="//field[@name='website_description']/.." position="after">
+                    <group string="Sales" name="sales">
+                        <field name="product_tmpl_id"/>
+                    </group>
+                </xpath>
             </field>
         </record>
 

@@ -192,7 +192,8 @@ class SaasPortalPlan(models.Model):
 
     on_create = fields.Selection([
         ('login', 'Log into just created instance'),
-        ('email', 'Go to information page that says to check email for credentials')
+        ('email', 'Go to information page that says to check email for credentials'),
+        ('home', 'Go to portal home page'),
     ], string="Workflow on create", default='email')
     on_create_email_template = fields.Many2one('mail.template',
                                                default=lambda self: self.env.ref('saas_portal.email_template_create_saas'))
@@ -205,8 +206,9 @@ class SaasPortalPlan(models.Model):
         else:
             self.state = 'draft'
 
-    @api.one
+    @api.multi
     def _new_database_vals(self, vals):
+        self.ensure_one()
         vals['max_users'] = self.max_users
         vals['total_storage_limit'] = self.total_storage_limit
         vals['block_on_expiration'] = self.block_on_expiration
@@ -245,7 +247,7 @@ class SaasPortalPlan(models.Model):
             if trial_db_count >= self.maximum_allowed_trial_dbs_per_partner:
                 raise MaximumTrialDBException("Limit of trial databases for this plan is %(maximum)s reached" % {'maximum': self.maximum_allowed_trial_dbs_per_partner})
 
-        vals = {'name': dbname or self.generate_dbname()[0],
+        vals = {'name': dbname or self.generate_dbname(),
                 'server_id': server.id,
                 'plan_id': self.id,
                 'partner_id': partner_id,
@@ -257,7 +259,7 @@ class SaasPortalPlan(models.Model):
             vals['client_id'] = client_id
             client = self.env['saas_portal.client'].search([('client_id', '=', client_id)])
 
-        vals = self._new_database_vals(vals)[0]
+        vals = self._new_database_vals(vals)
 
         if client:
             client.write(vals)
@@ -306,6 +308,8 @@ class SaasPortalPlan(models.Model):
         url = '{url}?{params}'.format(url=data.get('url'), params=werkzeug.url_encode(params))
         if self.on_create == 'email':
             url = '/information'
+        elif self.on_create == 'home':
+            url = '/my/home'
 
         # send email
         # TODO: get rid of such attributes as ``notify_user``, ``trial`` - move them on plan settings (use different plans for trials and non-trials)
@@ -314,7 +318,7 @@ class SaasPortalPlan(models.Model):
             if template:
                 client.message_post_with_template(template.id, composition_mode='comment')
 
-        client.write({'expiration_datetime': initial_expiration_datetime})
+        client.write({'grace_expiration': initial_expiration_datetime})
 
         client.send_params_to_client_db()
         # TODO make async call of action_sync_server here
@@ -322,8 +326,9 @@ class SaasPortalPlan(models.Model):
 
         return {'url': url, 'id': client.id, 'client_id': client_id}
 
-    @api.one
+    @api.multi
     def generate_dbname(self, raise_error=True):
+        self.ensure_one()
         if not self.dbname_template:
             if raise_error:
                 raise exceptions.Warning(_('Template for db name is not configured'))
@@ -338,18 +343,17 @@ class SaasPortalPlan(models.Model):
 
     @api.multi
     def create_template(self, addons=None):
-        assert len(self) == 1, 'This method is applied only for single record'
-        plan = self[0]
+        self.ensure_one()
         state = {
-            'd': plan.template_id.name,
-            'demo': plan.demo and 1 or 0,
+            'd': self.template_id.name,
+            'demo': self.demo and 1 or 0,
             'addons': addons or [],
-            'lang': plan.lang,
-            'tz': plan.tz,
+            'lang': self.lang,
+            'tz': self.tz,
             'is_template_db': 1,
         }
-        client_id = plan.template_id.client_id
-        plan.template_id.server_id = plan.server_id
+        client_id = self.template_id.client_id
+        self.template_id.server_id = self.server_id
 
         req, req_kwargs = self.server_id._request_server(path='/saas_server/new_database', state=state, client_id=client_id)
         res = requests.Session().send(req, **req_kwargs)
@@ -558,23 +562,16 @@ class SaasPortalClient(models.Model):
     name = fields.Char(required=True)
     partner_id = fields.Many2one('res.partner', string='Partner', track_visibility='onchange', readonly=True)
     plan_id = fields.Many2one('saas_portal.plan', string='Plan', track_visibility='onchange', ondelete='restrict', readonly=True)
-    expired = fields.Boolean('Expired', compute='_compute_expiration', store=True)
+    expiration_datetime = fields.Datetime(string="Expiration", readonly=True)
+    grace_expiration = fields.Datetime(string="Expiration of grace period")
+    expired = fields.Boolean('Expired')
     user_id = fields.Many2one('res.users', default=lambda self: self.env.user, string='Salesperson')
     notification_sent = fields.Boolean(default=False, readonly=True, help='notification about oncoming expiration has sent')
     support_team_id = fields.Many2one('saas_portal.support_team', 'Support Team')
-    expiration_datetime_sent = fields.Datetime(help='updates every time send_expiration_info is executed')
     active = fields.Boolean(default=True, compute='_compute_active', store=True)
     block_on_expiration = fields.Boolean('Block clients on expiration', default=False)
     block_on_storage_exceed = fields.Boolean('Block clients on storage exceed', default=False)
     storage_exceed = fields.Boolean('Storage limit has been exceed', default=False)
-    subscription_start = fields.Datetime(string="Subscription start", track_visibility='onchange', readonly=True)
-    expiration_datetime = fields.Datetime(string="Expiration", compute='_compute_expiration',
-                                          store=True)
-    period_paid = fields.Integer('Subscribed period (paid days)', readonly=True)
-    period_initial = fields.Integer('Initial period for trial (hours)',
-                                   help='Subsription initial period in hours for trials',
-                                   readonly=True)
-    subscription_log_ids = fields.One2many('saas_portal.subscription_log', 'client_id')
 
     # TODO: use new api for tracking
     _track = {
@@ -584,50 +581,6 @@ class SaasPortalClient(models.Model):
         }
     }
 
-    @api.multi
-    def change_subscription(self, expiration=None, reason=None):
-        if expiration:
-            expiration_dt = fields.Datetime.from_string(expiration)
-            log_obj = self.env['saas_portal.subscription_log']
-            for record in self:
-                record_expiration_dt = record.expiration_datetime and \
-                        fields.Datetime.from_string(record.expiration_datetime)
-                if record_expiration_dt != expiration_dt:
-                    record.upgrade(payload={'params':
-                                            [{'key': 'saas_client.expiration_datetime',
-                                                'value': expiration, 'hidden': True}]})
-                    # after expiration_datetime is computed on subscription_log_ids change
-                    # base.action.rule triggers send_expiration_info with record.upgrade but not in 8.0
-                    log_obj.create({
-                        'client_id': record.id,
-                        'expiration': record.expiration_datetime,
-                        'expiration_new': expiration,
-                        'reason': reason,
-                        })
-
-    @api.multi
-    def get_manual_timedelta(self):
-        self.ensure_one()
-        td = timedelta()
-        for log_record in self.subscription_log_ids:
-            td += fields.Datetime.from_string(log_record.expiration_new) - \
-                    fields.Datetime.from_string(log_record.expiration)
-        return td
-
-    @api.multi
-    @api.depends('period_paid', 'create_date', 'subscription_start', 'period_initial', 'trial', 'subscription_log_ids')
-    def _compute_expiration(self):
-        for record in self:
-            start = record.subscription_start or record.create_date
-
-            expiration_datetime = fields.Datetime.from_string(start) + \
-                timedelta(record.period_paid) + record.get_manual_timedelta() + \
-                timedelta(record.plan_id.grace_period)
-            if record.trial:
-                expiration_datetime = expiration_datetime + timedelta(hours=record.period_initial)
-            record.expiration_datetime = expiration_datetime
-            now = fields.Datetime.from_string(fields.Datetime.now())
-            record.expired = expiration_datetime < now
 
     @api.multi
     @api.depends('state')

@@ -1,0 +1,224 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* saas_portal_signup_custom2
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 10.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-05-03 09:43+0000\n"
+"PO-Revision-Date: 2017-05-03 09:43+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: saas_portal_signup_custom2
+#: model:mail.template,body_html:saas_portal_signup_custom2.email_template_create_saass
+msgid "\n"
+"\n"
+"            <p>\n"
+"                Thank you for registering with us<br />\n"
+"                Your new ODOO ERP application platform is ready!<br />\n"
+"            </p>\n"
+"            <p>\n"
+"                % for plan in object.plan_ids:\n"
+"                    % if plan.dbname_prefix:\n"
+"                        <p>\n"
+"                            We have created a testing environment in:<br />\n"
+"                            % for dbname in ctx[\"dbnames\"]:\n"
+"                                % if dbname.startswith(plan.dbname_prefix):\n"
+"                                    <em>${dbname}</em><br />\n"
+"                                % endif\n"
+"                            % endfor\n"
+"                            You can enter with the email and password you registered on our page to start practicing.\n"
+"                            Any transactions you make in the test environment, is only for testing so you can practice until you feel ready.\n"
+"                        </p>\n"
+"\n"
+"                        <p>\n"
+"                            Once you are ready to start growing your business, you can enter your production environment at:<br />\n"
+"                            % for dbname in ctx[\"dbnames\"]:\n"
+"                                % if not dbname.startswith(plan.dbname_prefix):\n"
+"                                    <em>${dbname}</em><br />\n"
+"                                % endif\n"
+"                            % endfor\n"
+"                            You can enter with the email and password that you registered on our page.\n"
+"                        </p>\n"
+"                    % endif\n"
+"                % endfor\n"
+"            </p>\n"
+"\n"
+"            "
+msgstr ""
+
+#. module: saas_portal_signup_custom2
+#: model:ir.ui.view,arch_db:saas_portal_signup_custom2.signup_fields
+msgid "Address"
+msgstr ""
+
+#. module: saas_portal_signup_custom2
+#: model:ir.ui.view,arch_db:saas_portal_signup_custom2.signup_fields
+msgid "Business Registration No."
+msgstr ""
+
+#. module: saas_portal_signup_custom2
+#: model:ir.ui.view,arch_db:saas_portal_signup_custom2.signup_fields
+msgid "City"
+msgstr ""
+
+#. module: saas_portal_signup_custom2
+#: model:ir.ui.view,arch_db:saas_portal_signup_custom2.signup_fields
+msgid "Company Name"
+msgstr ""
+
+#. module: saas_portal_signup_custom2
+#: model:ir.ui.view,arch_db:saas_portal_signup_custom2.signup_fields
+msgid "Country"
+msgstr ""
+
+#. module: saas_portal_signup_custom2
+#: model:ir.ui.view,arch_db:saas_portal_signup_custom2.signup_fields
+msgid "D&amp;B Number ("
+msgstr ""
+
+#. module: saas_portal_signup_custom2
+#: model:ir.model.fields,field_description:saas_portal_signup_custom2.field_saas_portal_plan_dbname_prefix
+msgid "DB Names prefix"
+msgstr ""
+
+#. module: saas_portal_signup_custom2
+#: model:ir.ui.view,arch_db:saas_portal_signup_custom2.signup_fields
+msgid "Desired web address for your system"
+msgstr ""
+
+#. module: saas_portal_signup_custom2
+#: model:ir.ui.view,arch_db:saas_portal_signup_custom2.signup_fields
+msgid "ERP Package"
+msgstr ""
+
+#. module: saas_portal_signup_custom2
+#: model:ir.ui.view,arch_db:saas_portal_signup_custom2.signup_fields
+msgid "Fax"
+msgstr ""
+
+#. module: saas_portal_signup_custom2
+#: model:ir.ui.view,arch_db:saas_portal_signup_custom2.view_website_config_settings
+msgid "Follow"
+msgstr ""
+
+#. module: saas_portal_signup_custom2
+#: model:ir.ui.view,arch_db:saas_portal_signup_custom2.signup_fields
+msgid "Get a D&amp;B Number"
+msgstr ""
+
+#. module: saas_portal_signup_custom2
+#: model:ir.ui.view,arch_db:saas_portal_signup_custom2.view_website_config_settings
+msgid "Google reCAPTCHA"
+msgstr ""
+
+#. module: saas_portal_signup_custom2
+#: model:ir.model.fields,field_description:saas_portal_signup_custom2.field_website_config_settings_google_recaptcha_secret_key
+#: model:ir.model.fields,field_description:saas_portal_signup_custom2.field_website_google_recaptcha_secret_key
+msgid "Google reCAPTCHA Secret Key"
+msgstr ""
+
+#. module: saas_portal_signup_custom2
+#: model:ir.model.fields,field_description:saas_portal_signup_custom2.field_website_config_settings_google_recaptcha_site_key
+#: model:ir.model.fields,field_description:saas_portal_signup_custom2.field_website_google_recaptcha_site_key
+msgid "Google reCAPTCHA Site Key"
+msgstr ""
+
+#. module: saas_portal_signup_custom2
+#: model:ir.ui.view,arch_db:saas_portal_signup_custom2.signup_fields
+msgid "I agree with the"
+msgstr ""
+
+#. module: saas_portal_signup_custom2
+#: code:addons/saas_portal_signup_custom2/controllers/main.py:19
+#, python-format
+msgid "Incorrect. Try again"
+msgstr ""
+
+#. module: saas_portal_signup_custom2
+#: model:ir.ui.view,arch_db:saas_portal_signup_custom2.signup_fields
+msgid "Lorem ipsum sodales sapien gravida ultricies sapien lectus ornare amet gravida enim urna integer bibendum ut risus arcu metus sem, proin ut justo eu. Rutrum eu rutrum, massa sodales sit tempus — curabitur non bibendum nulla pellentesque metus. Non, maecenas molestie nulla nam curabitur, nulla justo odio integer ipsum — ultricies pharetra. Enim: in non curabitur sapien molestie in non cursus ornare auctor. Integer, nulla nam malesuada tempus nec quisque duis cursus nec odio rutrum nulla. Rutrum tellus diam ultricies amet proin tellus urna, ut quam sapien orci."
+msgstr ""
+
+#. module: saas_portal_signup_custom2
+#: model:ir.ui.view,arch_db:saas_portal_signup_custom2.signup_fields
+msgid "Postal code"
+msgstr ""
+
+#. module: saas_portal_signup_custom2
+#: model:ir.ui.view,arch_db:saas_portal_signup_custom2.signup_fields
+msgid "State"
+msgstr ""
+
+#. module: saas_portal_signup_custom2
+#: model:ir.ui.view,arch_db:saas_portal_signup_custom2.signup_fields
+msgid "Tax code"
+msgstr ""
+
+#. module: saas_portal_signup_custom2
+#: model:ir.ui.view,arch_db:saas_portal_signup_custom2.signup_fields
+msgid "Tel."
+msgstr ""
+
+#. module: saas_portal_signup_custom2
+#: model:ir.ui.view,arch_db:saas_portal_signup_custom2.signup_fields
+msgid "Terms and Conditions"
+msgstr ""
+
+#. module: saas_portal_signup_custom2
+#: model:ir.model,name:saas_portal_signup_custom2.model_website
+#: model:ir.ui.view,arch_db:saas_portal_signup_custom2.signup_fields
+msgid "Website"
+msgstr ""
+
+#. module: saas_portal_signup_custom2
+#: model:mail.template,subject:saas_portal_signup_custom2.email_template_create_saass
+msgid "Your ODOO ERP Application System is Ready"
+msgstr ""
+
+#. module: saas_portal_signup_custom2
+#: model:ir.ui.view,arch_db:saas_portal_signup_custom2.view_website_config_settings
+msgid "reCAPTCHA Secret key"
+msgstr ""
+
+#. module: saas_portal_signup_custom2
+#: model:ir.ui.view,arch_db:saas_portal_signup_custom2.view_website_config_settings
+msgid "reCAPTCHA Site key"
+msgstr ""
+
+#. module: saas_portal_signup_custom2
+#: model:ir.model,name:saas_portal_signup_custom2.model_saas_portal_plan
+msgid "saas_portal.plan"
+msgstr ""
+
+#. module: saas_portal_signup_custom2
+#: model:ir.model.fields,help:saas_portal_signup_custom2.field_saas_portal_plan_dbname_prefix
+msgid "specify this field if you want to create several databases at once using saas_portal_signup module"
+msgstr ""
+
+#. module: saas_portal_signup_custom2
+#: model:ir.ui.view,arch_db:saas_portal_signup_custom2.view_website_config_settings
+msgid "the instructions"
+msgstr ""
+
+#. module: saas_portal_signup_custom2
+#: model:ir.ui.view,arch_db:saas_portal_signup_custom2.view_website_config_settings
+msgid "to create your keys."
+msgstr ""
+
+#. module: saas_portal_signup_custom2
+#: model:ir.model,name:saas_portal_signup_custom2.model_website_config_settings
+msgid "website.config.settings"
+msgstr ""
+
+#. module: saas_portal_signup_custom2
+#: model:ir.ui.view,arch_db:saas_portal_signup_custom2.signup_fields
+msgid "your-company-name"
+msgstr ""
+

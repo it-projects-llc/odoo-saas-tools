@@ -19,7 +19,7 @@ class WebsiteSaasDashboard(website_account):
             ('partner_id.id', '=', partner.id),
         ])
         response.qcontext.update({
-            'saas_portal_client': saas_portal_client and saas_portal_client[0] or False,
+            'saas_portal_client': saas_portal_client and saas_portal_client or False,
         })
         return response
 
@@ -36,7 +36,7 @@ class WebsiteSaasDashboard(website_account):
         base_saas_domain = config_obj.get_param('base_saas_domain')
         values = {
             'domain_name': saas_portal_client and saas_portal_client[0].name or False,
-            'saas_portal_client': saas_portal_client and saas_portal_client[0] or False,
+            'saas_portal_client': saas_portal_client and saas_portal_client or False,
             'base_saas_domain': base_saas_domain,
         }
         return request.render("saas_portal_portal.change_domain", values)

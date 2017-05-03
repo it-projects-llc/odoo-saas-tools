@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<record id="view_website_config_settings" model="ir.ui.view">
+	<field name="name">Website settings</field>
+	<field name="model">website.config.settings</field>
+	<field name="inherit_id" ref="website.view_website_config_settings"/>
+	<field name="arch" type="xml">
+		<xpath expr="//div[@name='google_maps']" position="after">
+			<label for="id" string="Google reCAPTCHA"/>
+			<div name="google_recaptcha">
+				<div>
+					Follow <a href="https://developers.google.com/recaptcha/docs/start">the instructions</a> to create your keys.
+				</div>
+				<div>
+					<label for="google_recaptcha_site_key" string="reCAPTCHA Site key"/>
+					<field name="google_recaptcha_site_key" class="oe_inline"/>
+				</div>
+				<div>
+					<label for="google_recaptcha_secret_key" string="reCAPTCHA Secret key"/>
+					<field name="google_recaptcha_secret_key" class="oe_inline"/>
+				</div>
+			</div>
+
+		</xpath>
+	</field>
+</record>
+
+</odoo>

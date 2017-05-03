@@ -10,10 +10,12 @@
     <xpath expr="//div[@id='o_my_sidebar']" position="inside">
       <t t-if="saas_portal_client">
         <div class="oe_structure">
-          <h3 class="page-header">Domain <a href="/my/domain" class="btn btn-default btn-xs">Change</a></h3>
-          
-          <p><t t-esc="saas_portal_client.name"/></p>
-          
+          <h3 class="page-header">Domain </h3>
+
+          <t t-foreach="saas_portal_client" t-as="client">
+              <p><t t-esc="client.name"/><a href="/my/domain" class="btn btn-default btn-xs">Change</a></p>
+          </t>
+
         </div>
       </t>
     </xpath>
@@ -34,7 +36,7 @@
           </div>
           <h1>Domain name</h1>
           <form role="form" class="form-inline">
-            <input type="hidden" name="client_id" t-att-value="saas_portal_client.id"/>
+            <!-- <input type="hidden" name="client_id" t-att-value="saas_portal_client.id"/> -->
             <input type="hidden" name="base_saas_domain" t-att-value="base_saas_domain"/>
 
 						<div class="input-group">
@@ -44,7 +46,7 @@
               <p>To work with the new domain you should do the following:</p>
               <ul>
                 <li>Look up for IP address of our server as such:
-                <p>$ ping <t t-esc="saas_portal_client.server_id.name"/></p>
+                <!-- <p>$ ping <t t-esc="saas_portal_client.server_id.name"/></p> -->
                 </li>
                 <li> Map your new name to the IP address on your DNS server. Use the A record for that.</li>
               </ul>
@@ -70,11 +72,12 @@
 
   <template id="stats" name="SaaS_Stats">
     <h3 class="page-header">SaaS stats</h3>
-    <t t-if="saas_portal_client">
-      <p>Current number of users: <t t-esc="saas_portal_client.users_len"/></p>
-      <p>File storage usage: <t t-esc="saas_portal_client.file_storage"/></p>
-      <p>Database storage usage: <t t-esc="saas_portal_client.db_storage"/></p>
-    </t>
+      <t t-foreach="saas_portal_client" t-as="client">
+        <h4><t t-esc="client.name"/></h4>
+        <p>Current number of users: <t t-esc="client.users_len"/></p>
+        <p>File storage usage: <t t-esc="client.file_storage"/></p>
+        <p>Database storage usage: <t t-esc="client.db_storage"/></p>
+      </t>
   </template>
 
 

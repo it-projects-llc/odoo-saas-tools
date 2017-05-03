@@ -194,7 +194,7 @@ class SaasPortalPlan(models.Model):
         ('login', 'Log into just created instance'),
         ('email', 'Go to information page that says to check email for credentials'),
         ('home', 'Go to portal home page'),
-    ], string="Workflow on create", default='email')
+    ], string="Workflow on create", default='email', copy=False)
     on_create_email_template = fields.Many2one('mail.template',
                                                default=lambda self: self.env.ref('saas_portal.email_template_create_saas'))
 

@@ -10,3 +10,4 @@ class SaasPortalPlan(models.Model):
     dbname_prefix = fields.Char('DB Names prefix',
                                 help='specify this field if you want to create several databases at once using saas_portal_signup module',
                                 placeholder='test-')
+    on_create = fields.Selection(default='home')

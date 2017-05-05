@@ -61,7 +61,7 @@ settings_group.add_argument('--odoo-test-enable', dest='test_enable', action='st
 settings_group.add_argument('--odoo-without-demo', dest='without_demo', action='store_true', default=False)
 settings_group.add_argument('--admin-password', dest='admin_password', help='Password for admin user. It\'s used for all databases.', default='admin')
 settings_group.add_argument('--base-domain', dest='base_domain', help='Base domain. Used for system that work with --db-filter=%d')
-settings_group.add_argument('--install-modules', dest='install_modules', help='Comma-separated list of modules to install. They will be automatically installed on appropriate database (Portal or Server)', default='saas_portal_start,saas_portal_sale')
+settings_group.add_argument('--install-modules', dest='install_modules', help='Comma-separated list of modules to install. They will be automatically installed on appropriate database (Portal or Server)', default='saas_portal_start,saas_portal_sale_online')
 #settings_group.add_argument('--db_user', dest='db_user', help='database user name')
 settings_group.add_argument('-s', '--simulate', dest='simulate', action='store_true', help='Don\'t make actual changes. Just show what script is going to do.')
 settings_group.add_argument('--drop-databases', dest='drop_databases', help='Drop existed databases before creating portal or server', action='store_true', default=False)

@@ -371,7 +371,7 @@ class SaasPortalPlan(models.Model):
             _logger.error('Error on parsing response: %s\n%s' % ([req.url, req.headers, req.body], res.text))
             raise
 
-        plan.template_id.password = data.get('superuser_password')
+        self.template_id.password = data.get('superuser_password')
         self.template_id.state = data.get('state')
         return data
 

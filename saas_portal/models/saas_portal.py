@@ -279,9 +279,10 @@ class SaasPortalPlan(models.Model):
             'email': owner_user.email,
         }
 
-        client.period_initial = trial and self.expiration
-        trial_expiration_datetime = (fields.Datetime.from_string(client.create_date) + timedelta(hours=client.period_initial)).strftime(DEFAULT_SERVER_DATETIME_FORMAT)
-        initial_expiration_datetime = (fields.Datetime.from_string(client.create_date) + timedelta(self.grace_period)).strftime(DEFAULT_SERVER_DATETIME_FORMAT)
+        client.trial_hours = trial and self.expiration
+        trial_expiration_datetime = (fields.Datetime.from_string(client.create_date) + timedelta(hours=client.trial_hours)).strftime(DEFAULT_SERVER_DATETIME_FORMAT)
+        initial_expiration_datetime = client.create_date
+        client.expiration_datetime = trial and trial_expiration_datetime or initial_expiration_datetime
         state = {
             'd': client.name,
             'public_url': client.public_url,
@@ -312,13 +313,10 @@ class SaasPortalPlan(models.Model):
             url = '/my/home'
 
         # send email
-        # TODO: get rid of such attributes as ``notify_user``, ``trial`` - move them on plan settings (use different plans for trials and non-trials)
         if notify_user or self.on_create == 'email':
             template = self.on_create_email_template
             if template:
                 client.message_post_with_template(template.id, composition_mode='comment')
-
-        client.write({'grace_expiration': initial_expiration_datetime})
 
         client.send_params_to_client_db()
         # TODO make async call of action_sync_server here
@@ -563,7 +561,6 @@ class SaasPortalClient(models.Model):
     partner_id = fields.Many2one('res.partner', string='Partner', track_visibility='onchange', readonly=True)
     plan_id = fields.Many2one('saas_portal.plan', string='Plan', track_visibility='onchange', ondelete='restrict', readonly=True)
     expiration_datetime = fields.Datetime(string="Expiration", readonly=True)
-    grace_expiration = fields.Datetime(string="Expiration of grace period")
     expired = fields.Boolean('Expired')
     user_id = fields.Many2one('res.users', default=lambda self: self.env.user, string='Salesperson')
     notification_sent = fields.Boolean(default=False, readonly=True, help='notification about oncoming expiration has sent')
@@ -572,6 +569,9 @@ class SaasPortalClient(models.Model):
     block_on_expiration = fields.Boolean('Block clients on expiration', default=False)
     block_on_storage_exceed = fields.Boolean('Block clients on storage exceed', default=False)
     storage_exceed = fields.Boolean('Storage limit has been exceed', default=False)
+    trial_hours = fields.Integer('Initial period for trial (hours)',
+                                 help='Subsription initial period in hours for trials',
+                                 readonly=True)
 
     # TODO: use new api for tracking
     _track = {
@@ -696,22 +696,7 @@ class SaasPortalClient(models.Model):
 
     @api.multi
     def send_expiration_info(self):
-        for record in self:
-            if record.state not in ['draft', 'deleted'] and \
-                    record.expiration_datetime_sent and \
-                    record.expiration_datetime and \
-                    record.expiration_datetime_sent != record.expiration_datetime:
-                record.expiration_datetime_sent = record.expiration_datetime
-
-                payload = record.get_upgrade_database_payload()
-                if payload:
-                    self.env['saas.config'].do_upgrade_database(payload, record)
-
-                record.send_expiration_info_to_partner()
-                # expiration date has been changed, flush expiration notification flag
-                record.notification_sent = False
-            else:
-                record.expiration_datetime_sent = record.expiration_datetime
+        pass
 
     @api.multi
     def get_upgrade_database_payload(self):
@@ -734,14 +719,6 @@ class SaasPortalClient(models.Model):
             if record.expiration_datetime:
                 template = self.env.ref('saas_portal.email_template_expiration_datetime_updated')
                 record.message_post_with_template(template.id, composition_mode='comment')
-
-    @api.one
-    def write(self, vals):
-        if 'expiration_datetime' in vals and vals['expiration_datetime']:
-            self.env['saas.config'].do_upgrade_database(
-                {'params': [{'key': 'saas_client.expiration_datetime', 'value': vals['expiration_datetime'], 'hidden': True}]},
-                self)
-        return super(SaasPortalClient, self).write(vals)
 
     @api.multi
     def storage_usage_monitoring(self):

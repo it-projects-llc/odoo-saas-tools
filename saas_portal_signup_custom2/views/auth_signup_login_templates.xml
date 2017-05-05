@@ -109,6 +109,18 @@
 				</div>
 			</div>
 		</div>
+		<div class="row">
+			<div class="col-lg-3 form-group field-trial">
+				<div class="input-group">
+					<label><input type="radio" name="trial_or_working" value="trial" required="required"/> Trial</label>
+				</div>
+			</div>
+			<div class="col-lg-3 form-group field-working">
+				<div class="input-group">
+					<label><input type="radio" name="trial_or_working" value="worknig" required="required"/> Working</label>
+				</div>
+			</div>
+		</div>
 
 	</xpath>
 

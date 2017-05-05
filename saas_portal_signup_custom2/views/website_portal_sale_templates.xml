@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<template id="portal_my_invoices" inherit_id="website_portal_sale.portal_my_invoices" name="SaaS Invoices and Payments">
+
+	<xpath expr="//a[contains(@t-if, 'invoice.state')]" position="attributes">
+		<attribute name="t-attf-href">/saas_payment/pay?reference=#{invoice.number}&amp;amount=#{invoice.residual}&amp;currency_id=#{invoice.currency_id.id}&amp;country_id=#{invoice.partner_id.country_id.id}&amp;contract_id=#{invoice.contract_id.id}</attribute>
+	</xpath>
+
+</template>
+
+<template id="saas_trial_pay" name="SaaS Payment for Trial">
+        <t t-call="website.layout">
+		<div class="wrap">
+			<div class="container o_website_saas_trial_payment">
+				<h3 class="page-header">Choose what to do with your trial database</h3>
+				<form class="oe_signup_form" role="form" method="post">
+					<input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+					<div class="row">
+						<div class="col-lg-3 form-group field-new">
+							<div class="input-group">
+								<label><input type="radio" name="convert_or_new" value="new" required="required"/> Create new working</label>
+							</div>
+						</div>
+						<div class="col-lg-3 form-group field-convert">
+							<div class="input-group">
+								<label><input type="radio" name="convert_or_new" value="convert" required="required"/> Convert to working</label>
+							</div>
+						</div>
+					</div>
+					<div class="clearfix oe_login_buttons">
+						<button type="submit" class="btn btn-primary pull-left">Apply</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</t>
+</template>
+
+</odoo>

@@ -18,7 +18,7 @@ class SaasPortalPlan(models.Model):
         product = self.product_tmpl_id.product_variant_ids[0]
         partner = self.env['res.partner'].browse(vals['partner_id'])
         pricelist = partner.property_product_pricelist and partner.property_product_pricelist.id or False
-        vals['contract_id'] = self.env['account.analytic.account'].sudo().create({
+        contract = self.env['account.analytic.account'].sudo().create({
             'name': vals['name'],
             'partner_id': vals['partner_id'],
             'recurring_invoices': True,
@@ -29,7 +29,9 @@ class SaasPortalPlan(models.Model):
                 'price_unit': partner.property_product_pricelist and product.with_context(pricelist=partner.property_product_pricelist.id).price or 0.0,
                 'uom_id': product.uom_id.id,
             })],
-        }).id
+        })
+        contract.cron_recurring_create_invoice()  # create invoice for new database immediately
+        vals['contract_id'] = contract.id
         return vals
 
 

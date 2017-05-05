@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import werkzeug
 from odoo import http
 import re
 from odoo.http import request
@@ -9,6 +10,7 @@ from odoo import SUPERUSER_ID
 from odoo.tools.translate import _
 from odoo.addons import auth_signup
 from odoo.addons.saas_portal.controllers.main import SaasPortal
+from odoo.addons.website_payment.controllers.main import WebsitePayment
 
 
 class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
@@ -23,8 +25,8 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
 
         if kw.get('dbname', False) and kw.get('product_id', False):
             redirect = '/saas_portal/add_new_client'
-            kw['redirect'] = '%s?dbname=%s&product_id=%s&password=%s' % (
-                redirect, kw['dbname'], kw['product_id'], kw['password'])
+            kw['redirect'] = '%s?dbname=%s&product_id=%s&password=%s&trial_or_working=%s' % (
+                redirect, kw['dbname'], kw['product_id'], kw['password'], kw['trial_or_working'])
 
         return super(AuthSignupHome, self).web_auth_signup(*args, **kw)
 
@@ -76,6 +78,7 @@ class AuthSaasPortal(SaasPortal):
                 kw['dbname'] = plan.dbname_prefix and plan.dbname_prefix + post.get('dbname') \
                     or post.get('dbname')
                 kw['plan_id'] = plan.id
+                kw['trial'] = kw['trial_or_working'] == 'trial'
                 dbname = self.get_full_dbname(kw['dbname'])
                 res = super(AuthSaasPortal, self).add_new_client(**kw)
                 dbnames.append(dbname)
@@ -95,3 +98,42 @@ class AuthSaasPortal(SaasPortal):
                 product.with_context(email_ctx).message_post_with_template(template.id, composition_mode='comment')
 
             return res
+
+
+class SaaSWebsitePayment(WebsitePayment):
+
+    @http.route()
+    def pay(self, reference='', amount=False, currency_id=None, acquirer_id=None, **kw):
+        return super(SaaSWebsitePayment, self).pay(reference=reference,
+                                                   amount=amount,
+                                                   currency_id=currency_id,
+                                                   acquirer_id=acquirer_id, **kw)
+
+    @http.route(['/saas_payment/pay'], type='http', auth='public', website=True)
+    def saas_pay(self, **kw):
+        contract_id = kw.get('contract_id')
+        if contract_id:
+            contract = request.env['account.analytic.account'].browse(contract_id)
+            saas_portal_client = request.env['saas_portal.client'].sudo().search([('contract_id', '=', int(contract_id))], limit=1)
+            if saas_portal_client.trial:
+                if kw.get('convert_or_new') == 'convert':
+                    saas_portal_client.trial = False
+                elif kw.get('convert_or_new') == 'new':
+                    name = saas_portal_client.name
+                    plan = saas_portal_client.plan_id
+                    partner_id = saas_portal_client.partner_id.id
+                    user_id = request.session.uid
+                    contract_id = saas_portal_client.contract_id
+
+                    saas_portal_client.delete_database_server()
+
+                    res = plan._create_new_database(dbname=name,
+                                                    partner_id=partner_id,
+                                                    user_id=user_id)
+                    saas_portal_client = request.env['saas_portal.client'].sudo().browse(res['id'])
+                    saas_portal_client.contract_id = contract_id
+                else:
+                    return request.render('saas_portal_signup_custom2.saas_trial_pay')
+
+        url = '/website_payment/pay?%s' % werkzeug.url_encode(kw)
+        return request.redirect(url)

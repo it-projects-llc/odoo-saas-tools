@@ -163,13 +163,6 @@ def main():
     if args.get('cleanup'):
         cleanup()
 
-    # create databases
-    if args.get('portal_create'):
-        new_portal_db_created = createdb(args.get('portal_db_name'), portal_modules)
-
-    if args.get('server_create'):
-        new_server_db_created = createdb(args.get('server_db_name'), server_modules)
-
     # run odoo to make updates via rpc
     error = None
     plan_id = None
@@ -185,13 +178,15 @@ def main():
         port_is_open or wait_net_service('127.0.0.1', int(xmlrpc_port), 30)
 
         if args.get('portal_create'):
-            if new_portal_db_created:
-                rpc_init_db(args.get('portal_db_name'), new_admin_password=args.get('admin_password'))
+            createdb(args.get('portal_db_name'))
+            rpc_init_db(args.get('portal_db_name'),
+                        install_modules=portal_modules)
             rpc_init_portal(args.get('portal_db_name'))
 
         if args.get('server_create'):
-            if new_server_db_created:
-                rpc_init_db(args.get('server_db_name'), new_admin_password=args.get('admin_password'))
+            createdb(args.get('server_db_name'))
+            rpc_init_db(args.get('server_db_name'),
+                        install_modules=server_modules)
             rpc_init_server(args.get('server_db_name'))
             rpc_add_server_to_portal(args.get('portal_db_name'))
 
@@ -231,28 +226,27 @@ def main():
 # ----------------------------------------------------------
 # Tools
 # ----------------------------------------------------------
-def createdb(dbname, install_modules=['base']):
-    without_demo = args.get('without_demo')
+def createdb(dbname):
     if args.get('drop_databases'):
         pg_dropdb(dbname)
+    without_demo = args.get('without_demo')
+    master_password = args.get('admin_password')
+    main_url = 'http://localhost:%s' % xmlrpc_port
+    demo = not without_demo
+    lang = 'en_US'  # TODO
+    admin_password = args.get('admin_password')
+
+    rpc_db = xmlrpclib.ServerProxy('{}/xmlrpc/2/db'.format(main_url))
 
     # create db if not exist
     created = False
+    log('create database via xmlrpc')
     try:
-        pg_createdb(dbname, without_demo=without_demo)
+        rpc_db.create_database(master_password, dbname, demo, lang, admin_password)
         created = True
     except Exception, e:
-        log('pg_createdb error:', e)
+        log('xmlrpc database creation error:', e)
 
-    cmd = get_cmd(dbname, workers=0)
-    cmd += ['-i', ','.join(install_modules)]
-    if args.get('test_enable'):
-        cmd += ['--test-enable']
-    if without_demo:
-        cmd += ['--without-demo=all']
-
-    cmd += ['--stop-after-init']
-    exec_cmd(cmd)
     return created
 
 def dropdb(dbname):
@@ -294,10 +288,15 @@ def rpc_execute_kw(auth, model, method, rpc_args=[], rpc_kwargs={}):
     return models.execute_kw(dbname, admin_uid, admin_password,
                              model, method, rpc_args, rpc_kwargs)
 
+def rpc_init_db(dbname, install_modules=None, new_admin_password=None):
+    auth = rpc_auth(dbname, admin_password=args.get('admin_password'))
+    if install_modules:
+        test_enable = args.get('test_enable')
+        domain = [('state', '=', 'uninstalled'), ('name', 'in', list(install_modules))]
+        module_ids = rpc_execute_kw(auth, 'ir.module.module', 'search', [domain])
+        rpc_execute_kw(auth, 'ir.module.module', 'button_immediate_install', [module_ids])
 
-def rpc_init_db(dbname, new_admin_password=None):
     if new_admin_password:
-        auth = rpc_auth(dbname)
         rpc_execute_kw(auth, 'res.users', 'write', [[SUPERUSER_ID], {
             'password': new_admin_password,
         }])
@@ -317,7 +316,7 @@ def rpc_init_portal(dbname):
     rpc_execute_kw(auth, 'ir.config_parameter', 'set_param', ['auth_signup.allow_uninvited', repr(True)])
 
 
-def rpc_init_server(server_db_name, new_admin_password=None):
+def rpc_init_server(server_db_name):
     # Update OAuth Provider urls
     auth = rpc_auth(server_db_name, admin_password=args.get('admin_password'))
     portal_host = args.get('portal_db_name')

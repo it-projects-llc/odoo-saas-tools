@@ -51,12 +51,14 @@ class SaasPortalServer(models.Model):
     local_port = fields.Char('Local port', help='local tcp port of server for server-side requests')
     local_request_scheme = fields.Selection([('http', 'http'), ('https', 'https')], 'Scheme', default='http', required=True)
     host = fields.Char('Host', compute=_compute_host)
+    odoo_version = fields.Char('Odoo version', readonly=True)
+    password = fields.Char()
 
     @api.model
     def create(self, vals):
-        self = super(SaasPortalServer, self).create(vals)
-        self.oauth_application_id._get_access_token(create=True)
-        return self
+        record = super(SaasPortalServer, self).create(vals)
+        record.oauth_application_id._get_access_token(create=True)
+        return record
 
     @api.one
     def _request_params(self, path='/web', scheme=None, port=None, state={}, scope=None, client_id=None):
@@ -64,7 +66,7 @@ class SaasPortalServer(models.Model):
         port = port or self.request_port
         scope = scope or ['userinfo', 'force_login', 'trial', 'skiptheuse']
         scope = ' '.join(scope)
-        client_id = client_id or self.env['saas_portal.client'].generate_client_id()
+        client_id = client_id or self.env['oauth.application'].generate_client_id()
         params = {
             'scope': scope,
             'state': simplejson.dumps(state),
@@ -368,6 +370,8 @@ class SaasPortalPlan(models.Model):
         except:
             _logger.error('Error on parsing response: %s\n%s' % ([req.url, req.headers, req.body], res.text))
             raise
+
+        plan.template_id.password = data.get('superuser_password')
         self.template_id.state = data.get('state')
         return data
 
@@ -431,6 +435,7 @@ class SaasPortalDatabase(models.Model):
                              'State', default='draft', track_visibility='onchange')
     host = fields.Char('Host', compute=_compute_host)
     public_url = fields.Char(compute='_compute_public_url', store=True)
+    password = fields.Char()
 
     @api.multi
     @api.depends('server_id.request_port', 'server_id.request_scheme', 'host')

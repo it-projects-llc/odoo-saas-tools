@@ -44,9 +44,14 @@ class ResUsers(models.Model):
                 raise exceptions.Warning(_('Maximimum allowed users is %(max_users)s, while you already have %(cur_users)s') % {'max_users': max_users, 'cur_users': cur_users})
         return super(ResUsers, self).create(vals)
 
-    def check(self, db, uid, passwd):
-        res = super(ResUsers, self).check(db, uid, passwd)
-        suspended = self.pool['ir.config_parameter'].get_saas_client_parameters(db)
-        if suspended == "1" and uid != SI:
-            raise SuspendedDBException
+    def check(cls, db, uid, passwd):
+        res = super(ResUsers, cls).check(db, uid, passwd)
+        cr = cls.pool.cursor()
+        try:
+            self = api.Environment(cr, uid, {})[cls._name]
+            suspended = self.env['ir.config_parameter'].get_param('saas_client.suspended', '0')
+            if suspended == "1" and uid != SI:
+                raise SuspendedDBException
+        finally:
+            cr.close()
         return res

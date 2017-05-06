@@ -7,7 +7,7 @@
 
     <title>{% if page.title %}{{ page.title }} - {{ site.title }}{% else %}{{ site.title }}{% endif %}</title>
 
-    <link rel="canonical" href="{{ page.url | replace:'index.html',''}}">
+    <link rel="canonical" href="{{ site.baseurl }}{{ page.url | replace:'index.html',''}}">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="{{ site.baseurl }}/css/bootstrap.min.css">

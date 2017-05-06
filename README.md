@@ -9,7 +9,7 @@ To preview website run it with
 If you don't have bundle tool yet exec commands below:
 
     $ sudo gem install bundler
-    $ sudo bundle install
+    $ bundle install
 
 
 ## Thanks

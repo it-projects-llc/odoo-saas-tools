@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        
+        <record id="view_clients_form" model="ir.ui.view">
+            <field name="name">saas_portal.client.form</field>
+            <field name="model">saas_portal.client</field>
+            <field name="inherit_id" ref="saas_portal.view_clients_form" />
+            <field name="arch" type="xml">
+                <field name="expiration_datetime" position="after">
+                   <field name="termination_protection"/>
+               </field>
+            </field>
+        </record>
+    </data>
+</openerp>

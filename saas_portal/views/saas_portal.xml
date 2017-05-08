@@ -150,6 +150,7 @@
                     <field name="sequence" widget="handle"/>
                     <field name="name"/>
                     <field name="active"/>
+                    <field name="odoo_version"/>
                 </tree>
             </field>
         </record>
@@ -174,6 +175,7 @@
                     <sheet>
                     <group>
                         <group>
+                            <field name="odoo_version"/>
                             <field name="name"/>
                             <field name="client_id"/>
                             <field name="active"/>
@@ -185,6 +187,9 @@
                           <field name="verify_ssl" attrs="{'invisible': [('local_request_scheme', '!=', 'https')]}"/>
                           <field name="local_host"/>
                           <field name="local_port"/>
+                        </group>
+                        <group string="Credentials for rpc">
+                          <field name="password" password="True"/>
                         </group>
                     </group>
                     <field name="client_ids" readonly="1">

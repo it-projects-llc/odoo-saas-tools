@@ -3,7 +3,7 @@ import werkzeug
 from odoo import http
 from odoo.http import request
 from odoo.addons.saas_portal.controllers.main import SaasPortal
-from odoo.addons.website_sale.controllers.main import website_sale
+from odoo.addons.website_sale.controllers.main import WebsiteSale as website_sale
 
 
 def signup_redirect():

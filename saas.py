@@ -61,6 +61,7 @@ settings_group.add_argument("--odoo-addons-path", dest="addons_path",
 settings_group.add_argument('--odoo-db-filter', dest='db_filter', default='%h')
 settings_group.add_argument('--odoo-test-enable', dest='test_enable', action='store_true')
 settings_group.add_argument('--odoo-without-demo', dest='without_demo', action='store_true', default=False)
+settings_group.add_argument('--master-password', dest='master_password', help='Master Password. Used on database creation.')
 settings_group.add_argument('--admin-password', dest='admin_password', help='Password for admin user. It\'s used for all databases.', default='admin')
 settings_group.add_argument('--base-domain', dest='base_domain', help='Base domain. Used for system that work with --db-filter=%d')
 settings_group.add_argument('--install-modules', dest='install_modules', help='Comma-separated list of modules to install. They will be automatically installed on appropriate database (Portal or Server)', default='saas_portal_start,saas_portal_sale_online')
@@ -110,11 +111,12 @@ for a in args:
 
 def get_odoo_config():
     res = {}
-    if not args.get('odoo_config'):
+    config_file = args.get('odoo_config') or os.environ.get("OPENERP_SERVER")
+    if not config_file:
         return res
     p = ConfigParser.ConfigParser()
-    log('Read odoo config', args.get('odoo_config'))
-    p.read(args.get('odoo_config'))
+    log('Read odoo config', config_file)
+    p.read(config_file)
     for (name, value) in p.items('options'):
         if value == 'True' or value == 'true':
             value = True
@@ -129,6 +131,7 @@ datadir = args.get('odoo_data_dir') or odoo_config.get('data_dir')
 xmlrpc_port = args.get('xmlrpc_port') or odoo_config.get('xmlrpc_port') or '8069'
 local_xmlrpc_port = args.get('local_xmlrpc_port') or odoo_config.get('xmlrpc_port') or '8069'
 longpolling_port = args.get('longpolling_port') or odoo_config.get('longpolling_port') or '8072'
+master_password = args.get('master_password') or odoo_config.get('admin_passwd') or 'admin'
 
 def filter_modules(s, regexp):
     return set([m for m in s.split(',') if re.match(regexp, m)])
@@ -230,7 +233,6 @@ def createdb(dbname):
     if args.get('drop_databases'):
         pg_dropdb(dbname)
     without_demo = args.get('without_demo')
-    master_password = args.get('admin_password')
     main_url = 'http://localhost:%s' % xmlrpc_port
     demo = not without_demo
     lang = 'en_US'  # TODO

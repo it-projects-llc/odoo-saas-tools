@@ -393,3 +393,19 @@ class SaasServerClient(models.Model):
             res.append(data)
 
         return res
+
+    @api.model
+    def _dns_create_record(self, **kw):
+        '''
+        saas_server_dns_* module should override this
+        '''
+        raise exceptions.Warning('No dns service API module installed')
+
+    @api.model
+    def _mail_create_domain(self, **kw):
+        '''
+        saas_server_mail_* module should override this
+        '''
+        raise exceptions.Warning('No mail service API module installed')
+
+

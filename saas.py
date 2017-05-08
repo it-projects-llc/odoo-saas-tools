@@ -53,12 +53,15 @@ settings_group.add_argument('--odoo-data-dir', dest='odoo_data_dir', help='Path 
 settings_group.add_argument('--odoo-xmlrpc-port', dest='xmlrpc_port', default='8069', help='Port to run odoo temporarly')
 settings_group.add_argument('--odoo-longpolling-port', dest='longpolling_port', default='8072', help='Port to run odoo temporarly')
 settings_group.add_argument('--local-xmlrpc-port', dest='local_xmlrpc_port', default=None, help='Port to be used for server-wide requests')
+settings_group.add_argument('--local-portal-host', dest='local_portal_host', help='Address for internal connection to portal', default="localhost")
+settings_group.add_argument('--local-server-host', dest='local_server_host', help='Address for internal connection to portal', default="localhost")
 settings_group.add_argument('--odoo-log-db', dest='log_db', help='Logging database. The same as odoo parameter')
 settings_group.add_argument("--odoo-addons-path", dest="addons_path",
                             help="specify additional addons paths (separated by commas).")
 settings_group.add_argument('--odoo-db-filter', dest='db_filter', default='%h')
 settings_group.add_argument('--odoo-test-enable', dest='test_enable', action='store_true')
 settings_group.add_argument('--odoo-without-demo', dest='without_demo', action='store_true', default=False)
+settings_group.add_argument('--master-password', dest='master_password', help='Master Password. Used on database creation.')
 settings_group.add_argument('--admin-password', dest='admin_password', help='Password for admin user. It\'s used for all databases.', default='admin')
 settings_group.add_argument('--base-domain', dest='base_domain', help='Base domain. Used for system that work with --db-filter=%d')
 settings_group.add_argument('--install-modules', dest='install_modules', help='Comma-separated list of modules to install. They will be automatically installed on appropriate database (Portal or Server)', default='saas_portal_start,saas_portal_sale_online')
@@ -75,13 +78,21 @@ portal_group.add_argument('--portal-modules', dest='portal_install_modules', hel
 server_group = parser.add_argument_group('Server creation')
 server_group.add_argument('--server-create', dest='server_create', help='Create SaaS Server database', action='store_true')
 server_group.add_argument('--server-db-name', dest='server_db_name', default='server-1.saas-portal-{suffix}.local')
-portal_group.add_argument('--server-modules', dest='server_install_modules', help='Comma-separated list of modules to install on Server')
+server_group.add_argument('--server-modules', dest='server_install_modules', help='Comma-separated list of modules to install on Server')
 
 plan_group = parser.add_argument_group('Plan creation')
 plan_group.add_argument('--plan-create', dest='plan_create', help='Create Plan', action='store_true')
 plan_group.add_argument('--plan-name', dest='plan_name', default='Plan')
 plan_group.add_argument('--plan-template-db-name', dest='plan_template_db_name', default='template-1.saas-portal-{suffix}.local')
 plan_group.add_argument('--plan-clients', dest='plan_clients', default='client-%i.saas-portal-{suffix}.local', help='Template for new client databases')
+
+saas_demo = parser.add_argument_group('SaaS Demo')
+saas_demo.add_argument('--demo-repositories', dest='demo_repositories',
+                       help="Comma-separated list of path to repositories. "
+                       "These repositories will be added to saas_server.repository table. "
+                       "Note that path has to in addons-path.")
+saas_demo.add_argument('--create-demo-templates', dest='create_demo_templates', action='store_true',
+                       help="Create Plans and Templates to publish and demostrate modules")
 
 other_group = parser.add_argument_group('Other')
 other_group.add_argument('--print-local-hosts', dest='print_local_hosts', action='store_true', help='Print hosts rules for local usage.')
@@ -100,11 +111,12 @@ for a in args:
 
 def get_odoo_config():
     res = {}
-    if not args.get('odoo_config'):
+    config_file = args.get('odoo_config') or os.environ.get("OPENERP_SERVER")
+    if not config_file:
         return res
     p = ConfigParser.ConfigParser()
-    log('Read odoo config', args.get('odoo_config'))
-    p.read(args.get('odoo_config'))
+    log('Read odoo config', config_file)
+    p.read(config_file)
     for (name, value) in p.items('options'):
         if value == 'True' or value == 'true':
             value = True
@@ -119,6 +131,7 @@ datadir = args.get('odoo_data_dir') or odoo_config.get('data_dir')
 xmlrpc_port = args.get('xmlrpc_port') or odoo_config.get('xmlrpc_port') or '8069'
 local_xmlrpc_port = args.get('local_xmlrpc_port') or odoo_config.get('xmlrpc_port') or '8069'
 longpolling_port = args.get('longpolling_port') or odoo_config.get('longpolling_port') or '8072'
+master_password = args.get('master_password') or odoo_config.get('admin_passwd') or 'admin'
 
 def filter_modules(s, regexp):
     return set([m for m in s.split(',') if re.match(regexp, m)])
@@ -153,13 +166,6 @@ def main():
     if args.get('cleanup'):
         cleanup()
 
-    # create databases
-    if args.get('portal_create'):
-        createdb(args.get('portal_db_name'), portal_modules)
-
-    if args.get('server_create'):
-        createdb(args.get('server_db_name'), server_modules)
-
     # run odoo to make updates via rpc
     error = None
     plan_id = None
@@ -175,16 +181,26 @@ def main():
         port_is_open or wait_net_service('127.0.0.1', int(xmlrpc_port), 30)
 
         if args.get('portal_create'):
-            rpc_init_db(args.get('portal_db_name'), new_admin_password=args.get('admin_password'))
+            createdb(args.get('portal_db_name'))
+            rpc_init_db(args.get('portal_db_name'),
+                        install_modules=portal_modules)
             rpc_init_portal(args.get('portal_db_name'))
 
         if args.get('server_create'):
-            rpc_init_db(args.get('server_db_name'), new_admin_password=args.get('admin_password'))
+            createdb(args.get('server_db_name'))
+            rpc_init_db(args.get('server_db_name'),
+                        install_modules=server_modules)
             rpc_init_server(args.get('server_db_name'))
             rpc_add_server_to_portal(args.get('portal_db_name'))
 
         if args.get('plan_create'):
             plan_id = rpc_create_plan(args.get('portal_db_name'))
+
+        if args.get('demo_repositories'):
+            rpc_add_demo_repositories(args.get('demo_repositories'))
+
+        if args.get('create_demo_templates'):
+            rpc_create_demo_templates()
 
         if args.get('test'):
             if not plan_id:
@@ -213,21 +229,27 @@ def main():
 # ----------------------------------------------------------
 # Tools
 # ----------------------------------------------------------
-def createdb(dbname, install_modules=['base']):
-    without_demo = args.get('without_demo')
+def createdb(dbname):
     if args.get('drop_databases'):
         pg_dropdb(dbname)
+    without_demo = args.get('without_demo')
+    main_url = 'http://localhost:%s' % xmlrpc_port
+    demo = not without_demo
+    lang = 'en_US'  # TODO
+    admin_password = args.get('admin_password')
 
-    cmd = get_cmd(dbname, workers=0)
-    cmd += ['-i', ','.join(install_modules)]
-    if args.get('test_enable'):
-        cmd += ['--test-enable']
-    if without_demo:
-        cmd += ['--without-demo=all']
+    rpc_db = xmlrpclib.ServerProxy('{}/xmlrpc/2/db'.format(main_url))
 
-    cmd += ['--stop-after-init']
-    exec_cmd(cmd)
+    # create db if not exist
+    created = False
+    log('create database via xmlrpc')
+    try:
+        rpc_db.create_database(master_password, dbname, demo, lang, admin_password)
+        created = True
+    except Exception, e:
+        log('xmlrpc database creation error:', e)
 
+    return created
 
 def dropdb(dbname):
     pg_dropdb(dbname)
@@ -245,8 +267,8 @@ def cleanup():
 # ----------------------------------------------------------
 # RPC Tools
 # ----------------------------------------------------------
-def rpc_auth(dbname, admin_username='admin', admin_password='admin'):
-    main_url = 'http://localhost:%s' % xmlrpc_port
+def rpc_auth(dbname, admin_username='admin', admin_password='admin', host='localhost'):
+    main_url = 'http://%s:%s' % (host, xmlrpc_port)
     if args.get('simulate'):
         return None, None, None, None
 
@@ -268,10 +290,15 @@ def rpc_execute_kw(auth, model, method, rpc_args=[], rpc_kwargs={}):
     return models.execute_kw(dbname, admin_uid, admin_password,
                              model, method, rpc_args, rpc_kwargs)
 
+def rpc_init_db(dbname, install_modules=None, new_admin_password=None):
+    auth = rpc_auth(dbname, admin_password=args.get('admin_password'))
+    if install_modules:
+        test_enable = args.get('test_enable')
+        domain = [('state', '=', 'uninstalled'), ('name', 'in', list(install_modules))]
+        module_ids = rpc_execute_kw(auth, 'ir.module.module', 'search', [domain])
+        rpc_execute_kw(auth, 'ir.module.module', 'button_immediate_install', [module_ids])
 
-def rpc_init_db(dbname, new_admin_password=None):
     if new_admin_password:
-        auth = rpc_auth(dbname)
         rpc_execute_kw(auth, 'res.users', 'write', [[SUPERUSER_ID], {
             'password': new_admin_password,
         }])
@@ -291,7 +318,7 @@ def rpc_init_portal(dbname):
     rpc_execute_kw(auth, 'ir.config_parameter', 'set_param', ['auth_signup.allow_uninvited', repr(True)])
 
 
-def rpc_init_server(server_db_name, new_admin_password=None):
+def rpc_init_server(server_db_name):
     # Update OAuth Provider urls
     auth = rpc_auth(server_db_name, admin_password=args.get('admin_password'))
     portal_host = args.get('portal_db_name')
@@ -301,7 +328,7 @@ def rpc_init_server(server_db_name, new_admin_password=None):
     vals = {
         'auth_endpoint': oauth_provider.get('auth_endpoint').replace('odoo.local', portal_host),
         'validation_endpoint': oauth_provider.get('validation_endpoint').replace('odoo.local', portal_host),
-        'local_host': 'localhost',
+        'local_host': args.get('local_portal_host'),
         'local_port': local_xmlrpc_port,
     }
     oauth_provider = rpc_execute_kw(auth, 'auth.oauth.provider', 'write', [[oauth_provider.get('id')], vals])
@@ -314,10 +341,44 @@ def rpc_add_server_to_portal(portal_db_name):
     #      * set Database Name, e.g. **s1.odoo.local**
     #      * fix autogenerated Database UUID to actual one (see previous section)
     #      * click [Save]
-    auth = rpc_auth(portal_db_name, admin_password=args.get('admin_password'))
+    auth = rpc_auth(portal_db_name, admin_password=args.get('admin_password'), host=args.get('local_portal_host'))
     server_db_name = args.get('server_db_name')
     uuid = rpc_get_uuid(server_db_name)
-    rpc_execute_kw(auth, 'saas_portal.server', 'create', [{'name': server_db_name, 'client_id': uuid, 'local_port': local_xmlrpc_port, 'local_host': 'localhost'}])
+    rpc_execute_kw(auth, 'saas_portal.server', 'create', [
+        {
+            'name': server_db_name,
+            'client_id': uuid,
+            'local_port': local_xmlrpc_port,
+            'local_host': args.get('local_server_host'),
+            'password': args.get('admin_password'),
+        }
+    ])
+
+
+def rpc_add_demo_repositories(demo_repositories):
+    demo_repositories = demo_repositories.split(',')
+    server_db_name = args.get('server_db_name')
+    auth = rpc_auth(server_db_name, admin_password=args.get('admin_password'))
+    for repo_path in demo_repositories:
+        vals = {
+            'path': repo_path,
+        }
+        rpc_execute_kw(auth, 'saas_server.repository', 'create', [vals])
+
+
+def rpc_create_demo_templates():
+    # auth to portal
+    portal_db_name = args.get('portal_db_name')
+    auth = rpc_auth(portal_db_name, admin_password=args.get('admin_password'))
+
+    # find server
+    server_db_name = args.get('server_db_name')
+    server_id = rpc_get_server_id(auth, server_db_name)
+
+    # execute
+    rpc_execute_kw(auth, 'saas_portal.server', 'update_repositories', [[server_id]])
+    rpc_execute_kw(auth, 'saas_portal.server', 'generate_demo_plans', [[server_id]])
+    rpc_execute_kw(auth, 'saas_portal.server', 'create_demo_templates', [[server_id]])
 
 
 def rpc_get_uuid(dbname):
@@ -335,6 +396,12 @@ def rpc_xmlid_to_object(auth, xmlid, model):
         return None
 
 
+def rpc_get_server_id(auth, server_db_name):
+    res = rpc_execute_kw(auth, 'saas_portal.server', 'search', [[('name', '=', server_db_name)]])
+    server_id = res[0]
+    return server_id
+
+
 def rpc_create_plan(portal_db_name):
     plan_name = args.get('plan_name')
     plan_template_db_name = args.get('plan_template_db_name')
@@ -350,6 +417,7 @@ def rpc_create_plan(portal_db_name):
     #      * set Template DB: type name, e.g. **t1.odoo.local**, and click *Create "__t1.odoo.local__"*
     #      * click [Save]
 
+    # TODO: use rpc_get_server_id
     res = rpc_execute_kw(auth, 'saas_portal.server', 'search', [[]])
     # use last created server
     log('search server', res)

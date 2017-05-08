@@ -394,3 +394,8 @@ class SaasServerClient(models.Model):
             res.append(data)
 
         return res
+
+    @api.model
+    def restart_server(self):
+        openerp.service.server.restart()
+        return True

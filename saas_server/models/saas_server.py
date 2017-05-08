@@ -175,14 +175,15 @@ class SaasServerClient(models.Model):
                 user = res[0]
             if not user:
                 user = client_env['res.users'].browse(SUPERUSER_ID)
+
             user.write({
                 'login': owner_user['login'],
-                'password': owner_user['password'],
+                'password': owner_user['password'] or random_password(),
                 'name': owner_user['name'],
                 'email': owner_user['email'],
                 'oauth_provider_id': oauth_provider.id,
                 'oauth_uid': owner_user['user_id'],
-                'oauth_access_token': access_token
+                'oauth_access_token': access_token,
             })
 
     @api.model
@@ -393,3 +394,8 @@ class SaasServerClient(models.Model):
             res.append(data)
 
         return res
+
+    @api.model
+    def restart_server(self):
+        openerp.service.server.restart()
+        return True

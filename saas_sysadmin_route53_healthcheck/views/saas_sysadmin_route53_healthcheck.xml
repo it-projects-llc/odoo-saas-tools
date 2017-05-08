@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <record model="ir.ui.view" id="view_server_form">
+            <field name="name">saas_portal.server.form</field>
+            <field name="model">saas_portal.server</field>
+            <field name="inherit_id" ref="saas_sysadmin_route53.view_server_form"/>
+            <field name="arch" type="xml">
+                <field name="aws_hosted_zone" position="after">
+                        <field name="health_check" attrs="{'readonly': [('ip_address', '=', False)]}"/>
+                </field>
+            </field>
+        </record>
+
+    </data>
+</openerp>

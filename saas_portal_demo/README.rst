@@ -45,12 +45,12 @@ Sponsors
 Further information
 ===================
 
-Demo: http://runbot.it-projects.info/demo/odoo-saas-tools/9.0
+Demo: http://runbot.it-projects.info/demo/odoo-saas-tools/10.0
 
-HTML Description: https://apps.odoo.com/apps/modules/9.0/saas_portal_demo/
+HTML Description: https://apps.odoo.com/apps/modules/10.0/saas_portal_demo/
 
 Usage instructions: `<doc/index.rst>`_
 
 Changelog: `<doc/changelog.rst>`_
 
-Tested on Odoo 8.0 bdf93910c324b17033f6215e217a0d13a64d2456
+Tested on Odoo 10.0 00e169c05a270a0943a74fbeb0a884009946c7cd

@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<openerp>
-  <data>
-		<template id="theme_module_shop" inherit_id="website.theme" name="saas portal assets">
-			<xpath expr="//link[@href='/website/static/src/css/website.css']" position="before">
-				<link rel='stylesheet' href='/saas_portal_demo/static/src/css/module_shop.css' t-ignore="true"/>
-			</xpath>
-		</template>
+<odoo>
+    <template id="assets_frontend" inherit_id="website.assets_frontend" name="saas demo assets">
+            <xpath expr="//link[last()]" position="after">
+                    <link rel='stylesheet' href='/saas_portal_demo/static/src/css/module_shop.css' t-ignore="true"/>
+            </xpath>
+    </template>
 
     <template id="demo_addons" inherit_id="website_sale.product">
       <xpath expr="//div[@class='row'][2]" position="after">
@@ -55,13 +54,13 @@
         </t>
       </xpath>
 
-      <xpath expr="//div[@class='col-sm-5 col-md-5 col-lg-4 col-lg-offset-1']/p[@class='text-muted']" position="replace">
+      <xpath expr="//div[@id='product_details']/p[@class='text-muted']" position="replace">
         <p class="text-muted">
          Prices are quoted without included dependencies
         </p>
       </xpath>
 
-      <xpath expr="//div[@class='col-sm-5 col-md-5 col-lg-4 col-lg-offset-1']/p[@class='text-muted']" position="after">
+      <xpath expr="//div[@id='product_details']/p[@class='text-muted']" position="after">
         <t t-foreach="product.attribute_line_ids" t-as="attribute_line">
           <t t-if="attribute_line.attribute_id.name == 'Odoo Version'">
             <t t-if="len(attribute_line.value_ids)&gt;1 and len(product.product_variant_ids.mapped('attribute_value_ids').filtered(lambda r: r.attribute_id.name == 'Odoo Version').ids)&gt;1">
@@ -97,5 +96,4 @@
       </xpath>
     </template>
 
-  </data>
-</openerp>
+</odoo>

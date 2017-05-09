@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 import requests
-from openerp import models, fields, api
 import xmlrpclib
-import openerp.addons.decimal_precision as dp
-from openerp.exceptions import Warning
+
+from odoo import models, fields, api
 
 
 class SaasPortalServer(models.Model):

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<openerp>
-    <data>
+<odoo>
 
         <record id="view_plans_demo_form" model="ir.ui.view">
             <field name="name">saas_portal_demo.plans.demo.form</field>
@@ -47,5 +46,4 @@
             </field>
         </record>
 
-    </data>
-</openerp>
+</odoo>

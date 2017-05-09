@@ -14,7 +14,7 @@ the Portal could know where demo modules are to get information needed to genera
 * Open ``SaaS Server / Configuration / Repositories``
 * Create new record
 
-  * choose the repository from drop-down list of available repositories 
+  * choose the repository from drop-down list of available repositories
 
 Parameters in __openerp__.py for demo modules
 ---------------------------------------------
@@ -22,7 +22,7 @@ Parameters in __openerp__.py for demo modules
 * demo_title
 * demo_addons
 * demo_addons_hidden
-* demo_url 
+* demo_url
 * demo_summary
 
 The example of __openerp__.py file of ``reminder_base``:

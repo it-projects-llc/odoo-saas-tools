@@ -29,6 +29,4 @@
     "post_init_hook": None,
     "installable": True,
     "auto_install": False,
-
-    "demo_demonstrative": False,
 }

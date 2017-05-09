@@ -33,14 +33,14 @@ Open *SaaS Server*
 * Open ``SaaS Server / Configuration / Repositories``
 * Create new record
 
-  * select the repository from drop-down list of available repositories 
+  * select the repository from drop-down list of available repositories
 
 Open *SaaS Portal*
 
 * Open  ``SaaS / SaaS / Servers``
 
   * Switch to some Server
-  * check that the right version is in ``Odoo version`` field. The version should look like 8 for odoo 8.0 or 9 for odoo 9.0, etc. 
+  * check that the right version is in ``Odoo version`` field. The version should look like 8 for odoo 8.0 or 9 for odoo 9.0, etc.
   * click ``[Update Repositories]``
   * click ``[Generate Demo Plans]``
   * click ``[Create Demo Template DBs]``
@@ -84,7 +84,7 @@ Customer databases are named as follows
 
 , where ``%i`` is a number of demo database
 
-After that, you need to configure proxing to corresponded odoo installation, for example 
+After that, you need to configure proxing to corresponded odoo installation, for example
 ::
 
  .odoo-8.demo.it-projects.info -> port 8869, 8872

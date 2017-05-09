@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<openerp>
-  <data>
+<odoo>
 
     <record id="product_product_saas" model="ir.ui.view">
       <field name="name">product.product.saas</field>
@@ -17,5 +16,4 @@
       </field>
     </record>
 
-  </data>
-</openerp>
+</odoo>

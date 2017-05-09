@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<openerp>
-    <data>
+<odoo>
 
         <template id="show_plan" name="Odoo Plan" page="True">
             <t t-call="website.layout">
@@ -67,5 +66,4 @@
             </t>
         </template>
 
-    </data>
-</openerp>
+</odoo>

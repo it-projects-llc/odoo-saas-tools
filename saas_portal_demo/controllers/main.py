@@ -3,7 +3,7 @@ import werkzeug
 from odoo import http
 from odoo.http import request
 from odoo.addons.saas_portal.controllers.main import SaasPortal
-from odoo.addons.website_sale.controllers.main import WebsiteSale as website_sale
+from odoo.addons.website_sale.controllers.main import WebsiteSale
 
 
 def signup_redirect():
@@ -29,7 +29,7 @@ class SaasPortalDemo(SaasPortal):
         return request.website.render("saas_portal_demo.show_plan", values)
 
 
-class website_sale_custom(website_sale):
+class WebsiteSaleCustom(WebsiteSale):
 
     @http.route(['/shop/product/<model("product.template"):product>'], type='http', auth="public", website=True)
     def product(self, product, category='', search='', **kwargs):
@@ -46,4 +46,4 @@ class website_sale_custom(website_sale):
             url = request.httprequest.url + '?version=' + max_version
             return werkzeug.utils.redirect(url)
 
-        return super(website_sale_custom, self).product(product=product, category=category, search=search, **kwargs)
+        return super(WebsiteSaleCustom, self).product(product=product, category=category, search=search, **kwargs)

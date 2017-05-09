@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 import os
 import logging
-import openerp
-from openerp import models, fields, api
-from openerp.exceptions import Warning as UserError
-from openerp.tools.translate import _
+import odoo
+from odoo import models, fields, api
+from odoo.exceptions import UserError
+from odoo.tools.translate import _
 import subprocess
 import tempfile
 
@@ -19,11 +19,11 @@ class SaasServerRepository(models.Model):
 
     @api.model
     def _get_repositories(self):
-        root_path = os.path.abspath(os.path.expanduser(os.path.expandvars(os.path.dirname(openerp.__file__))))
+        root_path = os.path.abspath(os.path.expanduser(os.path.expandvars(os.path.dirname(odoo.__file__))))
         base_addons = os.path.join(root_path, 'addons')
         main_addons = os.path.abspath(os.path.join(root_path, '../addons'))
         paths = [(p, os.path.basename(p))
-                 for p in openerp.conf.addons_paths
+                 for p in odoo.conf.addons_paths
                  if p not in [base_addons, main_addons] and os.path.exists(p + '/.git')]
         return paths
 

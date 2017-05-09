@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<openerp>
-  <data>
+<odoo>
 
     <record id="action_saas_server_repositories" model="ir.actions.act_window">
       <field name="name">Repositories</field>
@@ -16,6 +15,7 @@
 
     <menuitem id="menu_saas_server_repositories" parent="saas_server.menu_saas"
               sequence="100" action="action_saas_server_repositories"/>
+
     <record id='view_saas_server_repository_tree' model='ir.ui.view'>
       <field name="name">saas_server.repository.tree</field>
       <field name="model">saas_server.repository</field>
@@ -40,5 +40,4 @@
       </field>
     </record>
 
-  </data>
-</openerp>
+</odoo>

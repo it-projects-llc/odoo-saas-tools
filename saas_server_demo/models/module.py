@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from openerp import models, fields, api, tools
-from openerp.addons.base.module.module import module as A
-from openerp.modules import get_module_resource
+from odoo import models, fields, api, tools
+from odoo.addons.base.module.module import Module as A
+from odoo.modules import get_module_resource
 
 
 class ModuleDemo(models.Model):

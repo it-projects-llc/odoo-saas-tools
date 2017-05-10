@@ -4,6 +4,7 @@ import werkzeug
 from odoo import http
 import re
 from odoo.http import request
+import logging
 
 import odoo
 from odoo import SUPERUSER_ID
@@ -11,7 +12,9 @@ from odoo.tools.translate import _
 from odoo.addons import auth_signup
 from odoo.addons.saas_portal.controllers.main import SaasPortal
 from odoo.addons.website_payment.controllers.main import WebsitePayment
+from odoo.addons.auth_signup.models.res_users import SignupError
 
+_logger = logging.getLogger(__name__)
 
 class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
 
@@ -28,7 +31,26 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
             kw['redirect'] = '%s?dbname=%s&product_id=%s&password=%s&trial_or_working=%s' % (
                 redirect, kw['dbname'], kw['product_id'], kw['password'], kw['trial_or_working'])
 
-        return super(AuthSignupHome, self).web_auth_signup(*args, **kw)
+        # return super(AuthSignupHome, self).web_auth_signup(*args, **kw)
+# imp parent code: instead of showing ``Could not create a new account`` show assertion error text (e.g. if the passwords don't match)
+        qcontext = self.get_auth_signup_qcontext()
+
+        if not qcontext.get('token') and not qcontext.get('signup_enabled'):
+            raise werkzeug.exceptions.NotFound()
+
+        if 'error' not in qcontext and request.httprequest.method == 'POST':
+            try:
+                self.do_signup(qcontext)
+                return super(AuthSignupHome, self).web_login(*args, **kw)
+            except (SignupError, AssertionError), e:
+                if request.env["res.users"].sudo().search([("login", "=", qcontext.get("login"))]):
+                    qcontext["error"] = _("Another user is already registered using this email address.")
+                else:
+                    _logger.error(e.message)
+                    qcontext['error'] = e.message
+
+        return request.render('auth_signup.signup', qcontext)
+# end parent code
 
     def get_auth_signup_qcontext(self):
         qcontext = super(AuthSignupHome, self).get_auth_signup_qcontext()

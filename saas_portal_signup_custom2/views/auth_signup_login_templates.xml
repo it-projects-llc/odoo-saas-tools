@@ -80,7 +80,7 @@
 		</div>
 		<div class="row">
 			<div class="col-lg-6 form-group field-dnb_number">
-				<label for="dnb_number" class="control-label">D&amp;B Number (<a href="https://www.dandb.com/product/companyupdate/companyupdateRegistration?execution=e1s1">Get a D&amp;B Number</a>)</label>
+				<label for="dnb_number" class="control-label">D&amp;B Number (<a href="https://www.dandb.com/product/companyupdate/companyupdateRegistration?execution=e1s1" target="_blank">Get a D&amp;B Number</a>)</label>
 				<input type="text" name="dnb_number" t-att-value="dnb_number" id="dnb_number"
 					class="form-control" t-att-autofocus="'autofocus' if login and not only_passwords else None"
 					autocapitalize="off" t-att-readonly="'readonly' if only_passwords else None"/>

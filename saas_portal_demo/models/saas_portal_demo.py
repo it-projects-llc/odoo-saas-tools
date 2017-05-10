@@ -66,7 +66,7 @@ class SaasPortalServer(models.Model):
         namestring = '{0}-{1}.odoo-{2}.demo.{3}'
         saas_domain = self.env['ir.config_parameter'].get_param('saas_portal.base_saas_domain')
         template_name = namestring.format(demo_module['demo_url'],
-                                          'template',
+                                          't',
                                           self.odoo_version,
                                           saas_domain)
         plan_name = 'Demo for {0}.0 {1}'.format(self.odoo_version, demo_module['demo_url'])

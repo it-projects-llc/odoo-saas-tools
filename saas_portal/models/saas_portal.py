@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+import simplejson
+import werkzeug
+import requests
+import random
+
 from openerp import api
 from openerp import exceptions
 from openerp import fields
@@ -8,10 +13,6 @@ from openerp.tools.translate import _
 from openerp.addons.base.res.res_partner import _tz_get
 from datetime import datetime, timedelta
 from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
-import simplejson
-import werkzeug
-import requests
-import random
 
 from datetime import datetime, timedelta
 from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
@@ -706,8 +707,13 @@ class SaasPortalClient(models.Model):
             if record.partner_id.id != partner_id:
                 raise Forbidden
 
-    @api.one
+    @api.multi
     def duplicate_database(self, dbname=None, partner_id=None, expiration=None):
+        self.ensure_one()
+
+        owner_user = self.env['res.users'].search(
+            [('partner_id', '=', partner_id)], limit=1) or self.env.user
+
         server = self.server_id
         if not server:
             server = self.env['saas_portal.server'].get_saas_server()
@@ -727,24 +733,42 @@ class SaasPortalClient(models.Model):
         client = self.env['saas_portal.client'].create(vals)
         client_id = client.client_id
 
-        scheme = server.request_scheme
-        port = server.request_port
+        owner_user_data = {
+            'user_id': owner_user.id,
+            'login': owner_user.login,
+            'name': owner_user.name,
+            'email': owner_user.email,
+            'password': None,
+        }
+
         state = {
             'd': client.name,
             'e': client.expiration_datetime,
-            'r': '%s://%s:%s/web' % (scheme, client.host, port),
+            'r': client.public_url + 'web',
+            'owner_user': owner_user_data,
+            'public_url': client.public_url,
+            'db_template': self.name,
+            'disable_mail_server': True,
         }
-        state.update({'db_template': self.name,
-                      'disable_mail_server': True})
+
         scope = ['userinfo', 'force_login', 'trial', 'skiptheuse']
-        # TODO use _request_server
-        url = server._request(path='/saas_server/new_database',
-                              scheme=scheme,
-                              port=port,
-                              state=state,
-                              client_id=client_id,
-                              scope=scope,)[0]
-        return url
+
+        req, req_kwargs = server._request_server(path='/saas_server/new_database',
+                                                 state=state,
+                                                 client_id=client_id)
+        res = requests.Session().send(req, **req_kwargs)
+
+        if not res.ok:
+            raise Warning('Reason: %s \n Message: %s' % (res.reason, res.content))
+        try:
+            data = simplejson.loads(res.text)
+        except:
+            _logger.error('Error on parsing response: %s\n%s' % ([req.url, req.headers, req.body], res.text))
+            raise
+
+        data.update({'id': client.id})
+
+        return data
 
     @api.multi
     def send_expiration_info(self):

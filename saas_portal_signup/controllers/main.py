@@ -22,6 +22,8 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
         qcontext = super(AuthSignupHome, self).get_auth_signup_qcontext()
         if qcontext.get('token', False):
             qcontext['reset'] = True
+        else:
+            qcontext['reset'] = False
         if not qcontext.get('plans', False):
             qcontext['plans'] = request.env['saas_portal.plan'].sudo().search([])
 

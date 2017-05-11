@@ -6,84 +6,233 @@ API integration
 
 To control SaaS via external tool `built-in XML-RPC <https://www.odoo.com/documentation/8.0/api_integration.html>`__ can be used.
 
-Example in python language
---------------------------
+SaaS Portal API
+===============
+
+Operations covered:
+ * Authenticate admin user with SaaS Portal
+ * Signup a user on SaaS Portal
+ * Create client database
+ * Get id of client database record on SaaS Portal
+ * Suspend client database
+ * Limit number of users for client database
+ * Limit storage usage for client database
+ * Install/Uninstall modules in client database
+ * Grant/restrict access rights for users in client database
+ * Module lists for different subscription tiers
+ * Right lists for different subscription roles
+ * Upgrade and downgrade accounts
+
+
+Authenticate admin with SaaS Portal
+----------------------------------------
+
+All operations on SaaS Portal with client databases require authentication.
+
+To authenticate admin with SaaS Portal:
 
 ::
 
-    # Import libs
-    import json
-    import xmlrpclib
-    import requests
+   # Import libs
+   import json
+   import xmlrpclib
+   import requests
 
-    # Define credentials
-    main_url = 'http://odoo.local'
-    main_db = 'odoo.local'
-    admin_username = 'admin'
-    admin_password = 'admin'
+   # Define credentials
+   portal_url = <insert server URL>
+   portal_db = <insert database name>
+   admin_username = 'admin'
+   admin_password = <insert password for your admin user (default: admin)>
 
-    # Authenticate
-    common = xmlrpclib.ServerProxy('{}/xmlrpc/2/common'.format(main_url))
-    admin_uid = common.authenticate(main_db, admin_username, admin_password, {})
-    models = xmlrpclib.ServerProxy('{}/xmlrpc/2/object'.format(main_url))
-
-    # Signup a user
-    # (would raise error, if user already exists)
-    client_username = 'client-email@example.com'
-    client_name = 'Client Name'
-    client_password = 'Client Password'
-    models.execute_kw(main_db, admin_uid, admin_password, 'res.users', 'signup', [{
-        'login': client_username,
-        'name': client_name,
-        'password': client_password,
-    }])
-
-    # Authenticate the user at Main Database
-    client_uid = common.authenticate(main_db, client_username, client_password, {})
-
-    # Get user session at Main Database if needed
-    params = {'db': main_db, 'login': client_username, 'password': client_password}
-    data = json.dumps({'jsonrpc': '2.0', 'method': 'call', 'params': params})
-    r = requests.post('%s/web/session/authenticate' % main_url,
-                      data=data,
-                      headers={'Content-Type':'application/json'})
-    if not r.json()['result']['uid']:
-        raise Exception('Authenticaion failed')
-    client_session_id = r.json()['result']['session_id']
+   # Authenticate
+   common = xmlrpclib.ServerProxy('{}/xmlrpc/2/common'.format(portal_url))
+   admin_uid = common.authenticate(portal_db, admin_username, admin_password, {})
+   models = xmlrpclib.ServerProxy('{}/xmlrpc/2/object'.format(portal_url))
 
 
-    # Create new Client database
-    plan_id = 1  # specify plan you need
-    client_db = 'client.odoo.local'
+Signup a user on SaaS Portal
+----------------------------
 
-    # you can keep client_db empty to generate it automatically
-    # from "DB Names" parameter in Plan's form
+Before client database can be created a user of this client database should already exist on SaaS Portal.
+There are several ways to create a new user in odoo.
+Signup procedure creates users and assign the following groups to them:
+ * Portal
+ * View Online Payment Options
 
-    client_db = False
-    res = models.execute_kw(main_db, admin_uid, admin_password,
-                            'saas_portal.plan', 'create_new_database',
-                            [plan_id], {'dbname': client_db, 'user_id':client_uid})
+Membership in these groups gives users minimum privileges on SaaS Portal.
 
-    res['url']  # contains url for new database with client's access token.
-    saas_portal_client_id = res['id']
 
-    # Configure system
-    data = {
-        # configure addons
-        'update_addons': [],
-        'install_addons': ['sale', 'point_of_sale', 'stock', 'access_settings_menu', access_apps'],
-        'uninstall_addons': [],
-        # grant access to owner
-        'access_owner_add': ['base.group_sale_manager', 'stock.group_stock_manager', 'access_settings_menu.group_show_settings_menu'],
-        # restrict access for all users
-        'access_remove': ['access_apps.group_show_modules_menu'],
-        'params': [
-             {'key': 'saas_client.max_users', 'value': 10, 'hidden': True}
-        ],
-    }
-    res = models.execute_kw(main_db, admin_uid, admin_password,
-                            'saas.config', 'do_upgrade_database',
-                            [data, saas_portal_client_id])
+To signup a user:
+
+::
+
+   # Signup a user
+   client_username = 'client-email@example.com'
+   client_name = 'Client Name'
+   client_password = 'Client Password'
+   models.execute_kw(portal_db, admin_uid, admin_password, 'res.users', 'signup', [{
+   'login': client_username,
+   'name': client_name,
+   'password': client_password,
+   }])
+
+
+Create client database
+----------------------
+
+To create client database:
+
+::
+
+   # Authenticate the user at Portal Database
+   client_uid = common.authenticate(portal_db, client_username, client_password, {})
+   # Create new Client database
+   plan_id = 1  # specify plan you need
+   client_db = 'client.odoo.local'
+   # you can keep client_db empty to generate it automatically
+   # from "DB Names" parameter in Plan's form
+   owner_password = 'password of owner to log in his database'
+   res = models.execute_kw(portal_db, admin_uid, admin_password,
+                        'saas_portal.plan', 'create_new_database',
+                        [plan_id], {'dbname': client_db, 'user_id':client_uid, 'owner_password': owner_password})
+
+There will be two users in just created client database:
+ * admin
+ * owner user
+
+Groups assigned to owner in his database after creation:
+ * Employee
+ * Contact Creation
+
+
+Get id of client database record on SaaS Portal
+-----------------------------------------------
+
+Id of client database record on Portal should be known
+to manipulate the client database from SaaS Portal
+
+There are many ways to get the id.
+
+* from plan_id and partner_id:
+::
+
+   # these values are given from other searches
+   plan_id = 1
+   partner_id = 7
+
+   # search saas_portal.client on plan_id = 1 and partner_id = 7
+   ids = models.execute_kw(portal_db, admin_uid, admin_password,
+   'saas_portal.client', 'search',
+   [[['plan_id', '=', plan_id], ['partner_id', '=', partner_id]]])
+
+* from name of database (name of database is equal to domain host name):
+::
+
+   client_db = 'client.odoo.local'
+   ids = models.execute_kw(portal_db, admin_uid, admin_password,
+   'saas_portal.client', 'search',
+   [[['name', '=', client_db]]])
+
+
+Suspend client database
+-----------------------
+
+To suspend client database its id should be known.
+
+To suspend:
+::
+
+   saas_portal_client_id = ids[0]
+   data = {'params': [{'key': 'saas_client.suspended', 'value': '1', 'hidden': True}]}
+   res = models.execute_kw(portal_db, admin_uid, admin_password,
+                        'saas.config', 'do_upgrade_database',
+                        [data, saas_portal_client_id])
+
+To unsuspend/resume:
+::
+   
+   saas_portal_client_id = ids[0]
+   data = {'params': [{'key': 'saas_client.suspended', 'value': '0', 'hidden': True}]}
+   res = models.execute_kw(portal_db, admin_uid, admin_password,
+                        'saas.config', 'do_upgrade_database',
+                        [data, saas_portal_client_id])
+
+
+
+Limit number of users for client database
+-----------------------------------------
+
+Id of client database should be known.
+
+To limit number of users for client database by 4:
+::
+
+   saas_portal_client_id = ids[0]
+   data = {'params': [{'key': 'saas_client.max_users', 'value': '4', 'hidden': True}]}
+   res = models.execute_kw(portal_db, admin_uid, admin_password,
+                        'saas.config', 'do_upgrade_database',
+                        [data, saas_portal_client_id])
+
+
+Limit storage usage for client database
+---------------------------------------
+
+Id of client database should be known.
+
+To limit storage usage for client database by 500Mb:
+::
+
+   saas_portal_client_id = ids[0]
+   data = {'params': [{'key': 'saas_client.total_storage_limit', 'value': '500', 'hidden': True}]}
+   res = models.execute_kw(portal_db, admin_uid, admin_password,
+                        'saas.config', 'do_upgrade_database',
+                        [data, saas_portal_client_id])
+
+
+Install/Uninstall modules in client database
+--------------------------------------------
+
+Id of client database should be known.
+
+To install the modules 'sale' and 'fleet' in client database:
+::
+
+   saas_portal_client_id = ids[0]
+   data = {'install_addons': ['sale', 'fleet']}
+   res = models.execute_kw(portal_db, admin_uid, admin_password,
+                        'saas.config', 'do_upgrade_database',
+                        [data, saas_portal_client_id])
+
+To uninstall the module 'fleet' in client database:
+::
+
+   saas_portal_client_id = ids[0]
+   data = {'uninstall_addons': ['fleet']}
+   res = models.execute_kw(portal_db, admin_uid, admin_password,
+                        'saas.config', 'do_upgrade_database',
+                        [data, saas_portal_client_id])
+
+
+Grant/restrict access rights for users in client database
+---------------------------------------------------------
+
+To assign the sale manager and the stock manager groups to owner user:
+::
+
+   saas_portal_client_id = ids[0]
+   data = {'access_owner_add': ['base.group_sale_manager', 'stock.group_stock_manager']}
+   res = models.execute_kw(portal_db, admin_uid, admin_password,
+                        'saas.config', 'do_upgrade_database',
+                        [data, saas_portal_client_id])
+
+To restrict access for all users by excluding them from the show modules menu group:
+::
+
+   saas_portal_client_id = ids[0]
+   data = {'access_remove': ['access_apps.group_show_modules_menu']}
+   res = models.execute_kw(portal_db, admin_uid, admin_password,
+                        'saas.config', 'do_upgrade_database',
+                        [data, saas_portal_client_id])
 
 Notes abouts API integration
 ----------------------------

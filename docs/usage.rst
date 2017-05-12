@@ -6,3 +6,4 @@ Usage
     :titlesonly:
 
     usage/features
+    usage/subscriptions

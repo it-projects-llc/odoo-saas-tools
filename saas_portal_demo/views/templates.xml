@@ -11,6 +11,7 @@
       <xpath expr="//div[@class='row'][2]" position="after">
         <div class="row" style="padding-top:20px;">
           <div class="col-xs-12">
+
             <div class="row">
               <t t-foreach="product.product_variant_ids" t-as="product_variant">
                 <t t-if="set(product_variant.attribute_value_ids.ids) &amp; attrib_set">
@@ -45,6 +46,13 @@
                 </t>
               </t>
             </div>
+
+            <div class="row">
+              <div class="col-lg-12 col-md-12 col-sm-12">
+                <p class="text-center">Powered by <a href="https://it-projects-llc.github.io/odoo-saas-tools/">Odoo Saas Tools</a></p>
+              </div>
+            </div>
+
           </div>
         </div>
       </xpath>

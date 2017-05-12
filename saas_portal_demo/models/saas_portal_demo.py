@@ -63,12 +63,11 @@ class SaasPortalServer(models.Model):
             version = self._get_odoo_version()
             if version:
                 self.odoo_version = version.split('.', 1)[0]
-        namestring = '{0}-{1}.odoo-{2}.demo.{3}'
+        namestring = '{0}-{1}_odoo-{2}'
         saas_domain = self.env['ir.config_parameter'].get_param('saas_portal.base_saas_domain')
         template_name = namestring.format(demo_module['demo_url'],
                                           't',
-                                          self.odoo_version,
-                                          saas_domain)
+                                          self.odoo_version)
         plan_name = 'Demo for {0}.0 {1}'.format(self.odoo_version, demo_module['demo_url'])
 
         if template_obj.search_count([('name', '=', template_name)]) == 0:

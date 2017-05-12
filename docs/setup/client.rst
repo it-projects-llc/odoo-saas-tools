@@ -7,7 +7,6 @@ uninstall **saas_client** module, edit ir.confir_parameter records
 etc. The simplest solution is don't give to customer access to
 administration. To make more flexible configuration, you could install
 following modules on SaaS Client databases:
-*With Love, Lily!!*
 
 * `ir_rule_protected <https://github.com/yelizariev/access-addons/tree/8.0/ir_rule_protected>`__ - makes impossible for non-superuser admin edit\delete protected ir.rule
 * `access_restricted <https://github.com/yelizariev/access-addons/tree/8.0/access_restricted>`__ - makes impossible for administrator set (and see) more access rights (groups) than he already have. (follow the link for more description)

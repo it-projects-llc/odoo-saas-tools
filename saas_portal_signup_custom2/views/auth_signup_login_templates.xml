@@ -33,6 +33,7 @@
 				<select name="country_id" class="form-control"
 					required="required" t-att-readonly="'readonly' if only_passwords else None">
 					<option value="" selected="selected" disabled="disabled">Select</option>
+					<option t-if="prev_sel_country" t-att-value="prev_sel_country.id" selected="selected"><t t-esc="prev_sel_country.name"/></option>
 					<t t-foreach="countries or []" t-as="country">
 						<option t-att-value="country.id"><t t-esc="country.name"/></option>
 					</t>
@@ -94,6 +95,7 @@
 					required="required" t-att-readonly="'readonly' if only_passwords else None"
 					t-att-autofocus="'autofocus' if login and not only_passwords else None">
 					<option value="" selected="selected" disabled="disabled">Select a package</option>
+					<option t-if="prev_sel_product" t-att-value="prev_sel_product.id" selected="selected"><t t-esc="prev_sel_product.name"/></option>
 					<t t-foreach="products or []" t-as="product">
 						<option t-if="product.saas_default" selected="selected" t-att-value="product.id"><t t-esc="product.name"/></option>
 						<option t-if="not product.saas_default" t-att-value="product.id"><t t-esc="product.name"/></option>
@@ -114,12 +116,22 @@
 		<div class="row">
 			<div class="col-lg-3 form-group field-trial">
 				<div class="input-group">
-					<label><input type="radio" name="trial_or_working" value="trial" required="required"/> Trial</label>
+					<label>
+						<input t-if="trial_or_working == 'trial'" checked="checked"
+							type="radio" name="trial_or_working" value="trial" required="required"> Trial</input>
+						<input t-else=""
+							type="radio" name="trial_or_working" value="trial" required="required"> Trial</input>
+					</label>
 				</div>
 			</div>
 			<div class="col-lg-3 form-group field-working">
 				<div class="input-group">
-					<label><input type="radio" name="trial_or_working" value="worknig" required="required"/> Paid Subscription</label>
+					<label>
+						<input t-if="trial_or_working == 'working'" checked="checked"
+							type="radio" name="trial_or_working" value="working" required="required"> Paid Subscription</input>
+						<input t-else=""
+							type="radio" name="trial_or_working" value="working" required="required"> Paid Subscription</input>
+					</label>
 				</div>
 			</div>
 		</div>

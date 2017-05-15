@@ -22,6 +22,15 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
     def web_auth_signup(self, *args, **kw):
 
         qcontext = self.get_auth_signup_qcontext()
+
+        country_id = kw.get('country_id')
+        if country_id:
+            qcontext['prev_sel_country'] = request.env['res.country'].sudo().browse(int(country_id))
+
+        product_id = kw.get('product_id')
+        if product_id:
+            qcontext['prev_sel_product'] = request.env['product.template'].sudo().browse(int(product_id))
+
         qcontext['error'] = _("Incorrect. Try again")
         if kw.has_key('g-recaptcha-response') and not request.website.recaptcha_siteverify(kw.get('g-recaptcha-response')):
             return request.render('auth_signup.signup', qcontext)

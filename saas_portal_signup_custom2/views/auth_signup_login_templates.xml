@@ -30,8 +30,9 @@
 			</div>
 			<div class="col-lg-4 form-group field-country o_signup_form_required">
 				<label class="control-label" for="country_id">Country</label>
-				<select name="country_id" class="form-control" required="required" t-att-readonly="'readonly' if only_passwords else None">
-					<option value=""></option>
+				<select name="country_id" class="form-control"
+					required="required" t-att-readonly="'readonly' if only_passwords else None">
+					<option value="" selected="selected" disabled="disabled">Select</option>
 					<t t-foreach="countries or []" t-as="country">
 						<option t-att-value="country.id"><t t-esc="country.name"/></option>
 					</t>
@@ -89,9 +90,10 @@
 		<div class="row">
 			<div class="col-lg-6 form-group field-role">
 				<label for="product_id" class="control-label">ERP Package</label>
-				<select name="product_id" class="form-control" required="required" t-att-readonly="'readonly' if only_passwords else None"
+				<select name="product_id" class="form-control" placeholder="Select a package"
+					required="required" t-att-readonly="'readonly' if only_passwords else None"
 					t-att-autofocus="'autofocus' if login and not only_passwords else None">
-					<option value=""></option>
+					<option value="" selected="selected" disabled="disabled">Select a package</option>
 					<t t-foreach="products or []" t-as="product">
 						<option t-if="product.saas_default" selected="selected" t-att-value="product.id"><t t-esc="product.name"/></option>
 						<option t-if="not product.saas_default" t-att-value="product.id"><t t-esc="product.name"/></option>
@@ -117,7 +119,7 @@
 			</div>
 			<div class="col-lg-3 form-group field-working">
 				<div class="input-group">
-					<label><input type="radio" name="trial_or_working" value="worknig" required="required"/> Working</label>
+					<label><input type="radio" name="trial_or_working" value="worknig" required="required"/> Paid Subscription</label>
 				</div>
 			</div>
 		</div>
@@ -168,14 +170,13 @@
 				</div>
 			</div>
 		</div>
+		<div class="row">
+			<div class="col-lg-6 form-group">
+				<div class="g-recaptcha" t-att-data-sitekey="website.google_recaptcha_site_key"></div>
+			</div>
+		</div>
 	</xpath>
 
-</template>
-
-<template id="saas_portal_signup_custom2.signup" inherit_id="auth_signup.signup">
-	<xpath expr="//div[@class='clearfix oe_login_buttons']" position="before">
-		<div class="g-recaptcha" t-att-data-sitekey="website.google_recaptcha_site_key"></div>
-	</xpath>
 </template>
 
 </odoo>

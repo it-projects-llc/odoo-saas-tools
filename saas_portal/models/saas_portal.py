@@ -308,6 +308,7 @@ class SaasPortalPlan(models.Model):
             'access_token': client.oauth_application_id._get_access_token(user_id, create=True),
         }
         url = '{url}?{params}'.format(url=data.get('url'), params=werkzeug.url_encode(params))
+        auth_url = url
         if self.on_create == 'email':
             url = '/information'
 
@@ -324,7 +325,7 @@ class SaasPortalPlan(models.Model):
         # TODO make async call of action_sync_server here
         # client.server_id.action_sync_server()
 
-        return {'url': url, 'id': client.id, 'client_id': client_id}
+        return {'url': url, 'id': client.id, 'client_id': client_id, 'auth_url': auth_url}
 
     @api.multi
     def generate_dbname(self, raise_error=True):

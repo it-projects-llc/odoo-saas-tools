@@ -118,10 +118,11 @@ class SaasPortalServer(models.Model):
         self.env['saas_portal.client'].search([]).storage_usage_monitoring()
 
     @api.one
-    def action_sync_server(self):
+    def action_sync_server(self, updating_client_ID=None):
         state = {
             'd': self.name,
             'client_id': self.client_id,
+            'updating_client_ID': updating_client_ID,
         }
         req, req_kwargs = self._request_server(path='/saas_server/sync_server', state=state, client_id=self.client_id)
         res = requests.Session().send(req, **req_kwargs)
@@ -329,6 +330,7 @@ class SaasPortalPlan(models.Model):
         client.send_params_to_client_db()
         # TODO make async call of action_sync_server here
         # client.server_id.action_sync_server()
+        client.sync_client()
 
         return {'url': url, 'id': client.id, 'client_id': client_id}
 
@@ -723,6 +725,11 @@ class SaasPortalClient(models.Model):
         _logger.info('delete database: %s', res.text)
         if res.status_code != 500:
             self.name = new_dbname
+
+    @api.multi
+    def sync_client(self):
+        self.ensure_one()
+        self.server_id.action_sync_server(updating_client_ID=self.client_id)
 
     @api.multi
     def duplicate_database(self, dbname=None, partner_id=None, expiration=None):

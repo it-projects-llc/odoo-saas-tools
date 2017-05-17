@@ -187,8 +187,8 @@ intersphinx_mapping = {
     'django': ('https://django.readthedocs.org/en/latest/', None),
 }
 
-github_user = 'odoo'
-github_project = 'odoo'
+github_user = 'it-projects-llc'
+github_project = 'odoo-saas-tools'
 
 # monkeypatch PHP lexer to not require <?php
 from sphinx.highlighting import lexers

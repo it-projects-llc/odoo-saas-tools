@@ -190,6 +190,11 @@ class SaasServerClient(models.Model):
     def update_all(self):
         self.sudo().search([]).update()
 
+    @api.multi
+    def update_one(self):
+        self.ensure_one()
+        self.sudo().update()
+
     @api.one
     def update(self):
         try:

@@ -259,6 +259,7 @@ class SaasServer(http.Controller):
 
         state = simplejson.loads(post.get('state'))
         client_id = state.get('client_id')
+        updating_client_ID = state.get('updating_client_ID')
         db = state.get('d')
         access_token = post['access_token']
         saas_oauth_provider = request.env.ref('saas_server.saas_oauth_provider').sudo()
@@ -267,7 +268,10 @@ class SaasServer(http.Controller):
         if user_data.get("error"):
             raise Exception(user_data['error'])
 
-        request.env['saas_server.client'].update_all()
+        if updating_client_ID:
+            request.env['saas_server.client'].sudo().search([('client_id', '=', updating_client_ID)]).update_one()
+        else:
+            request.env['saas_server.client'].update_all()
         res = []
         for client in request.env['saas_server.client'].sudo().search([('state', 'not in', ['draft'])]):
             res.append({

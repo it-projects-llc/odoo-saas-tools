@@ -14,7 +14,8 @@ Index
     :maxdepth: 2
 
     setup
-    usage           
+    usage
+    demo
     api
     reference
 

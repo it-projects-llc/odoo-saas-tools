@@ -31,6 +31,10 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
         if product_id:
             qcontext['prev_sel_product'] = request.env['product.template'].sudo().browse(int(product_id))
 
+        state_id = kw.get('state_id')
+        if state_id:
+            qcontext['prev_sel_state'] = request.env['res.country.state'].sudo().browse(int(state_id))
+
         qcontext['error'] = _("Incorrect. Try again")
         if kw.has_key('g-recaptcha-response') and not request.website.recaptcha_siteverify(kw.get('g-recaptcha-response')):
             return request.render('auth_signup.signup', qcontext)
@@ -69,6 +73,8 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
             qcontext['base_saas_domain'] = self.get_saas_domain()
         if not qcontext.get('products', False):
             qcontext['products'] = request.env['product.template'].sudo().search([('plan_ids', '!=', False)])
+        if not qcontext.get('states', False):
+            qcontext['states'] = request.env['res.country.state'].sudo().search([])
         return qcontext
 
     def get_saas_domain(self):
@@ -80,6 +86,14 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
     def do_signup(self, qcontext):
         values = dict((key, qcontext.get(key)) for key in ('login', 'name', 'password'))
         values['email'] = qcontext['login']
+        values['company_name'] = qcontext.get('company_name', None)
+        values['website'] = qcontext.get('company_website', None)
+        values['phone'] = qcontext.get('tel', None)
+        values['fax'] = qcontext.get('fax', None)
+        values['city'] = qcontext.get('city', None)
+        values['street'] = qcontext.get('address', None)
+        values['vat'] = qcontext.get('tax_code', None)
+        values['zip'] = qcontext.get('postal_code', None)
         if qcontext.get('country_id', False):
             values['country_id'] = qcontext['country_id']
         if qcontext.get('dbname', False):

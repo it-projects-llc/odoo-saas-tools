@@ -1,3 +1,1 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_saas_portal_plan,access_saas_portal_plan,model_saas_portal_plan,base.group_user,1,0,0,0
-access_saas_portal_database,access_saas_portal_database,model_saas_portal_database,,1,0,0,0

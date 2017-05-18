@@ -19,12 +19,12 @@
 					<div class="row">
 						<div class="col-lg-3 form-group field-new">
 							<div class="input-group">
-								<label><input type="radio" name="convert_or_new" value="new" required="required"/> Create new working</label>
+								<label><input type="radio" name="convert_or_new" value="new" required="required"/> Replace with new blank database</label>
 							</div>
 						</div>
 						<div class="col-lg-3 form-group field-convert">
 							<div class="input-group">
-								<label><input type="radio" name="convert_or_new" value="convert" required="required"/> Convert to working</label>
+								<label><input type="radio" name="convert_or_new" value="convert" required="required"/> Convert to subscription keeping data</label>
 							</div>
 						</div>
 					</div>

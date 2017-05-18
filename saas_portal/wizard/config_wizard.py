@@ -130,7 +130,7 @@ class SaasPortalCreateClient(models.TransientModel):
         plan_id = self._default_plan_id()
         if plan_id:
             plan = self.env['saas_portal.plan'].browse(plan_id)
-            return plan.generate_dbname(raise_error=False)[0]
+            return plan.generate_dbname(raise_error=False)
         return ''
 
     name = fields.Char('Database name', required=True, default=_default_name)

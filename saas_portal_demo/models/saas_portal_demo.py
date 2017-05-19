@@ -68,7 +68,7 @@ class SaasPortalServer(models.Model):
         template_name = namestring.format(demo_module['demo_url'], 't')
         plan_name = 'Demo for {0}.0 {1}'.format(self.odoo_version, demo_module['demo_url'])
 
-        if template_obj.search_count([('name', '=', template_name)]) == 0:
+        if template_obj.search_count([('name', '=', template_name), ('server_id', '=', self.id)]) == 0:
             template = template_obj.create({'name': template_name, 'server_id': self.id})
             if plan_obj.search_count([('name', '=', plan_name)]) == 0:
                 plan = plan_obj.create({'name': plan_name,

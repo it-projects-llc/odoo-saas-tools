@@ -54,6 +54,8 @@ class SaasPortalServer(models.Model):
     host = fields.Char('Host', compute=_compute_host)
     odoo_version = fields.Char('Odoo version', readonly=True)
     password = fields.Char()
+    clients_host_template = fields.Char('Template for clients host names',
+                                        help='The possible dynamic parts of the host names are: {dbname}, {base_saas_domain}, {base_saas_domain_1}')
 
     @api.model
     def create(self, vals):

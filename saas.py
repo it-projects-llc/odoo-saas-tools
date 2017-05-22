@@ -52,6 +52,7 @@ settings_group.add_argument('--odoo-config', dest='odoo_config', help='Path to o
 settings_group.add_argument('--odoo-data-dir', dest='odoo_data_dir', help='Path to odoo data dir', default=None)
 settings_group.add_argument('--odoo-xmlrpc-port', dest='xmlrpc_port', default='8069', help='Port to run odoo temporarly')
 settings_group.add_argument('--odoo-longpolling-port', dest='longpolling_port', default='8072', help='Port to run odoo temporarly')
+settings_group.add_argument('--use-existed-odoo', dest='use_existed_odoo', action='store_true', default=False, help='Wait infinitly for 8069 port. Usefull in docker environment.')
 settings_group.add_argument('--local-xmlrpc-port', dest='local_xmlrpc_port', default=None, help='Port to be used for server-wide requests')
 settings_group.add_argument('--local-portal-host', dest='local_portal_host', help='Address for internal connection to portal', default="localhost")
 settings_group.add_argument('--local-server-host', dest='local_server_host', help='Address for internal connection to portal', default="localhost")
@@ -171,7 +172,7 @@ def main():
     plan_id = None
     pid = None
 
-    port_is_open = wait_net_service('127.0.0.1', int(xmlrpc_port), 3)
+    port_is_open = wait_net_service('127.0.0.1', int(xmlrpc_port), 3 if not args.get('use_existed_odoo') else False)
     if port_is_open:
         log('Port is used. Probably, odoo is already running. Let\'s try to use it. It it will fail, you need either stop odoo or pass another port to saas.py via --xmlrpc-port arg')
     else:
@@ -242,7 +243,7 @@ def createdb(dbname):
 
     # create db if not exist
     created = False
-    log('create database via xmlrpc')
+    log('create database via xmlrpc', dbname)
     try:
         rpc_db.create_database(master_password, dbname, demo, lang, admin_password)
         created = True

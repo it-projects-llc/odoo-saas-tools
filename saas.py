@@ -64,6 +64,7 @@ settings_group.add_argument('--odoo-without-demo', dest='without_demo', action='
 settings_group.add_argument('--master-password', dest='master_password', help='Master Password. Used on database creation.')
 settings_group.add_argument('--admin-password', dest='admin_password', help='Password for admin user. It\'s used for all databases.', default='admin')
 settings_group.add_argument('--base-domain', dest='base_domain', help='Base domain. Used for system that work with --db-filter=%d')
+settings_group.add_argument('--dynamic-base-domain', dest='dynamic_base_domain', default=False, action='store_true', help='Force to keep Base domain empty. It will be updated on first admin logining')
 settings_group.add_argument('--install-modules', dest='install_modules', help='Comma-separated list of modules to install. They will be automatically installed on appropriate database (Portal or Server)', default='saas_portal_start,saas_portal_sale_online')
 #settings_group.add_argument('--db_user', dest='db_user', help='database user name')
 settings_group.add_argument('-s', '--simulate', dest='simulate', action='store_true', help='Don\'t make actual changes. Just show what script is going to do.')
@@ -312,7 +313,8 @@ def rpc_init_portal(dbname):
     base_saas_domain = dbname
     if args.get('base_domain') and '.' not in dbname:
         base_saas_domain = args.get('base_domain')
-    rpc_execute_kw(auth, 'ir.config_parameter', 'set_param', ['saas_portal.base_saas_domain', base_saas_domain])
+    if not arg.get('dynamic_base_domain'):
+        rpc_execute_kw(auth, 'ir.config_parameter', 'set_param', ['saas_portal.base_saas_domain', base_saas_domain])
 
     # Allow external users to sign up
     rpc_execute_kw(auth, 'ir.config_parameter', 'set_param', ['auth_signup.allow_uninvited', repr(True)])

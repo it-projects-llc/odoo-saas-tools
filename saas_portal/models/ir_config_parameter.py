@@ -16,4 +16,4 @@ class IrConfigParameter(models.Model):
                 # get rid of "http(s)://" at the beggining and "/" and the end if any
                 domain_only = domain_only.split('/')[2]
             self.set_param(BASE_SAAS_DOMAIN, domain_only)
-        return super(self, IrConfigParameter).set_param(key, value, groups=groups)
+        return super(IrConfigParameter, self).set_param(key, value, groups=groups)

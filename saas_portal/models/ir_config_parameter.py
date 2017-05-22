@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from odoo import models
+from odoo import models, api
 
 
 BASE_SAAS_DOMAIN = 'saas_portal.base_saas_domain'

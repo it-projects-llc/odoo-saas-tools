@@ -440,7 +440,7 @@ class SaasPortalDatabase(models.Model):
                               ],
                              'State', default='draft', track_visibility='onchange')
     host = fields.Char('Host', compute='_compute_host')
-    public_url = fields.Char(compute='_compute_public_url', store=True)
+    public_url = fields.Char(compute='_compute_public_url')
     password = fields.Char()
 
     @api.multi
@@ -459,7 +459,6 @@ class SaasPortalDatabase(models.Model):
                 _compute_host(self)
 
     @api.multi
-    @api.depends('server_id.request_port', 'server_id.request_scheme', 'host')
     def _compute_public_url(self):
         for record in self:
             scheme = record.server_id.request_scheme

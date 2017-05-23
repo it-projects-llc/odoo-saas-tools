@@ -445,9 +445,11 @@ class SaasPortalDatabase(models.Model):
 
     @api.multi
     def _compute_host(self):
+        base_saas_domain = self.env['ir.config_parameter'].get_param('saas_portal.base_saas_domain')
+        base_saas_domain_1 = '.'.join(base_saas_domain.rsplit('.', 2)[-2:])
         name_dict = {
-            'base_saas_domain': self.env['ir.config_parameter'].get_param('saas_portal.base_saas_domain'),
-            'base_saas_domain_1': self.env['ir.config_parameter'].get_param('saas_portal.base_saas_domain_1'),
+            'base_saas_domain': base_saas_domain,
+            'base_saas_domain_1': base_saas_domain_1,
         }
         for record in self:
             if record.server_id.clients_host_template:

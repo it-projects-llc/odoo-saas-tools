@@ -62,6 +62,12 @@
         </t>
       </xpath>
 
+      <xpath expr="//hr" position="replace">
+        <t t-if="not product.module_name">
+            <hr />
+        </t>
+      </xpath>
+
       <xpath expr="//div[@id='product_details']/p[@class='text-muted']" position="replace">
         <p class="text-muted">
          Prices are quoted without included dependencies

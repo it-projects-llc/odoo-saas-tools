@@ -80,6 +80,8 @@ server_group = parser.add_argument_group('Server creation')
 server_group.add_argument('--server-create', dest='server_create', help='Create SaaS Server database', action='store_true')
 server_group.add_argument('--server-db-name', dest='server_db_name', default='server-1.saas-portal-{suffix}.local')
 server_group.add_argument('--server-modules', dest='server_install_modules', help='Comma-separated list of modules to install on Server')
+server_group.add_argument('--server-hosts-template', dest='server_hosts_template',
+                          help='server-wide host name template of client instances, i.e. {dbname}.odoo-10.{base_saas_domain}, {dbname} is the default')
 
 plan_group = parser.add_argument_group('Plan creation')
 plan_group.add_argument('--plan-create', dest='plan_create', help='Create Plan', action='store_true')
@@ -106,7 +108,7 @@ args = vars(parser.parse_args())
 # format vars
 suffix = args['suffix']
 for a in args:
-    if isinstance(args[a], str):
+    if isinstance(args[a], str) and not a == 'server_hosts_template':
         args[a] = args[a].format(suffix=suffix)
 
 
@@ -352,6 +354,7 @@ def rpc_add_server_to_portal(portal_db_name):
             'local_port': local_xmlrpc_port,
             'local_host': args.get('local_server_host'),
             'password': args.get('admin_password'),
+            'clients_host_template': args.get('server_hosts_template'),
         }
     ])
 

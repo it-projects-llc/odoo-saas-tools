@@ -346,16 +346,16 @@ def rpc_add_server_to_portal(portal_db_name):
     auth = rpc_auth(portal_db_name, admin_password=args.get('admin_password'), host=args.get('local_portal_host'))
     server_db_name = args.get('server_db_name')
     uuid = rpc_get_uuid(server_db_name)
-    rpc_execute_kw(auth, 'saas_portal.server', 'create', [
-        {
+    vals = {
             'name': server_db_name,
             'client_id': uuid,
             'local_port': local_xmlrpc_port,
             'local_host': args.get('local_server_host'),
             'password': args.get('admin_password'),
-            'clients_host_template': args.get('server_hosts_template'),
-        }
-    ])
+    }
+    if args.get('server_hosts_template'):
+        vals.update({'clients_host_template': server_hosts_template})
+    rpc_execute_kw(auth, 'saas_portal.server', 'create', [vals])
 
 
 def rpc_add_demo_repositories(demo_repositories):

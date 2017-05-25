@@ -24,10 +24,10 @@
 				<input type="text" name="city" t-att-value="city" id="city" class="form-control" t-att-autofocus="'autofocus' if login and not only_passwords else None"
 				    autocapitalize="off" required="required" t-att-readonly="'readonly' if only_passwords else None"/>
 			</div>
-			<div class="col-lg-4 form-group field-state o_signup_form_required">
+			<div class="col-lg-4 form-group field-state">
 				<label class="control-label" for="state_id">State</label>
 				<select name="state_id" class="form-control"
-					required="required" t-att-readonly="'readonly' if only_passwords else None">
+					t-att-readonly="'readonly' if only_passwords else None">
 					<option value="" selected="selected" disabled="disabled">Select</option>
 					<option t-if="prev_sel_state" t-att-value="prev_sel_state.id" selected="selected"><t t-esc="prev_sel_state.name"/></option>
 					<t t-foreach="states or []" t-as="state">
@@ -35,11 +35,6 @@
 					</t>
 				</select>
 			</div>
-			<!-- <div class="col-lg-4 form-group field-state"> -->
-			<!-- 	<label for="state" class="control-label">State</label> -->
-			<!-- 	<input type="text" name="state" t-att-value="state" id="state" class="form-control" t-att-autofocus="'autofocus' if login and not only_passwords else None" -->
-			<!-- 	    autocapitalize="off" t-att-readonly="'readonly' if only_passwords else None"/> -->
-			<!-- </div> -->
 			<div class="col-lg-4 form-group field-country o_signup_form_required">
 				<label class="control-label" for="country_id">Country</label>
 				<select name="country_id" class="form-control"

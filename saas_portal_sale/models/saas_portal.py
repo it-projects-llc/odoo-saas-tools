@@ -12,6 +12,8 @@ class SaasPortalPlan(models.Model):
                                            help='Whether to use trial database or create new one when user make payment', required=True, default='create_new')
     product_tmpl_id = fields.Many2one('product.template', 'Product')
 
+    product_variant_ids = fields.One2many('product.product', 'saas_plan_id', 'Product variants')
+
     @api.multi
     def _new_database_vals(self, vals):
         vals = super(SaasPortalPlan, self)._new_database_vals(vals)

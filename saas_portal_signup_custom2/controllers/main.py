@@ -29,7 +29,7 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
 
         product_id = kw.get('product_id')
         if product_id:
-            qcontext['prev_sel_product'] = request.env['product.template'].sudo().browse(int(product_id))
+            qcontext['prev_sel_product'] = request.env['product.product'].sudo().browse(int(product_id))
 
         state_id = kw.get('state_id')
         if state_id:
@@ -72,7 +72,7 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
         if not qcontext.get('base_saas_domain', False):
             qcontext['base_saas_domain'] = self.get_saas_domain()
         if not qcontext.get('products', False):
-            qcontext['products'] = request.env['product.template'].sudo().search([('plan_ids', '!=', False)])
+            qcontext['products'] = request.env['product.product'].sudo().search([('saas_plan_id', '!=', False)])
         if not qcontext.get('states', False):
             qcontext['states'] = request.env['res.country.state'].sudo().search([])
         return qcontext
@@ -114,35 +114,17 @@ class AuthSaasPortal(SaasPortal):
     @http.route()
     def add_new_client(self, **post):
 
-        product = request.env['product.template'].sudo().browse(int(post.get('product_id')))
-        dbnames = []
-        if product and product.plan_ids:
-            for plan in product.plan_ids:
+        product = request.env['product.product'].sudo().browse(int(post.get('product_id')))
+        res = None
+        if product:
+            plan = product.saas_plan_id
+            kw = post.copy()
+            kw['dbname'] = post.get('dbname')
+            kw['plan_id'] = plan.id
+            kw['trial'] = kw['trial_or_working'] == 'trial'
+            res = super(AuthSaasPortal, self).add_new_client(**kw)
 
-                kw = post.copy()
-                kw['dbname'] = plan.dbname_prefix and plan.dbname_prefix + post.get('dbname') \
-                    or post.get('dbname')
-                kw['plan_id'] = plan.id
-                kw['trial'] = kw['trial_or_working'] == 'trial'
-                dbname = self.get_full_dbname(kw['dbname'])
-                res = super(AuthSaasPortal, self).add_new_client(**kw)
-                dbnames.append(dbname)
-
-            template = product.on_create_email_template
-            if template:
-                email_ctx = {
-                    'default_model': 'product.template',
-                    'default_res_id': product.id,
-                    'default_use_template': bool(template),
-                    'default_template_id': template.id,
-                    'default_composition_mode': 'comment',
-                    'dbnames': dbnames,
-                    'from_user': request.env['res.users'].sudo().browse(SUPERUSER_ID),
-                    'partner_to': request.env['res.users'].sudo().browse(request.session.uid).partner_id.id,
-                }
-                product.with_context(email_ctx).message_post_with_template(template.id, composition_mode='comment')
-
-            return res
+        return res
 
 
 class SaaSWebsitePayment(WebsitePayment):

@@ -326,10 +326,12 @@ class SaasPortalPlan(models.Model):
             url = '/my/home'
 
         # send email
-        if notify_user or self.on_create == 'email':
-            template = self.on_create_email_template
-            if template:
-                client.message_post_with_template(template.id, composition_mode='comment')
+        template = self.on_create_email_template
+        if template:
+            email_ctx = {
+                'my_home': 'http://{}/my/home'.format(self.env['ir.config_parameter'].get_param('saas_portal.base_saas_domain')),
+            }
+            client.with_context(email_ctx).message_post_with_template(template.id, composition_mode='comment')
 
         client.send_params_to_client_db()
         # TODO make async call of action_sync_server here

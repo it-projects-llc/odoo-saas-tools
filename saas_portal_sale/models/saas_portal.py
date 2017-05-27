@@ -17,9 +17,10 @@ class SaasPortalPlan(models.Model):
     @api.multi
     def _new_database_vals(self, vals):
         vals = super(SaasPortalPlan, self)._new_database_vals(vals)
-        product = self.product_tmpl_id.product_variant_ids[0]
+        product = self.env['product.product'].browse(vals['product_id'])
         partner = self.env['res.partner'].browse(vals['partner_id'])
         pricelist = partner.property_product_pricelist and partner.property_product_pricelist.id or False
+
         contract = self.env['account.analytic.account'].sudo().create({
             'name': vals['name'],
             'partner_id': vals['partner_id'],
@@ -33,6 +34,7 @@ class SaasPortalPlan(models.Model):
             })],
         })
         contract.cron_recurring_create_invoice()  # create invoice for new database immediately
+
         vals['contract_id'] = contract.id
         return vals
 

@@ -122,6 +122,7 @@ class AuthSaasPortal(SaasPortal):
             kw['dbname'] = post.get('dbname')
             kw['plan_id'] = plan.id
             kw['trial'] = kw['trial_or_working'] == 'trial'
+            kw['product_id'] = product.id
             res = super(AuthSaasPortal, self).add_new_client(**kw)
 
         return res

@@ -238,7 +238,17 @@ class SaasPortalPlan(models.Model):
         return self._create_new_database(**kwargs)
 
     @api.multi
-    def _create_new_database(self, dbname=None, client_id=None, partner_id=None, user_id=None, notify_user=False, trial=False, support_team_id=None, async=None, owner_password=None):
+    def _create_new_database(self,
+                             dbname=None,
+                             client_id=None,
+                             partner_id=None,
+                             user_id=None,
+                             notify_user=False,
+                             trial=False,
+                             support_team_id=None,
+                             async=None,
+                             product_id=None,
+                             owner_password=None):
         self.ensure_one()
 
         server = self.server_id
@@ -265,13 +275,15 @@ class SaasPortalPlan(models.Model):
             if trial_db_count >= self.maximum_allowed_trial_dbs_per_partner:
                 raise MaximumTrialDBException("Limit of trial databases for this plan is %(maximum)s reached" % {'maximum': self.maximum_allowed_trial_dbs_per_partner})
 
-        vals = {'name': dbname or self.generate_dbname(),
-                'server_id': server.id,
-                'plan_id': self.id,
-                'partner_id': partner_id,
-                'trial': trial,
-                'support_team_id': support_team_id,
-                }
+        vals = {
+            'name': dbname or self.generate_dbname(),
+            'server_id': server.id,
+            'plan_id': self.id,
+            'partner_id': partner_id,
+            'trial': trial,
+            'support_team_id': support_team_id,
+            'product_id': product_id,
+        }
         client = None
         if client_id:
             vals['client_id'] = client_id

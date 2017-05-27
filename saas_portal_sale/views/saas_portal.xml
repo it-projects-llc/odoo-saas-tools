@@ -28,7 +28,7 @@
                 </data>
                 <xpath expr="//field[@name='website_description']/.." position="after">
                     <group string="Sales" name="sales">
-                        <field name="product_tmpl_id"/>
+                        <!-- <field name="product_tmpl_id"/> -->
                         <field name="product_variant_ids" widget="many2many_tags"/>
                     </group>
                 </xpath>

@@ -42,7 +42,7 @@ upload nginx_odoo_params
 
 ::
 
-  curl -s https://gist.githubusercontent.com/yelizariev/a359cea062a1579c5e34bfd0c40f1201/raw/nginx_odoo_params > odoo_params
+  curl -s https://raw.githubusercontent.com/it-projects-llc/odoo-saas-tools/10.0/docs/demo/nginx_odoo_params > odoo_params
   docker cp odoo_params odoo-nginx:/etc/nginx/odoo_params
 
 
@@ -116,7 +116,7 @@ nginx
 
 ::
 
- curl -s https://gist.githubusercontent.com/yelizariev/a359cea062a1579c5e34bfd0c40f1201/raw/nginx_odoo.conf > portal.conf
+ curl -s https://raw.githubusercontent.com/it-projects-llc/odoo-saas-tools/10.0/docs/demo/nginx_odoo.conf > portal.conf
  sed -i "s/NGINX_SERVER_DOMAIN/${ODOO_DOMAIN}/g" portal.conf
  sed -i "s/SERVER_HOST/odoo-portal/g" portal.conf
  docker cp portal.conf odoo-nginx:/etc/nginx/conf.d/portal.conf
@@ -209,7 +209,7 @@ nginx proxing
 
 ::
 
- curl -s https://gist.githubusercontent.com/yelizariev/a359cea062a1579c5e34bfd0c40f1201/raw/nginx_odoo.conf > nginx-${SERVER_NAME}.conf
+ curl -s https://raw.githubusercontent.com/it-projects-llc/odoo-saas-tools/10.0/docs/demo/nginx_odoo.conf > nginx-${SERVER_NAME}.conf
  sed -i "s/NGINX_SERVER_DOMAIN/.${SERVER_NAME}.${ODOO_DOMAIN}/g" nginx-${SERVER_NAME}.conf
  sed -i "s/SERVER_HOST/${SERVER_NAME}/g" nginx-${SERVER_NAME}.conf
  docker cp nginx-${SERVER_NAME}.conf odoo-nginx:/etc/nginx/conf.d/${SERVER_NAME}.conf

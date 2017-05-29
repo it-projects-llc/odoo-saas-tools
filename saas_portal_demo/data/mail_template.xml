@@ -1,0 +1,28 @@
+<odoo>
+
+        <record id="email_template_create_saas" model="mail.template">
+            <field name="name">demo. on create SaaS client</field>
+            <field name="email_from">${(object.user_id.email or '')|safe}</field>
+            <field name="subject">${object.plan_id.name}</field>
+            <field name="partner_to">${object.partner_id.id}</field>
+            <field name="model_id" ref="saas_portal.model_saas_portal_client"/>
+            <field name="auto_delete" eval="True"/>
+            <field name="lang">${object.partner_id.lang}</field>
+            <field name="body_html"><![CDATA[
+
+            <p>
+                Hello ${object.partner_id.name},<br />
+                Thank you for signing-up with us!<br />
+                Your new ${object.plan_id.name} account is ready.<br />
+                Here is the link to access your account:<br />
+                <a href="${object.public_url}">${object.public_url}</a><br />
+                You can login using your registered email and password.<br />
+            </p>
+            <p>
+		Your trial will end on ${object.expiration_datetime}.<br />
+            </p>
+
+            ]]></field>
+        </record>
+
+</odoo>

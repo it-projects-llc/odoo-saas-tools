@@ -29,6 +29,7 @@
         "views/product.xml",
         "data/product.xml",
         "data/ir_cron.xml",
+        "data/mail_template.xml",
     ],
     "qweb": [
     ],

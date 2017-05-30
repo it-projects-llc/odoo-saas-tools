@@ -7,18 +7,119 @@ header-img: "img/getting-started.jpg"
 
 <section>
     <h1>Getting started</h1>
+    <p>Choose one of the installation options under the Usage section and then you can play with SaaS.</p>
+    <h2>Usage</h2>
+    <p>Creating database <b>via backend as admin:</b>
+        <ul>
+            <li> Login to <em>SaaS Portal</em>.</li>
+            <li>Open <em>SaaS &gt;&gt; Plan</em></li>
+            <li>Select a <em>Plan</em></li>
+            <li>Click <em>[Log in to template DB]</em></li>
+            <li>Click on shown link to log in to template database</li>
+            <li>Click on shown link to log in to template database</li>
+            <li>At template database make some adjustments, e.g. install <em>Point Of Sale</em> module</li>
+            <li>Now return back to <em>Portal</em> and click <em>[Create Client]</em></li>
+            <li>You got a new database! You can click <em>[Log in]</em> to check it - it must have all adjustments you made in template database.</li>
+        </ul>
+    </p>
+    <p>Creating database <b>via frontend as client:</b></p>
+    <ul>
+        <li>Log out from  <em>SaaS Portal</em> (or simply open Incognito window)</li>
+        <li>At <em>SaaS Portal</em> open page <em>/page/start?plan_id=1</em></li>
+        <li>Choose subdomain name (note that at runbot you can use only names, that starts with the same prefix as Portal, e.g. <em>05851-10-0-7629a4--base---your-database-name-here</em></li>
+        <li>Click <em>[Create!]</em></li>
+        <li>System asks you to log in - click <em>Sign Up</em> instead.</li>
+        <li>After signing up you new database will be created and you will be redirected to New Database.</li>
+    </ul>
+        <p>For further information see <a href="https://odoo-saas-tools.readthedocs.io/">SaaS Documentation</a>.</p>
 
-    <div class="row">
-        <div class="col-md-6 mt32 mb32">
-            <img class="img img-responsive center-block mb16" src="{{site.baseurl}}/img/saas_portal.plan.form.png" alt="Odoo SaaS Portal"/>
-        </div>
-        <div class="col-md-6 mt64 mb32">
-            <p>
-                <a class="btn btn-default" href="http://runbot.it-projects.info/demo/odoo-saas-tools/10.0" role="button">Try on Runbot</a>
-            </p>
-            <p>
-                <a class="btn btn-default" href="https://github.com/it-projects-llc/install-odoo" role="button">Install via Dockers </a>
-            </p>
-        </div>
-    </div>
+    <h2>Option 1: Runbot</h2>
+    <p>Click the button below and use <em>admin</em> <em>admin</em> login and password. Note that runbot is a public service and there could be another people who use the system.</p>
+    <p class="text-center">
+        <a class="btn btn-default" target="_blank" href="http://runbot.it-projects.info/demo/odoo-saas-tools/10.0" role="button">Try on Runbot</a>
+    </p>
+    <h2>Option 2: Docker installation</h2>
+    <p>First of all you need to install docker engine.</p>
+    <p class="text-center">
+        <a class="btn btn-default" target="_blank" href="https://docs.docker.com/engine/installation/" role="button">Install docker engine</a>
+    </p>
+     <p> Once you have docker engine execute commands below</p>
+
+        <pre>
+docker network create odoo-saas
+
+docker run \
+-d \
+-e POSTGRES_USER=odoo \
+-e POSTGRES_PASSWORD=odoo \
+--network=odoo-saas \
+--name db-saas  \
+postgres:9.5
+
+docker run \
+-d \
+--name odoo \
+--network=odoo-saas \
+-e ODOO_MASTER_PASS=admin \
+-e DB_PORT_5432_TCP_ADDR=db-saas \
+-t itprojectsllc/install-odoo:10.0
+
+docker exec \
+ -u root \
+ -t odoo \
+sed -i 's/dbfilter.*/dbfilter = ^%d$/' /mnt/config/odoo-server.conf
+
+docker restart odoo
+
+# before executing this stop nginx or apache if you have one
+docker run  \
+-d \
+-p 80:80 \
+--name saas-nginx \
+--network=odoo-saas \
+-t itprojectsllc/docker-odoo-nginx
+
+INIT_SAAS_TOOLS_VALUE=' \
+--portal-create \
+--server-create \
+--plan-create \
+--odoo-script=/mnt/odoo-source/odoo-bin \
+--odoo-config=/mnt/config/odoo-server.conf \
+--portal-db-name=portal \
+--server-db-name=server-1 \
+--server-hosts-template={dbname}.{base_saas_domain_1} \
+--plan-template-db-name=template-1 \
+--plan-clients=demo-%i \
+' && docker exec -u root -t odoo /bin/bash \
+-c "export INIT_SAAS_TOOLS='$INIT_SAAS_TOOLS_VALUE'; bash /install-odoo-saas.sh"
+        </pre>
+
+        <p>If you made above on your server, then you need to prepare DNS with wildcard, e.g.</p>
+
+        <pre>
+*.saas.YOUR-DOMAIN.EXAMPLE.COM -> YOUR_SERVER_IP
+        </pre>
+
+        <p>If you made a local installation on your computer, then update your hosts file by executing command below. It allows to use url <a href="http://portal.saas.example.com">portal.saas.example.com</a></p>
+
+        <pre>
+
+sudo echo && INIT_SAAS_TOOLS_VALUE=' \
+--print-local-hosts \
+--odoo-script=/mnt/odoo-source/odoo-bin \
+--odoo-config=/mnt/config/odoo-server.conf \
+--suffix=saas.example.com \
+--portal-db-name=portal.{suffix} \
+--server-db-name=server-1.{suffix} \
+--plan-template-db-name=template-1.{suffix} \
+' && sudo bash -c "docker exec -u odoo -t odoo bash -c \"python /mnt/addons/it-projects-llc/odoo-saas-tools/saas.py ${INIT_SAAS_TOOLS_VALUE}\" >> /etc/hosts"
+
+
+        </pre>
+
+        <p>Now you have SaaS available. Open corresponding url prefixed with <em>portal</em>, e.g. <em>http://portal.saas.YOUR-DOMAIN.EXAMPLE.COM</em> or <em>http://saas.example.com</em> </p>
+
+    <h2>Option 3: AWS AMI installation</h2>
+    <p><em>The option is comming soon...</em></p>
+
 </section>

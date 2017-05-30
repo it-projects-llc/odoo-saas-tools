@@ -353,7 +353,8 @@ def rpc_add_server_to_portal(portal_db_name):
             'local_host': args.get('local_server_host'),
             'password': args.get('admin_password'),
     }
-    if args.get('server_hosts_template'):
+    server_hosts_template = args.get('server_hosts_template')
+    if server_hosts_template:
         vals.update({'clients_host_template': server_hosts_template})
     rpc_execute_kw(auth, 'saas_portal.server', 'create', [vals])
 

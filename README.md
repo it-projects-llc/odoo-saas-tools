@@ -1,38 +1,14 @@
 [![Build Status](http://runbot.it-projects.info/runbot/badge/flat/odoo-saas-tools/8.0.svg)](http://runbot.it-projects.info/demo/odoo-saas-tools/8.0)
 
 Odoo SaaS Tools
-===============
+==================
 
 System to sale and manage odoo databases.
 
-Requirements
-============
+Main Project Website: https://it-projects-llc.github.io/odoo-saas-tools/
 
-To start SaaS system you need:
+Getting Started: https://it-projects-llc.github.io/odoo-saas-tools/getting-started/
 
-* ubuntu/debian OS
-* [installed odoo](http://odoo-development.readthedocs.io/en/latest/admin/install.html)
-* [configured nginx](docs/port_80.rst) 
-* [installed dependencies](docs/dependencies.rst)
-* [correctly configured odoo](docs/odoo-configuration.rst) 
-* records in /etc/hosts, if you install it locally, or dns records otherwise:
+News: https://it-projects-llc.github.io/odoo-saas-tools/blog/ — [Subscribe by Email!](https://feedburner.google.com/fb/a/mailverify?uri=odoo-saas-tools&loc=en_US)
 
-    > sudo bash -c "python saas.py --print-local-hosts >> /etc/hosts"
-
-Build and run
-=============
-
-Execute saas.py script and wait some time
-
-> python saas.py --portal-create --server-create --plan-create --run --odoo-script=/path/to/openerp-server --odoo-config=/path/to/openerp-server.config
-
-The SaaS system is ready! Try, for example, open start page:
-
-* http://saas-portal-8.local/page/start?plan_id=1
-
-Links
-=====
-
-* Features: [docs/features.rst](docs/features.rst)
-* API integration: [docs/api.rst](docs/api.rst)
-* Development: [docs/development.rst](docs/development.rst)
+Documentation: https://odoo-saas-tools.readthedocs.io/

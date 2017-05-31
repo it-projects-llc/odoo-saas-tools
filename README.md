@@ -9,6 +9,6 @@ Main Project Website: https://it-projects-llc.github.io/odoo-saas-tools/
 
 Getting Started: https://it-projects-llc.github.io/odoo-saas-tools/getting-started/
 
-News: https://it-projects-llc.github.io/odoo-saas-tools/blog/ -- [Subscribe by Email!](https://feedburner.google.com/fb/a/mailverify?uri=odoo-saas-tools&loc=en_US)
+News: https://it-projects-llc.github.io/odoo-saas-tools/blog/ — [Subscribe by Email!](https://feedburner.google.com/fb/a/mailverify?uri=odoo-saas-tools&loc=en_US)
 
 Documentation: https://odoo-saas-tools.readthedocs.io/

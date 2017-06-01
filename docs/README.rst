@@ -2,7 +2,7 @@
  Odoo Saas Tools Docs
 ======================
 
-http://odoo-saas-tools.readthedocs.io/
+https://odoo-saas-tools.readthedocs.io/
 
 How to update Docs
 ==================

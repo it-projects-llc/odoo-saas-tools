@@ -9,9 +9,9 @@ comments: true
 tags: [ Fundraising ]
 ---
 
-It was three years ago when I started odoo-saas-tools project with a hope, that it could be useful and interesting system. Very soon me and other people found that it is really so. Two years ago I began to build a team and founded [IT-Projects LLC](https://www.it-projects.info/) company. A lot of work was made since that time on odoo-saas-tools and I want to thank you to all [contributors](https://github.com/it-projects-llc/odoo-saas-tools/graphs/contributors) and our clients who helped to develop this opensource project.
+It was three years ago when I started odoo-saas-tools project with a hope, that it could be useful and interesting system. Very soon me and other people found that it is really so. Two years ago I began to build a team and founded [IT-Projects LLC](https://www.it-projects.info/) company. A lot of work was made since that time on odoo-saas-tools and I want to thank to all [contributors](https://github.com/it-projects-llc/odoo-saas-tools/graphs/contributors) and our clients who helped to develop this opensource project.
 
-As we worked, we realised more and more things that has to be done to make the system much more robust, scalable and easy to use. But we are not able to implement most of those things due to resource shortage. As we develope an opensource project I believe I have a right to ask community to sponsor it. Any help are welcome. It's not only funds, but also development contribution, documentation improvements, sharing news about the campaing, etc.
+As we worked, we realised more and more things that has to be done to make the system much more robust, scalable and easy to use. But we are not able to implement most of those things due to resource shortage. As we develop an opensource project I believe I have a right to ask community to sponsor it. Any help are welcome. It's not only funds, but also development contribution, documentation improvements, sharing news about the campaign, etc.
 
 Fundraising goal and time frame
 ===============================
@@ -34,27 +34,27 @@ To encourage sponsors we have prepared three offers:
 
 * Only 5 packages are available at the begining
 * It is the only way to get exclusive early deploy after finishing *phase #1*
-* One year of service after deploy
+* One year of support after deploy
 * First places at sponsors list
 
 **5 000 $US package**.
 
 * Only 5 packages are available at the begining
 * Priority deploy after finishing *phase #2*
-* Half year of service after deploy
+* Half year of support after deploy
 * Second places at sponsors list
 
 **1 000 $US package**.
 
 * Unlimited packages are available before finishing *phase #1* or before reaching the fundraising goal
 * Deploy after finishing *phase #2*
-* One month of service after deploy
+* One month of support after deploy
 * Third places at sponsors list
 
 Interested?
 ===========
 
-Contact as by email: <a href="mailto:saas@it-projects.info">saas@it-projects.info</a>
+Contact us by email: <a href="mailto:saas@it-projects.info">saas@it-projects.info</a>
 
 The Updates
 ===========
@@ -78,11 +78,11 @@ It is the minimal list of updates. We expect to do even more.
 * Documentation: clean up, improvements, updates
 * Better *SaaS Plan* experience
   * Switching between payment plans (see [issue #383](https://github.com/it-projects-llc/odoo-saas-tools/issues/383))
-* syncronisation between *SaaS Portal* and *SaaS Servers*
+* Synchronization between *SaaS Portal* and *SaaS Servers*
   * Server wide requests via rpc
   * Reviewed sync scheme
-    * Allow to sync one database ony
-* Reviewed expiration date feature
+    * Allow to sync one database only
+* Reviewed expiration feature for subscriptions
 * Support system from client database
 * Etherpad support ("pad" modules):
   * Scalable deploy

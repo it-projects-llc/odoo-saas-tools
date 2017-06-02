@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<record id="view_partner_form" model="ir.ui.view">
+	<field name="name">partner.form.inherit</field>
+	<field name="model">res.partner</field>
+	<field name="inherit_id" ref="base.view_partner_form"/>
+	<field name="arch" type="xml">
+		<field name="category_id" position="after">
+			<field name="business_reg_no"/>
+			<field name="dnb_number"/>
+			<field name="tax_code"/>
+		</field>
+	</field>
+</record>
+
+
+</odoo>
+

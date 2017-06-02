@@ -92,8 +92,11 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
         values['fax'] = qcontext.get('fax', None)
         values['city'] = qcontext.get('city', None)
         values['street'] = qcontext.get('address', None)
-        values['vat'] = qcontext.get('tax_code', None)
+        # values['vat'] = qcontext.get('tax_code', None)
         values['zip'] = qcontext.get('postal_code', None)
+        values['business_reg_no'] = qcontext.get('business_reg_no', None)
+        values['tax_code'] = qcontext.get('tax_code', None)
+        values['dnb_number'] = qcontext.get('dnb_number', None)
         if qcontext.get('country_id', False):
             values['country_id'] = qcontext['country_id']
         if qcontext.get('state_id', False):

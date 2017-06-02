@@ -36,6 +36,7 @@
         'views/website_templates.xml',
         'views/website_portal_sale_templates.xml',
         'views/res_config_views.xml',
+        'views/res_partner_view.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

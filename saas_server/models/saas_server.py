@@ -193,7 +193,9 @@ class SaasServerClient(models.Model):
                 'vat': owner_user.get('vat'),
                 'zip': owner_user.get('zip'),
                 'country_id': owner_user.get('country_id') and self.env['res.country'].browse(owner_user['country_id']) and \
-                self.env['res.country'].browse(owner_user['country_id']).id,
+                self.env['res.country'].browse(owner_user['country_id']).id or None,
+                'state_id': owner_user.get('state_id') and self.env['res.country.state'].browse(owner_user['state_id']) and \
+                self.env['res.country.state'].browse(owner_user['state_id']).id or None,
             })
 
     @api.model

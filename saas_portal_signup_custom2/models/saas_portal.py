@@ -23,5 +23,6 @@ class SaasPortalPlan(models.Model):
             'vat': owner_user.vat,
             'zip': owner_user.zip,
             'country_id': owner_user.country_id.id,
+            'state_id': owner_user.state_id.id,
         })
         return owner_user_data

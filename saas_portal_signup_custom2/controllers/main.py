@@ -96,6 +96,8 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
         values['zip'] = qcontext.get('postal_code', None)
         if qcontext.get('country_id', False):
             values['country_id'] = qcontext['country_id']
+        if qcontext.get('state_id', False):
+            values['state_id'] = qcontext['state_id']
         if qcontext.get('dbname', False):
             f_dbname = '%s.%s' % (qcontext['dbname'], self.get_saas_domain())
             full_dbname = f_dbname.replace('www.', '')

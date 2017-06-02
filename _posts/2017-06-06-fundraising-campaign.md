@@ -84,6 +84,9 @@ It is the minimal list of updates. We expect to do even more.
     * Allow to sync one database ony
 * Reviewed expiration date feature
 * Support system from client database
+* Etherpad support ("pad" modules):
+  * scalable deploy
+  * backuping and restoring
 
 Current progress
 ====================

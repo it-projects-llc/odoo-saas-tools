@@ -14,7 +14,7 @@ if ($('#fundraising_progress').length){
             'done': d
         });
     });
-    function animate(type, value, options){
+    var animate = function(type, value, options){
         var TOTAL = 4.0;
         $({val:0}).animate({val:TOTAL*value}, $.extend({
             step: function(now){
@@ -35,17 +35,17 @@ if ($('#fundraising_progress').length){
                 $('#'+type + '_progress').html( Math.round((100 * (now / TOTAL))) + ' %');
 
             }}, options));
-    }
-    function start(){
+    };
+    var start = function(){
         animate('funded', FUNDED,{
-            'duration': 5000
+            'duration': 3000
         });
         setTimeout(function(){
             animate('done', DONE,{
-                'duration': 5000
+                'duration': 3000
             });
         }, 1000);
-    }
+    };
 
     var started = false;
     $(window).scroll(function() {
@@ -54,7 +54,7 @@ if ($('#fundraising_progress').length){
         var windowHeight = jQuery( window ).height();
         var thisPos = $('#fundraising_progress').offset().top;
         var topOfWindow = $(window).scrollTop();
-        if (topOfWindow + windowHeight - 200 > thisPos ) {
+        if (topOfWindow + windowHeight - 300 > thisPos ) {
             started = true;
             start();
         }

@@ -198,6 +198,14 @@ class SaasServerClient(models.Model):
                 self.env['res.country.state'].browse(owner_user['state_id']).id or None,
             })
 
+            if owner_user.get('company_name'):
+                company = client_env['res.company'].create({
+                    'name': owner_user['company_name'],
+                    'partner_id': user.partner_id.id,
+                })
+                user.write({'company_ids': [(4, company.id, 0)]})
+                user.write({'company_id': company.id})
+
     @api.model
     def update_all(self):
         self.sudo().search([]).update()

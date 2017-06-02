@@ -2,7 +2,7 @@
 layout:     post
 title:      "Fundraising campaign"
 subtitle:   "It's a time to make the Greate Updates"
-date:       2017-06-01 00:00:00
+date:       2017-06-06 06:06:06
 author:     "Ivan Yelizariev"
 header-img: "img/posts/sea-flight-sky-earth.jpg"
 comments: true

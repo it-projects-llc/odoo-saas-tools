@@ -14,7 +14,7 @@ It was three years ago when I started odoo-saas-tools project with a hope, that 
 As we worked, we realised more and more things that has to be done to make the system much more robust, scalable and easy to use. But we are not able to implement most of those things due to resource shortage. As we develope an opensource project I believe I have a right to ask community to sponsor it. Any help are welcome. It's not only funds, but also development contribution, documentation improvements, sharing news about the campaing, etc.
 
 Fundraising goal and time frame
-======================================
+===============================
 
 We need to fundraise 80 000 US$ for up to 10 months of work.
 
@@ -26,7 +26,7 @@ We have two phases of development:
 * Phase #2. Live testing and further improvements - up to 4 months
 
 Fundraising packages
-=========================
+====================
 
 To encourage sponsors we have prepared three offers:
 
@@ -52,12 +52,12 @@ To encourage sponsors we have prepared three offers:
 * Third places at sponsors list
 
 Interested?
-=============
+===========
 
 Contact as by email: <a href="mailto:saas@it-projects.info">saas@it-projects.info</a>
 
 The Updates
-==============
+===========
 
 It is the minimal list of updates. We expect to do even more.
 
@@ -89,6 +89,6 @@ It is the minimal list of updates. We expect to do even more.
   * backuping and restoring
 
 Current progress
-====================
+================
 
 Fundraising and development progress will be published at this [blog]({{ site.baseurl }}/blog/tags/Fundraising). Some funny animation is available at the [main page]({{ site.baseurl }}/)

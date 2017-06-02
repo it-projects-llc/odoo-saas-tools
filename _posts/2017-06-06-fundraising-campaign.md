@@ -61,12 +61,12 @@ The Updates
 
 It is the minimal list of updates. We expect to do even more.
 
-* scalable deploy for any load
+* Scalable deploy for any load
   * AWS Support
   * Refactoring: One *SaaS Plan* - Many *SaaS Servers*
   * One *SaaS Server* = One cluster (One load balancer + Many instances + One posgtgres + Few special instances for odoo cron workers)
   * Automatic high load testing
-* backuping and restoring
+* Backuping and restoring
   * Refactor backup system
   * Restore *SaaS Client* from database dump (see [comment on issue #383](https://github.com/it-projects-llc/odoo-saas-tools/issues/383#issuecomment-261453697)
 * Automation on spreading module updates
@@ -85,8 +85,9 @@ It is the minimal list of updates. We expect to do even more.
 * Reviewed expiration date feature
 * Support system from client database
 * Etherpad support ("pad" modules):
-  * scalable deploy
-  * backuping and restoring
+  * Scalable deploy
+  * Backuping and restoring
+* Allow to specify server_wide_modules at *SaaS Server*
 
 Current progress
 ================

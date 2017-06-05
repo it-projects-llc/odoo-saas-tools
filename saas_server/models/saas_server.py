@@ -176,7 +176,7 @@ class SaasServerClient(models.Model):
             if not user:
                 user = client_env['res.users'].browse(SUPERUSER_ID)
 
-            user.write({
+            vals = {
                 'login': owner_user['login'],
                 'password': owner_user['password'] or random_password(),
                 'name': owner_user['name'],
@@ -196,12 +196,28 @@ class SaasServerClient(models.Model):
                 self.env['res.country'].browse(owner_user['country_id']).id or None,
                 'state_id': owner_user.get('state_id') and self.env['res.country.state'].browse(owner_user['state_id']) and \
                 self.env['res.country.state'].browse(owner_user['state_id']).id or None,
-            })
+            }
+            user.write(vals)
 
             if owner_user.get('company_name'):
+                partner = client_env['res.partner'].create({
+                    'name': owner_user['company_name'],
+                    'company_name': owner_user.get('company_name'),
+                    'website': owner_user.get('website'),
+                    'phone': owner_user.get('phone'),
+                    'fax': owner_user.get('fax'),
+                    'city': owner_user.get('city'),
+                    'street': owner_user.get('street'),
+                    'vat': owner_user.get('vat'),
+                    'zip': owner_user.get('zip'),
+                    'country_id': owner_user.get('country_id') and self.env['res.country'].browse(owner_user['country_id']) and \
+                    self.env['res.country'].browse(owner_user['country_id']).id or None,
+                    'state_id': owner_user.get('state_id') and self.env['res.country.state'].browse(owner_user['state_id']) and \
+                    self.env['res.country.state'].browse(owner_user['state_id']).id or None,
+                })
                 company = client_env['res.company'].create({
                     'name': owner_user['company_name'],
-                    'partner_id': user.partner_id.id,
+                    'partner_id': partner.id,
                 })
                 user.write({'company_ids': [(4, company.id, 0)]})
                 user.write({'company_id': company.id})

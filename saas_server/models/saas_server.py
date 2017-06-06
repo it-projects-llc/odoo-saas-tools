@@ -214,7 +214,7 @@ class SaasServerClient(models.Model):
                     self.env['res.country'].browse(owner_user['country_id']).id or None,
                     'state_id': owner_user.get('state_id') and self.env['res.country.state'].browse(owner_user['state_id']) and \
                     self.env['res.country.state'].browse(owner_user['state_id']).id or None,
-                    'company_type': 'company',
+                    'is_company': True,
                 })
                 company = client_env['res.company'].create({
                     'name': owner_user['company_name'],

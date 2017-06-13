@@ -20,7 +20,7 @@
             </p>
             <p>
                 % if object.trial:
-                        Your trial will end on ${object.expiration_datetime}.<br />
+                        Your trial will end on ${object.expiration_datetime.split()[0]}.<br />
                         Please pay the invoice to continue the ERP subscription.<br />
                 % else:
                         Please pay the invoice to continue the ERP subscription within ${object.plan_id.grace_period} days.<br />

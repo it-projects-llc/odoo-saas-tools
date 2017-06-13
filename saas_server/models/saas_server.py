@@ -196,12 +196,20 @@ class SaasServerClient(models.Model):
                 self.env['res.country'].browse(owner_user['country_id']).id or None,
                 'state_id': owner_user.get('state_id') and self.env['res.country.state'].browse(owner_user['state_id']) and \
                 self.env['res.country.state'].browse(owner_user['state_id']).id or None,
+
+                'business_reg_no': owner_user.get('business_reg_no'),
+                'dnb_number': owner_user.get('dnb_number'),
+                'tax_code': owner_user.get('tax_code'),
+                'vat': owner_user.get('tax_code'),
+                'vat': owner_user.get('vat'),
             }
             user.write(vals)
 
+            main_company = client_env.ref('base.main_company')
             if owner_user.get('company_name'):
-                partner = client_env['res.partner'].create({
+                main_company.partner_id.update({
                     'name': owner_user['company_name'],
+                    'email': owner_user['email'],
                     'company_name': owner_user.get('company_name'),
                     'website': owner_user.get('website'),
                     'phone': owner_user.get('phone'),
@@ -215,13 +223,35 @@ class SaasServerClient(models.Model):
                     'state_id': owner_user.get('state_id') and self.env['res.country.state'].browse(owner_user['state_id']) and \
                     self.env['res.country.state'].browse(owner_user['state_id']).id or None,
                     'is_company': True,
+
                 })
-                company = client_env['res.company'].create({
-                    'name': owner_user['company_name'],
-                    'partner_id': partner.id,
+                main_company.update({
+                    'company_registry': owner_user.get('business_reg_no'),
                 })
-                user.write({'company_ids': [(4, company.id, 0)]})
-                user.write({'company_id': company.id})
+
+                # partner = client_env['res.partner'].create({
+                #     'name': owner_user['company_name'],
+                #     'company_name': owner_user.get('company_name'),
+                #     'website': owner_user.get('website'),
+                #     'phone': owner_user.get('phone'),
+                #     'fax': owner_user.get('fax'),
+                #     'city': owner_user.get('city'),
+                #     'street': owner_user.get('street'),
+                #     'vat': owner_user.get('vat'),
+                #     'zip': owner_user.get('zip'),
+                #     'country_id': owner_user.get('country_id') and self.env['res.country'].browse(owner_user['country_id']) and \
+                #     self.env['res.country'].browse(owner_user['country_id']).id or None,
+                #     'state_id': owner_user.get('state_id') and self.env['res.country.state'].browse(owner_user['state_id']) and \
+                #     self.env['res.country.state'].browse(owner_user['state_id']).id or None,
+                #     'is_company': True,
+                # })
+                # company = client_env['res.company'].create({
+                #     'name': owner_user['company_name'],
+                #     'partner_id': partner.id,
+                # })
+
+                user.write({'company_ids': [(4, main_company.id, 0)]})
+                user.write({'company_id': main_company.id})
 
     @api.model
     def update_all(self):

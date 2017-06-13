@@ -24,5 +24,8 @@ class SaasPortalPlan(models.Model):
             'zip': owner_user.zip,
             'country_id': owner_user.country_id.id,
             'state_id': owner_user.state_id.id,
+            'business_reg_no': owner_user.business_reg_no,
+            'dnb_number': owner_user.dnb_number,
+            'tax_code': owner_user.tax_code,
         })
         return owner_user_data

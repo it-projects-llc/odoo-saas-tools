@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 10.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-05-03 09:43+0000\n"
-"PO-Revision-Date: 2017-05-03 09:43+0000\n"
+"POT-Creation-Date: 2017-06-13 10:39+0000\n"
+"PO-Revision-Date: 2017-06-13 10:39+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -16,38 +16,26 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. module: saas_portal_signup_custom2
-#: model:mail.template,body_html:saas_portal_signup_custom2.email_template_create_saass
+#: model:mail.template,body_html:saas_portal_signup_custom2.email_template_create_saas
 msgid "\n"
 "\n"
 "            <p>\n"
-"                Thank you for registering with us<br />\n"
-"                Your new ODOO ERP application platform is ready!<br />\n"
+"                Hello ${object.partner_id.name},<br />\n"
+"                Thank you for signing-up with us!<br />\n"
+"                Your new ${object.plan_id.name} account is ready.<br />\n"
+"                Here is the link to access your account:<br />\n"
+"                <a href=\"${object.public_url}\">${object.public_url}</a><br />\n"
+"                You can login using your registered email and password.<br />\n"
 "            </p>\n"
 "            <p>\n"
-"                % for plan in object.plan_ids:\n"
-"                    % if plan.dbname_prefix:\n"
-"                        <p>\n"
-"                            We have created a testing environment in:<br />\n"
-"                            % for dbname in ctx[\"dbnames\"]:\n"
-"                                % if dbname.startswith(plan.dbname_prefix):\n"
-"                                    <em>${dbname}</em><br />\n"
-"                                % endif\n"
-"                            % endfor\n"
-"                            You can enter with the email and password you registered on our page to start practicing.\n"
-"                            Any transactions you make in the test environment, is only for testing so you can practice until you feel ready.\n"
-"                        </p>\n"
-"\n"
-"                        <p>\n"
-"                            Once you are ready to start growing your business, you can enter your production environment at:<br />\n"
-"                            % for dbname in ctx[\"dbnames\"]:\n"
-"                                % if not dbname.startswith(plan.dbname_prefix):\n"
-"                                    <em>${dbname}</em><br />\n"
-"                                % endif\n"
-"                            % endfor\n"
-"                            You can enter with the email and password that you registered on our page.\n"
-"                        </p>\n"
-"                    % endif\n"
-"                % endfor\n"
+"                % if object.trial:\n"
+"                        Your trial will end on ${object.expiration_datetime.split()[0]}.<br />\n"
+"                        Please pay the invoice to continue the ERP subscription.<br />\n"
+"                % else:\n"
+"                        Please pay the invoice to continue the ERP subscription within ${object.plan_id.grace_period} days.<br />\n"
+"                % endif\n"
+"                You can find the invoice when login to: <a href=\"${ctx['my_home']}\">My portal</a><br />\n"
+"                Then click on your name at top right corner -> My Account -> Your Invoices and Payments\n"
 "            </p>\n"
 "\n"
 "            "
@@ -59,8 +47,24 @@ msgid "Address"
 msgstr ""
 
 #. module: saas_portal_signup_custom2
+#: code:addons/saas_portal_signup_custom2/controllers/main.py:60
+#, python-format
+msgid "Another user is already registered using this email address."
+msgstr ""
+
+#. module: saas_portal_signup_custom2
+#: model:ir.ui.view,arch_db:saas_portal_signup_custom2.saas_trial_pay
+msgid "Apply"
+msgstr ""
+
+#. module: saas_portal_signup_custom2
 #: model:ir.ui.view,arch_db:saas_portal_signup_custom2.signup_fields
 msgid "Business Registration No."
+msgstr ""
+
+#. module: saas_portal_signup_custom2
+#: model:ir.ui.view,arch_db:saas_portal_signup_custom2.saas_trial_pay
+msgid "Choose what to do with your trial database"
 msgstr ""
 
 #. module: saas_portal_signup_custom2
@@ -74,6 +78,11 @@ msgid "Company Name"
 msgstr ""
 
 #. module: saas_portal_signup_custom2
+#: model:ir.ui.view,arch_db:saas_portal_signup_custom2.saas_trial_pay
+msgid "Convert to subscription keeping data"
+msgstr ""
+
+#. module: saas_portal_signup_custom2
 #: model:ir.ui.view,arch_db:saas_portal_signup_custom2.signup_fields
 msgid "Country"
 msgstr ""
@@ -81,11 +90,6 @@ msgstr ""
 #. module: saas_portal_signup_custom2
 #: model:ir.ui.view,arch_db:saas_portal_signup_custom2.signup_fields
 msgid "D&amp;B Number ("
-msgstr ""
-
-#. module: saas_portal_signup_custom2
-#: model:ir.model.fields,field_description:saas_portal_signup_custom2.field_saas_portal_plan_dbname_prefix
-msgid "DB Names prefix"
 msgstr ""
 
 #. module: saas_portal_signup_custom2
@@ -136,7 +140,7 @@ msgid "I agree with the"
 msgstr ""
 
 #. module: saas_portal_signup_custom2
-#: code:addons/saas_portal_signup_custom2/controllers/main.py:19
+#: code:addons/saas_portal_signup_custom2/controllers/main.py:38
 #, python-format
 msgid "Incorrect. Try again"
 msgstr ""
@@ -148,7 +152,27 @@ msgstr ""
 
 #. module: saas_portal_signup_custom2
 #: model:ir.ui.view,arch_db:saas_portal_signup_custom2.signup_fields
+msgid "Paid Subscription"
+msgstr ""
+
+#. module: saas_portal_signup_custom2
+#: model:ir.ui.view,arch_db:saas_portal_signup_custom2.signup_fields
 msgid "Postal code"
+msgstr ""
+
+#. module: saas_portal_signup_custom2
+#: model:ir.ui.view,arch_db:saas_portal_signup_custom2.saas_trial_pay
+msgid "Replace with new blank database"
+msgstr ""
+
+#. module: saas_portal_signup_custom2
+#: model:ir.ui.view,arch_db:saas_portal_signup_custom2.signup_fields
+msgid "Select"
+msgstr ""
+
+#. module: saas_portal_signup_custom2
+#: model:ir.ui.view,arch_db:saas_portal_signup_custom2.signup_fields
+msgid "Select a package"
 msgstr ""
 
 #. module: saas_portal_signup_custom2
@@ -172,14 +196,19 @@ msgid "Terms and Conditions"
 msgstr ""
 
 #. module: saas_portal_signup_custom2
+#: model:ir.ui.view,arch_db:saas_portal_signup_custom2.signup_fields
+msgid "Trial"
+msgstr ""
+
+#. module: saas_portal_signup_custom2
 #: model:ir.model,name:saas_portal_signup_custom2.model_website
 #: model:ir.ui.view,arch_db:saas_portal_signup_custom2.signup_fields
 msgid "Website"
 msgstr ""
 
 #. module: saas_portal_signup_custom2
-#: model:mail.template,subject:saas_portal_signup_custom2.email_template_create_saass
-msgid "Your ODOO ERP Application System is Ready"
+#: model:mail.template,subject:saas_portal_signup_custom2.email_template_create_saas
+msgid "Your ${object.plan_id.name} account is ready"
 msgstr ""
 
 #. module: saas_portal_signup_custom2
@@ -195,11 +224,6 @@ msgstr ""
 #. module: saas_portal_signup_custom2
 #: model:ir.model,name:saas_portal_signup_custom2.model_saas_portal_plan
 msgid "saas_portal.plan"
-msgstr ""
-
-#. module: saas_portal_signup_custom2
-#: model:ir.model.fields,help:saas_portal_signup_custom2.field_saas_portal_plan_dbname_prefix
-msgid "specify this field if you want to create several databases at once using saas_portal_signup module"
 msgstr ""
 
 #. module: saas_portal_signup_custom2

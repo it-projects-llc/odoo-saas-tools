@@ -2,7 +2,7 @@
  Odoo Saas Tools Docs
 ======================
 
-http://odoo-saas-tools.readthedocs.io/
+https://odoo-saas-tools.readthedocs.io/
 
 How to update Docs
 ==================
@@ -19,17 +19,17 @@ Initialization
 Contribution
 ------------
 
-  * Edit files in the repo. Check documentations:
-  
-    * http://www.sphinx-doc.org/en/stable/rest.html
-    * http://www.sphinx-doc.org/en/stable/domains.html
-    * http://www.sphinx-doc.org/en/stable/markup/index.html
+* Edit files in the repo. Check documentations:
 
-  * Try it out::
+  * http://www.sphinx-doc.org/en/stable/rest.html
+  * http://www.sphinx-doc.org/en/stable/domains.html
+  * http://www.sphinx-doc.org/en/stable/markup/index.html
 
-      cd /path/to/odoo-saas-tools/docs
-      make html
-      # check warningn and errors in compilation logs
-      google-chrome _build/html/index.html
+* Try it out::
 
-  * Make commits, push, create Pull Request
+    cd /path/to/odoo-saas-tools/docs
+    make html
+    # check warningn and errors in compilation logs
+    google-chrome _build/html/index.html
+
+* Make commits, push, create Pull Request

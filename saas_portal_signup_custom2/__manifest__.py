@@ -26,6 +26,7 @@
                 'saas_portal_sale',
                 'saas_portal_portal',
                 'website',
+                'website_portal_sale',
                 'res_partner_custom2',
                 ],
 

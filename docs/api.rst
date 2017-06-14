@@ -56,8 +56,9 @@ Signup a user on SaaS Portal
 Before client database can be created a user of this client database should already exist on SaaS Portal.
 There are several ways to create a new user in odoo.
 Signup procedure creates users and assign the following groups to them:
- * Portal
- * View Online Payment Options
+
+* Portal
+* View Online Payment Options
 
 Membership in these groups gives users minimum privileges on SaaS Portal.
 

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="action_saas_server_repositories" model="ir.actions.act_window">
+      <field name="name">Repositories</field>
+      <field name="res_model">saas_server.repository</field>
+      <field name="view_type">form</field>
+      <field name="view_mode">tree,form</field>
+      <field name="help" type="html">
+        <p class="oe_view_nocontent_create">
+          Click to add a new repository with modules you want to demonstrate to.
+        </p>
+      </field>
+    </record>
+
+    <menuitem id="menu_saas_server_repositories" parent="saas_server.menu_saas"
+              sequence="100" action="action_saas_server_repositories"/>
+
+    <record id='view_saas_server_repository_tree' model='ir.ui.view'>
+      <field name="name">saas_server.repository.tree</field>
+      <field name="model">saas_server.repository</field>
+      <field name="arch" type="xml">
+        <tree string="Repositories">
+          <field name="path"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id='view_saas_server_repository_form' model='ir.ui.view'>
+      <field name="name">saas_server.repository.form</field>
+      <field name="model">saas_server.repository</field>
+      <field name="arch" type="xml">
+        <form string="Repository">
+          <sheet>
+            <group>
+              <field name="path"/>
+            </group>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+</odoo>

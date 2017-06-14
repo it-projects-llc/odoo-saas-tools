@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_server_form" model="ir.ui.view">
+      <field name="name">saas_portal.server.form</field>
+      <field name="model">saas_portal.server</field>
+      <field name="inherit_id" ref="saas_portal.view_server_form"/>
+      <field name="arch" type="xml">
+        <xpath expr="//button[@name='action_sync_server']" position="after">
+            <button name="generate_demo_plans" type="object" string="Generate Demo Plans"/>
+            <button name="create_demo_templates" type="object" string="Create Demo Template DBs"/>
+            <button name="update_repositories" type="object" string="Update Repositories"/>
+            <button name="restart_server" type="object" string="Restart Server"/>
+            <button name="update_templates" type="object" string="Update templates"/>
+        </xpath>
+      </field>
+    </record>
+
+    <record id="view_plans_form" model="ir.ui.view">
+      <field name="name">saas_portal.plans.form</field>
+      <field name="model">saas_portal.plan</field>
+      <field name="inherit_id" ref="saas_portal.view_plans_form"/>
+      <field name="arch" type="xml">
+        <xpath expr="//sheet/group[4]" position="after">
+          <notebook>
+            <page string="Demo Modules">
+              <field name="demo_plan_module_ids" mode="tree">
+                <tree string="Demo Modules" create="0" delete="false">
+                  <field name="technical_name"/>
+                  <field name="url"/>
+                </tree>
+              </field>
+            </page>
+            <page string="Demo Hidden Modules">
+              <field name="demo_plan_hidden_module_ids" mode="tree">
+                <tree string="Demo Modules" create="0" delete="false">
+                  <field name="technical_name"/>
+                </tree>
+              </field>
+            </page>
+          </notebook>
+        </xpath>
+      </field>
+    </record>
+
+</odoo>

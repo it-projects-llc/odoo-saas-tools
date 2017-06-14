@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="product_product_saas" model="ir.ui.view">
+      <field name="name">product.product.saas</field>
+      <field name="model">product.product</field>
+      <field name="inherit_id" ref="product.product_normal_form_view"/>
+      <field name="arch" type="xml">
+        <xpath expr="//page[last()]" position="before">
+          <page string="SaaS Demo">
+            <group>
+              <field name="variant_plan_id"/>
+            </group>
+          </page>
+        </xpath>
+      </field>
+    </record>
+
+</odoo>

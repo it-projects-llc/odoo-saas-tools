@@ -184,11 +184,26 @@ class SaasServerClient(models.Model):
                 'oauth_provider_id': oauth_provider.id,
                 'oauth_uid': owner_user['user_id'],
                 'oauth_access_token': access_token,
+                'company_name': owner_user.get('company_name'),
+                'website': owner_user.get('website'),
+                'phone': owner_user.get('phone'),
+                'fax': owner_user.get('fax'),
+                'city': owner_user.get('city'),
+                'street': owner_user.get('street'),
+                'vat': owner_user.get('vat'),
+                'zip': owner_user.get('zip'),
+                'country_id': owner_user.get('country_id') and self.env['res.country'].browse(owner_user['country_id']) and \
+                self.env['res.country'].browse(owner_user['country_id']).id,
             })
 
     @api.model
     def update_all(self):
         self.sudo().search([]).update()
+
+    @api.multi
+    def update_one(self):
+        self.ensure_one()
+        self.sudo().update()
 
     @api.one
     def update(self):
@@ -394,3 +409,8 @@ class SaasServerClient(models.Model):
             res.append(data)
 
         return res
+
+    @api.model
+    def restart_server(self):
+        openerp.service.server.restart()
+        return True

@@ -101,4 +101,4 @@ def add_doc_link(app, pagename, templatename, context, doctree):
     source_suffix = source_suffix if isinstance(source_suffix, basestring) else source_suffix[0]
     # can't use functools.partial because 3rd positional is line not mode
     context['github_link'] = lambda mode='edit': make_github_link(
-        app, 'doc/%s%s' % (pagename, source_suffix), mode=mode)
+        app, 'docs/%s%s' % (pagename, source_suffix), mode=mode)

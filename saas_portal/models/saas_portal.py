@@ -1,4 +1,10 @@
 # -*- coding: utf-8 -*-
+import simplejson
+import werkzeug
+import requests
+import random
+from datetime import datetime, timedelta
+
 from odoo import api
 from odoo import exceptions
 from odoo import fields
@@ -8,12 +14,7 @@ from odoo.tools.translate import _
 from odoo.addons.base.res.res_partner import _tz_get
 from datetime import datetime, timedelta
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
-import simplejson
-import werkzeug
-import requests
-import random
 
-from datetime import datetime, timedelta
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 from odoo.addons.saas_base.exceptions import MaximumDBException, MaximumTrialDBException
 
@@ -54,12 +55,16 @@ class SaasPortalServer(models.Model):
     local_port = fields.Char('Local port', help='local tcp port of server for server-side requests')
     local_request_scheme = fields.Selection([('http', 'http'), ('https', 'https')], 'Scheme', default='http', required=True)
     host = fields.Char('Host', compute=_compute_host)
+    odoo_version = fields.Char('Odoo version', readonly=True)
+    password = fields.Char()
+    clients_host_template = fields.Char('Template for clients host names',
+                                        help='The possible dynamic parts of the host names are: {dbname}, {base_saas_domain}, {base_saas_domain_1}')
 
     @api.model
     def create(self, vals):
-        self = super(SaasPortalServer, self).create(vals)
-        self.oauth_application_id._get_access_token(create=True)
-        return self
+        record = super(SaasPortalServer, self).create(vals)
+        record.oauth_application_id._get_access_token(create=True)
+        return record
 
     @api.one
     def _request_params(self, path='/web', scheme=None, port=None, state={}, scope=None, client_id=None):
@@ -67,7 +72,7 @@ class SaasPortalServer(models.Model):
         port = port or self.request_port
         scope = scope or ['userinfo', 'force_login', 'trial', 'skiptheuse']
         scope = ' '.join(scope)
-        client_id = client_id or self.env['saas_portal.client'].generate_client_id()
+        client_id = client_id or self.env['oauth.application'].generate_client_id()
         params = {
             'scope': scope,
             'state': simplejson.dumps(state),
@@ -118,10 +123,11 @@ class SaasPortalServer(models.Model):
         self.env['saas_portal.client'].search([]).storage_usage_monitoring()
 
     @api.one
-    def action_sync_server(self):
+    def action_sync_server(self, updating_client_ID=None):
         state = {
             'd': self.name,
             'client_id': self.client_id,
+            'updating_client_ID': updating_client_ID,
         }
         req, req_kwargs = self._request_server(path='/saas_server/sync_server', state=state, client_id=self.client_id)
         res = requests.Session().send(req, **req_kwargs)
@@ -215,6 +221,23 @@ class SaasPortalPlan(models.Model):
         return vals
 
     @api.multi
+    def _prepare_owner_user_data(self, owner_user, owner_password):
+        """
+        Prepare the dict of values to update owner user data in client instalnce. This method may be
+        overridden to implement custom values (making sure to call super() to establish
+        a clean extension chain).
+        """
+        self.ensure_one()
+        owner_user_data = {
+            'user_id': owner_user.id,
+            'login': owner_user.login,
+            'password': owner_password,
+            'name': owner_user.name,
+            'email': owner_user.email,
+        }
+        return owner_user_data
+
+    @api.multi
     def create_new_database(self, **kwargs):
         return self._create_new_database(**kwargs)
 
@@ -270,13 +293,8 @@ class SaasPortalPlan(models.Model):
             owner_user = self.env['res.users'].browse(user_id)
         else:
             owner_user = self.env.user
-        owner_user_data = {
-            'user_id': owner_user.id,
-            'login': owner_user.login,
-            'password': owner_password,
-            'name': owner_user.name,
-            'email': owner_user.email,
-        }
+
+        owner_user_data = self._prepare_owner_user_data(owner_user, owner_password)
 
         client.period_initial = trial and self.expiration
         trial_expiration_datetime = (fields.Datetime.from_string(client.create_date) + timedelta(hours=client.period_initial)).strftime(DEFAULT_SERVER_DATETIME_FORMAT)
@@ -305,6 +323,7 @@ class SaasPortalPlan(models.Model):
             'access_token': client.oauth_application_id._get_access_token(user_id, create=True),
         }
         url = '{url}?{params}'.format(url=data.get('url'), params=werkzeug.url_encode(params))
+        auth_url = url
         if self.on_create == 'email':
             url = '/information'
 
@@ -320,8 +339,9 @@ class SaasPortalPlan(models.Model):
         client.send_params_to_client_db()
         # TODO make async call of action_sync_server here
         # client.server_id.action_sync_server()
+        client.sync_client()
 
-        return {'url': url, 'id': client.id, 'client_id': client_id}
+        return {'url': url, 'id': client.id, 'client_id': client_id, 'auth_url': auth_url}
 
     @api.multi
     def generate_dbname(self, raise_error=True):
@@ -362,6 +382,8 @@ class SaasPortalPlan(models.Model):
         except:
             _logger.error('Error on parsing response: %s\n%s' % ([req.url, req.headers, req.body], res.text))
             raise
+
+        self.template_id.password = data.get('superuser_password')
         self.template_id.state = data.get('state')
         return data
 
@@ -423,11 +445,26 @@ class SaasPortalDatabase(models.Model):
                               ('template', 'Template'),
                               ],
                              'State', default='draft', track_visibility='onchange')
-    host = fields.Char('Host', compute=_compute_host)
-    public_url = fields.Char(compute='_compute_public_url', store=True)
+    host = fields.Char('Host', compute='_compute_host')
+    public_url = fields.Char(compute='_compute_public_url')
+    password = fields.Char()
 
     @api.multi
-    @api.depends('server_id.request_port', 'server_id.request_scheme', 'host')
+    def _compute_host(self):
+        base_saas_domain = self.env['ir.config_parameter'].get_param('saas_portal.base_saas_domain')
+        base_saas_domain_1 = '.'.join(base_saas_domain.rsplit('.', 2)[-2:])
+        name_dict = {
+            'base_saas_domain': base_saas_domain,
+            'base_saas_domain_1': base_saas_domain_1,
+        }
+        for record in self:
+            if record.server_id.clients_host_template:
+                name_dict.update({'dbname': record.name})
+                record.host = record.server_id.clients_host_template.format(**name_dict)
+            else:
+                _compute_host(self)
+
+    @api.multi
     def _compute_public_url(self):
         for record in self:
             scheme = record.server_id.request_scheme
@@ -697,13 +734,23 @@ class SaasPortalClient(models.Model):
             self.name = new_dbname
 
     @api.multi
+    def sync_client(self):
+        self.ensure_one()
+        self.server_id.action_sync_server(updating_client_ID=self.client_id)
+
+    @api.multi
     def check_partner_access(self, partner_id):
         for record in self:
             if record.partner_id.id != partner_id:
                 raise Forbidden
 
-    @api.one
+    @api.multi
     def duplicate_database(self, dbname=None, partner_id=None, expiration=None):
+        self.ensure_one()
+
+        owner_user = self.env['res.users'].search(
+            [('partner_id', '=', partner_id)], limit=1) or self.env.user
+
         server = self.server_id
         if not server:
             server = self.env['saas_portal.server'].get_saas_server()
@@ -723,24 +770,42 @@ class SaasPortalClient(models.Model):
         client = self.env['saas_portal.client'].create(vals)
         client_id = client.client_id
 
-        scheme = server.request_scheme
-        port = server.request_port
+        owner_user_data = {
+            'user_id': owner_user.id,
+            'login': owner_user.login,
+            'name': owner_user.name,
+            'email': owner_user.email,
+            'password': None,
+        }
+
         state = {
             'd': client.name,
             'e': client.expiration_datetime,
-            'r': '%s://%s:%s/web' % (scheme, client.host, port),
+            'r': client.public_url + 'web',
+            'owner_user': owner_user_data,
+            'public_url': client.public_url,
+            'db_template': self.name,
+            'disable_mail_server': True,
         }
-        state.update({'db_template': self.name,
-                      'disable_mail_server': True})
+
         scope = ['userinfo', 'force_login', 'trial', 'skiptheuse']
-        # TODO use _request_server
-        url = server._request(path='/saas_server/new_database',
-                              scheme=scheme,
-                              port=port,
-                              state=state,
-                              client_id=client_id,
-                              scope=scope,)[0]
-        return url
+
+        req, req_kwargs = server._request_server(path='/saas_server/new_database',
+                                                 state=state,
+                                                 client_id=client_id)
+        res = requests.Session().send(req, **req_kwargs)
+
+        if not res.ok:
+            raise Warning('Reason: %s \n Message: %s' % (res.reason, res.content))
+        try:
+            data = simplejson.loads(res.text)
+        except:
+            _logger.error('Error on parsing response: %s\n%s' % ([req.url, req.headers, req.body], res.text))
+            raise
+
+        data.update({'id': client.id})
+
+        return data
 
     @api.multi
     def send_expiration_info(self):

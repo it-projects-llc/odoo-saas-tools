@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="assets_frontend" inherit_id="website.assets_frontend" name="saas demo assets">
+            <xpath expr="//link[last()]" position="after">
+                    <link rel='stylesheet' href='/saas_portal_demo/static/src/css/module_shop.css' t-ignore="true"/>
+            </xpath>
+    </template>
+
+    <template id="demo_addons" inherit_id="website_sale.product">
+      <xpath expr="//div[@class='row'][2]" position="after">
+        <div class="row" style="padding-top:20px;">
+          <div class="col-xs-12">
+
+            <div class="row">
+              <t t-foreach="product.product_variant_ids" t-as="product_variant">
+                <t t-if="set(product_variant.attribute_value_ids.ids) &amp; attrib_set">
+                  <div t-foreach="product_variant.variant_plan_id.demo_plan_module_ids" t-as="module" class="col-lg-3 col-md-6 col-sm-6">
+                    <div class="panel deep-1 deep_hover">
+                      <a t-att-href="module.url">
+                        <div class="loempia_panel_thumbnail loempia_panel_thumbnail_nocover o_apps_category_reminders_and_agenda">
+                          <t t-if="module.summary">
+                            <p class="loempia_panel_summary"><t t-esc="module.summary"/></p>
+                          </t>
+                          <div class="loempia_panel_thumbnail_icon">
+                            <span itemprop="image" t-field="module.icon" t-field-options='{"widget": "image", "style": "height:64px"}' />
+                          </div>
+                          <p class="loempia_panel_short_desc"><t t-esc="module.shortdesc"/></p>
+                        </div>
+                        <div class="row loempia_panel_desc">
+                          <div class="col-md-12">
+                            <h4><b><t t-esc="module.shortdesc"/></b></h4>
+                          </div>
+                          <div class="col-xs-8 loempia_panel_author">
+                            by <t t-esc="module.author"/>
+                          </div>
+                          <div class="col-xs-4 text-right loempia_card_price">
+                            <b>
+                              <span><span class="oe_currency_value"><t t-esc="module.price"/></span> €</span>
+                            </b>
+                          </div>
+                        </div>
+                      </a>
+                    </div>
+                  </div>
+                </t>
+              </t>
+            </div>
+
+            <div class="row">
+              <div class="col-lg-12 col-md-12 col-sm-12">
+                <p class="text-center">Powered by <a href="https://it-projects-llc.github.io/odoo-saas-tools/">Odoo Saas Tools</a></p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </xpath>
+
+      <xpath expr="//t[@t-call='website_sale.product_price']" position="replace">
+        <t t-if="not product.module_name">
+          <t t-call="website_sale.product_price"/>
+        </t>
+      </xpath>
+
+      <xpath expr="//hr" position="replace">
+        <t t-if="not product.module_name">
+            <hr />
+        </t>
+      </xpath>
+
+      <xpath expr="//div[@id='product_details']/p[@class='text-muted']" position="replace">
+        <p class="text-muted">
+         Prices are quoted without included dependencies
+        </p>
+      </xpath>
+
+      <xpath expr="//div[@id='product_details']/p[@class='text-muted']" position="after">
+        <t t-foreach="product.attribute_line_ids" t-as="attribute_line">
+          <t t-if="attribute_line.attribute_id.name == 'Odoo Version'">
+            <t t-if="len(attribute_line.value_ids)&gt;1 and len(product.product_variant_ids.mapped('attribute_value_ids').filtered(lambda r: r.attribute_id.name == 'Odoo Version').ids)&gt;1">
+              <p><b>Also available for</b><br/>
+              <t t-foreach="attribute_line.value_ids" t-as="value">
+                <t t-if="not (set([value.id]) &amp; attrib_set) and value.id in product.product_variant_ids.mapped('attribute_value_ids').filtered(lambda r: r.attribute_id.name == 'Odoo Version').ids">
+                  <a t-attf-href="/shop/product/#{product.seo_url}?attrib=#{attribute_line.attribute_id.id}-#{value.id}">
+                    <span><t t-esc="value.name"/></span>
+                  </a>
+                </t>
+              </t>
+              </p>
+            </t>
+          </t>
+        </t>
+      </xpath>
+
+    </template>
+
+    <template id="hide_odoo_version_attribute_li" inherit_id="website_sale.variants">
+      <xpath expr="//li[@t-if='len(variant_id.value_ids) > 1']" position="attributes">
+        <attribute name="t-if">len(variant_id.value_ids) > 1 and variant_id.attribute_id.name != 'Odoo Version'</attribute>
+      </xpath>
+    </template>
+
+    <template id="demo_product" inherit_id="saas_portal_sale_online.product">
+      <xpath expr="//a[@id='try_trial']" position="replace">
+        <t t-foreach="product.product_variant_ids" t-as="product_variant">
+          <t t-if="set(product_variant.attribute_value_ids.ids) &amp; attrib_set">
+              <a id="try_trial" style="margin-left: 8px" class="btn btn-primary btn-default btn-lg mt8"
+                  t-attf-href="/saas_portal/add_new_client?plan_id=#{product_variant.variant_plan_id.id}">Try trial</a>
+          </t>
+        </t>
+      </xpath>
+    </template>
+
+</odoo>

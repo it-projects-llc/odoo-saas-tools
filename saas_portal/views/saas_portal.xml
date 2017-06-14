@@ -50,6 +50,7 @@
                         <button string="Delete" name="delete_database_server" type="object" attrs="{'invisible':['|',('state', 'in', ['draft', 'deleted'])]}" icon="fa-eraser" 
                         confirm="Are you sure to delete this database?"/>
                         <button string="Sync server" type="object" name="action_sync_server" icon="fa-refresh"/>
+                        <button string="Sync client" type="object" name="sync_client" icon="fa-refresh"/>
                         <button name="%(saas_portal.action_rename_database)d" string="Rename Database" type="action"/>
                         <button name="%(action_view_subscription_wizard)d" string="Manage subscription"
                           type="action" context="{'default_client_id': id, 'default_expiration': expiration_datetime}"/>
@@ -151,6 +152,7 @@
                     <field name="sequence" widget="handle"/>
                     <field name="name"/>
                     <field name="active"/>
+                    <field name="odoo_version"/>
                 </tree>
             </field>
         </record>
@@ -175,6 +177,7 @@
                     <sheet>
                     <group>
                         <group>
+                            <field name="odoo_version"/>
                             <field name="name"/>
                             <field name="client_id"/>
                             <field name="active"/>
@@ -186,6 +189,12 @@
                           <field name="verify_ssl" attrs="{'invisible': [('local_request_scheme', '!=', 'https')]}"/>
                           <field name="local_host"/>
                           <field name="local_port"/>
+                        </group>
+                        <group string="Credentials for rpc">
+                          <field name="password" password="True"/>
+                        </group>
+                        <group string="Client Settings">
+                          <field name="clients_host_template"/>
                         </group>
                     </group>
                     <field name="client_ids" readonly="1">

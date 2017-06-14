@@ -1,4 +1,5 @@
 :banner: banners/web_service_api.jpg
+:force-toc: True
 
 =================
  API integration
@@ -100,24 +101,24 @@ to manipulate the client database from SaaS Portal
 There are many ways to get the id.
 
 * from plan_id and partner_id:
-::
+  ::
 
-   # these values are given from other searches
-   plan_id = 1
-   partner_id = 7
+     # these values are given from other searches
+     plan_id = 1
+     partner_id = 7
 
-   # search saas_portal.client on plan_id = 1 and partner_id = 7
-   ids = models.execute_kw(portal_db, admin_uid, admin_password,
-   'saas_portal.client', 'search',
-   [[['plan_id', '=', plan_id], ['partner_id', '=', partner_id]]])
+     # search saas_portal.client on plan_id = 1 and partner_id = 7
+     ids = models.execute_kw(portal_db, admin_uid, admin_password,
+     'saas_portal.client', 'search',
+     [[['plan_id', '=', plan_id], ['partner_id', '=', partner_id]]])
 
 * from name of database (name of database is equal to domain host name):
-::
+  ::
 
-   client_db = 'client.odoo.local'
-   ids = models.execute_kw(portal_db, admin_uid, admin_password,
-   'saas_portal.client', 'search',
-   [[['name', '=', client_db]]])
+     client_db = 'client.odoo.local'
+     ids = models.execute_kw(portal_db, admin_uid, admin_password,
+     'saas_portal.client', 'search',
+     [[['name', '=', client_db]]])
 
 
 Suspend client database
@@ -137,7 +138,7 @@ To suspend:
 
 To unsuspend/resume:
 ::
-   
+
    saas_portal_client_id = ids[0]
    data = {'params': [{'key': 'saas_client.suspended', 'value': '0', 'hidden': True}]}
    res = models.execute_kw(portal_db, admin_uid, admin_password,

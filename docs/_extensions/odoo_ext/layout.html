@@ -235,7 +235,7 @@
       <main class="container-fluid {{ ' '.join(classes) }}">
         {% if pagename != master_doc %}
         <div class="row">
-          {% if 'has-toc' not in meta and not (pagename in toc) %}
+          {% if 'has-toc' not in meta and not (pagename in toc) or 'force-toc' in meta %}
           <aside>
             <div class="navbar-aside text-center">
               {{ toc }}
@@ -247,7 +247,7 @@
             </div>
           </aside>
           {% endif %}
-          <article class="doc-body {% if 'has-toc' in meta %}doc-toc{% endif %}{% if pagename in toc%}index-category{% endif %}">
+          <article class="doc-body {% if 'has-toc' in meta %}doc-toc{% endif %}{% if pagename in toc and not 'force-toc' in meta%}index-category{% endif %}">
             {% endif %}
             {% block body %} {% endblock %}
           {% if pagename != master_doc %}</article>

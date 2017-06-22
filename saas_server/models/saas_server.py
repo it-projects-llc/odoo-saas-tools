@@ -381,7 +381,7 @@ class SaasServerClient(models.Model):
         '''
         backup transport agents should override this
         '''
-        raise exceptions.Warning('Transport agent has not been configured')
+        raise exceptions.Warning('Transport agent has not been configured. You need either install one of saas_server_backup_* or remove saas_portal_backup')
 
     @api.multi
     def backup_database(self):

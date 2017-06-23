@@ -13,10 +13,17 @@ addons:
       - python-lxml  # because pip installation is slow
 
 env:
-  - VERSION="8.0" LINT_CHECK="1"
-  - VERSION="8.0" ODOO_REPO="odoo/odoo" LINT_CHECK="0"
-  - VERSION="8.0" ODOO_REPO="OCA/OCB" LINT_CHECK="0"
-  - VERSION="8.0" UNIT_TEST="1" LINT_CHECK="0"
+  global:
+  - VERSION="8.0" TESTS="0" LINT_CHECK="0" TRANSIFEX="0" UNIT_TEST="0"
+  - PYLINT_ODOO_JSLINTRC="/home/travis/maintainer-quality-tools/travis/cfg/.jslintrc"
+  - TRANSIFEX_USER='i18n-bot@it-projects.info'
+  - secure: "SSViOVvjVOD4nDpfhfF3QwIB1u0/m/fz25aOpRHa6RrHNng9f4iVSZpL0X27FSOon8F7UpHdn4mFaxgCce0Dlzcd+spJn4sGgF3l7E4D9rLAvygYpavGADPAKYdEsGI9QRH8MOuqQzu2wXkt70SwufSn1Lr3vRHhwAVByOqHyaWjyjLWwRA7jSjEf5OrVFNcpsOlWgR5EUxjOrvhlDD7vyfMx5dKMx6ro6pNpenDieQMKOj2aFqm7M7uE9yrqqx2bvHyJb+oOXorUjfYcLsxZBw0LY4ZUOpzZgDcUm19cD5apJpJbdlN39hrkBwMqT9aUw6l8+I9dNHjxS5NK7BCI27DbMN9HhFwXOx9msZOwYitP+jYS8x0NKeZGfpvIRiJvSrRypGkpXYzrxI60bRxNyIRMcuvtIbA3g9yqGCXAcgL88TMxCIxOTk4QjYY/F6h+gsARznEYS1ase4FTcE8vu/ofVlM6Aqr9o/VnkcnvAsNvWfxtOfPIJ9Eb9kqJaSbSE/WbpGuf+j0SmgAe7MnWXJ1H3WIaUux8n7lSuTyuC2nuTWxI8XloGkeiGuOzCId5YQ0IWL66rITqahEDqqodM7DNNRO5BpvaCTg+2c/Zb6jiGHS2nrIPrtsWUUsTIF0T3kPbCaC6JMyJukepqvy9ykBDWiSmh/AYyc3kTouc24="
+
+  matrix:
+  - LINT_CHECK="1"
+  - TRANSIFEX="1"
+  - TESTS="1" ODOO_REPO="odoo/odoo"
+  - TESTS="1" ODOO_REPO="OCA/OCB"
 
 virtualenv:
   system_site_packages: true

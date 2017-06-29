@@ -108,8 +108,6 @@ init saas
  "
 
  docker exec -i -u root -t odoo-portal /bin/bash -c "export INIT_SAAS_TOOLS='$INIT_SAAS_TOOLS_VALUE'; bash /install-odoo-saas.sh"
- docker exec -i -u root -t odoo-portal /bin/bash -c "sed -i 's/dbfilter.*/dbfilter = ^%h$/' /mnt/config/odoo-server.conf"
- docker restart odoo-portal
 
 nginx
 ^^^^^

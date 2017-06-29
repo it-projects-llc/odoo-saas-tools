@@ -166,8 +166,6 @@ update dbfilter
 
 Init saas
 ^^^^^^^^^
-Note. For odoo 10.0+ use
-``--odoo-script=/mnt/odoo-source/odoo-bin \``
 
 ::
 

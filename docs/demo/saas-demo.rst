@@ -128,11 +128,9 @@ SaaS Server
 
 ::
 
- SERVER_NAME="odoo-8" ODOO_BRANCH="8.0"
- SERVER_NAME="odoo-9" ODOO_BRANCH="9.0"
- SERVER_NAME="odoo-10" ODOO_BRANCH="10.0"
-
- if [[ $ODOO_BRANCH = "8.0" ]]; then ODOO_SCRIPT="/mnt/odoo-surce/openerp-server"; elif [[ $ODOO_BRANCH = "9.0" ]]; then ODOO_SCRIPT="/mnt/odoo-surce/openerp-server"; elif [[ $ODOO_BRANCH = "10.0" ]]; then ODOO_SCRIPT="/mnt/odoo-surce/odoo-bin"; fi
+ SERVER_NAME="odoo-8" ODOO_BRANCH="8.0" ODOO_SCRIPT="/mnt/odoo-surce/openerp-server"
+ SERVER_NAME="odoo-9" ODOO_BRANCH="9.0 "ODOO_SCRIPT="/mnt/odoo-surce/openerp-server"
+ SERVER_NAME="odoo-10" ODOO_BRANCH="10.0" ODOO_SCRIPT="/mnt/odoo-surce/odoo-bin"
 
 * Then execute commands below. After that repeat it with another odoo version.
 

@@ -87,7 +87,9 @@ Portal odoo docker
  $DOCKER_PARAMS \
  --name odoo-portal \
  --network=saas-demo-network \
- -t itprojectsllc/install-odoo:10.0
+ -t itprojectsllc/install-odoo:10.0 \
+ -- \
+ --db-filter=^%h$
 
 press Ctrl-C
 
@@ -154,15 +156,11 @@ Server odoo docker
  $DOCKER_PARAMS \
  --network=saas-demo-network \
  -t itprojectsllc/install-odoo:$ODOO_BRANCH
+ -- \
+ --db-filter=^%h$
 
 press Ctrl-C
 
-update dbfilter
-
-::
-
- docker exec -u root -i -t $SERVER_NAME /bin/bash -c "sed -i 's/dbfilter.*/dbfilter = ^%d$/' /mnt/config/odoo-server.conf"
- docker restart $SERVER_NAME
 
 Init saas
 ^^^^^^^^^

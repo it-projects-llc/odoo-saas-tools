@@ -87,24 +87,23 @@ Portal odoo docker
  $DOCKER_PARAMS \
  --name odoo-portal \
  --network=saas-demo-network \
- -t itprojectsllc/install-odoo:8.0
+ -t itprojectsllc/install-odoo:10.0
 
 press Ctrl-C
 
 init saas
 ^^^^^^^^^
 
-* TODO use /mnt/odoo-source/odoo-bin for odoo-10 portal
-
 ::
 
  INIT_SAAS_TOOLS_VALUE="\
  --portal-create \
- --odoo-script=/mnt/odoo-source/openerp-server \
+ --odoo-script=/mnt/odoo-source/odoo-bin \
  --odoo-config=/mnt/config/odoo-server.conf \
  --admin-password=${ODOO_MASTER_PASS} \
  --portal-db-name=${PORTAL_DB} \
  --install-modules=saas_portal_demo \
+ --odoo-without-demo \
  "
 
  docker exec -i -u root -t odoo-portal /bin/bash -c "export INIT_SAAS_TOOLS='$INIT_SAAS_TOOLS_VALUE'; bash /install-odoo-saas.sh"

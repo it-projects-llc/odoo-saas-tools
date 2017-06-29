@@ -154,7 +154,7 @@ Note. Don't forget to update the ``DOCKER_PARAMS`` variable if you used it to cr
  --network=saas-demo-network \
  -t itprojectsllc/install-odoo:$ODOO_BRANCH
  -- \
- --db-filter=^%h$
+ --db-filter=^%d$
 
 press Ctrl-C
 

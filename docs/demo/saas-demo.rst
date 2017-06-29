@@ -170,7 +170,7 @@ Init saas
  --admin-password=${ODOO_MASTER_PASS} \
  --portal-db-name=${PORTAL_DB} \
  --server-db-name=${SERVER_NAME} \
- --server-hosts-template-={dbname}.${SERVER_NAME}.{base_saas_domain} \
+ --server-hosts-template={dbname}.${SERVER_NAME}.{base_saas_domain} \
  --local-portal-host=odoo-portal \
  --local-server-host=${SERVER_NAME} \
  --install-modules=saas_server_demo \

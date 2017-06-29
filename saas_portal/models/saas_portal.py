@@ -57,6 +57,8 @@ class SaasPortalServer(models.Model):
     host = fields.Char('Host', compute=_compute_host)
     odoo_version = fields.Char('Odoo version', readonly=True)
     password = fields.Char()
+    clients_host_template = fields.Char('Template for clients host names',
+                                        help='The possible dynamic parts of the host names are: {dbname}, {base_saas_domain}, {base_saas_domain_1}')
 
     @api.model
     def create(self, vals):
@@ -431,9 +433,22 @@ class SaasPortalDatabase(models.Model):
                               ('template', 'Template'),
                               ],
                              'State', default='draft', track_visibility='onchange')
-    host = fields.Char('Host', compute=_compute_host)
+    host = fields.Char('Host', compute='_compute_host')
     public_url = fields.Char(compute='_compute_public_url', store=True)
     password = fields.Char()
+
+    @api.multi
+    def _compute_host(self):
+        name_dict = {
+            'base_saas_domain': self.env['ir.config_parameter'].get_param('saas_portal.base_saas_domain'),
+            'base_saas_domain_1': self.env['ir.config_parameter'].get_param('saas_portal.base_saas_domain_1'),
+        }
+        for record in self:
+            if record.server_id.clients_host_template:
+                name_dict.update({'dbname': record.name})
+                record.host = record.server_id.clients_host_template.format(**name_dict)
+            else:
+                _compute_host(self)
 
     @api.multi
     @api.depends('server_id.request_port', 'server_id.request_scheme', 'host')

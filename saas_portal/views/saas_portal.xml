@@ -192,6 +192,9 @@
                         <group string="Credentials for rpc">
                           <field name="password" password="True"/>
                         </group>
+                        <group string="Client Settings">
+                          <field name="clients_host_template"/>
+                        </group>
                     </group>
                     <field name="client_ids" readonly="1">
                         <tree>

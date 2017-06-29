@@ -143,6 +143,7 @@ db
 
 Server odoo docker
 ------------------
+Note. Don't forget to update the ``DOCKER_PARAMS`` variable if you used it to create a bind mount (like this ``-v /HOST_DIR:/CONTAINER_DIR``) - use appropriate branch for repo that you are binding
 
 ::
 

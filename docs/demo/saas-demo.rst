@@ -133,6 +133,8 @@ SaaS Server
  SERVER_NAME="odoo-9" ODOO_BRANCH="9.0"
  SERVER_NAME="odoo-10" ODOO_BRANCH="10.0"
 
+ if [[ $ODOO_BRANCH = "8.0" ]]; then ODOO_SCRIPT="/mnt/odoo-surce/openerp-server"; elif [[ $ODOO_BRANCH = "9.0" ]]; then ODOO_SCRIPT="/mnt/odoo-surce/openerp-server"; elif [[ $ODOO_BRANCH = "10.0" ]]; then ODOO_SCRIPT="/mnt/odoo-surce/odoo-bin"; fi
+
 * Then execute commands below. After that repeat it with another odoo version.
 
 db
@@ -172,7 +174,7 @@ Note. For odoo 10.0+ use
 
  INIT_SAAS_TOOLS_VALUE="\
  --server-create \
- --odoo-script=/mnt/odoo-source/openerp-server \
+ --odoo-script=$ODOO_SCRIPT \
  --odoo-config=/mnt/config/odoo-server.conf \
  --admin-password=${ODOO_MASTER_PASS} \
  --portal-db-name=${PORTAL_DB} \

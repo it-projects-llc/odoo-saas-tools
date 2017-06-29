@@ -183,6 +183,7 @@ Note. For odoo 10.0+ use
  --demo-repositories=\
  /mnt/addons/it-projects-llc/misc-addons,\
  /mnt/addons/it-projects-llc/pos-addons \
+ --odoo-without-demo \
  "
 
  docker exec -u root -i -t $SERVER_NAME /bin/bash -c "export INIT_SAAS_TOOLS='$INIT_SAAS_TOOLS_VALUE'; bash /install-odoo-saas.sh"

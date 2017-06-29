@@ -87,7 +87,7 @@ Portal odoo docker
  $DOCKER_PARAMS \
  --name odoo-portal \
  --network=saas-demo-network \
- -t itprojectsllc/install-odoo:8.0
+ -t itprojectsllc/install-odoo:9.0
  -- \
  --db-filter=^%h$
 

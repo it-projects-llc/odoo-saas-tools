@@ -434,14 +434,16 @@ class SaasPortalDatabase(models.Model):
                               ],
                              'State', default='draft', track_visibility='onchange')
     host = fields.Char('Host', compute='_compute_host')
-    public_url = fields.Char(compute='_compute_public_url', store=True)
+    public_url = fields.Char(compute='_compute_public_url')
     password = fields.Char()
 
     @api.multi
     def _compute_host(self):
+        base_saas_domain = self.env['ir.config_parameter'].get_param('saas_portal.base_saas_domain')
+        base_saas_domain_1 = '.'.join(base_saas_domain.rsplit('.', 2)[-2:])
         name_dict = {
-            'base_saas_domain': self.env['ir.config_parameter'].get_param('saas_portal.base_saas_domain'),
-            'base_saas_domain_1': self.env['ir.config_parameter'].get_param('saas_portal.base_saas_domain_1'),
+            'base_saas_domain': base_saas_domain,
+            'base_saas_domain_1': base_saas_domain_1,
         }
         for record in self:
             if record.server_id.clients_host_template:
@@ -451,7 +453,6 @@ class SaasPortalDatabase(models.Model):
                 _compute_host(self)
 
     @api.multi
-    @api.depends('server_id.request_port', 'server_id.request_scheme', 'host')
     def _compute_public_url(self):
         for record in self:
             scheme = record.server_id.request_scheme

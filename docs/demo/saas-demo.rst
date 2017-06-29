@@ -174,7 +174,7 @@ Note. For odoo 10.0+ use
 
  INIT_SAAS_TOOLS_VALUE="\
  --server-create \
- --odoo-script=$ODOO_SCRIPT \
+ --odoo-script=${ODOO_SCRIPT} \
  --odoo-config=/mnt/config/odoo-server.conf \
  --admin-password=${ODOO_MASTER_PASS} \
  --portal-db-name=${PORTAL_DB} \

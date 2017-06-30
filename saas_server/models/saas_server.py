@@ -176,25 +176,16 @@ class SaasServerClient(models.Model):
             if not user:
                 user = client_env['res.users'].browse(SUPERUSER_ID)
 
-            user.write({
-                'login': owner_user['login'],
-                'password': owner_user['password'] or random_password(),
-                'name': owner_user['name'],
-                'email': owner_user['email'],
+            vals = owner_user
+            vals.update({
                 'oauth_provider_id': oauth_provider.id,
                 'oauth_uid': owner_user['user_id'],
                 'oauth_access_token': access_token,
-                'company_name': owner_user.get('company_name'),
-                'website': owner_user.get('website'),
-                'phone': owner_user.get('phone'),
-                'fax': owner_user.get('fax'),
-                'city': owner_user.get('city'),
-                'street': owner_user.get('street'),
-                'vat': owner_user.get('vat'),
-                'zip': owner_user.get('zip'),
                 'country_id': owner_user.get('country_id') and self.env['res.country'].browse(owner_user['country_id']) and \
                 self.env['res.country'].browse(owner_user['country_id']).id,
             })
+
+            user.write(vals)
 
     @api.model
     def update_all(self):

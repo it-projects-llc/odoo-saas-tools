@@ -221,7 +221,7 @@ class SaasPortalPlan(models.Model):
         return vals
 
     @api.multi
-    def _prepare_owner_user_data(self, owner_user, owner_password):
+    def _prepare_owner_user_data(self, owner_user):
         """
         Prepare the dict of values to update owner user data in client instalnce. This method may be
         overridden to implement custom values (making sure to call super() to establish
@@ -231,7 +231,6 @@ class SaasPortalPlan(models.Model):
         owner_user_data = {
             'user_id': owner_user.id,
             'login': owner_user.login,
-            'password': owner_password,
             'name': owner_user.name,
             'email': owner_user.email,
         }
@@ -242,7 +241,7 @@ class SaasPortalPlan(models.Model):
         return self._create_new_database(**kwargs)
 
     @api.multi
-    def _create_new_database(self, dbname=None, client_id=None, partner_id=None, user_id=None, notify_user=False, trial=False, support_team_id=None, async=None, owner_password=None):
+    def _create_new_database(self, dbname=None, client_id=None, partner_id=None, user_id=None, notify_user=False, trial=False, support_team_id=None, async=None):
         self.ensure_one()
 
         server = self.server_id
@@ -294,7 +293,7 @@ class SaasPortalPlan(models.Model):
         else:
             owner_user = self.env.user
 
-        owner_user_data = self._prepare_owner_user_data(owner_user, owner_password)
+        owner_user_data = self._prepare_owner_user_data(owner_user)
 
         client.period_initial = trial and self.expiration
         trial_expiration_datetime = (fields.Datetime.from_string(client.create_date) + timedelta(hours=client.period_initial)).strftime(DEFAULT_SERVER_DATETIME_FORMAT)

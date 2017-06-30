@@ -169,7 +169,8 @@ class SaasServerClient(models.Model):
                 user = res[0]
                 client_env['ir.config_parameter'].set_param('res.users.owner', user.id, groups=['saas_client.group_saas_support'])
 
-            res = client_env['res.users'].search([('oauth_uid', '=', owner_user['user_id'])])
+            portal_owner_uid = owner_user.pop('user_id')
+            res = client_env['res.users'].search([('oauth_uid', '=', portal_owner_uid)])
             if res:
                 # user already exists (e.g. administrator)
                 user = res[0]
@@ -179,7 +180,7 @@ class SaasServerClient(models.Model):
             vals = owner_user
             vals.update({
                 'oauth_provider_id': oauth_provider.id,
-                'oauth_uid': owner_user['user_id'],
+                'oauth_uid': portal_owner_uid,
                 'oauth_access_token': access_token,
                 'country_id': owner_user.get('country_id') and self.env['res.country'].browse(owner_user['country_id']) and \
                 self.env['res.country'].browse(owner_user['country_id']).id,

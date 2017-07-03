@@ -95,10 +95,3 @@ class SaasPortal(http.Controller):
             arg0 = literal_eval(arg0)
         messages = []
         return simplejson.dumps({'messages': messages})
-
-    @http.route(['/information'], type='http', auth='user', website=True)
-    def inform_client(self, **post):
-        values = {
-        }
-
-        return request.render('saas_portal.information', values)

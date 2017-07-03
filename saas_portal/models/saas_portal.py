@@ -198,10 +198,8 @@ class SaasPortalPlan(models.Model):
 
     on_create = fields.Selection([
         ('login', 'Log into just created instance'),
-        ('email', 'Go to information page that says to check email for credentials')
-    ], string="Workflow on create", default='email')
-    on_create_email_template = fields.Many2one('mail.template',
-                                               default=lambda self: self.env.ref('saas_portal.email_template_create_saas'))
+    ], string="Workflow on create", default='login')
+    on_create_email_template = fields.Many2one('mail.template')
 
     @api.one
     @api.depends('template_id.state')
@@ -221,11 +219,29 @@ class SaasPortalPlan(models.Model):
         return vals
 
     @api.multi
+    def _prepare_owner_user_data(self, user_id):
+        """
+        Prepare the dict of values to update owner user data in client instalnce. This method may be
+        overridden to implement custom values (making sure to call super() to establish
+        a clean extension chain).
+        """
+        self.ensure_one()
+        owner_user = self.env['res.users'].browse(user_id) or self.env.user
+        owner_user_data = {
+            'user_id': owner_user.id,
+            'login': owner_user.login,
+            'name': owner_user.name,
+            'email': owner_user.email,
+            'password_crypt': owner_user.password_crypt,
+        }
+        return owner_user_data
+
+    @api.multi
     def create_new_database(self, **kwargs):
         return self._create_new_database(**kwargs)
 
     @api.multi
-    def _create_new_database(self, dbname=None, client_id=None, partner_id=None, user_id=None, notify_user=False, trial=False, support_team_id=None, async=None, owner_password=None):
+    def _create_new_database(self, dbname=None, client_id=None, partner_id=None, user_id=None, notify_user=False, trial=False, support_team_id=None, async=None):
         self.ensure_one()
 
         server = self.server_id
@@ -272,17 +288,7 @@ class SaasPortalPlan(models.Model):
             client = self.env['saas_portal.client'].create(vals)
         client_id = client.client_id
 
-        if user_id:
-            owner_user = self.env['res.users'].browse(user_id)
-        else:
-            owner_user = self.env.user
-        owner_user_data = {
-            'user_id': owner_user.id,
-            'login': owner_user.login,
-            'password': owner_password,
-            'name': owner_user.name,
-            'email': owner_user.email,
-        }
+        owner_user_data = self._prepare_owner_user_data(user_id)
 
         client.period_initial = trial and self.expiration
         trial_expiration_datetime = (fields.Datetime.from_string(client.create_date) + timedelta(hours=client.period_initial)).strftime(DEFAULT_SERVER_DATETIME_FORMAT)
@@ -312,8 +318,6 @@ class SaasPortalPlan(models.Model):
         }
         url = '{url}?{params}'.format(url=data.get('url'), params=werkzeug.url_encode(params))
         auth_url = url
-        if self.on_create == 'email':
-            url = '/information'
 
         # send email
         # TODO: get rid of such attributes as ``notify_user``, ``trial`` - move them on plan settings (use different plans for trials and non-trials)

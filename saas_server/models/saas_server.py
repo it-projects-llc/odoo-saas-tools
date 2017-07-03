@@ -404,5 +404,5 @@ class SaasServerClient(models.Model):
 
     @api.model
     def restart_server(self):
-        openerp.service.server.restart()
+        odoo.service.server.restart()
         return True

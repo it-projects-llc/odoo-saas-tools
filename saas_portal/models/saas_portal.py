@@ -198,8 +198,7 @@ class SaasPortalPlan(models.Model):
 
     on_create = fields.Selection([
         ('login', 'Log into just created instance'),
-        ('email', 'Go to information page that says to check email for credentials')
-    ], string="Workflow on create", default='email')
+    ], string="Workflow on create", default='login')
     on_create_email_template = fields.Many2one('mail.template',
                                                default=lambda self: self.env.ref('saas_portal.email_template_create_saas'))
 
@@ -320,8 +319,6 @@ class SaasPortalPlan(models.Model):
         }
         url = '{url}?{params}'.format(url=data.get('url'), params=werkzeug.url_encode(params))
         auth_url = url
-        if self.on_create == 'email':
-            url = '/information'
 
         # send email
         # TODO: get rid of such attributes as ``notify_user``, ``trial`` - move them on plan settings (use different plans for trials and non-trials)

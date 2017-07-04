@@ -105,11 +105,11 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
             f_dbname = '%s.%s' % (qcontext['dbname'], self.get_saas_domain())
             full_dbname = f_dbname.replace('www.', '')
             db_exists = odoo.service.db.exp_db_exist(full_dbname)
-            assert re.match('[a-zA-Z0-9_.-]+$', qcontext.get('dbname')), "Only letters or numbers are allowed in domain."
-            assert db_exists == False, "Web address exists, please choose another web address"
-        assert re.match("^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\.([a-zA-Z]{2,3}|[0-9]{1,3})(\\]?)$", values['email']), "Please enter a valid email address."
-        assert any([k for k in values.values()]), "The form was not properly filled in."
-        assert values.get('password') == qcontext.get('confirm_password'), "Passwords do not match; please retype them."
+            assert re.match('[a-zA-Z0-9_.-]+$', qcontext.get('dbname')), _("Only letters or numbers are allowed in domain.")
+            assert db_exists == False, _("Web address exists, please choose another web address")
+        assert re.match("^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\.([a-zA-Z]{2,3}|[0-9]{1,3})(\\]?)$", values['email']), _("Please enter a valid email address.")
+        assert any([k for k in values.values()]), _("The form was not properly filled in.")
+        assert values.get('password') == qcontext.get('confirm_password'), _("Passwords do not match; please retype them.")
         self._signup_with_values(qcontext.get('token'), values)
         request.cr.commit()
 

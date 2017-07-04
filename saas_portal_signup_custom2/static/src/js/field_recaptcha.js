@@ -5,7 +5,7 @@ odoo.define('saas_portal_signup_custom2.recaptcha', function(require){
 	    var $captchas = $('.g-recaptcha');
 
 	    if ($captchas.length) {
-		$.getScript('https://www.google.com/recaptcha/api.js');
+		$.getScript('https://www.google.com/recaptcha/api.js?hl=vi');
 	    }
 	});
 });

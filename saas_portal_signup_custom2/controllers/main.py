@@ -35,8 +35,8 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
         if state_id:
             qcontext['prev_sel_state'] = request.env['res.country.state'].sudo().browse(int(state_id))
 
-        qcontext['error'] = _("Incorrect. Try again")
         if kw.has_key('g-recaptcha-response') and not request.website.recaptcha_siteverify(kw.get('g-recaptcha-response')):
+            qcontext['error'] = _("Incorrect. Try again")
             return request.render('auth_signup.signup', qcontext)
 
         if kw.get('dbname', False) and kw.get('product_id', False):
@@ -46,7 +46,7 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
 
         # return super(AuthSignupHome, self).web_auth_signup(*args, **kw)
 # imp parent code: instead of showing ``Could not create a new account`` show assertion error text (e.g. if the passwords don't match)
-        qcontext = self.get_auth_signup_qcontext()
+        # qcontext = self.get_auth_signup_qcontext()
 
         if not qcontext.get('token') and not qcontext.get('signup_enabled'):
             raise werkzeug.exceptions.NotFound()

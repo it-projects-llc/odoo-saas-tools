@@ -88,6 +88,8 @@ It is the minimal list of updates. We expect to do even more.
   * Scalable deploy
   * Backuping and restoring
 * Allow to specify server_wide_modules at *SaaS Server*
+* Support for https (upload certificate manually or obtaining one via letsencrypt automatically)
+* Allow to set up interface and payment scheme as for [Odoo Online Edition](https://www.odoo.com/pricing-online)
 
 Current progress
 ================

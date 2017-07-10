@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+<template id="saas_portal_signup_custom2.signup" inherit_id="auth_signup.signup">
+	<xpath expr="//form[@class='oe_signup_form']" position="inside">
+		<div id="fields_validation_string" style="display: none;" string='Please fill out this field.'></div>
+		<div id="selections_validation_string" style="display: none;" string='Please select an item in the lis.'></div>
+	</xpath>
+</template>
+
 <template id="saas_portal_signup_custom2.signup_fields" inherit_id="auth_signup.fields">
 
 	<xpath expr="//div[@class='form-group field-login']" position="before">
@@ -10,7 +17,7 @@
 				<label for="company" class="control-label">Company Name</label>
 				<input type="text" name="company_name" t-att-value="company_name" id="company_name"
 					class="form-control" t-att-autofocus="'autofocus' if login and not only_passwords else None"
-				    autocapitalize="off" required="required" oninvalid="this.setCustomValidity('test validation message')" t-att-readonly="'readonly' if only_passwords else None"/>
+					autocapitalize="off" required="required" oninvalid="this.setCustomValidity($('#fields_validation_string').attr('string'))" t-att-readonly="'readonly' if only_passwords else None"/>
 			</div>
 			<div class="col-lg-6 form-group field-address o_signup_form_required">
 				<label for="address" class="control-label">Address</label>

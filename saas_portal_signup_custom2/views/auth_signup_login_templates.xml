@@ -10,7 +10,7 @@
 				<label for="company" class="control-label">Company Name</label>
 				<input type="text" name="company_name" t-att-value="company_name" id="company_name"
 					class="form-control" t-att-autofocus="'autofocus' if login and not only_passwords else None"
-				    autocapitalize="off" required="required" t-att-readonly="'readonly' if only_passwords else None"/>
+				    autocapitalize="off" required="required" oninvalid="this.setCustomValidity('test validation message')" t-att-readonly="'readonly' if only_passwords else None"/>
 			</div>
 			<div class="col-lg-6 form-group field-address o_signup_form_required">
 				<label for="address" class="control-label">Address</label>

@@ -4,7 +4,7 @@
 <template id="saas_portal_signup_custom2.signup" inherit_id="auth_signup.signup">
 	<xpath expr="//form[@class='oe_signup_form']" position="inside">
 		<div id="fields_validation_string" style="display: none;" string='Please fill out this field.'></div>
-		<div id="selections_validation_string" style="display: none;" string='Please select an item in the lis.'></div>
+		<div id="selections_validation_string" style="display: none;" string='Please select an item in the list.'></div>
 	</xpath>
 </template>
 

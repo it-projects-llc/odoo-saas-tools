@@ -5,7 +5,17 @@
 	<xpath expr="//form[@class='oe_signup_form']" position="inside">
 		<div id="fields_validation_string" style="display: none;" string='Please fill out this field.'></div>
 		<div id="selections_validation_string" style="display: none;" string='Please select an item in the list.'></div>
+		<div id="radio_validation_string" style="display: none;" string='Please select one of these options.'></div>
+		<div id="checkbox_validation_string" style="display: none;" string='Please check this box if you want to proceed.'></div>
 	</xpath>
+	<xpath expr="//form[@class='oe_signup_form']" position="after">
+		<script>
+			function clearValidity(){
+			document.getElementById('trial_radio_box').setCustomValidity('');
+			}
+		</script>
+	</xpath>
+
 </template>
 
 <template id="saas_portal_signup_custom2.signup_fields" inherit_id="auth_signup.fields">
@@ -17,19 +27,28 @@
 				<label for="company" class="control-label">Company Name</label>
 				<input type="text" name="company_name" t-att-value="company_name" id="company_name"
 					class="form-control" t-att-autofocus="'autofocus' if login and not only_passwords else None"
-					autocapitalize="off" required="required" oninvalid="this.setCustomValidity($('#fields_validation_string').attr('string'))" t-att-readonly="'readonly' if only_passwords else None"/>
+					autocapitalize="off" required="required"
+					oninvalid="this.setCustomValidity($('#fields_validation_string').attr('string'))"
+					oninput="setCustomValidity('')"
+					t-att-readonly="'readonly' if only_passwords else None"/>
 			</div>
 			<div class="col-lg-6 form-group field-address o_signup_form_required">
 				<label for="address" class="control-label">Address</label>
 				<input type="text" name="address" t-att-value="address" id="address" class="form-control" t-att-autofocus="'autofocus' if login and not only_passwords else None"
-				    autocapitalize="off" required="required" t-att-readonly="'readonly' if only_passwords else None"/>
+					autocapitalize="off" required="required"
+					oninvalid="this.setCustomValidity($('#fields_validation_string').attr('string'))"
+					oninput="setCustomValidity('')"
+					t-att-readonly="'readonly' if only_passwords else None"/>
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-lg-4 form-group field-city o_signup_form_required">
 				<label for="city" class="control-label">City</label>
 				<input type="text" name="city" t-att-value="city" id="city" class="form-control" t-att-autofocus="'autofocus' if login and not only_passwords else None"
-				    autocapitalize="off" required="required" t-att-readonly="'readonly' if only_passwords else None"/>
+					autocapitalize="off" required="required"
+					oninvalid="this.setCustomValidity($('#fields_validation_string').attr('string'))"
+					oninput="setCustomValidity('')"
+					t-att-readonly="'readonly' if only_passwords else None"/>
 			</div>
 			<div class="col-lg-4 form-group field-state">
 				<label class="control-label" for="state_id">State</label>
@@ -45,7 +64,10 @@
 			<div class="col-lg-4 form-group field-country o_signup_form_required">
 				<label class="control-label" for="country_id">Country</label>
 				<select name="country_id" class="form-control"
-					required="required" t-att-readonly="'readonly' if only_passwords else None">
+					required="required"
+					oninvalid="this.setCustomValidity($('#selections_validation_string').attr('string'))"
+					oninput="setCustomValidity('')"
+					t-att-readonly="'readonly' if only_passwords else None">
 					<option value="" selected="selected" disabled="disabled">Select</option>
 					<option t-if="prev_sel_country" t-att-value="prev_sel_country.id" selected="selected"><t t-esc="prev_sel_country.name"/></option>
 					<t t-foreach="countries or []" t-as="country">
@@ -65,7 +87,10 @@
 				<label for="tel" class="control-label">Tel.</label>
 				<input type="text" name="tel" t-att-value="tel" id="tel"
 					class="form-control" t-att-autofocus="'autofocus' if login and not only_passwords else None"
-					autocapitalize="off" required="required" t-att-readonly="'readonly' if only_passwords else None"/>
+					autocapitalize="off" required="required"
+					oninvalid="this.setCustomValidity($('#fields_validation_string').attr('string'))"
+					oninput="setCustomValidity('')"
+					t-att-readonly="'readonly' if only_passwords else None"/>
 			</div>
 			<div class="col-lg-4 form-group field-fax">
 				<label for="fax" class="control-label">Fax</label>
@@ -79,13 +104,19 @@
 				<label for="business_reg_no" class="control-label">Business Registration No.</label>
 				<input type="text" name="business_reg_no" t-att-value="business_reg_no" id="business_reg_no"
 					class="form-control" t-att-autofocus="'autofocus' if login and not only_passwords else None"
-					autocapitalize="off" required="required" t-att-readonly="'readonly' if only_passwords else None"/>
+					autocapitalize="off" required="required"
+					oninvalid="this.setCustomValidity($('#fields_validation_string').attr('string'))"
+					oninput="setCustomValidity('')"
+					t-att-readonly="'readonly' if only_passwords else None"/>
 			</div>
 			<div class="col-lg-4 form-group field-tax_code o_signup_form_required">
 				<label for="tax_code" class="control-label">Tax code</label>
 				<input type="text" name="tax_code" t-att-value="tax_code" id="tax_code"
 					class="form-control" t-att-autofocus="'autofocus' if login and not only_passwords else None"
-					autocapitalize="off" required="required" t-att-readonly="'readonly' if only_passwords else None"/>
+					autocapitalize="off" required="required"
+					oninvalid="this.setCustomValidity($('#fields_validation_string').attr('string'))"
+					oninput="setCustomValidity('')"
+					t-att-readonly="'readonly' if only_passwords else None"/>
 			</div>
 			<div class="col-lg-4 form-group field-company_website">
 				<label for="company_website" class="control-label">Website</label>
@@ -103,10 +134,13 @@
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-lg-6 form-group field-role">
+			<div class="col-lg-6 form-group field-role o_signup_form_required">
 				<label for="product_id" class="control-label">ERP Package</label>
 				<select name="product_id" class="form-control" placeholder="Select a package"
-					required="required" t-att-readonly="'readonly' if only_passwords else None"
+					required="required"
+					oninvalid="this.setCustomValidity($('#selections_validation_string').attr('string'))"
+					oninput="setCustomValidity('')"
+					t-att-readonly="'readonly' if only_passwords else None"
 					t-att-autofocus="'autofocus' if login and not only_passwords else None">
 					<option value="" selected="selected" disabled="disabled">Select a package</option>
 					<option t-if="prev_sel_product" t-att-value="prev_sel_product.id" selected="selected"><t t-esc="prev_sel_product.name"/></option>
@@ -116,12 +150,15 @@
 					</t>
 				</select>
 			</div>
-			<div class="col-lg-6 form-group field-name">
+			<div class="col-lg-6 form-group field-name o_signup_form_required">
 				<label for="dbname" class="control-label">Desired web address for your system</label>
 				<div class="input-group">
 					<input type="text" name="dbname" t-att-value="dbname"
 						id="dbname" class="form-control" placeholder="your-company-name" maxlength="10"
-						required="required" t-att-readonly="'readonly' if only_passwords else None"
+						required="required"
+						oninvalid="this.setCustomValidity($('#fields_validation_string').attr('string'))"
+						oninput="setCustomValidity('')"
+						t-att-readonly="'readonly' if only_passwords else None"
 						t-att-autofocus="'autofocus' if login and not only_passwords else None" />
 				<span class="input-group-addon">.<t t-raw="base_saas_domain"/></span>
 				</div>
@@ -132,9 +169,13 @@
 				<div class="input-group">
 					<label>
 						<input t-if="trial_or_working == 'trial'" checked="checked"
-							type="radio" name="trial_or_working" value="trial" required="required"> Trial</input>
+							type="radio" id="trial_radio_box" name="trial_or_working" value="trial" required="required"
+							oninvalid="this.setCustomValidity($('#radio_validation_string').attr('string'))"
+							onclick="clearValidity()"> Trial</input>
 						<input t-else=""
-							type="radio" name="trial_or_working" value="trial" required="required"> Trial</input>
+							type="radio" id="trial_radio_box" name="trial_or_working" value="trial" required="required"
+							oninvalid="this.setCustomValidity($('#radio_validation_string').attr('string'))"
+							onclick="clearValidity()"> Trial</input>
 					</label>
 				</div>
 			</div>
@@ -142,12 +183,15 @@
 				<div class="input-group">
 					<label>
 						<input t-if="trial_or_working == 'working'" checked="checked"
-							type="radio" name="trial_or_working" value="working" required="required"> Paid Subscription</input>
+							type="radio" name="trial_or_working" value="working" required="required"
+							onclick="clearValidity()"> Paid Subscription</input>
 						<input t-else=""
-							type="radio" name="trial_or_working" value="working" required="required"> Paid Subscription</input>
+							type="radio" name="trial_or_working" value="working" required="required"
+							onclick="clearValidity()"> Paid Subscription</input>
 					</label>
 				</div>
 			</div>
+
 		</div>
 
 	</xpath>
@@ -158,25 +202,53 @@
 	<xpath expr="//div[@class='form-group field-login']" position="attributes">
 		<attribute name="class">form-group field-login o_signup_form_required</attribute>
 	</xpath>
+	<xpath expr="//input[@name='login']" position="attributes">
+		<attribute name="oninvalid">this.setCustomValidity($('#fields_validation_string').attr('string'))</attribute>
+		<attribute name="oninput">setCustomValidity('')</attribute>
+	</xpath>
 
 	<xpath expr="//div[@class='form-group field-name']" position="replace">
 		<div class="row"><div class="col-lg-12">$0</div></div>
+	</xpath>
+	<xpath expr="//div[@class='form-group field-name']" position="attributes">
+		<attribute name="class">form-group field-name o_signup_form_required</attribute>
+	</xpath>
+	<xpath expr="//input[@name='name']" position="attributes">
+		<attribute name="oninvalid">this.setCustomValidity($('#fields_validation_string').attr('string'))</attribute>
+		<attribute name="oninput">setCustomValidity('')</attribute>
 	</xpath>
 
 	<xpath expr="//div[@class='form-group field-password']" position="replace">
 		<div class="row"><div class="col-lg-12">$0</div></div>
 	</xpath>
+	<xpath expr="//div[@class='form-group field-password']" position="attributes">
+		<attribute name="class">form-group field-password o_signup_form_required</attribute>
+	</xpath>
+	<xpath expr="//input[@name='password']" position="attributes">
+		<attribute name="oninvalid">this.setCustomValidity($('#fields_validation_string').attr('string'))</attribute>
+		<attribute name="oninput">setCustomValidity('')</attribute>
+	</xpath>
 
 	<xpath expr="//div[@class='form-group field-confirm_password']" position="replace">
 		<div class="row"><div class="col-lg-12">$0</div></div>
 	</xpath>
+	<xpath expr="//div[contains(@class,'form-group field-confirm_password')]" position="attributes">
+		<attribute name="class">form-group field-confirm_password o_signup_form_required</attribute>
+	</xpath>
+	<xpath expr="//input[@name='confirm_password']" position="attributes">
+		<attribute name="oninvalid">this.setCustomValidity($('#fields_validation_string').attr('string'))</attribute>
+		<attribute name="oninput">setCustomValidity('')</attribute>
+	</xpath>
 
-	<xpath expr="//div[@class='form-group field-confirm_password']" position="after">
+	<xpath expr="//div[contains(@class,'form-group field-confirm_password')]" position="after">
 		<div class="row">
 			<div class="col-lg-6 form-group">
 				<label for="product_id" class="control-label">Terms and Conditions</label>
 				<div class="input-group">
-					<input type="checkbox" required="required" name="option3" value="a3" /> I agree with the
+					<input type="checkbox" required="required"
+						oninvalid="this.setCustomValidity($('#checkbox_validation_string').attr('string'))"
+						onclick="setCustomValidity('')"
+						name="option3" value="a3" /> I agree with the
 					<a class="btn btn-link btn" data-toggle="modal" data-target=".modal_terms_and_conditions">Terms and Conditions</a>
 				</div>
 			</div>

@@ -36,7 +36,7 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
             qcontext['prev_sel_state'] = request.env['res.country.state'].sudo().browse(int(state_id))
 
         if kw.has_key('g-recaptcha-response') and not request.website.recaptcha_siteverify(kw.get('g-recaptcha-response')):
-            qcontext['error'] = _("Incorrect. Try again")
+            qcontext['error'] = _("Please confirm you are human")
             return request.render('auth_signup.signup', qcontext)
 
         if kw.get('dbname', False) and kw.get('product_id', False):

@@ -250,7 +250,9 @@ class SaasPortalDatabase(models.Model):
     @api.multi
     def _get_xmlrpc_object(self):
         self.ensure_one()
-        url = self.server_id.local_request_scheme + '://' + self.local_host
+        url = self.server_id.local_request_scheme + '://' + self.server_id.local_host
+        if self.server_id.local_port:
+            url += ':' + self.server_id.local_port
         db = self.name
         username = 'admin'
         password = self.password

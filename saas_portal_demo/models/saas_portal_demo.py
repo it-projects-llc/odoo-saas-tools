@@ -3,6 +3,7 @@ import requests
 import xmlrpclib
 
 from odoo import models, fields, api
+from odoo import SUPERUSER_ID as SI
 
 
 class SaasPortalServer(models.Model):
@@ -173,6 +174,19 @@ class SaasPortalServer(models.Model):
                 payload = {'install_addons': addons}
                 plan.template_id.upgrade(payload=payload)
                 record.action_sync_server()
+
+                # after installing demo modules: make `owner_template` user a member of all the admin's security groups
+                db, uid, password, models = plan.template_id._get_xmlrpc_object()
+                admin_groups = models.execute_kw(db, uid, password,
+                        'res.users', 'search_read',
+                        [[['id', '=', SI]]],
+                        {'fields': ['groups_id']})
+                owner_user_id = models.execute_kw(db, uid, password,
+                        'res.users', 'search',
+                        [[['login', '=', 'owner_template']]])
+                models.execute_kw(db, uid, password,
+                        'res.users', 'write',
+                        [owner_user_id, {'groups_id': [(6, 0, admin_groups[0]['groups_id'])]}])
 
         return True
 

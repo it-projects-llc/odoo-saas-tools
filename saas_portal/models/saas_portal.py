@@ -320,12 +320,10 @@ class SaasPortalPlan(models.Model):
         url = '{url}?{params}'.format(url=data.get('url'), params=werkzeug.url_encode(params))
         auth_url = url
 
-        # send email
-        # TODO: get rid of such attributes as ``notify_user``, ``trial`` - move them on plan settings (use different plans for trials and non-trials)
-        if notify_user or self.on_create == 'email':
-            template = self.on_create_email_template
-            if template:
-                client.message_post_with_template(template.id, composition_mode='comment')
+        # send email if there is mail template record
+        template = self.on_create_email_template
+        if template:
+            client.message_post_with_template(template.id, composition_mode='comment')
 
         client.write({'expiration_datetime': initial_expiration_datetime})
 

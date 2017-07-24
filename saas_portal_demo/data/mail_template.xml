@@ -1,9 +1,9 @@
 <odoo>
 
-        <record id="email_template_create_saas" model="mail.template">
-            <field name="name">demo. on create SaaS client</field>
+        <record id="email_template_create_saas_for_demo" model="mail.template">
+            <field name="name">on new SaaS client instance for demo</field>
             <field name="email_from">${(object.user_id.email or '')|safe}</field>
-            <field name="subject">${object.plan_id.name}</field>
+            <field name="subject">Your demo instance for ${object.plan_id.name}</field>
             <field name="partner_to">${object.partner_id.id}</field>
             <field name="model_id" ref="saas_portal.model_saas_portal_client"/>
             <field name="auto_delete" eval="True"/>

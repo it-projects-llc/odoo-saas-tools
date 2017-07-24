@@ -34,7 +34,6 @@ class SaasPortal(http.Controller):
             partner_id = user.partner_id.id
         plan = self.get_plan(int(post.get('plan_id', 0) or 0))
         trial = bool(post.get('trial'))
-        print '\n\n\n', 'controller, trial', trial, '\n\n\n'
         try:
             res = plan.create_new_database(dbname=dbname,
                                            user_id=user_id,

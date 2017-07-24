@@ -325,7 +325,7 @@ class SaasPortalPlan(models.Model):
         if template:
             client.message_post_with_template(template.id, composition_mode='comment')
 
-        client.write({'expiration_datetime': initial_expiration_datetime})
+        client.write({'expiration_datetime': trial and trial_expiration_datetime or initial_expiration_datetime})
 
         client.send_params_to_client_db()
         # TODO make async call of action_sync_server here

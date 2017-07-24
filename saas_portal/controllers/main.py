@@ -33,10 +33,13 @@ class SaasPortal(http.Controller):
             user = request.env['res.users'].browse(user_id)
             partner_id = user.partner_id.id
         plan = self.get_plan(int(post.get('plan_id', 0) or 0))
+        trial = bool(post.get('trial'))
+        print '\n\n\n', 'controller, trial', trial, '\n\n\n'
         try:
             res = plan.create_new_database(dbname=dbname,
                                            user_id=user_id,
-                                           partner_id=partner_id,)
+                                           partner_id=partner_id,
+                                           trial=trial,)
         except MaximumDBException:
             url = request.env['ir.config_parameter'].sudo().get_param('saas_portal.page_for_maximumdb', '/')
             return werkzeug.utils.redirect(url)

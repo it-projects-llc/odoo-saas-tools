@@ -169,7 +169,8 @@ Init saas
  --server-hosts-template={dbname}.${SERVER_NAME}.{base_saas_domain} \
  --local-portal-host=odoo-portal \
  --local-server-host=${SERVER_NAME} \
- --install-modules=saas_server_demo \
+ --install-modules=saas_server_demo,\
+ saas_server_autodelete \
  --demo-repositories=\
  /mnt/addons/it-projects-llc/misc-addons,\
  /mnt/addons/it-projects-llc/pos-addons \

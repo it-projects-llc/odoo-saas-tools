@@ -75,7 +75,8 @@ class SaasPortalServer(models.Model):
                 plan = plan_obj.create({'name': plan_name,
                                         'server_id': self.id,
                                         'dbname_template': namestring.format(demo_module['demo_url'], '%i'),
-                                        'template_id': template.id})
+                                        'template_id': template.id,
+                                        'on_create_email_template': self.env.ref('saas_portal_demo.email_template_create_saas_for_demo')})
                 return plan
         else:
             return None

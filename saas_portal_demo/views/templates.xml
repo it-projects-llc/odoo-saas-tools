@@ -111,7 +111,7 @@
         <t t-foreach="product.product_variant_ids" t-as="product_variant">
           <t t-if="set(product_variant.attribute_value_ids.ids) &amp; attrib_set">
               <a id="try_trial" style="margin-left: 8px" class="btn btn-primary btn-default btn-lg mt8"
-                  t-attf-href="/saas_portal/add_new_client?plan_id=#{product_variant.variant_plan_id.id}">Try trial</a>
+                  t-attf-href="/saas_portal/add_new_client?plan_id=#{product_variant.variant_plan_id.id}&amp;trial=1">Try trial</a>
           </t>
         </t>
       </xpath>

@@ -82,6 +82,18 @@ class SaasPortalServer(models.Model):
         else:
             return None
 
+
+    @api.multi
+    def _create_demo_images(self, demo_module):
+        self.ensure_one()
+
+        db, uid, password, models = self._get_xmlrpc_object(self.name)
+
+        images = models.execute_kw(db, uid, password, 'ir.module.module', 'get_demo_images', [demo_module['id']])
+
+        return images
+
+
     @api.multi
     def _create_demo_product(self, demo_module, plan):
         self.ensure_one()
@@ -96,6 +108,8 @@ class SaasPortalServer(models.Model):
         odoo_version_attrib = self.env.ref('saas_portal_demo.odoo_version_product_attribute')
         attrib_value = self.env.ref('saas_portal_demo.product_attribute_value_{}'.format(self.odoo_version))
 
+        images_res = self._create_demo_images(demo_module)
+
         if not product_template:
             vals = {
                 'name': product_template_name,
@@ -103,10 +117,11 @@ class SaasPortalServer(models.Model):
                 'website_published': True,
                 'seo_url': demo_module.get('demo_url'),
                 'description': demo_module.get('demo_summary'),
-                'image': demo_module.get('demo_image'),
+                'image': images_res and images_res.popitem()[1] or None,
                 'sale_on_website': False,
                 'saas_demo': True,
                 'type': 'service',
+                'product_image_ids': images_res and [(0, 0, {'name': name, 'image': image}) for name, image in images_res.iteritems()] or None,
             }
             product_template = product_template_obj.with_context({
                 'create_product_product': False

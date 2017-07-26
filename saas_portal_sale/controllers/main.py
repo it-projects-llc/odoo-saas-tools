@@ -12,7 +12,6 @@ class SaasPortalSale(SaasPortal):
         plan = self.get_plan(int(post.get('plan_id', 0) or 0))
 
         if not plan.free_subdomains:
-            dbname = self.get_full_dbname(post.get('dbname'))
             user_id = request.session.uid
             partner_id = None
             if user_id:

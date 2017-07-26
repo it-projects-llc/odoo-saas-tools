@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 import logging
-_logger = logging.getLogger(__name__)
 
 from odoo import api
 from odoo import models
+
+_logger = logging.getLogger(__name__)
 
 
 class SaasPortalPlan(models.Model):

@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
 from ast import literal_eval
 import odoo
-from odoo import SUPERUSER_ID, exceptions
+from odoo import exceptions
 from odoo.tools.translate import _
 from odoo import http
 from odoo.http import request
 from odoo.addons.saas_base.exceptions import MaximumDBException, MaximumTrialDBException
 import werkzeug
 import simplejson
-from datetime import datetime, timedelta
-from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 
 
 class SignupError(Exception):

@@ -182,7 +182,7 @@ class SaasServerClient(models.Model):
                 'oauth_provider_id': oauth_provider.id,
                 'oauth_uid': portal_owner_uid,
                 'oauth_access_token': access_token,
-                'country_id': owner_user.get('country_id') and self.env['res.country'].browse(owner_user['country_id']) and \
+                'country_id': owner_user.get('country_id') and self.env['res.country'].browse(owner_user['country_id']) and
                 self.env['res.country'].browse(owner_user['country_id']).id,
             })
 
@@ -339,12 +339,12 @@ class SaasServerClient(models.Model):
                 limit_record = base_limit_records_number_obj.search([('model_id', '=', model.id)])
                 if limit_record:
                     limit_record.update({'domain': limit_line['domain'],
-                                         'max_records': limit_line['max_records'],})
+                                         'max_records': limit_line['max_records']})
                 else:
                     base_limit_records_number_obj.create({'name': 'limit_' + limit_line['model'],
                                                       'model_id': model.id,
                                                       'domain': limit_line['domain'],
-                                                      'max_records': limit_line['max_records'],})
+                                                      'max_records': limit_line['max_records']})
             else:
                 res['limit'] = "there is no model named %s" % limit_line['model']
 

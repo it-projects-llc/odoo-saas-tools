@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import requests
 import xmlrpclib
 
 from odoo import models, fields, api
@@ -32,9 +31,9 @@ class SaasPortalServer(models.Model):
                                 [[['name', '=', 'base']]],
                                 )
         base_module = models.execute_kw(db, uid, password,
-                                    'ir.module.module',
-                                    'read', [ids],
-                                    {'fields': ['latest_version']})
+                                        'ir.module.module',
+                                        'read', [ids],
+                                        {'fields': ['latest_version']})
         return base_module[0].get('latest_version')
 
     def _prepare_module(self, module, plan):
@@ -65,7 +64,6 @@ class SaasPortalServer(models.Model):
             if version:
                 self.odoo_version = version.split('.', 1)[0]
         namestring = '{0}-{1}'
-        saas_domain = self.env['ir.config_parameter'].get_param('saas_portal.base_saas_domain')
         template_name = namestring.format(demo_module['demo_url'], 't')
         plan_name = 'Demo for {0}.0 {1}'.format(self.odoo_version, demo_module['demo_url'])
 
@@ -82,7 +80,6 @@ class SaasPortalServer(models.Model):
         else:
             return None
 
-
     @api.multi
     def _create_demo_images(self, demo_module):
         self.ensure_one()
@@ -92,7 +89,6 @@ class SaasPortalServer(models.Model):
         images = models.execute_kw(db, uid, password, 'ir.module.module', 'get_demo_images', [demo_module['id']])
 
         return images
-
 
     @api.multi
     def _create_demo_product(self, demo_module, plan):
@@ -145,6 +141,7 @@ class SaasPortalServer(models.Model):
             'attribute_value_ids': [(4, attrib_value.id)],
             'variant_plan_id': plan.id,
         })
+        return product_product
 
     @api.multi
     def generate_demo_plans(self):
@@ -194,16 +191,9 @@ class SaasPortalServer(models.Model):
 
                 # after installing demo modules: make `owner_template` user a member of all the admin's security groups
                 db, uid, password, models = plan.template_id._get_xmlrpc_object()
-                admin_groups = models.execute_kw(db, uid, password,
-                        'res.users', 'search_read',
-                        [[['id', '=', SI]]],
-                        {'fields': ['groups_id']})
-                owner_user_id = models.execute_kw(db, uid, password,
-                        'res.users', 'search',
-                        [[['login', '=', 'owner_template']]])
-                models.execute_kw(db, uid, password,
-                        'res.users', 'write',
-                        [owner_user_id, {'groups_id': [(6, 0, admin_groups[0]['groups_id'])]}])
+                admin_groups = models.execute_kw(db, uid, password, 'res.users', 'search_read', [[['id', '=', SI]]], {'fields': ['groups_id']})
+                owner_user_id = models.execute_kw(db, uid, password, 'res.users', 'search', [[['login', '=', 'owner_template']]])
+                models.execute_kw(db, uid, password, 'res.users', 'write', [owner_user_id, {'groups_id': [(6, 0, admin_groups[0]['groups_id'])]}])
 
         return True
 
@@ -225,13 +215,10 @@ class SaasPortalServer(models.Model):
     @api.multi
     def update_templates(self):
         for record in self:
-            plans = self.env['saas_portal.plan'].search([('server_id', '=', record.id),
-                                                         ('demo_plan_module_ids', '!=', False),
-                                                         ('template_id.state', '=', 'template')])
+            plans = self.env['saas_portal.plan'].search([('server_id', '=', record.id), ('demo_plan_module_ids', '!=', False), ('template_id.state', '=', 'template')])
             for plan in plans:
                 db, uid, password, models = plan.template_id._get_xmlrpc_object()
-                id = models.execute_kw(db, uid, password, 'ir.module.module', 'search',
-                                        [[['name', 'in', ['base']]]])
+                id = models.execute_kw(db, uid, password, 'ir.module.module', 'search', [[['name', 'in', ['base']]]])
                 models.execute_kw(db, uid, password, 'ir.module.module', 'button_upgrade', [id])
         return True
 

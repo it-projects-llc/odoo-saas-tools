@@ -24,14 +24,14 @@ class ModuleDemo(models.Model):
     def get_values_from_terp(terp):
         res = A.get_values_from_terp(terp)
         res.update({
-            'demo_title': terp.get('demo_title', False),
-            'demo_summary': terp.get('demo_summary', False),
-            'demo_addons': ','.join(terp.get('demo_addons', [])),
-            'demo_addons_hidden': ','.join(terp.get('demo_addons_hidden', [])),
-            'demo_url': terp.get('demo_url', False),
-            'price': terp.get('price', False),
-            'currency': terp.get('currency', False),
-            })
+                    'demo_title': terp.get('demo_title', False),
+                    'demo_summary': terp.get('demo_summary', False),
+                    'demo_addons': ','.join(terp.get('demo_addons', [])),
+                    'demo_addons_hidden': ','.join(terp.get('demo_addons_hidden', [])),
+                    'demo_url': terp.get('demo_url', False),
+                    'price': terp.get('price', False),
+                    'currency': terp.get('currency', False),
+                    })
         return res
 
     @api.multi

@@ -118,6 +118,7 @@ class SaasServer(http.Controller):
     @webservice
     def upgrade_database(self, **post):
         state = simplejson.loads(post.get('state'))
+        data = state.get('data')
         access_token = post['access_token']
         saas_oauth_provider = request.env.ref('saas_server.saas_oauth_provider').sudo()
 
@@ -140,6 +141,7 @@ class SaasServer(http.Controller):
         _logger.info('delete_database post: %s', post)
         state = simplejson.loads(post.get('state'))
         client_id = state.get('client_id')
+        db = state.get('d')
         new_dbname = state.get('new_dbname')
         saas_oauth_provider = request.env.ref('saas_server.saas_oauth_provider').sudo()
 
@@ -256,7 +258,9 @@ class SaasServer(http.Controller):
         _logger.info('sync_server post: %s', post)
 
         state = simplejson.loads(post.get('state'))
+        client_id = state.get('client_id')
         updating_client_ID = state.get('updating_client_ID')
+        db = state.get('d')
         access_token = post['access_token']
         saas_oauth_provider = request.env.ref('saas_server.saas_oauth_provider').sudo()
 
@@ -301,6 +305,7 @@ class SaasServer(http.Controller):
 
         state = simplejson.loads(post.get('state'))
         client_id = state.get('client_id')
+        db = state.get('d')
         access_token = post['access_token']
         saas_oauth_provider = request.env.ref('saas_server.saas_oauth_provider').sudo()
 

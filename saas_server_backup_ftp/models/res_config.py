@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api
-from odoo import _
+from odoo import tools, _
 from odoo.exceptions import Warning as UserError
 
 import logging
@@ -36,7 +36,6 @@ class SaasPortalConfigWizard(models.TransientModel):
         for record in self:
             config_parameters.set_param("saas_server.sftp_rsa_key_path",
                                         record.sftp_rsa_key_path or '')
-
     # sftp_server
     @api.model
     def get_default_sftp_server(self, fields):
@@ -89,6 +88,7 @@ class SaasPortalConfigWizard(models.TransientModel):
         server = self.env["ir.config_parameter"].get_param("saas_server.sftp_server", default=None)
         username = self.env["ir.config_parameter"].get_param("saas_server.sftp_username", default=None)
         password = self.env["ir.config_parameter"].get_param("saas_server.sftp_password", default=None)
+        path = self.env["ir.config_parameter"].get_param("saas_server.sftp_path", default=None)
         sftp_rsa_key_path = self.env["ir.config_parameter"].get_param('saas_server.sftp_rsa_key_path')
 
         messageTitle = ""

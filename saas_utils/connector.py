@@ -19,6 +19,7 @@
 #
 ##############################################################################
 import odoo
+from odoo import SUPERUSER_ID
 
 
 def call(dbname, model, method, *args, **kwargs):

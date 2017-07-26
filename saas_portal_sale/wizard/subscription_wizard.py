@@ -28,6 +28,7 @@ class SaasSubscriptionWizard(models.TransientModel):
 
         self.invoice_line_ids.write({'saas_portal_client_id': self.client_id.id})
 
+
     @api.model
     def find_partner_payments(self, partner_id, plan_id):
         lines = self.env['account.invoice.line'].search([('partner_id', '=', partner_id),

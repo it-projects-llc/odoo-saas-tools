@@ -347,7 +347,7 @@ class SaasPortalPlan(models.Model):
     @api.multi
     def create_template_button(self):
         res = self.create_template()
-        return res
+
 
     @api.multi
     def create_template(self, addons=None):
@@ -601,8 +601,8 @@ class SaasPortalClient(models.Model):
                                           store=True)
     period_paid = fields.Integer('Subscribed period (paid days)', readonly=True)
     period_initial = fields.Integer('Initial period for trial (hours)',
-                                    help='Subsription initial period in hours for trials',
-                                    readonly=True)
+                                   help='Subsription initial period in hours for trials',
+                                   readonly=True)
     subscription_log_ids = fields.One2many('saas_portal.subscription_log', 'client_id')
 
     # TODO: use new api for tracking
@@ -778,6 +778,8 @@ class SaasPortalClient(models.Model):
             'db_template': self.name,
             'disable_mail_server': True,
         }
+
+        scope = ['userinfo', 'force_login', 'trial', 'skiptheuse']
 
         req, req_kwargs = server._request_server(path='/saas_server/new_database',
                                                  state=state,

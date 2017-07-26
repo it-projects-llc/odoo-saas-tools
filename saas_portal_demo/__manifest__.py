@@ -9,8 +9,8 @@
     "author": "IT-Projects LLC, Cesar Lage, Ivan Yelizariev",
     "website": "https://it-projects.info",
     "license": "GPL-3",
-    # "price": 9.00,
-    # "currency": "EUR",
+    #"price": 9.00,
+    #"currency": "EUR",
 
     "depends": [
         "saas_portal",

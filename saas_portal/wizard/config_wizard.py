@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import requests
+import werkzeug
+import simplejson
 
 from odoo.http import request
 from odoo import api
@@ -43,6 +45,7 @@ class SaasConfig(models.TransientModel):
     def upgrade_database(self):
         self.ensure_one()
         obj = self[0]
+        scheme = request.httprequest.scheme
         payload = {
             # TODO: add configure mail server option here
             'update_addons_list': (obj.update_addons_list or ''),
@@ -75,7 +78,7 @@ class SaasConfig(models.TransientModel):
         }
         req, req_kwargs = database_record.server_id._request_server(
             path='/saas_server/upgrade_database',
-            client_id=database_record.client_id,
+            client_id = database_record.client_id,
             state=state,
         )
         res = requests.Session().send(req, **req_kwargs)
@@ -106,7 +109,7 @@ class SaasConfigParam(models.TransientModel):
 
     def _get_keys(self):
         return [
-            ('saas_client.max_users', 'Max Users (obsolete)'),  # this parameter is obsolete. use access_limit_records_number module
+            ('saas_client.max_users', 'Max Users (obsolete)'), # this parameter is obsolete. use access_limit_records_number module
             ('saas_client.suspended', 'Suspended'),
             ('saas_client.total_storage_limit', 'Total storage limit'),
         ]

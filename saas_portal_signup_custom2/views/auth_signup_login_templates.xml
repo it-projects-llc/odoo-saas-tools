@@ -42,6 +42,22 @@
 			</div>
 		</div>
 		<div class="row">
+			<div class="col-lg-4 form-group field-business_sector o_signup_form_required">
+				<label class="control-label" for="country_id">Business sector</label>
+				<select name="sector_id" class="form-control"
+					required="required"
+					oninvalid="this.setCustomValidity($('#selections_validation_string').attr('string'))"
+					oninput="setCustomValidity('')"
+					t-att-readonly="'readonly' if only_passwords else None">
+					<option value="" selected="selected" disabled="disabled">Select</option>
+					<option t-if="prev_sel_sector" t-att-value="prev_sel_sector.id" selected="selected"><t t-esc="prev_sel_sector.name"/></option>
+					<t t-foreach="sectors or []" t-as="sector">
+						<option t-att-value="sector.id"><t t-esc="sector.name"/></option>
+					</t>
+				</select>
+			</div>
+		</div>
+		<div class="row">
 			<div class="col-lg-4 form-group field-city o_signup_form_required">
 				<label for="city" class="control-label">City</label>
 				<input type="text" name="city" t-att-value="city" id="city" class="form-control" t-att-autofocus="'autofocus' if login and not only_passwords else None"

@@ -27,6 +27,10 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
         if country_id:
             qcontext['prev_sel_country'] = request.env['res.country'].sudo().browse(int(country_id))
 
+        sector_id = kw.get('sector_id')
+        if sector_id:
+            qcontext['prev_sel_sector'] = request.env['res.partner.sector'].sudo().browse(int(sector_id))
+
         product_id = kw.get('product_id')
         if product_id:
             qcontext['prev_sel_product'] = request.env['product.product'].sudo().browse(int(product_id))
@@ -75,6 +79,8 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
             qcontext['products'] = request.env['product.product'].sudo().search([('saas_plan_id', '!=', False)])
         if not qcontext.get('states', False):
             qcontext['states'] = request.env['res.country.state'].sudo().search([])
+        if not qcontext.get('sectors', False):
+            qcontext['sectors'] = request.env['res.partner.sector'].sudo().search([])
         return qcontext
 
     def get_saas_domain(self):

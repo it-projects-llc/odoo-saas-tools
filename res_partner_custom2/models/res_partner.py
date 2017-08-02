@@ -12,6 +12,7 @@ class Partner(models.Model):
     employee_number = fields.Integer(string='Number of employee')
     company_size = fields.Selection(string='Company size', selection='_get_company_sizes')
     account_currency_id = fields.Many2one('res.currency', string='Banking account currency')
+    previous_year_turnover = fields.Integer(string='Previous year turn-over')
 
     @api.model
     def _get_company_sizes(self):

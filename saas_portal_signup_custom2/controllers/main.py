@@ -111,6 +111,7 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
         establishment_date = datetime(int(qcontext.get('establishment_year')), 1, 1)
         values['establishment_year'] = establishment_date.strftime(DF)
         # values['employee_number'] = qcontext.get('employee_number', None)
+        values['previous_year_turnover'] = qcontext.get('previous_year_turnover', None)
         values['company_size'] = qcontext.get('company_size', None)
         values['website'] = qcontext.get('company_website', None)
         values['phone'] = qcontext.get('tel', None)

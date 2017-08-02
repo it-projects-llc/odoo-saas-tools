@@ -98,6 +98,14 @@
 			</div>
 		</div>
 		<div class="row">
+			<div class="col-lg-3 form-group field-previous_year_turnover">
+				<label for="previous_year_turnover" class="control-label">Previous year turn-over</label>
+				<input type="text" name="previous_year_turnover" t-att-value="previous_year_turnover" id="previous_year_turnover" class="form-control"
+					t-att-autofocus="'autofocus' if login and not only_passwords else None"
+				    autocapitalize="off" t-att-readonly="'readonly' if only_passwords else None"/>
+			</div>
+		</div>
+		<div class="row">
 			<div class="col-lg-4 form-group field-city o_signup_form_required">
 				<label for="city" class="control-label">City</label>
 				<input type="text" name="city" t-att-value="city" id="city" class="form-control" t-att-autofocus="'autofocus' if login and not only_passwords else None"

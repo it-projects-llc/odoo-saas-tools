@@ -15,6 +15,7 @@
 			<!-- <field name="employee_number"/> -->
 			<field name="company_size" attrs="{'invisible': [('is_company', '=', False)]}"/>
 			<field name="account_currency_id" options="{'no_create': True}" attrs="{'invisible': [('is_company', '=', False)]}"/>
+			<field name="previous_year_turnover" attrs="{'invisible': [('is_company', '=', False)]}"/>
 		</field>
 	</field>
 </record>

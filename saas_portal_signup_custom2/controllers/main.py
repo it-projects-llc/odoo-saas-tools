@@ -5,7 +5,9 @@ from odoo import http
 import re
 from odoo.http import request
 import logging
+from datetime import datetime
 
+from openerp.tools import DEFAULT_SERVER_DATE_FORMAT as DF
 import odoo
 from odoo import SUPERUSER_ID
 from odoo.tools.translate import _
@@ -38,6 +40,10 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
         state_id = kw.get('state_id')
         if state_id:
             qcontext['prev_sel_state'] = request.env['res.country.state'].sudo().browse(int(state_id))
+
+        company_size = kw.get('company_size')
+        if company_size:
+            qcontext['prev_sel_company_size'] = company_size
 
         if kw.has_key('g-recaptcha-response') and not request.website.recaptcha_siteverify(kw.get('g-recaptcha-response')):
             qcontext['error'] = _("Please confirm you are human")
@@ -81,6 +87,8 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
             qcontext['states'] = request.env['res.country.state'].sudo().search([])
         if not qcontext.get('sectors', False):
             qcontext['sectors'] = request.env['res.partner.sector'].sudo().search([])
+        if not qcontext.get('company_sizes', False):
+            qcontext['company_sizes'] = request.env['res.partner']._get_company_sizes()
         return qcontext
 
     def get_saas_domain(self):
@@ -94,6 +102,10 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
         values['email'] = qcontext['login']
         values['company_name'] = qcontext.get('company_name', None)
         values['is_company'] = True
+        establishment_date = datetime(int(qcontext.get('establishment_year')), 1, 1)
+        values['establishment_year'] = establishment_date.strftime(DF)
+        # values['employee_number'] = qcontext.get('employee_number', None)
+        values['company_size'] = qcontext.get('company_size', None)
         values['website'] = qcontext.get('company_website', None)
         values['phone'] = qcontext.get('tel', None)
         values['fax'] = qcontext.get('fax', None)
@@ -106,6 +118,8 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
         values['dnb_number'] = qcontext.get('dnb_number', None)
         if qcontext.get('country_id', False):
             values['country_id'] = qcontext['country_id']
+        if qcontext.get('sector_id', False):
+            values['sector_id'] = qcontext['sector_id']
         if qcontext.get('state_id', False):
             values['state_id'] = qcontext['state_id']
         if qcontext.get('dbname', False):

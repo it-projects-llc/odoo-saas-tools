@@ -42,7 +42,7 @@
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-lg-4 form-group field-business_sector o_signup_form_required">
+			<div class="col-lg-3 form-group field-business_sector o_signup_form_required">
 				<label class="control-label" for="country_id">Business sector</label>
 				<select name="sector_id" class="form-control"
 					required="required"
@@ -53,6 +53,32 @@
 					<option t-if="prev_sel_sector" t-att-value="prev_sel_sector.id" selected="selected"><t t-esc="prev_sel_sector.name"/></option>
 					<t t-foreach="sectors or []" t-as="sector">
 						<option t-att-value="sector.id"><t t-esc="sector.name"/></option>
+					</t>
+				</select>
+			</div>
+			<div class="col-lg-3 form-group field-year o_signup_form_required">
+				<label for="company" class="control-label">Year of establishment</label>
+				<input type="text" name="establishment_year" t-att-value="establishment_year" id="establishment_year"
+					class="form-control" t-att-autofocus="'autofocus' if login and not only_passwords else None"
+					autocapitalize="off" required="required"
+					oninvalid="this.setCustomValidity($('#fields_validation_string').attr('string'))"
+					oninput="setCustomValidity('')"
+					t-att-readonly="'readonly' if only_passwords else None"/>
+			</div>
+			<!-- <div class="col-lg-3 form-group field-employee_number"> -->
+			<!-- 	<label for="employee_number" class="control-label">Number of employee</label> -->
+			<!-- 	<input type="text" name="employee_number" t-att-value="employee_number" id="employee_number" class="form-control" -->
+			<!-- 		t-att-autofocus="'autofocus' if login and not only_passwords else None" -->
+			<!-- 	    autocapitalize="off" t-att-readonly="'readonly' if only_passwords else None"/> -->
+			<!-- </div> -->
+			<div class="col-lg-3 form-group field-company_size">
+				<label class="control-label" for="company_size">Company size</label>
+				<select name="company_size" class="form-control"
+					t-att-readonly="'readonly' if only_passwords else None">
+					<option value="" selected="selected" disabled="disabled">Select</option>
+					<option t-if="prev_sel_company_size" t-att-value="prev_sel_company_size" selected="selected"><t t-esc="prev_sel_company_size"/></option>
+					<t t-foreach="company_sizes or []" t-as="company_size">
+						<option t-att-value="company_size[0]"><t t-esc="company_size[1]"/></option>
 					</t>
 				</select>
 			</div>

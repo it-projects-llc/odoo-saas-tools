@@ -41,6 +41,10 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
         if state_id:
             qcontext['prev_sel_state'] = request.env['res.country.state'].sudo().browse(int(state_id))
 
+        currency_id = kw.get('account_currency_id')
+        if currency_id:
+            qcontext['prev_sel_currency'] = request.env['res.currency'].sudo().browse(int(currency_id))
+
         company_size = kw.get('company_size')
         if company_size:
             qcontext['prev_sel_company_size'] = company_size
@@ -89,6 +93,8 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
             qcontext['sectors'] = request.env['res.partner.sector'].sudo().search([])
         if not qcontext.get('company_sizes', False):
             qcontext['company_sizes'] = request.env['res.partner']._get_company_sizes()
+        if not qcontext.get('currencies', False):
+            qcontext['currencies'] = request.env['res.currency'].search([])
         return qcontext
 
     def get_saas_domain(self):
@@ -118,6 +124,8 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
         values['dnb_number'] = qcontext.get('dnb_number', None)
         if qcontext.get('country_id', False):
             values['country_id'] = qcontext['country_id']
+        if qcontext.get('account_currency_id', False):
+            values['account_currency_id'] = qcontext['account_currency_id']
         if qcontext.get('sector_id', False):
             values['sector_id'] = qcontext['sector_id']
         if qcontext.get('state_id', False):

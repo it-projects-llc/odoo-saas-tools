@@ -11,6 +11,7 @@ class Partner(models.Model):
     establishment_year = fields.Datetime()
     employee_number = fields.Integer(string='Number of employee')
     company_size = fields.Selection(string='Company size', selection='_get_company_sizes')
+    account_currency_id = fields.Many2one('res.currency', string='Banking account currency')
 
     @api.model
     def _get_company_sizes(self):

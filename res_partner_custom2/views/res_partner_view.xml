@@ -13,7 +13,8 @@
 			<field name="tax_code"/>
 			<field name="establishment_year" attrs="{'invisible': [('is_company', '=', False)]}"/>
 			<!-- <field name="employee_number"/> -->
-			<field name="company_size"/>
+			<field name="company_size" attrs="{'invisible': [('is_company', '=', False)]}"/>
+			<field name="account_currency_id" options="{'no_create': True}" attrs="{'invisible': [('is_company', '=', False)]}"/>
 		</field>
 	</field>
 </record>

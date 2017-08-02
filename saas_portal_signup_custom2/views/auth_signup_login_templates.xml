@@ -82,6 +82,20 @@
 					</t>
 				</select>
 			</div>
+			<div class="col-lg-3 form-group field-account_currency_id o_signup_form_required">
+				<label class="control-label" for="account_currency_id">Banking account currency</label>
+				<select name="account_currency_id" class="form-control"
+					required="required"
+					oninvalid="this.setCustomValidity($('#selections_validation_string').attr('string'))"
+					oninput="setCustomValidity('')"
+					t-att-readonly="'readonly' if only_passwords else None">
+					<option value="" selected="selected" disabled="disabled">Select</option>
+					<option t-if="prev_sel_currency" t-att-value="prev_sel_currency.id" selected="selected"><t t-esc="prev_sel_currency.name"/></option>
+					<t t-foreach="currencies or []" t-as="currency">
+						<option t-att-value="currency.id"><t t-esc="currency.name"/></option>
+					</t>
+				</select>
+			</div>
 		</div>
 		<div class="row">
 			<div class="col-lg-4 form-group field-city o_signup_form_required">

@@ -76,7 +76,7 @@
 				<select name="company_size" class="form-control"
 					t-att-readonly="'readonly' if only_passwords else None">
 					<option value="" selected="selected" disabled="disabled">Select</option>
-					<option t-if="prev_sel_company_size" t-att-value="prev_sel_company_size" selected="selected"><t t-esc="prev_sel_company_size"/></option>
+					<option t-if="prev_sel_company_size" t-att-value="prev_sel_company_size[0]" selected="selected"><t t-esc="prev_sel_company_size[1]"/></option>
 					<t t-foreach="company_sizes or []" t-as="company_size">
 						<option t-att-value="company_size[0]"><t t-esc="company_size[1]"/></option>
 					</t>
@@ -105,6 +105,34 @@
 				    autocapitalize="off" t-att-readonly="'readonly' if only_passwords else None"/>
 			</div>
 		</div>
+		<fieldset class="director-information">
+			<legend class="director-information">Director information</legend>
+			<div class="row">
+					<div class="col-lg-4 form-group field-full_name">
+						<label for="full_name" class="control-label">Full name</label>
+						<input type="text" name="full_name" t-att-value="full_name" id="full_name" class="form-control"
+							t-att-autofocus="'autofocus' if login and not only_passwords else None"
+						    autocapitalize="off" t-att-readonly="'readonly' if only_passwords else None"/>
+					</div>
+					<div class="col-lg-4 form-group field-gender">
+						<label class="control-label" for="gender">Gender</label>
+						<select name="gender" class="form-control"
+							t-att-readonly="'readonly' if only_passwords else None">
+							<option value="" selected="selected" disabled="disabled">Select</option>
+							<option t-if="prev_sel_gender" t-att-value="prev_sel_gender[0]" selected="selected"><t t-esc="prev_sel_gender[1]"/></option>
+							<t t-foreach="genders or []" t-as="gender">
+								<option t-att-value="gender[0]"><t t-esc="gender[1]"/></option>
+							</t>
+						</select>
+					</div>
+					<div class="col-lg-4 form-group field-birthdate_date">
+						<label for="birthdate_date" class="control-label">Date of birth</label>
+						<input type="text" name="birthdate_date" t-att-value="birthdate_date" id="birthdate_date" class="form-control"
+							t-att-autofocus="'autofocus' if login and not only_passwords else None"
+						    autocapitalize="off" t-att-readonly="'readonly' if only_passwords else None"/>
+					</div>
+			</div>
+		</fieldset>
 		<div class="row">
 			<div class="col-lg-4 form-group field-city o_signup_form_required">
 				<label for="city" class="control-label">City</label>

@@ -14,6 +14,7 @@
 
     "depends": [
         "base",
+        "partner_contact_gender",
     ],
     "external_dependencies": {"python": [], "bin": []},
     "data": [

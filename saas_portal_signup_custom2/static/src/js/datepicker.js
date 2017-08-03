@@ -22,5 +22,19 @@ odoo.define('saas_portal_signup_custom2.yearpicker', function(require){
 		$(".ui-datepicker-next").hide();
 		$(".ui-datepicker-prev").hide();
 	    });
+
+	    var birthdate_input=$('input[name="birthdate_date"]');
+	    var container=$('.bootstrap-iso form').length>0 ? $('.bootstrap-iso form').parent() : "body";
+	    var options={
+		changeYear: true,
+		changeMonth: true,
+		yearRange:"-100:+0",
+		format: 'mm/dd/yyyy',
+		container: container,
+		todayHighlight: true,
+		autoclose: true,
+	    };
+	    birthdate_input.datepicker(options);
+
 	});
 });

@@ -47,7 +47,13 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
 
         company_size = kw.get('company_size')
         if company_size:
-            qcontext['prev_sel_company_size'] = company_size
+            sizes_dict = dict(request.env['res.partner']._get_company_sizes())
+            qcontext['prev_sel_company_size'] = (company_size, sizes_dict[company_size])
+
+        gender = kw.get('gender')
+        if gender:
+            genders_dict = dict(request.env['res.partner']._get_genders())
+            qcontext['prev_sel_gender'] = (gender, genders_dict[gender])
 
         if kw.has_key('g-recaptcha-response') and not request.website.recaptcha_siteverify(kw.get('g-recaptcha-response')):
             qcontext['error'] = _("Please confirm you are human")
@@ -93,6 +99,8 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
             qcontext['sectors'] = request.env['res.partner.sector'].sudo().search([])
         if not qcontext.get('company_sizes', False):
             qcontext['company_sizes'] = request.env['res.partner']._get_company_sizes()
+        if not qcontext.get('genders', False):
+            qcontext['genders'] = request.env['res.partner']._get_genders()
         if not qcontext.get('currencies', False):
             qcontext['currencies'] = request.env['res.currency'].search([])
         return qcontext
@@ -110,9 +118,19 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
         values['is_company'] = True
         establishment_date = datetime(int(qcontext.get('establishment_year')), 1, 1)
         values['establishment_year'] = establishment_date.strftime(DF)
-        # values['employee_number'] = qcontext.get('employee_number', None)
         values['previous_year_turnover'] = qcontext.get('previous_year_turnover', None)
         values['company_size'] = qcontext.get('company_size', None)
+
+        birthdate_date = qcontext.get('birthdate_date') and \
+                datetime.strptime(qcontext['birthdate_date'], "%m/%d/%Y")
+        if qcontext.get('full_name'):
+            values['child_ids'] = [(0, 0, {
+                'name': qcontext['full_name'],
+                'gender': qcontext.get('gender'),
+                'birthdate_date': birthdate_date.strftime(DF),
+                'function': 'Director',
+                })]
+
         values['website'] = qcontext.get('company_website', None)
         values['phone'] = qcontext.get('tel', None)
         values['fax'] = qcontext.get('fax', None)

@@ -13,6 +13,7 @@ class Partner(models.Model):
     company_size = fields.Selection(string='Company size', selection='_get_company_sizes')
     account_currency_id = fields.Many2one('res.currency', string='Banking account currency')
     previous_year_turnover = fields.Integer(string='Previous year turn-over')
+    gender = fields.Selection(string='Gender', selection='_get_genders')
 
     @api.model
     def _get_company_sizes(self):
@@ -25,3 +26,11 @@ class Partner(models.Model):
                 ]
 
         return company_sizes
+
+    def _get_genders(self):
+        genders = [
+                ('male', 'Male'),
+                ('female', 'Female'),
+                ]
+
+        return genders

@@ -212,8 +212,8 @@ class SaasServerClient(models.Model):
                 })
                 main_company.update({
                     'company_registry': owner_user.get('business_reg_no'),
-                    'currency_id': owner_user.get('currency_id') and self.env['res.currency'].browse(owner_user['currency_id']) and \
-                    self.env['res.currency'].browse(owner_user['currency_id']).id or None,
+                    'currency_id': owner_user.get('account_currency_id') and self.env['res.currency'].browse(owner_user['account_currency_id']) and \
+                    self.env['res.currency'].browse(owner_user['account_currency_id']).id or None,
                 })
 
                 # partner = client_env['res.partner'].create({

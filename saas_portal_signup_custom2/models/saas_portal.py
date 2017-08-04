@@ -27,5 +27,6 @@ class SaasPortalPlan(models.Model):
             'business_reg_no': owner_user.business_reg_no,
             'dnb_number': owner_user.dnb_number,
             'tax_code': owner_user.tax_code,
+            'account_currency_id': owner_user.account_currency_id.id,
         })
         return owner_user_data

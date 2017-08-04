@@ -145,7 +145,6 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
             values['country_id'] = qcontext['country_id']
         if qcontext.get('account_currency_id', False):
             values['account_currency_id'] = qcontext['account_currency_id']
-            values['currency_id'] = qcontext['account_currency_id']
         if qcontext.get('sector_id', False):
             values['sector_id'] = qcontext['sector_id']
         if qcontext.get('state_id', False):

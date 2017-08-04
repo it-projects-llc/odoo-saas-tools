@@ -169,40 +169,25 @@ class SaasServerClient(models.Model):
                 user = res[0]
                 client_env['ir.config_parameter'].set_param('res.users.owner', user.id, groups=['saas_client.group_saas_support'])
 
-            res = client_env['res.users'].search([('oauth_uid', '=', owner_user['user_id'])])
+            portal_owner_uid = owner_user.pop('user_id')
+            res = client_env['res.users'].search([('oauth_uid', '=', portal_owner_uid)])
             if res:
                 # user already exists (e.g. administrator)
                 user = res[0]
             if not user:
                 user = client_env['res.users'].browse(SUPERUSER_ID)
 
-            vals = {
-                'login': owner_user['login'],
-                'password': owner_user['password'] or random_password(),
-                'name': owner_user['name'],
-                'email': owner_user['email'],
+            vals = owner_user
+            vals.update({
                 'oauth_provider_id': oauth_provider.id,
-                'oauth_uid': owner_user['user_id'],
+                'oauth_uid': portal_owner_uid,
                 'oauth_access_token': access_token,
-                'company_name': owner_user.get('company_name'),
-                'website': owner_user.get('website'),
-                'phone': owner_user.get('phone'),
-                'fax': owner_user.get('fax'),
-                'city': owner_user.get('city'),
-                'street': owner_user.get('street'),
-                'vat': owner_user.get('vat'),
-                'zip': owner_user.get('zip'),
                 'country_id': owner_user.get('country_id') and self.env['res.country'].browse(owner_user['country_id']) and \
                 self.env['res.country'].browse(owner_user['country_id']).id or None,
                 'state_id': owner_user.get('state_id') and self.env['res.country.state'].browse(owner_user['state_id']) and \
                 self.env['res.country.state'].browse(owner_user['state_id']).id or None,
+            })
 
-                'business_reg_no': owner_user.get('business_reg_no'),
-                'dnb_number': owner_user.get('dnb_number'),
-                'tax_code': owner_user.get('tax_code'),
-                'vat': owner_user.get('tax_code'),
-                'vat': owner_user.get('vat'),
-            }
             user.write(vals)
 
             main_company = client_env.ref('base.main_company')
@@ -227,6 +212,8 @@ class SaasServerClient(models.Model):
                 })
                 main_company.update({
                     'company_registry': owner_user.get('business_reg_no'),
+                    'currency_id': owner_user.get('currency_id') and self.env['res.currency'].browse(owner_user['currency_id']) and \
+                    self.env['res.currency'].browse(owner_user['currency_id']).id or None,
                 })
 
                 # partner = client_env['res.partner'].create({

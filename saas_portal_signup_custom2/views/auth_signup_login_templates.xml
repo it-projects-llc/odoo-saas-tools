@@ -32,14 +32,6 @@
 					oninput="setCustomValidity('')"
 					t-att-readonly="'readonly' if only_passwords else None"/>
 			</div>
-			<div class="col-lg-6 form-group field-address o_signup_form_required">
-				<label for="address" class="control-label">Address</label>
-				<input type="text" name="address" t-att-value="address" id="address" class="form-control" t-att-autofocus="'autofocus' if login and not only_passwords else None"
-					autocapitalize="off" required="required"
-					oninvalid="this.setCustomValidity($('#fields_validation_string').attr('string'))"
-					oninput="setCustomValidity('')"
-					t-att-readonly="'readonly' if only_passwords else None"/>
-			</div>
 		</div>
 		<div class="row">
 			<div class="col-lg-3 form-group field-business_sector o_signup_form_required">
@@ -105,36 +97,16 @@
 				    autocapitalize="off" t-att-readonly="'readonly' if only_passwords else None"/>
 			</div>
 		</div>
-		<fieldset class="director-information">
-			<legend class="director-information">Director information</legend>
-			<div class="row">
-					<div class="col-lg-4 form-group field-full_name">
-						<label for="full_name" class="control-label">Full name</label>
-						<input type="text" name="full_name" t-att-value="full_name" id="full_name" class="form-control"
-							t-att-autofocus="'autofocus' if login and not only_passwords else None"
-						    autocapitalize="off" t-att-readonly="'readonly' if only_passwords else None"/>
-					</div>
-					<div class="col-lg-4 form-group field-gender">
-						<label class="control-label" for="gender">Gender</label>
-						<select name="gender" class="form-control"
-							t-att-readonly="'readonly' if only_passwords else None">
-							<option value="" selected="selected" disabled="disabled">Select</option>
-							<option t-if="prev_sel_gender" t-att-value="prev_sel_gender[0]" selected="selected"><t t-esc="prev_sel_gender[1]"/></option>
-							<t t-foreach="genders or []" t-as="gender">
-								<option t-att-value="gender[0]"><t t-esc="gender[1]"/></option>
-							</t>
-						</select>
-					</div>
-					<div class="col-lg-4 form-group field-birthdate_date">
-						<label for="birthdate_date" class="control-label">Date of birth</label>
-						<input type="text" name="birthdate_date" t-att-value="birthdate_date" id="birthdate_date" class="form-control"
-							t-att-autofocus="'autofocus' if login and not only_passwords else None"
-						    autocapitalize="off" t-att-readonly="'readonly' if only_passwords else None"/>
-					</div>
-			</div>
-		</fieldset>
 		<div class="row">
-			<div class="col-lg-4 form-group field-city o_signup_form_required">
+			<div class="col-lg-3 form-group field-address o_signup_form_required">
+				<label for="address" class="control-label">Address</label>
+				<input type="text" name="address" t-att-value="address" id="address" class="form-control" t-att-autofocus="'autofocus' if login and not only_passwords else None"
+					autocapitalize="off" required="required"
+					oninvalid="this.setCustomValidity($('#fields_validation_string').attr('string'))"
+					oninput="setCustomValidity('')"
+					t-att-readonly="'readonly' if only_passwords else None"/>
+			</div>
+			<div class="col-lg-3 form-group field-city o_signup_form_required">
 				<label for="city" class="control-label">City</label>
 				<input type="text" name="city" t-att-value="city" id="city" class="form-control" t-att-autofocus="'autofocus' if login and not only_passwords else None"
 					autocapitalize="off" required="required"
@@ -142,7 +114,7 @@
 					oninput="setCustomValidity('')"
 					t-att-readonly="'readonly' if only_passwords else None"/>
 			</div>
-			<div class="col-lg-4 form-group field-state">
+			<div class="col-lg-3 form-group field-state">
 				<label class="control-label" for="state_id">State</label>
 				<select name="state_id" class="form-control"
 					t-att-readonly="'readonly' if only_passwords else None">
@@ -153,7 +125,7 @@
 					</t>
 				</select>
 			</div>
-			<div class="col-lg-4 form-group field-country o_signup_form_required">
+			<div class="col-lg-3 form-group field-country o_signup_form_required">
 				<label class="control-label" for="country_id">Country</label>
 				<select name="country_id" class="form-control"
 					required="required"
@@ -225,6 +197,34 @@
 					autocapitalize="off" t-att-readonly="'readonly' if only_passwords else None"/>
 			</div>
 		</div>
+		<fieldset class="director-information">
+			<legend class="director-information">Director information</legend>
+			<div class="row">
+					<div class="col-lg-4 form-group field-full_name">
+						<label for="full_name" class="control-label">Full name</label>
+						<input type="text" name="full_name" t-att-value="full_name" id="full_name" class="form-control"
+							t-att-autofocus="'autofocus' if login and not only_passwords else None"
+						    autocapitalize="off" t-att-readonly="'readonly' if only_passwords else None"/>
+					</div>
+					<div class="col-lg-4 form-group field-gender">
+						<label class="control-label" for="gender">Gender</label>
+						<select name="gender" class="form-control"
+							t-att-readonly="'readonly' if only_passwords else None">
+							<option value="" selected="selected" disabled="disabled">Select</option>
+							<option t-if="prev_sel_gender" t-att-value="prev_sel_gender[0]" selected="selected"><t t-esc="prev_sel_gender[1]"/></option>
+							<t t-foreach="genders or []" t-as="gender">
+								<option t-att-value="gender[0]"><t t-esc="gender[1]"/></option>
+							</t>
+						</select>
+					</div>
+					<div class="col-lg-4 form-group field-birthdate_date">
+						<label for="birthdate_date" class="control-label">Date of birth</label>
+						<input type="text" name="birthdate_date" t-att-value="birthdate_date" id="birthdate_date" class="form-control"
+							t-att-autofocus="'autofocus' if login and not only_passwords else None"
+						    autocapitalize="off" t-att-readonly="'readonly' if only_passwords else None"/>
+					</div>
+			</div>
+		</fieldset>
 		<div class="row">
 			<div class="col-lg-6 form-group field-role o_signup_form_required">
 				<label for="product_id" class="control-label">ERP Package</label>

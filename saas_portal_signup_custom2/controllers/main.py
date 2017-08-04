@@ -115,7 +115,7 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
         values = dict((key, qcontext.get(key)) for key in ('login', 'name', 'password'))
         values['email'] = qcontext['login']
         values['company_name'] = qcontext.get('company_name', None)
-        values['is_company'] = True
+        # values['is_company'] = True
         establishment_date = datetime(int(qcontext.get('establishment_year')), 1, 1)
         values['establishment_year'] = establishment_date.strftime(DF)
         values['previous_year_turnover'] = qcontext.get('previous_year_turnover', None)
@@ -145,6 +145,7 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
             values['country_id'] = qcontext['country_id']
         if qcontext.get('account_currency_id', False):
             values['account_currency_id'] = qcontext['account_currency_id']
+            values['currency_id'] = qcontext['account_currency_id']
         if qcontext.get('sector_id', False):
             values['sector_id'] = qcontext['sector_id']
         if qcontext.get('state_id', False):

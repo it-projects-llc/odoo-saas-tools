@@ -8,7 +8,7 @@ class Partner(models.Model):
     business_reg_no = fields.Char('Business Registration No.')
     dnb_number = fields.Char('D&B Number')
     tax_code = fields.Char('Tax code')
-    establishment_year = fields.Datetime()
+    establishment_year = fields.Datetime(string='Year of establishment')
     employee_number = fields.Integer(string='Number of employee')
     company_size = fields.Selection(string='Company size', selection='_get_company_sizes')
     account_currency_id = fields.Many2one('res.currency', string='Banking account currency')

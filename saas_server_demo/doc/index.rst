@@ -51,8 +51,8 @@ The example of __openerp__.py file of ``reminder_base``:
     'demo_summary': 'The module provides easy way to configure instant or mail notifications for any supported record with date field.'
  }
 
-Also you can add an image. Put it in the ``./static/description`` with the ``demo_image.png`` name. The Portal uses it in website page from where
-customers create their demo.
+* put images for demo into ``.static/description/demo_img`` folder
+
 
 Demo modules list initialization
 --------------------------------

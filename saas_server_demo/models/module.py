@@ -50,7 +50,7 @@ class ModuleDemo(models.Model):
     def get_demo_images(self):
         for record in self:
             res = {}
-            img_path = get_module_resource(record.name, 'static', 'description', 'img')
+            img_path = get_module_resource(record.name, 'static', 'description', 'demo_img')
             if img_path:
                 (_, _, filenames) = walk(img_path).next()
                 for file_name in filenames:

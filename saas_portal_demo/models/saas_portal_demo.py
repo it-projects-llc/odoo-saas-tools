@@ -204,6 +204,11 @@ class SaasPortalServer(models.Model):
                 models.execute_kw(db, uid, password,
                         'res.users', 'write',
                         [owner_user_id, {'groups_id': [(6, 0, admin_groups[0]['groups_id'])]}])
+                # configure outgoing mail service for using `postfix` docker container
+                mail_server_id = models.execute_kw(db, uid, password,
+                        'ir.mail_server', 'search', [[]], {'limit': 1})
+                models.execute_kw(db, uid, password,
+                        'ir.mail_server', 'write', [mail_server_id, {'name': 'postfix', 'smtp_host': 'postfix'}])
 
         return True
 

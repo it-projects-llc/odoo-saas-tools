@@ -63,9 +63,12 @@
 			<!-- 		t-att-autofocus="'autofocus' if login and not only_passwords else None" -->
 			<!-- 	    autocapitalize="off" t-att-readonly="'readonly' if only_passwords else None"/> -->
 			<!-- </div> -->
-			<div class="col-lg-3 form-group field-company_size">
+			<div class="col-lg-3 form-group field-company_size o_signup_form_required">
 				<label class="control-label" for="company_size">Company size</label>
 				<select name="company_size" class="form-control"
+					required="required"
+					oninvalid="this.setCustomValidity($('#selections_validation_string').attr('string'))"
+					oninput="setCustomValidity('')"
 					t-att-readonly="'readonly' if only_passwords else None">
 					<option value="" selected="selected" disabled="disabled">Select</option>
 					<option t-if="prev_sel_company_size" t-att-value="prev_sel_company_size[0]" selected="selected"><t t-esc="prev_sel_company_size[1]"/></option>
@@ -90,9 +93,12 @@
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-lg-3 form-group field-previous_year_turnover">
+			<div class="col-lg-3 form-group field-previous_year_turnover o_signup_form_required">
 				<label for="previous_year_turnover" class="control-label">Previous year turn-over</label>
-				<input type="text" name="previous_year_turnover" t-att-value="previous_year_turnover" id="previous_year_turnover" class="form-control"
+					<input type="text" name="previous_year_turnover" t-att-value="previous_year_turnover" id="previous_year_turnover" class="form-control"
+					required="required"
+					oninvalid="this.setCustomValidity($('#fields_validation_string').attr('string'))"
+					oninput="setCustomValidity('')"
 					t-att-autofocus="'autofocus' if login and not only_passwords else None"
 				    autocapitalize="off" t-att-readonly="'readonly' if only_passwords else None"/>
 			</div>
@@ -200,15 +206,21 @@
 		<fieldset class="director-information">
 			<legend class="director-information">Director information</legend>
 			<div class="row">
-					<div class="col-lg-4 form-group field-full_name">
+					<div class="col-lg-4 form-group field-full_name o_signup_form_required">
 						<label for="full_name" class="control-label">Full name</label>
 						<input type="text" name="full_name" t-att-value="full_name" id="full_name" class="form-control"
+							required="required"
+							oninvalid="this.setCustomValidity($('#fields_validation_string').attr('string'))"
+							oninput="setCustomValidity('')"
 							t-att-autofocus="'autofocus' if login and not only_passwords else None"
 						    autocapitalize="off" t-att-readonly="'readonly' if only_passwords else None"/>
 					</div>
-					<div class="col-lg-4 form-group field-gender">
+					<div class="col-lg-4 form-group field-gender o_signup_form_required">
 						<label class="control-label" for="gender">Gender</label>
 						<select name="gender" class="form-control"
+							required="required"
+							oninvalid="this.setCustomValidity($('#selections_validation_string').attr('string'))"
+							oninput="setCustomValidity('')"
 							t-att-readonly="'readonly' if only_passwords else None">
 							<option value="" selected="selected" disabled="disabled">Select</option>
 							<option t-if="prev_sel_gender" t-att-value="prev_sel_gender[0]" selected="selected"><t t-esc="prev_sel_gender[1]"/></option>
@@ -217,9 +229,12 @@
 							</t>
 						</select>
 					</div>
-					<div class="col-lg-4 form-group field-birthdate_date">
+					<div class="col-lg-4 form-group field-birthdate_date o_signup_form_required">
 						<label for="birthdate_date" class="control-label">Date of birth</label>
 						<input type="text" name="birthdate_date" t-att-value="birthdate_date" id="birthdate_date" class="form-control"
+							required="required"
+							oninvalid="this.setCustomValidity($('#fields_validation_string').attr('string'))"
+							oninput="setCustomValidity('')"
 							t-att-autofocus="'autofocus' if login and not only_passwords else None"
 						    autocapitalize="off" t-att-readonly="'readonly' if only_passwords else None"/>
 					</div>

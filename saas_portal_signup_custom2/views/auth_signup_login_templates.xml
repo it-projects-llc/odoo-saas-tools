@@ -39,7 +39,7 @@
 				<select name="sector_id" class="form-control"
 					required="required"
 					oninvalid="this.setCustomValidity($('#selections_validation_string').attr('string'))"
-					oninput="setCustomValidity('')"
+					onchange="setCustomValidity('')"
 					t-att-readonly="'readonly' if only_passwords else None">
 					<option value="" selected="selected" disabled="disabled">Select</option>
 					<option t-if="prev_sel_sector" t-att-value="prev_sel_sector.id" selected="selected"><t t-esc="prev_sel_sector.name"/></option>
@@ -54,7 +54,7 @@
 					class="form-control" t-att-autofocus="'autofocus' if login and not only_passwords else None"
 					autocapitalize="off" required="required"
 					oninvalid="this.setCustomValidity($('#fields_validation_string').attr('string'))"
-					oninput="setCustomValidity('')"
+					onchange="setCustomValidity('')"
 					t-att-readonly="'readonly' if only_passwords else None"/>
 			</div>
 			<!-- <div class="col-lg-3 form-group field-employee_number"> -->
@@ -68,7 +68,7 @@
 				<select name="company_size" class="form-control"
 					required="required"
 					oninvalid="this.setCustomValidity($('#selections_validation_string').attr('string'))"
-					oninput="setCustomValidity('')"
+					onchange="setCustomValidity('')"
 					t-att-readonly="'readonly' if only_passwords else None">
 					<option value="" selected="selected" disabled="disabled">Select</option>
 					<option t-if="prev_sel_company_size" t-att-value="prev_sel_company_size[0]" selected="selected"><t t-esc="prev_sel_company_size[1]"/></option>
@@ -82,7 +82,7 @@
 				<select name="account_currency_id" class="form-control"
 					required="required"
 					oninvalid="this.setCustomValidity($('#selections_validation_string').attr('string'))"
-					oninput="setCustomValidity('')"
+					onchange="setCustomValidity('')"
 					t-att-readonly="'readonly' if only_passwords else None">
 					<option value="" selected="selected" disabled="disabled">Select</option>
 					<option t-if="prev_sel_currency" t-att-value="prev_sel_currency.id" selected="selected"><t t-esc="prev_sel_currency.name"/></option>
@@ -136,7 +136,7 @@
 				<select name="country_id" class="form-control"
 					required="required"
 					oninvalid="this.setCustomValidity($('#selections_validation_string').attr('string'))"
-					oninput="setCustomValidity('')"
+					onchange="setCustomValidity('')"
 					t-att-readonly="'readonly' if only_passwords else None">
 					<option value="" selected="selected" disabled="disabled">Select</option>
 					<option t-if="prev_sel_country" t-att-value="prev_sel_country.id" selected="selected"><t t-esc="prev_sel_country.name"/></option>
@@ -220,7 +220,7 @@
 						<select name="gender" class="form-control"
 							required="required"
 							oninvalid="this.setCustomValidity($('#selections_validation_string').attr('string'))"
-							oninput="setCustomValidity('')"
+							onchange="setCustomValidity('')"
 							t-att-readonly="'readonly' if only_passwords else None">
 							<option value="" selected="selected" disabled="disabled">Select</option>
 							<option t-if="prev_sel_gender" t-att-value="prev_sel_gender[0]" selected="selected"><t t-esc="prev_sel_gender[1]"/></option>
@@ -234,7 +234,7 @@
 						<input type="text" name="birthdate_date" t-att-value="birthdate_date" id="birthdate_date" class="form-control"
 							required="required"
 							oninvalid="this.setCustomValidity($('#fields_validation_string').attr('string'))"
-							oninput="setCustomValidity('')"
+							onchange="setCustomValidity('')"
 							t-att-autofocus="'autofocus' if login and not only_passwords else None"
 						    autocapitalize="off" t-att-readonly="'readonly' if only_passwords else None"/>
 					</div>
@@ -246,7 +246,7 @@
 				<select name="product_id" class="form-control" placeholder="Select a package"
 					required="required"
 					oninvalid="this.setCustomValidity($('#selections_validation_string').attr('string'))"
-					oninput="setCustomValidity('')"
+					onchange="setCustomValidity('')"
 					t-att-readonly="'readonly' if only_passwords else None"
 					t-att-autofocus="'autofocus' if login and not only_passwords else None">
 					<option value="" selected="selected" disabled="disabled">Select a package</option>

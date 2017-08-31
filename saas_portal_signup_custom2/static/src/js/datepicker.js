@@ -13,6 +13,7 @@ odoo.define('saas_portal_signup_custom2.yearpicker', function(require){
 		onClose: function(dateText, inst) {
 		    var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
 		    $(this).datepicker('setDate', new Date(year, 1));
+		    $(this).trigger('change');
 		}
 	    };
 	    date_input.datepicker(options);
@@ -33,8 +34,10 @@ odoo.define('saas_portal_signup_custom2.yearpicker', function(require){
 		container: container,
 		todayHighlight: true,
 		autoclose: true,
+		onSelect: function(dateText, inst) {
+		    $(this).trigger('change');
+		}
 	    };
 	    birthdate_input.datepicker(options);
-
 	});
 });

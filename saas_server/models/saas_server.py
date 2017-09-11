@@ -192,25 +192,26 @@ class SaasServerClient(models.Model):
 
             main_company = client_env.ref('base.main_company')
             if owner_user.get('company_name'):
-                main_company.partner_id.update({
-                    'name': owner_user['company_name'],
-                    'email': owner_user['email'],
-                    'company_name': owner_user.get('company_name'),
-                    'website': owner_user.get('website'),
-                    'phone': owner_user.get('phone'),
-                    'fax': owner_user.get('fax'),
-                    'city': owner_user.get('city'),
-                    'street': owner_user.get('street'),
-                    'vat': owner_user.get('vat'),
-                    'zip': owner_user.get('zip'),
-                    'country_id': owner_user.get('country_id') and self.env['res.country'].browse(owner_user['country_id']) and \
-                    self.env['res.country'].browse(owner_user['country_id']).id or None,
-                    'state_id': owner_user.get('state_id') and self.env['res.country.state'].browse(owner_user['state_id']) and \
-                    self.env['res.country.state'].browse(owner_user['state_id']).id or None,
-                    'is_company': True,
+                # main_company.partner_id.update({
+                #     'name': owner_user['company_name'],
+                #     'email': owner_user['email'],
+                #     'company_name': owner_user.get('company_name'),
+                #     'website': owner_user.get('website'),
+                #     'phone': owner_user.get('phone'),
+                #     'fax': owner_user.get('fax'),
+                #     'city': owner_user.get('city'),
+                #     'street': owner_user.get('street'),
+                #     'vat': owner_user.get('vat'),
+                #     'zip': owner_user.get('zip'),
+                #     'country_id': owner_user.get('country_id') and self.env['res.country'].browse(owner_user['country_id']) and \
+                #     self.env['res.country'].browse(owner_user['country_id']).id or None,
+                #     'state_id': owner_user.get('state_id') and self.env['res.country.state'].browse(owner_user['state_id']) and \
+                #     self.env['res.country.state'].browse(owner_user['state_id']).id or None,
+                #     'is_company': True,
 
-                })
+                # })
                 main_company.update({
+                    'partner_id': user.partner_id.id,
                     'company_registry': owner_user.get('business_reg_no'),
                     'currency_id': owner_user.get('account_currency_id') and self.env['res.currency'].browse(owner_user['account_currency_id']) and \
                     self.env['res.currency'].browse(owner_user['account_currency_id']).id or None,

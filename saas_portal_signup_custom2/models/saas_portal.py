@@ -28,5 +28,10 @@ class SaasPortalPlan(models.Model):
             'dnb_number': owner_user.dnb_number,
             'tax_code': owner_user.tax_code,
             'account_currency_id': owner_user.account_currency_id.id,
+            'is_company': owner_user.is_company,
+            'establishment_year': owner_user.establishment_year,
+            'previous_year_turnover': owner_user.previous_year_turnover,
+            'company_size': owner_user.company_size,
+            'sector_id': owner_user.sector_id.id,
         })
         return owner_user_data

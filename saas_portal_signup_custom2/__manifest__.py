@@ -27,9 +27,6 @@
                 'saas_portal_portal',
                 'website_sale',
                 'res_partner_custom2',
-                'partner_sector',
-                'partner_contact_birthdate',
-                'partner_contact_gender',
                 ],
 
     # always loaded

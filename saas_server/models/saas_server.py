@@ -177,6 +177,7 @@ class SaasServerClient(models.Model):
             if not user:
                 user = client_env['res.users'].browse(SUPERUSER_ID)
 
+            owner_user.pop('sector_id')
             vals = owner_user
             vals.update({
                 'oauth_provider_id': oauth_provider.id,

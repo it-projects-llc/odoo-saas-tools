@@ -36,12 +36,12 @@
 		<div class="row">
 			<div class="col-lg-3 form-group field-business_sector o_signup_form_required">
 				<label class="control-label" for="country_id">Business sector</label>
-				<select name="sector_id" class="form-control"
+				<select name="sector_id" class="form-control" id="selectsector"
 					required="required"
 					oninvalid="this.setCustomValidity($('#selections_validation_string').attr('string'))"
 					onchange="setCustomValidity('')"
 					t-att-readonly="'readonly' if only_passwords else None">
-					<option value="" selected="selected" disabled="disabled">Select</option>
+					<!-- <option value="" selected="selected" disabled="disabled">Select</option> -->
 					<option t-if="prev_sel_sector" t-att-value="prev_sel_sector.id" selected="selected"><t t-esc="prev_sel_sector.name"/></option>
 					<t t-foreach="sectors or []" t-as="sector">
 						<option t-att-value="sector.id"><t t-esc="sector.name"/></option>

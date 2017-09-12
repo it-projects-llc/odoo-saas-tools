@@ -5,10 +5,13 @@
 
 	<xpath expr="//link[last()]" position="after">
 		<link rel="stylesheet" type="text/less" href="/saas_portal_signup_custom2/static/src/less/website.ui.components.less"/>
+		<link rel="stylesheet" href="http://gregfranko.com/jquery.selectBoxIt.js/css/jquery.selectBoxIt.css" />
 	</xpath>
 	<xpath expr="//script[last()]" position="after">
 		<script src="/saas_portal_signup_custom2/static/src/js/field_recaptcha.js" />
 		<script src="/saas_portal_signup_custom2/static/src/js/datepicker.js" />
+		<!-- <script src="http://gregfranko.com/jquery.selectBoxIt.js/js/jquery.selectBoxIt.min.js"></script> -->
+		<script src="/saas_portal_signup_custom2/static/src/js/selectsector.js" />
 	</xpath>
 
 </template>

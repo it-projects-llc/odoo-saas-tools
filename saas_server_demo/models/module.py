@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+import os
+from os import walk
+
 from openerp import models, fields, api, tools
 from openerp.addons.base.module.module import module as A
 from openerp.modules import get_module_resource
@@ -41,3 +44,17 @@ class ModuleDemo(models.Model):
                     record.demo_image = image_file.read().encode('base64')
                 finally:
                     image_file.close()
+
+
+    @api.multi
+    def get_demo_images(self):
+        for record in self:
+            res = {}
+            img_path = get_module_resource(record.name, 'static', 'description', 'demo_img')
+            if img_path:
+                (_, _, filenames) = walk(img_path).next()
+                for file_name in filenames:
+                    full_name = os.path.join(img_path, file_name)
+                    with tools.file_open(full_name, 'rb') as image_file:
+                        res[file_name] = image_file.read().encode('base64')
+                return res

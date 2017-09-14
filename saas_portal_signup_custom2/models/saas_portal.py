@@ -57,3 +57,9 @@ class SaasPortalPlan(models.Model):
                 }
         client_obj.upgrade(payload=payload)
         return res
+
+    @api.multi
+    def create_template(self, **kwargs):
+        res = super(SaasPortalPlan, self).create_template(**kwargs)
+        if self.template_id:
+            self.template_id.upgrade(payload={'install_addons': ['res_partner_custom2']})

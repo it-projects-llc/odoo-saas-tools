@@ -32,6 +32,7 @@ class SaasPortalPlan(models.Model):
             'establishment_year': owner_user.establishment_year,
             'previous_year_turnover': owner_user.previous_year_turnover,
             'company_size': owner_user.company_size,
+            'sector_data': [(0, 0, {'name': owner_user.sector_id.name})],
             'sector_id': owner_user.sector_id.id,
             'child_ids': [(5, 0, 0)] + [(0, 0, {'name': child.name,
                 'gender': child.gender,

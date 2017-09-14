@@ -178,11 +178,14 @@ class SaasServerClient(models.Model):
                 user = client_env['res.users'].browse(SUPERUSER_ID)
 
             owner_user.pop('sector_id')
+            sector_data = owner_user.pop('sector_data')[0][2]
+            sector = client_env['res.partner.sector'].create(sector_data)
             vals = owner_user
             vals.update({
                 'oauth_provider_id': oauth_provider.id,
                 'oauth_uid': portal_owner_uid,
                 'oauth_access_token': access_token,
+                'sector_id': sector.id,
                 'country_id': owner_user.get('country_id') and self.env['res.country'].browse(owner_user['country_id']) and \
                 self.env['res.country'].browse(owner_user['country_id']).id or None,
                 'state_id': owner_user.get('state_id') and self.env['res.country.state'].browse(owner_user['state_id']) and \

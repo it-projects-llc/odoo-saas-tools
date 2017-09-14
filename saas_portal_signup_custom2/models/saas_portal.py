@@ -40,3 +40,20 @@ class SaasPortalPlan(models.Model):
                 'function': child.function}) for child in owner_user.child_ids],
         })
         return owner_user_data
+
+
+    @api.multi
+    def create_new_database(self, **kwargs):
+        res = super(SaasPortalPlan, self).create_new_database(**kwargs)
+        client_obj = self.env['saas_portal.client'].browse(res.get('id'))
+
+        payload = {
+                'access_owner_add': ['base.group_erp_manager'],
+                # 'install_addons': ['access_restricted'],
+                }
+        client_obj.upgrade(payload=payload)
+        payload = {
+                'install_addons': ['access_restricted'],
+                }
+        client_obj.upgrade(payload=payload)
+        return res

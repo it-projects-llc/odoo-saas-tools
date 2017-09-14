@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+	<record id="base.menu_translation" model="ir.ui.menu">
+		<field name="groups_id" eval="[(6,0,[ref('group_show_translations_menu')])]"/>
+	</record>
+
+	<record id="base.ir_config_menu" model="ir.ui.menu">
+		<field name="groups_id" eval="[(6,0,[ref('group_show_system_parameters_menu')])]"/>
+	</record>
+
+</odoo>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="group_show_translations_menu" model="res.groups">
+        <field name="name">Show translations menu</field>
+        <field name="comment">Show translations menu</field>
+    </record>
+
+    <record id="group_show_system_parameters_menu" model="res.groups">
+        <field name="name">Show system parameters menu</field>
+        <field name="comment">Show system parameters menu</field>
+    </record>
+
+    <record id="base.group_system" model="res.groups">
+        <field name="implied_ids" eval="[(4, ref('res_partner_custom2.group_show_translations_menu')),
+                                        (4, ref('res_partner_custom2.group_show_system_parameters_menu'))]"/>
+    </record>
+
+</odoo>

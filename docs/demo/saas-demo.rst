@@ -74,14 +74,9 @@ Local saas repo. Optional. Path before colons depends on your system.
 Portal odoo docker
 ------------------
 
-* TODO: switch portal version to latest
-* TODO: don't expose ports ( requests are handled via nginx)
-
 ::
 
  docker run \
- -p 8069:8069 \
- -p 8072:8072 \
  -e ODOO_MASTER_PASS=$ODOO_MASTER_PASS \
  -e DB_PORT_5432_TCP_ADDR=db-portal \
  $DOCKER_PARAMS \

@@ -24,8 +24,15 @@ class SaasPortal(http.Controller):
             return {"error": {"msg": "database already taken"}}
         return {"ok": 1}
 
-    @http.route(['/saas_portal/add_new_client'], type='http', auth='user', website=True)
+    @http.route(['/saas_portal/add_new_client'], type='http', auth='public', website=True)
     def add_new_client(self, **post):
+        uid = request.session.uid
+        plan_id = int(post.get('plan_id'))
+        if not uid:
+            url = '/web/signup?redirect=/saas_portal/add_new_client'
+            query = {'plan_id': str(plan_id)}
+            return http.local_redirect(path=url, query=query)
+
         dbname = self.get_full_dbname(post.get('dbname'))
         user_id = request.session.uid
         partner_id = None

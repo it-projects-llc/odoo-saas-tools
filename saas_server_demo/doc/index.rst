@@ -51,7 +51,7 @@ The example of __openerp__.py file of ``reminder_base``:
     'demo_summary': 'The module provides easy way to configure instant or mail notifications for any supported record with date field.'
  }
 
-* put images for demo into ``.static/description/demo_img`` folder
+* put images for demo into ``.static/description/demo`` folder
 
 
 Demo modules list initialization

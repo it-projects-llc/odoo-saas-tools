@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from urllib import urlencode
 from ast import literal_eval
 import odoo
 from odoo import SUPERUSER_ID, exceptions
@@ -24,8 +25,15 @@ class SaasPortal(http.Controller):
             return {"error": {"msg": "database already taken"}}
         return {"ok": 1}
 
-    @http.route(['/saas_portal/add_new_client'], type='http', auth='user', website=True)
-    def add_new_client(self, **post):
+    @http.route(['/saas_portal/add_new_client'], type='http', auth='public', website=True)
+    def add_new_client(self, redirect_to_signup=False, **post):
+        uid = request.session.uid
+        if not uid:
+            url = '/web/signup' if redirect_to_signup else '/web/login'
+            redirect = unicode('/saas_portal/add_new_client?' + urlencode(post))
+            query = {'redirect': redirect}
+            return http.local_redirect(path=url, query=query)
+
         dbname = self.get_full_dbname(post.get('dbname'))
         user_id = request.session.uid
         partner_id = None

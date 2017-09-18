@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from urllib import urlencode
 from ast import literal_eval
 import odoo
 from odoo import SUPERUSER_ID, exceptions
@@ -25,12 +26,11 @@ class SaasPortal(http.Controller):
         return {"ok": 1}
 
     @http.route(['/saas_portal/add_new_client'], type='http', auth='public', website=True)
-    def add_new_client(self, redirect_to_signup=False, trial=False, **post):
-        trial = trial and bool(int(trial))
+    def add_new_client(self, redirect_to_signup=False, **post):
         uid = request.session.uid
         if not uid:
             url = '/web/signup' if redirect_to_signup else '/web/login'
-            redirect = unicode('/saas_portal/add_new_client?plan_id={}&trial={}'.format(post.get('plan_id'), trial and '1' or '0'))
+            redirect = unicode('/saas_portal/add_new_client?' + urlencode(post))
             query = {'redirect': redirect}
             return http.local_redirect(path=url, query=query)
 
@@ -41,6 +41,7 @@ class SaasPortal(http.Controller):
             user = request.env['res.users'].browse(user_id)
             partner_id = user.partner_id.id
         plan = self.get_plan(int(post.get('plan_id', 0) or 0))
+        trial = bool(post.get('trial'))
         try:
             res = plan.create_new_database(dbname=dbname,
                                            user_id=user_id,

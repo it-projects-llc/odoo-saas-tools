@@ -12,12 +12,12 @@ Index
    maxdepth instead
 .. toctree::
     :maxdepth: 2
-
+	
+    introduction
     setup
+    api
     usage
     demo
-    api
-    reference
 
 .. ifconfig:: todo_include_todos
 

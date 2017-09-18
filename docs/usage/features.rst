@@ -1,3 +1,4 @@
+:banner: banners/features.jpeg
 Features
 ========
 

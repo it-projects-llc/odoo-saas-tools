@@ -1,1 +1,2 @@
-e-commerce
+e-commerce https://github.com/OCA/e-commerce
+access-addons https://github.com/it-projects-llc/access-addons

@@ -136,15 +136,24 @@ class SaasPortalCreateClient(models.TransientModel):
     name = fields.Char('Database name', required=True, default=_default_name)
     plan_id = fields.Many2one('saas_portal.plan', string='Plan', readonly=True, default=_default_plan_id)
     user_id = fields.Many2one('res.users', string='User')
-    notify_user = fields.Boolean(help='Notify user by email when database will have been created', default=False)
+    user_ids = fields.Many2many('res.users')
+    notify_user = fields.Boolean(help='Notify user by email when database will have been created', default=True)
     support_team_id = fields.Many2one('saas_portal.support_team', 'Support Team', default=lambda self: self.env.user.support_team_id)
     async_creation = fields.Boolean('Asynchronous', default=False, help='Asynchronous creation of client base')
     trial = fields.Boolean('Trial')
 
+    @api.model
+    def default_get(self, fields_list):
+        result = super(SaasPortalCreateClient, self).default_get(fields_list)
+        user_ids = self.env['res.users'].search([])
+        result['user_ids'] = [(6, 0, user_ids.ids)]
+        return result
+
     @api.multi
     def apply(self):
         wizard = self[0]
-        res = wizard.plan_id.create_new_database(dbname=wizard.name, user_id=self.user_id.id,
+        invite = self.user_id not in self.user_ids
+        res = wizard.plan_id.create_new_database(dbname=wizard.name, user_id=self.user_id.id, invite=invite,
                                                  notify_user=self.notify_user,
                                                  support_team_id=self.support_team_id.id,
                                                  async=self.async_creation,

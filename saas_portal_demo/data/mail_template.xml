@@ -12,15 +12,29 @@
 
             <p>
                 Hello ${object.partner_id.name},<br />
-                Thank you for signing-up with us!<br />
-                Your new ${object.plan_id.name} account is ready.<br />
-                Here is the link to access your account:<br />
+                Your new ${object.plan_id.name} instance is ready.<br />
+                Here is the link to access:<br />
                 <a href="${object.public_url}">${object.public_url}</a><br />
-                You can login using your registered email and password.<br />
+                % if ctx['invite']:
+                        <div style="padding:0px;width:600px;margin:auto;background: #FFFFFF repeat top /100%;color:#777777">
+                            <p>
+                                You have been invited to portal in order to get access to your instance of Odoo.
+                            </p>
+                            <p>
+                                To accept the invitation, click on the following link:
+                            </p>
+                            <div style="text-align: center; margin-top: 16px;">
+                                 <a href="${ctx['user'].signup_url}" style="padding: 5px 10px; font-size: 12px; line-height: 18px; color: #FFFFFF; border-color:#875A7B; text-decoration: none; display: inline-block; margin-bottom: 0px; font-weight: 400; text-align: center; vertical-align: middle; cursor: pointer; white-space: nowrap; background-image: none; background-color: #875A7B; border: 1px solid #875A7B; border-radius:3px">Accept invitation to portal</a>
+                            </div>
+                        </div>
+                % else:
+                        <p>You can login using your registered email and password.</p>
+                % endif
             </p>
             <p>
-		Your trial will end on ${object.expiration_datetime}.<br />
+		Trial ends on ${object.expiration_datetime}.<br />
             </p>
+            <p>Best regards,</p>
 
             ]]></field>
         </record>

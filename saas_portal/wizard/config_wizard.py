@@ -135,6 +135,7 @@ class SaasPortalCreateClient(models.TransientModel):
 
     name = fields.Char('Database name', required=True, default=_default_name)
     plan_id = fields.Many2one('saas_portal.plan', string='Plan', readonly=True, default=_default_plan_id)
+    partner_id = fields.Many2one('res.partner', string='Partner')
     user_id = fields.Many2one('res.users', string='User')
     user_ids = fields.Many2many('res.users')
     notify_user = fields.Boolean(help='Notify user by email when database will have been created', default=True)
@@ -142,18 +143,16 @@ class SaasPortalCreateClient(models.TransientModel):
     async_creation = fields.Boolean('Asynchronous', default=False, help='Asynchronous creation of client base')
     trial = fields.Boolean('Trial')
 
-    @api.model
-    def default_get(self, fields_list):
-        result = super(SaasPortalCreateClient, self).default_get(fields_list)
-        user_ids = self.env['res.users'].search([])
-        result['user_ids'] = [(6, 0, user_ids.ids)]
-        return result
+    @api.onchange('user_id')
+    def update_partner(self):
+        if self.user_id:
+            self.partner_id = self.user_id.partner_id
 
     @api.multi
     def apply(self):
         wizard = self[0]
         invite = self.user_id not in self.user_ids
-        res = wizard.plan_id.create_new_database(dbname=wizard.name, user_id=self.user_id.id, invite=invite,
+        res = wizard.plan_id.create_new_database(dbname=wizard.name, partner_id=wizard.partner_id.id, user_id=self.user_id.id, invite=invite,
                                                  notify_user=self.notify_user,
                                                  support_team_id=self.support_team_id.id,
                                                  async=self.async_creation,

@@ -15,7 +15,7 @@
                 Your new ${object.plan_id.name} instance is ready.<br />
                 Here is the link to access:<br />
                 <a href="${object.public_url}">${object.public_url}</a><br />
-                % if ctx['invite']:
+                % if ctx['user'].partner_id.signup_valid:
                         <div style="padding:0px;width:600px;margin:auto;background: #FFFFFF repeat top /100%;color:#777777">
                             <p>
                                 You have been invited to portal in order to get access to your instance of Odoo.

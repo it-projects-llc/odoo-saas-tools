@@ -242,7 +242,7 @@ class SaasPortalPlan(models.Model):
         return self._create_new_database(**kwargs)
 
     @api.multi
-    def _create_new_database(self, dbname=None, client_id=None, partner_id=None, user_id=None, invite=False, notify_user=True, trial=False, support_team_id=None, async=None):
+    def _create_new_database(self, dbname=None, client_id=None, partner_id=None, user_id=None, notify_user=True, trial=False, support_team_id=None, async=None):
         self.ensure_one()
 
         server = self.server_id
@@ -323,7 +323,9 @@ class SaasPortalPlan(models.Model):
         # send email if there is mail template record
         template = self.on_create_email_template
         if template and notify_user:
-            client.with_context(invite=invite, user=user).message_post_with_template(template.id, composition_mode='comment')
+            # we have to have a user in this place (how to user without a user?)
+            user = self.env['res.users'].browse(user_id)
+            client.with_context(user=user).message_post_with_template(template.id, composition_mode='comment')
 
         client.write({'expiration_datetime': trial and trial_expiration_datetime or initial_expiration_datetime})
 

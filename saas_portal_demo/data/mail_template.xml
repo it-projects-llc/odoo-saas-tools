@@ -28,7 +28,7 @@
                             </div>
                         </div>
                 % else:
-                        <p>You can login using your registered email and password.</p>
+                        <p>You can login using your email and password provided when signing up.</p>
                 % endif
             </p>
             <p>

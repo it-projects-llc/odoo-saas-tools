@@ -72,7 +72,7 @@ And it should look like:
 
 ::
 
- <base_saas_domain>.shop/product/<demo_url>?version=<odoo version>
+ {base_saas_domain}.shop/product/{demo_url}?version={odoo version}
 
 Where
 

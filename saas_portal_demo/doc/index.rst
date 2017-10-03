@@ -76,12 +76,12 @@ And it should look like:
 
 Where
 
-``base_saas_domain`` is domain of your saas portal, i.e. ``apps.it-projects.info``,
+``{base_saas_domain}`` is domain of your saas portal, i.e. ``apps.it-projects.info``,
 
-``demo_url`` is the parameter specified along with ``live_test_url`` inside of manifest file of the module to demonstrate,
+``{demo_url}`` is the parameter specified along with ``live_test_url`` inside of manifest file of the module to demonstrate,
 i.e. ``reminderes-and-agenda``
 
-and ``odoo_version`` is one of the ``8.0``, ``9.0``, ``10.0``, etc.
+and ``{odoo_version}`` is one of the ``8.0``, ``9.0``, ``10.0``, etc.
 
 As an example - this is our ``live_test_url`` for the reminders modules: ``http://apps.it-projects.info/shop/product/reminders-and-agenda?version=8.0``
 

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="portal_my_home_menu_demo" name="Portal layout : demo menu entries" inherit_id="website_portal.portal_layout" priority="25">
+        <xpath expr="//ul[contains(@class,'o_portal_submenu')]" position="inside">
+            <li>
+                <a href="/my/instances">Instances</a>
+            </li>
+        </xpath>
+    </template>
+
+    <template id="portal_my_home_demo" name="Portal My Home : demo entries" inherit_id="website_portal.portal_my_home" priority="25">
+        <xpath expr="//div[contains(@class,'o_my_home_content')]" position="inside">
+            <h3 class="page-header">
+                <a href="/my/instances">Your Instances
+                    <small class="ml8">
+                        <t t-if="instance_count">
+                            <span class='badge'><t t-esc="instance_count"/></span>
+                        </t>
+                        <t t-if="not instance_count">
+                            There are currently no SaaS instances for your account.
+                        </t>
+                    </small>
+                </a>
+            </h3>
+        </xpath>
+    </template>
+
+    <template id="portal_my_instances" name="My Instances">
+      <t t-call="website_portal.portal_layout">
+        <h3 class="page-header">Your Instances</h3>
+        <t t-if="not instances">
+            <p>There are currently no instances for your account.</p>
+        </t>
+        <t t-if="instances">
+            <table class="table table-hover o_my_status_table">
+                <thead>
+                  <tr class="active">
+                      <th>Instance</th>
+                      <th>Valid Until</th>
+                    </tr>
+                </thead>
+                <t t-foreach="instances" t-as="instance">
+                    <tr>
+                        <td>
+                            <a t-attf-href="{{instance._request_url('/saas_server/edit_database')[0]}}"><t t-esc="instance.name"/></a>
+                        </td>
+                        <td><span t-field="instances.expiration_datetime"/></td>
+                    </tr>
+                </t>
+            </table>
+        </t>
+      </t>
+    </template>
+
+</odoo>

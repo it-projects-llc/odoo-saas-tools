@@ -31,6 +31,7 @@
         "data/product.xml",
         "data/ir_cron.xml",
         "data/mail_template.xml",
+        "data/ir_actions.xml",
     ],
     "qweb": [
     ],

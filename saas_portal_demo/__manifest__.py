@@ -19,6 +19,7 @@
         "website_seo_url",
         "website_seo_url_product",
         "website_sale_add_to_cart_disable",
+        "website_portal",
     ],
     "external_dependencies": {"python": ['requests'], "bin": []},
     "data": [
@@ -26,6 +27,7 @@
         "views/templates.xml",
         "views/saas_portal_demo.xml",
         "views/product.xml",
+        'views/saas_portal_demo_templates.xml',
         "data/product.xml",
         "data/ir_cron.xml",
         "data/mail_template.xml",

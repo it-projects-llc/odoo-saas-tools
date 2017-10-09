@@ -59,7 +59,7 @@ class WebsiteAccount(website_account):
         partner = request.env.user.partner_id
 
         SaasPortalClient = request.env['saas_portal.client']
-        instance_count = SaasPortalClient.search_count([
+        instance_count = SaasPortalClient.sudo().search_count([
             ('partner_id', '=', partner.id),
         ])
 
@@ -78,7 +78,7 @@ class WebsiteAccount(website_account):
         partner = request.env.user.partner_id
         SaasPortalClient = request.env['saas_portal.client']
 
-        instances = SaasPortalClient.search([('partner_id', '=', partner.id)])
+        instances = SaasPortalClient.sudo().search([('partner_id', '=', partner.id)])
 
         values.update({
             'instances': instances,

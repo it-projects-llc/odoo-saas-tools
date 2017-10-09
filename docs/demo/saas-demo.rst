@@ -103,7 +103,7 @@ init saas
  --odoo-without-demo \
  "
 
- docker exec -i -t odoo-portal /bin/bash -c "export INIT_SAAS_TOOLS='$INIT_SAAS_TOOLS_VALUE'; bash /install-odoo-saas.sh"
+ docker exec -i -u root -t odoo-portal /bin/bash -c "export INIT_SAAS_TOOLS='$INIT_SAAS_TOOLS_VALUE'; bash /install-odoo-saas.sh"
 
 nginx
 ^^^^^
@@ -177,7 +177,7 @@ Init saas
  --odoo-without-demo \
  "
 
- docker exec -i -t $SERVER_NAME /bin/bash -c "export INIT_SAAS_TOOLS='$INIT_SAAS_TOOLS_VALUE'; bash /install-odoo-saas.sh"
+ docker exec -u root -i -t $SERVER_NAME /bin/bash -c "export INIT_SAAS_TOOLS='$INIT_SAAS_TOOLS_VALUE'; bash /install-odoo-saas.sh"
 
 
 call "create demo templates" on PORTAL
@@ -193,7 +193,7 @@ call "create demo templates" on PORTAL
  --create-demo-templates \
  "
 
- docker exec -i -t odoo-portal /bin/bash -c "export INIT_SAAS_TOOLS='$INIT_SAAS_TOOLS_VALUE'; bash /install-odoo-saas.sh"
+ docker exec -u root -i -t odoo-portal /bin/bash -c "export INIT_SAAS_TOOLS='$INIT_SAAS_TOOLS_VALUE'; bash /install-odoo-saas.sh"
 
 
 nginx proxing

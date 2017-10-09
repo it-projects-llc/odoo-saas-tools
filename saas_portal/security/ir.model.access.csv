@@ -1,1 +1,4 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_saas_server,saas_portal.server,model_saas_portal_server,base.group_system,1,1,1,0
+access_saas_plan,saas_portal.plan,model_saas_portal_plan,base.group_system,1,1,1,0
+access_saas_client,saas_portal.client,model_saas_portal_client,base.group_system,1,1,1,0

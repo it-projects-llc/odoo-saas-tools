@@ -14,13 +14,10 @@
                 Hello ${object.partner_id.name},<br />
                 Your new ${object.plan_id.name} instance is ready.<br />
                 % if ctx['user'].partner_id.signup_valid:
+                        In order to get access to the instance, please accept an invitation to portal by clicking on the link below.
+                        After you have set your password you will be redirected to a page with a list of your instances. Just click on the name to open and starting testing.
+
                         <div style="padding:0px;width:600px;margin:auto;background: #FFFFFF repeat top /100%;color:#777777">
-                            <p>
-                                You have been invited to portal in order to get access to your instance of Odoo.
-                            </p>
-                            <p>
-                                To accept the invitation, click on the following link:
-                            </p>
                             <div style="text-align: center; margin-top: 16px;">
                                  <a href="${ctx['user'].signup_url}" style="padding: 5px 10px; font-size: 12px; line-height: 18px; color: #FFFFFF; border-color:#875A7B; text-decoration: none; display: inline-block; margin-bottom: 0px; font-weight: 400; text-align: center; vertical-align: middle; cursor: pointer; white-space: nowrap; background-image: none; background-color: #875A7B; border: 1px solid #875A7B; border-radius:3px">Accept invitation to portal</a>
                             </div>

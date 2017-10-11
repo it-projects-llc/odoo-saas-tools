@@ -76,7 +76,7 @@
 
       <xpath expr="//div[@id='product_details']/p[@class='text-muted']" position="replace">
         <p class="text-muted">
-         Prices are quoted without included dependencies
+         Prices are quoted without dependencies
         </p>
       </xpath>
 

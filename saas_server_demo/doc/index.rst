@@ -64,7 +64,7 @@ The example of __openerp__.py file of ``reminder_base``:
     ]
  }
 
-* the first image in the demo_images list will be used as title imgage for product
+* the first image in the demo_images list will be used as title image for product
 
 
 Demo modules list initialization

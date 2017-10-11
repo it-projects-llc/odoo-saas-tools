@@ -17,8 +17,7 @@ class ModuleDemo(models.Model):
     demo_summary = fields.Char(string='Demo set summary')
     price = fields.Float(string='Price', default=0)
     currency = fields.Char("Currency", help="The currency the field is expressed in.")
-    demo_image_url = fields.Char('Demo image URL')
-    demo_image = fields.Binary(compute="_compute_demo_image")
+    demo_images = fields.Char(help="file names, the files should be placed in /static/description/demo of the module")
 
     @staticmethod
     def get_values_from_terp(terp):
@@ -31,30 +30,23 @@ class ModuleDemo(models.Model):
                     'demo_url': terp.get('demo_url', False),
                     'price': terp.get('price', False),
                     'currency': terp.get('currency', False),
+                    'demo_images': ','.join(terp.get('demo_images', [])),
                     })
         return res
 
     @api.multi
-    def _compute_demo_image(self):
-        for record in self:
-            path = get_module_resource(record.name, 'static', 'description', 'demo_image.png')
-            if path:
-                image_file = tools.file_open(path, 'rb')
-                try:
-                    record.demo_image = image_file.read().encode('base64')
-                finally:
-                    image_file.close()
-
-
-    @api.multi
     def get_demo_images(self):
-        for record in self:
-            res = {}
-            img_path = get_module_resource(record.name, 'static', 'description', 'demo')
-            if img_path:
-                (_, _, filenames) = walk(img_path).next()
-                for file_name in filenames:
-                    full_name = os.path.join(img_path, file_name)
+        self.ensure_one()
+        demo_images = self.demo_images and self.demo_images.split(',')
+        res = {}
+        img_path = get_module_resource(self.name, 'static', 'description', 'demo')
+        if img_path:
+            (_, _, filenames) = walk(img_path).next()
+            main = True
+            for image_name in demo_images:
+                if image_name in filenames:
+                    full_name = os.path.join(img_path, image_name)
                     with tools.file_open(full_name, 'rb') as image_file:
-                        res[file_name] = image_file.read().encode('base64')
-                return res
+                        res[main and 'main_demo_image' or image_name] = image_file.read().encode('base64')
+                        main = False
+        return res

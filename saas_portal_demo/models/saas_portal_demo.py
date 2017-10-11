@@ -111,6 +111,7 @@ class SaasPortalServer(models.Model):
         attrib_value = self.env.ref('saas_portal_demo.product_attribute_value_{}'.format(self.odoo_version))
 
         images_res = self._create_demo_images(demo_module)
+        main_image = images_res.pop('main_demo_image', None)
 
         if not product_template:
             vals = {
@@ -119,7 +120,7 @@ class SaasPortalServer(models.Model):
                 'website_published': True,
                 'seo_url': demo_module.get('demo_url'),
                 'description': demo_module.get('demo_summary'),
-                'image': images_res and images_res.popitem()[1] or None,
+                'image': main_image,
                 'sale_on_website': False,
                 'saas_demo': True,
                 'type': 'service',

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+        <record id="base.group_portal" model="res.groups">
+            <field name="implied_ids" eval="[(4, ref('website_sale.group_website_multi_image'))]"/>
+        </record>
+        <record id="base.group_user" model="res.groups">
+            <field name="implied_ids" eval="[(4, ref('website_sale.group_website_multi_image'))]"/>
+        </record>
+        <record id="base.group_public" model="res.groups">
+            <field name="implied_ids" eval="[(4, ref('website_sale.group_website_multi_image'))]"/>
+        </record>
+</odoo>

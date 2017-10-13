@@ -22,8 +22,7 @@
     "external_dependencies": {"python": ['requests'], "bin": []},
     "data": [
         "security/ir.model.access.csv",
-        # "views/saas_portal.xml",
-        # "views/website.xml"
+        "security/saas_portal_demo.xml",
         "views/templates.xml",
         "views/saas_portal_demo.xml",
         "views/product.xml",

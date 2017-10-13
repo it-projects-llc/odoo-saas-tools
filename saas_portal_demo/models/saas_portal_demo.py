@@ -119,11 +119,11 @@ class SaasPortalServer(models.Model):
                 'website_published': True,
                 'seo_url': demo_module.get('demo_url'),
                 'description': demo_module.get('demo_summary'),
-                'image': images_res and images_res.popitem()[1] or None,
+                'image': images_res and images_res.pop(0)[1] or None,
                 'sale_on_website': False,
                 'saas_demo': True,
                 'type': 'service',
-                'product_image_ids': images_res and [(0, 0, {'name': name, 'image': image}) for name, image in images_res.iteritems()] or None,
+                'product_image_ids': images_res and [(0, 0, {'name': name, 'image': image}) for name, image in images_res] or None,
             }
             product_template = product_template_obj.with_context({
                 'create_product_product': False

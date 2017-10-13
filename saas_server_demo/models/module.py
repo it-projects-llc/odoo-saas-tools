@@ -38,16 +38,13 @@ class ModuleDemo(models.Model):
     def get_demo_images(self):
         self.ensure_one()
         demo_images = self.demo_images and self.demo_images.split(',')
-        res = {}
+        res = []
         mod_path = get_module_resource(self.name)
-        main = True
         for image_name in demo_images:
             full_name = os.path.join(mod_path, image_name)
             try:
                 with tools.file_open(full_name, 'rb') as image_file:
-                    res[main and 'main_demo_image' or image_name] = image_file.read().encode('base64')
+                    res.append((image_name, image_file.read().encode('base64')))
             except:
                 pass
-            else:
-                main = False
         return res

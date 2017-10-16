@@ -214,7 +214,7 @@ class SaasPortalServer(models.Model):
 
     @api.model
     def update_all_templates(self):
-        servers = self.env['saas_portal.servere'].search([])
+        servers = self.env['saas_portal.server'].search([])
         for server in servers:
             server.update_templates()
 

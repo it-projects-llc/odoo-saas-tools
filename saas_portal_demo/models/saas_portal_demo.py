@@ -243,6 +243,13 @@ class SaasPortalServer(models.Model):
         return True
 
 
+    @api.model
+    def update_all_templates(self):
+        servers = self.env['saas_portal.server'].search([])
+        for server in servers:
+            server.update_templates()
+
+
 class SaaSPortalDemoPlanModule(models.Model):
     _name = 'saas_portal.demo_plan_module'
     _rec_name = 'technical_name'

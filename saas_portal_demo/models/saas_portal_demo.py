@@ -106,10 +106,11 @@ class SaasPortalServer(models.Model):
                 'website_published': True,
                 'seo_url': demo_module.get('demo_url'),
                 'description': demo_module.get('demo_summary'),
-                'image': demo_module.get('demo_image'),
+                'image': images_res and images_res.pop(0)[1] or None,
                 'sale_on_website': False,
                 'saas_demo': True,
                 'type': 'service',
+                'product_image_ids': images_res and [(0, 0, {'name': name, 'image': image}) for name, image in images_res] or None,
             }
             product_template = product_template_obj.with_context({
                 'create_product_product': False
@@ -209,6 +210,13 @@ class SaasPortalServer(models.Model):
                                         [[['name', 'in', ['base']]]])
                 models.execute_kw(db, uid, password, 'ir.module.module', 'button_upgrade', [id])
         return True
+
+
+    @api.model
+    def update_all_templates(self):
+        servers = self.env['saas_portal.server'].search([])
+        for server in servers:
+            server.update_templates()
 
 
 class SaaSPortalDemoPlanModule(models.Model):

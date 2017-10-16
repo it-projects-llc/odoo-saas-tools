@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
   <data>
-		<template id="theme_module_shop" inherit_id="website.theme" name="saas portal assets">
-			<xpath expr="//link[@href='/website/static/src/css/website.css']" position="before">
-				<link rel='stylesheet' href='/saas_portal_demo/static/src/css/module_shop.css' t-ignore="true"/>
-			</xpath>
-		</template>
+    <template id="assets_frontend" inherit_id="website.assets_frontend" name="saas demo assets">
+            <xpath expr="//link[last()]" position="after">
+                    <link rel='stylesheet' href='/saas_portal_demo/static/src/css/module_shop.css' t-ignore="true"/>
+            </xpath>
+    </template>
 
     <template id="demo_addons" inherit_id="website_sale.product">
       <xpath expr="//div[@class='row'][2]" position="after">
@@ -65,7 +65,7 @@
 
       <xpath expr="//div[@class='col-sm-5 col-md-5 col-lg-4 col-lg-offset-1']/p[@class='text-muted']" position="replace">
         <p class="text-muted">
-         Prices are quoted without included dependencies
+         Prices are quoted without dependencies
         </p>
       </xpath>
 

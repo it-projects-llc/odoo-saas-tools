@@ -40,7 +40,7 @@
       <field name="nextcall" eval="(DateTime.now().replace(hour=00, minute=00, second=00)).strftime('%Y-%m-%d %H:%M:%S')" />
       <field name="doall" eval="False"/>
       <field name="model" eval="'saas_portal.server'"/>
-      <field name="function" eval="'update_templates'"/>
+      <field name="function" eval="'update_all_templates'"/>
       <field name="args" eval="'()'"/>
     </record>
 

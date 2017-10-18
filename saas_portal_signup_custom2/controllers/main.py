@@ -159,6 +159,9 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
         assert re.match("^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\.([a-zA-Z]{2,3}|[0-9]{1,3})(\\]?)$", values['email']), _("Please enter a valid email address.")
         assert any([k for k in values.values()]), _("The form was not properly filled in.")
         assert values.get('password') == qcontext.get('confirm_password'), _("Passwords do not match; please retype them.")
+        supported_langs = [lang['code'] for lang in request.env['res.lang'].sudo().search_read([], ['code'])]
+        if request.lang in supported_langs:
+            values['lang'] = request.lang
         self._signup_with_values(qcontext.get('token'), values)
         request.cr.commit()
 

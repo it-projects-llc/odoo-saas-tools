@@ -113,49 +113,60 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
 
     def do_signup(self, qcontext):
         values = dict((key, qcontext.get(key)) for key in ('login', 'name', 'password'))
-        values['email'] = qcontext['login']
-        values['company_name'] = qcontext.get('company_name', None)
-        values['name'] = qcontext.get('company_name', None)
-        values['is_company'] = True
+
+        parent_values = {}
+        parent_values['is_company'] = True
+        parent_values['name'] = qcontext.get('company_name', None)
         establishment_date = datetime(int(qcontext.get('establishment_year')), 1, 1)
-        values['establishment_year'] = establishment_date.strftime(DF)
-        values['previous_year_turnover'] = qcontext.get('previous_year_turnover', None)
-        values['company_size'] = qcontext.get('company_size', None)
+        parent_values['establishment_year'] = establishment_date.strftime(DF)
+        parent_values['previous_year_turnover'] = qcontext.get('previous_year_turnover', None)
+        parent_values['company_size'] = qcontext.get('company_size', None)
+        parent_values['website'] = qcontext.get('company_website', None)
+        parent_values['phone'] = qcontext.get('tel', None)
+        parent_values['fax'] = qcontext.get('fax', None)
+        parent_values['city'] = qcontext.get('city', None)
+        parent_values['street'] = qcontext.get('address', None)
+        parent_values['vat'] = qcontext.get('tax_code', None)
+        parent_values['zip'] = qcontext.get('postal_code', None)
+        parent_values['business_reg_no'] = qcontext.get('business_reg_no', None)
+        parent_values['tax_code'] = qcontext.get('tax_code', None)
+        parent_values['dnb_number'] = qcontext.get('dnb_number', None)
+        parent_values['email'] = qcontext['login']
 
         birthdate_date = qcontext.get('birthdate_date') and \
                 datetime.strptime(qcontext['birthdate_date'], "%m/%d/%Y")
         if qcontext.get('full_name'):
-            values['child_ids'] = [(0, 0, {
+            parent_values['child_ids'] = [(0, 0, {
                 'name': qcontext['full_name'],
                 'gender': qcontext.get('gender'),
                 'birthdate_date': birthdate_date.strftime(DF),
                 'function': 'Director',
                 })]
 
-        values['website'] = qcontext.get('company_website', None)
-        values['phone'] = qcontext.get('tel', None)
-        values['fax'] = qcontext.get('fax', None)
-        values['city'] = qcontext.get('city', None)
-        values['street'] = qcontext.get('address', None)
-        values['vat'] = qcontext.get('tax_code', None)
-        values['zip'] = qcontext.get('postal_code', None)
-        values['business_reg_no'] = qcontext.get('business_reg_no', None)
-        values['tax_code'] = qcontext.get('tax_code', None)
-        values['dnb_number'] = qcontext.get('dnb_number', None)
-        if qcontext.get('country_id', False):
-            values['country_id'] = qcontext['country_id']
-        if qcontext.get('account_currency_id', False):
-            values['account_currency_id'] = qcontext['account_currency_id']
         if qcontext.get('sector_id', False):
-            values['sector_id'] = qcontext['sector_id']
+            parent_values['sector_id'] = qcontext['sector_id']
+        if qcontext.get('country_id', False):
+            parent_values['country_id'] = qcontext['country_id']
+        if qcontext.get('account_currency_id', False):
+            parent_values['account_currency_id'] = qcontext['account_currency_id']
         if qcontext.get('state_id', False):
-            values['state_id'] = qcontext['state_id']
+            parent_values['state_id'] = qcontext['state_id']
+
+        parent_id = request.env['res.partner'].sudo().create(parent_values)
+
+        values['parent_id'] = parent_id.id
+        values['company_name'] = qcontext.get('company_name', None)
+        values['email'] = qcontext['login']
+        # values['name'] = qcontext.get('company_name', None)
+        values['is_company'] = False
+
         if qcontext.get('dbname', False):
             f_dbname = '%s.%s' % (qcontext['dbname'], self.get_saas_domain())
             full_dbname = f_dbname.replace('www.', '')
             db_exists = odoo.service.db.exp_db_exist(full_dbname)
             assert re.match('[a-zA-Z0-9_.-]+$', qcontext.get('dbname')), _("Only letters or numbers are allowed in domain.")
             assert db_exists == False, _("Web address exists, please choose another web address")
+
         assert re.match("^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\.([a-zA-Z]{2,3}|[0-9]{1,3})(\\]?)$", values['email']), _("Please enter a valid email address.")
         assert any([k for k in values.values()]), _("The form was not properly filled in.")
         assert values.get('password') == qcontext.get('confirm_password'), _("Passwords do not match; please retype them.")

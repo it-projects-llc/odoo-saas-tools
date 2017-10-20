@@ -14,7 +14,7 @@ class SaasPortalPlan(models.Model):
     def _prepare_owner_user_data(self, owner_user, owner_password):
         owner_user_data = super(SaasPortalPlan, self)._prepare_owner_user_data(owner_user, owner_password)
         owner_user_data.update({
-            'company_name': owner_user.company_name,
+            'company_name': owner_user.parent_id.name,
             'website': owner_user.parent_id.website,
             'phone': owner_user.parent_id.phone,
             'fax': owner_user.parent_id.fax,

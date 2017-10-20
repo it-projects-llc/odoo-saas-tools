@@ -202,6 +202,7 @@ class SaasServerClient(models.Model):
             user.write(vals)
 
             main_company = client_env.ref('base.main_company')
+            company_name = owner_user.get('company_name')
             if owner_user.get('company_name'):
                 main_company.partner_id.update({
                     'name': owner_user['company_name'],
@@ -220,8 +221,16 @@ class SaasServerClient(models.Model):
                     self.env['res.country.state'].browse(owner_user['state_id']).id or None,
                     'is_company': True,
                     'child_ids': child_ids,
+                    'business_reg_no': owner_user.get('business_reg_no'),
+                    'dnb_number': owner_user.get('dnb_number'),
+                    'tax_code': owner_user.get('tax_code'),
+                    'account_currency_id': owner_user.get('account_currency_id') and self.env['res.currency'].browse(owner_user['account_currency_id']) and \
+                    self.env['res.currency'].browse(owner_user['account_currency_id']).id or None,
+                    'establishment_year': owner_user.get('establishment_year'),
+                    'previous_year_turnover': owner_user.get('previous_year_turnover'),
+                    'sector_id': sector.id,
                 })
-                main_company.partner_id.update({'child_ids': [(4, owner_user.partner_id.id, 0)]})
+                main_company.partner_id.update({'child_ids': [(4, user.partner_id.id, 0)]})
                 main_company.update({
                     # 'partner_id': user.partner_id.id,
                     'company_registry': owner_user.get('business_reg_no'),

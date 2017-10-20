@@ -239,7 +239,7 @@ class SaasPortalServer(models.Model):
                 db, uid, password, models = plan.template_id._get_xmlrpc_object()
                 id = models.execute_kw(db, uid, password, 'ir.module.module', 'search',
                                         [[['name', 'in', ['base']]]])
-                models.execute_kw(db, uid, password, 'ir.module.module', 'button_upgrade', [id])
+                models.execute_kw(db, uid, password, 'ir.module.module', 'button_immediate_upgrade', [id])
         return True
 
 

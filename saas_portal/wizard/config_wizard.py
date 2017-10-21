@@ -240,7 +240,7 @@ class SaasPortalEditDatabase(models.TransientModel):
     @api.model
     def default_get(self, fields):
         res = super(SaasPortalEditDatabase, self).default_get(fields)
-        print 'default_get', self._context
+        print('default_get', self._context)
         res['active_model'] = self._context.get('active_model')
         res['active_id'] = self._context.get('active_id')
 

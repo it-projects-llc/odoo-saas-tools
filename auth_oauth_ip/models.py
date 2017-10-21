@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 import re
 import werkzeug
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import json
-import urlparse
+import urllib.parse
 
 from odoo import models, fields, api
 
@@ -32,14 +32,14 @@ class res_users(models.Model):
             return super(res_users, self)._auth_oauth_rpc(endpoint, access_token)
 
         endpoint = endpoint.replace(host, '%s:%s' % (local_host, local_port))
-        if urlparse.urlparse(endpoint)[4]:
+        if urllib.parse.urlparse(endpoint)[4]:
             url = endpoint + '&' + params
         else:
             url = endpoint + '?' + params
-        req = urllib2.Request(url, headers={'host': host})
-        print 'url', url
+        req = urllib.request.Request(url, headers={'host': host})
+        print('url', url)
         # f = urllib2.urlopen(url)
-        f = urllib2.urlopen(req)
+        f = urllib.request.urlopen(req)
 
         response = f.read()
         return json.loads(response)

@@ -1,9 +1,11 @@
 odoo.define('saas_client', function (require) {
+"use strict";
 
 var Widget = require('web.Widget');
-var dashboard = require('web_settings_dashboard');
+var Dashboard = require('web_settings_dashboard');
 
-dashboard.Dashboard.include({
+
+Dashboard.Dashboard.include({
     init: function(parent, data){
         var ret = this._super(parent, data);
         this.all_dashboards.push('saas');

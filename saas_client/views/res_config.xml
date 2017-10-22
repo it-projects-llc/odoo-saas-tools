@@ -3,18 +3,17 @@
   <data>
     <record id="view_saas_general_configuration" model="ir.ui.view">
       <field name="name">General Settings</field>
-      <field name="model">base.config.settings</field>
-      <field name="inherit_id" ref="base_setup.view_general_configuration"/>
+      <field name="model">res.config.settings</field>
+      <field name="inherit_id" ref="base_setup.res_config_settings_view_form"/>
       <field name="arch" type="xml">
         <data>
-          <xpath expr="//group[@name='google']" position="before">
-            <group string="Domain" name="domain">
-              <label for="id" string="Your Domain"/>
+          <xpath expr="//div[@id='module_auth_oauth']" position="before">
+            <div class="col-xs-12 col-md-6 o_setting_box" id="module_auth_oauth">
               <div name="your_domain">
                   <div><field name="current_domain" class="oe_inline"/></div>
                   <field name="domain_change_link" class="oe_inline"/>
               </div>
-            </group>
+            </div>
           </xpath>
         </data>
       </field>

@@ -1,4 +1,4 @@
-openerp.saas_client = function(instance){
+odoo.saas_client = function(instance){
     var _t = instance.web._t,
        _lt = instance.web._lt;
 

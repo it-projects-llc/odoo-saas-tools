@@ -2,7 +2,7 @@ from odoo import models, fields, api
 
 
 class BaseConfigSettings(models.TransientModel):
-    _inherit = 'base.config.settings'
+    _inherit = 'res.config.settings'
 
     base_saas_domain = fields.Char('Base SaaS domain')
 

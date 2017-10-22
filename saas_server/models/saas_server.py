@@ -255,7 +255,7 @@ class SaasServerClient(models.Model):
         # "data" comes from saas_portal/models/wizard.py::upgrade_database
         post = data
         module = client_env['ir.module.module']
-        print('_upgrade_database', data)
+        print(('_upgrade_database', data))
         res = {}
 
         # 0. Update module list

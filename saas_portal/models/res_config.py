@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api
-import urlparse
+import urllib.parse
 
 
 class SaasPortalConfigWizard(models.TransientModel):
@@ -24,7 +24,7 @@ class SaasPortalConfigWizard(models.TransientModel):
         if base_saas_domain is None:
             domain = self.env["ir.config_parameter"].get_param("web.base.url")
             try:
-                base_saas_domain = urlparse.urlsplit(domain).netloc.split(':')[0]
+                base_saas_domain = urllib.parse.urlsplit(domain).netloc.split(':')[0]
             except Exception:
                 pass
         return {'base_saas_domain': base_saas_domain or False}

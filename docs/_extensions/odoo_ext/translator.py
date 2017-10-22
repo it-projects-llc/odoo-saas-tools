@@ -2,7 +2,7 @@
 import os.path
 import posixpath
 import re
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 from docutils import nodes
 from sphinx import addnodes, util
@@ -59,21 +59,21 @@ class BootstrapTranslator(nodes.NodeVisitor, object):
         self.param_separator = ','
 
     def encode(self, text):
-        return unicode(text).translate({
-            ord('&'): u'&amp;',
-            ord('<'): u'&lt;',
-            ord('"'): u'&quot;',
-            ord('>'): u'&gt;',
-            0xa0: u'&nbsp;'
+        return str(text).translate({
+            ord('&'): '&amp;',
+            ord('<'): '&lt;',
+            ord('"'): '&quot;',
+            ord('>'): '&gt;',
+            0xa0: '&nbsp;'
         })
 
     def starttag(self, node, tagname, **attributes):
-        tagname = unicode(tagname).lower()
+        tagname = str(tagname).lower()
 
         # extract generic attributes
-        attrs = {name.lower(): value for name, value in attributes.iteritems()}
+        attrs = {name.lower(): value for name, value in attributes.items()}
         attrs.update(
-            (name, value) for name, value in node.attributes.iteritems()
+            (name, value) for name, value in node.attributes.items()
             if name.startswith('data-')
         )
 
@@ -86,31 +86,31 @@ class BootstrapTranslator(nodes.NodeVisitor, object):
         if ids:
             _ids = iter(ids)
             attrs['id'] = next(_ids)
-            postfix.extend(u'<i id="{}"></i>'.format(_id) for _id in _ids)
+            postfix.extend('<i id="{}"></i>'.format(_id) for _id in _ids)
 
         # set CSS class
         classes = set(node.get('classes', []) + attrs.pop('class', '').split())
         if classes:
-            attrs['class'] = u' '.join(classes)
+            attrs['class'] = ' '.join(classes)
 
-        return u'{prefix}<{tag} {attrs}>{postfix}'.format(
-            prefix=u''.join(prefix),
+        return '{prefix}<{tag} {attrs}>{postfix}'.format(
+            prefix=''.join(prefix),
             tag=tagname,
-            attrs=u' '.join(u'{}="{}"'.format(name, self.attval(value))
-                            for name,  value in attrs.iteritems()),
-            postfix=u''.join(postfix),
+            attrs=' '.join('{}="{}"'.format(name, self.attval(value))
+                            for name,  value in attrs.items()),
+            postfix=''.join(postfix),
         )
     # only "space characters" SPACE, CHARACTER TABULATION, LINE FEED,
     # FORM FEED and CARRIAGE RETURN should be collapsed, not al White_Space
-    def attval(self, value, whitespace=re.compile(u'[ \t\n\f\r]')):
-        return self.encode(whitespace.sub(u' ', unicode(value)))
+    def attval(self, value, whitespace=re.compile('[ \t\n\f\r]')):
+        return self.encode(whitespace.sub(' ', str(value)))
 
     def astext(self):
-        return u''.join(self.body)
+        return ''.join(self.body)
 
     def unknown_visit(self, node):
-        print "unknown node", node.__class__.__name__
-        self.body.append(u'[UNKNOWN NODE {}]'.format(node.__class__.__name__))
+        print("unknown node", node.__class__.__name__)
+        self.body.append('[UNKNOWN NODE {}]'.format(node.__class__.__name__))
         raise nodes.SkipNode
 
     def visit_highlightlang(self, node):
@@ -127,7 +127,7 @@ class BootstrapTranslator(nodes.NodeVisitor, object):
         # close "parent" or preceding section, unless this is the opening of
         # the first section
         if self.section_level:
-            self.body.append(u'</section>')
+            self.body.append('</section>')
         self.section_level += 1
 
         self.body.append(self.starttag(node, 'section'))
@@ -135,7 +135,7 @@ class BootstrapTranslator(nodes.NodeVisitor, object):
         self.section_level -= 1
         # close last section of document
         if not self.section_level:
-            self.body.append(u'</section>')
+            self.body.append('</section>')
 
     def is_compact_paragraph(self, node):
         parent = node.parent
@@ -167,10 +167,10 @@ class BootstrapTranslator(nodes.NodeVisitor, object):
 
     def visit_paragraph(self, node):
         if self.is_compact_paragraph(node):
-            self.context.append(u'')
+            self.context.append('')
             return
         self.body.append(self.starttag(node, 'p'))
-        self.context.append(u'</p>')
+        self.context.append('</p>')
     def depart_paragraph(self, node):
         self.body.append(self.context.pop())
     def visit_compact_paragraph(self, node):
@@ -203,27 +203,27 @@ class BootstrapTranslator(nodes.NodeVisitor, object):
             **highlight_args)
         self.body.append(self.starttag(node, 'div', CLASS='highlight-%s' % lang))
         self.body.append(highlighted)
-        self.body.append(u'</div>\n')
+        self.body.append('</div>\n')
         raise nodes.SkipNode
     def depart_literal_block(self, node):
-        self.body.append(u'</pre>')
+        self.body.append('</pre>')
 
     def visit_bullet_list(self, node):
         self.body.append(self.starttag(node, 'ul'))
     def depart_bullet_list(self, node):
-        self.body.append(u'</ul>')
+        self.body.append('</ul>')
     def visit_enumerated_list(self, node):
         self.body.append(self.starttag(node, 'ol'))
     def depart_enumerated_list(self, node):
-        self.body.append(u'</ol>')
+        self.body.append('</ol>')
     def visit_list_item(self, node):
         self.body.append(self.starttag(node, 'li'))
     def depart_list_item(self, node):
-        self.body.append(u'</li>')
+        self.body.append('</li>')
     def visit_definition_list(self, node):
         self.body.append(self.starttag(node, 'dl'))
     def depart_definition_list(self, node):
-        self.body.append(u'</dl>')
+        self.body.append('</dl>')
     def visit_definition_list_item(self, node):
         pass
     def depart_definition_list_item(self, node):
@@ -231,14 +231,14 @@ class BootstrapTranslator(nodes.NodeVisitor, object):
     def visit_term(self, node):
         self.body.append(self.starttag(node, 'dt'))
     def depart_term(self, node):
-        self.body.append(u'</dt>')
+        self.body.append('</dt>')
     def visit_termsep(self, node):
         self.body.append(self.starttag(node, 'br'))
         raise nodes.SkipNode
     def visit_definition(self, node):
         self.body.append(self.starttag(node, 'dd'))
     def depart_definition(self, node):
-        self.body.append(u'</dd>')
+        self.body.append('</dd>')
 
     def visit_admonition(self, node, type=None):
         clss = {
@@ -264,13 +264,13 @@ class BootstrapTranslator(nodes.NodeVisitor, object):
         )))
         if 'alert-dismissible' in node.get('classes', []):
             self.body.append(
-                u'<button type="button" class="close" data-dismiss="alert" aria-label="Close">'
-                u'<span aria-hidden="true">&times;</span>'
-                u'</button>')
+                '<button type="button" class="close" data-dismiss="alert" aria-label="Close">'
+                '<span aria-hidden="true">&times;</span>'
+                '</button>')
         if type:
             node.insert(0, nodes.title(type, admonitionlabels[type]))
     def depart_admonition(self, node):
-        self.body.append(u'</div>')
+        self.body.append('</div>')
     visit_note = lambda self, node: self.visit_admonition(node, 'note')
     visit_warning = lambda self, node: self.visit_admonition(node, 'warning')
     visit_attention = lambda self, node: self.visit_admonition(node, 'attention')
@@ -296,16 +296,16 @@ class BootstrapTranslator(nodes.NodeVisitor, object):
     def visit_versionmodified(self, node):
         self.body.append(self.starttag(node, 'div', CLASS=node['type']))
     def depart_versionmodified(self, node):
-        self.body.append(u'</div>')
+        self.body.append('</div>')
 
     def visit_title(self, node):
         parent = node.parent
-        closing = u'</p>'
+        closing = '</p>'
         if isinstance(parent, nodes.Admonition):
             self.body.append(self.starttag(node, 'p', CLASS='alert-title'))
         elif isinstance(node.parent, nodes.document):
             self.body.append(self.starttag(node, 'h1'))
-            closing = u'</h1>'
+            closing = '</h1>'
             self.start_document_title = len(self.body)
         else:
             assert isinstance(parent, nodes.section), "expected a section node as parent to the title, found {}".format(parent)
@@ -314,7 +314,7 @@ class BootstrapTranslator(nodes.NodeVisitor, object):
                 raise nodes.SkipNode()
             nodename = 'h{}'.format(self.section_level)
             self.body.append(self.starttag(node, nodename))
-            closing = u'</{}>'.format(nodename)
+            closing = '</{}>'.format(nodename)
         self.context.append(closing)
     def depart_title(self, node):
         self.body.append(self.context.pop())
@@ -328,25 +328,25 @@ class BootstrapTranslator(nodes.NodeVisitor, object):
     def visit_rubric(self, node):
         self.body.append(self.starttag(node, 'h{}'.format(min(self.section_level + 1, 6))))
     def depart_rubric(self, node):
-        self.body.append(u'</h{}>'.format(min(self.section_level + 1, 6)))
+        self.body.append('</h{}>'.format(min(self.section_level + 1, 6)))
 
     def visit_block_quote(self, node):
         self.body.append(self.starttag(node, 'blockquote'))
     def depart_block_quote(self, node):
-        self.body.append(u'</blockquote>')
+        self.body.append('</blockquote>')
     def visit_attribution(self, node):
         self.body.append(self.starttag(node, 'footer'))
     def depart_attribution(self, node):
-        self.body.append(u'</footer>')
+        self.body.append('</footer>')
 
     def visit_container(self, node):
         self.body.append(self.starttag(node, 'div'))
     def depart_container(self, node):
-        self.body.append(u'</div>')
+        self.body.append('</div>')
     def visit_compound(self, node):
         self.body.append(self.starttag(node, 'div'))
     def depart_compound(self, node):
-        self.body.append(u'</div>')
+        self.body.append('</div>')
 
     def visit_image(self, node):
         uri = node['uri']
@@ -375,46 +375,46 @@ class BootstrapTranslator(nodes.NodeVisitor, object):
     def visit_figure(self, node):
         self.body.append(self.starttag(node, 'div'))
     def depart_figure(self, node):
-        self.body.append(u'</div>')
+        self.body.append('</div>')
     def visit_caption(self, node):
         # first paragraph of figure content
         self.body.append(self.starttag(node, 'h4'))
     def depart_caption(self, node):
-        self.body.append(u'</h4>')
+        self.body.append('</h4>')
     def visit_legend(self, node): pass
     def depart_legend(self, node): pass
 
     def visit_line(self, node):
         self.body.append(self.starttag(node, 'div', CLASS='line'))
         # ensure the line still takes the room it needs
-        if not len(node): self.body.append(u'<br />')
+        if not len(node): self.body.append('<br />')
     def depart_line(self, node):
-        self.body.append(u'</div>')
+        self.body.append('</div>')
 
     def visit_line_block(self, node):
         self.body.append(self.starttag(node, 'div', CLASS='line-block'))
     def depart_line_block(self, node):
-        self.body.append(u'</div>')
+        self.body.append('</div>')
 
     def visit_table(self, node):
         self.body.append(self.starttag(node, 'table', CLASS='table'))
     def depart_table(self, node):
-        self.body.append(u'</table>')
+        self.body.append('</table>')
     def visit_tgroup(self, node): pass
     def depart_tgroup(self, node): pass
     def visit_colspec(self, node): raise nodes.SkipNode
     def visit_thead(self, node):
         self.body.append(self.starttag(node, 'thead'))
     def depart_thead(self, node):
-        self.body.append(u'</thead>')
+        self.body.append('</thead>')
     def visit_tbody(self, node):
         self.body.append(self.starttag(node, 'tbody'))
     def depart_tbody(self, node):
-        self.body.append(u'</tbody>')
+        self.body.append('</tbody>')
     def visit_row(self, node):
         self.body.append(self.starttag(node, 'tr'))
     def depart_row(self, node):
-        self.body.append(u'</tr>')
+        self.body.append('</tr>')
     def visit_entry(self, node):
         if isinstance(node.parent.parent, nodes.thead):
             tagname = 'th'
@@ -423,7 +423,7 @@ class BootstrapTranslator(nodes.NodeVisitor, object):
         self.body.append(self.starttag(node, tagname))
         self.context.append(tagname)
     def depart_entry(self, node):
-        self.body.append(u'</{}>'.format(self.context.pop()))
+        self.body.append('</{}>'.format(self.context.pop()))
 
     def visit_Text(self, node):
         self.body.append(self.encode(node.astext()))
@@ -432,30 +432,30 @@ class BootstrapTranslator(nodes.NodeVisitor, object):
     def visit_literal(self, node):
         self.body.append(self.starttag(node, 'code'))
     def depart_literal(self, node):
-        self.body.append(u'</code>')
+        self.body.append('</code>')
     visit_literal_emphasis = visit_literal
     depart_literal_emphasis = depart_literal
     def visit_emphasis(self, node):
         self.body.append(self.starttag(node, 'em'))
     def depart_emphasis(self, node):
-        self.body.append(u'</em>')
+        self.body.append('</em>')
     def visit_strong(self, node):
         self.body.append(self.starttag(node, 'strong'))
     def depart_strong(self, node):
-        self.body.append(u'</strong>')
+        self.body.append('</strong>')
     visit_literal_strong = visit_strong
     depart_literal_strong = depart_strong
     def visit_inline(self, node):
         self.body.append(self.starttag(node, 'span'))
     def depart_inline(self, node):
-        self.body.append(u'</span>')
+        self.body.append('</span>')
     def visit_abbreviation(self, node):
         attrs = {}
         if 'explanation' in node:
             attrs['title'] = node['explanation']
         self.body.append(self.starttag(node, 'abbr', **attrs))
     def depart_abbreviation(self, node):
-        self.body.append(u'</abbr>')
+        self.body.append('</abbr>')
 
     def visit_reference(self, node):
         attrs = {
@@ -471,25 +471,25 @@ class BootstrapTranslator(nodes.NodeVisitor, object):
 
         self.body.append(self.starttag(node, 'a', **attrs))
     def depart_reference(self, node):
-        self.body.append(u'</a>')
+        self.body.append('</a>')
     def visit_target(self, node): pass
     def depart_target(self, node): pass
     def visit_footnote(self, node):
         self.body.append(self.starttag(node, 'div', CLASS='footnote'))
         self.footnote_backrefs(node)
     def depart_footnote(self, node):
-        self.body.append(u'</div>')
+        self.body.append('</div>')
     def visit_footnote_reference(self, node):
         self.body.append(self.starttag(
             node, 'a', href='#' + node['refid'], CLASS="footnote-ref"))
     def depart_footnote_reference(self, node):
-        self.body.append(u'</a>')
+        self.body.append('</a>')
     def visit_label(self, node):
         self.body.append(self.starttag(node, 'span', CLASS='footnote-label'))
-        self.body.append(u'%s[' % self.context.pop())
+        self.body.append('%s[' % self.context.pop())
     def depart_label(self, node):
         # Context added in footnote_backrefs.
-        self.body.append(u']%s</span> %s' % (self.context.pop(), self.context.pop()))
+        self.body.append(']%s</span> %s' % (self.context.pop(), self.context.pop()))
     def footnote_backrefs(self, node):
         # should store following data on context stack (in that order since
         # they'll be popped so LIFO)
@@ -520,32 +520,32 @@ class BootstrapTranslator(nodes.NodeVisitor, object):
     def visit_desc(self, node):
         self.body.append(self.starttag(node, 'section', CLASS='code-' + node['objtype']))
     def depart_desc(self, node):
-        self.body.append(u'</section>')
+        self.body.append('</section>')
     def visit_desc_signature(self, node):
         self.body.append(self.starttag(node, 'h6'))
-        self.body.append(u'<code>')
+        self.body.append('<code>')
     def depart_desc_signature(self, node):
-        self.body.append(u'</code>')
-        self.body.append(u'</h6>')
+        self.body.append('</code>')
+        self.body.append('</h6>')
     def visit_desc_addname(self, node): pass
     def depart_desc_addname(self, node): pass
     def visit_desc_type(self, node): pass
     def depart_desc_type(self, node): pass
     def visit_desc_returns(self, node):
-        self.body.append(u' → ')
+        self.body.append(' → ')
     def depart_desc_returns(self, node):
         pass
     def visit_desc_name(self, node): pass
     def depart_desc_name(self, node): pass
     def visit_desc_parameterlist(self, node):
-        self.body.append(u'(')
+        self.body.append('(')
         self.first_param = True
         self.optional_param_level = 0
         # How many required parameters are left.
         self.required_params_left = sum(isinstance(c, addnodes.desc_parameter) for c in node.children)
         self.param_separator = node.child_text_separator
     def depart_desc_parameterlist(self, node):
-        self.body.append(u')')
+        self.body.append(')')
     # If required parameters are still to come, then put the comma after
     # the parameter.  Otherwise, put the comma before.  This ensures that
     # signatures like the following render correctly (see issue #1001):
@@ -559,39 +559,39 @@ class BootstrapTranslator(nodes.NodeVisitor, object):
             self.body.append(self.param_separator)
         if self.optional_param_level == 0:
             self.required_params_left -= 1
-        if 'noemph' not in node: self.body.append(u'<em>')
+        if 'noemph' not in node: self.body.append('<em>')
     def depart_desc_parameter(self, node):
-        if 'noemph' not in node: self.body.append(u'</em>')
+        if 'noemph' not in node: self.body.append('</em>')
         if self.required_params_left:
             self.body.append(self.param_separator)
     def visit_desc_optional(self, node):
         self.optional_param_level += 1
-        self.body.append(u'[')
+        self.body.append('[')
     def depart_desc_optional(self, node):
         self.optional_param_level -= 1
-        self.body.append(u']')
+        self.body.append(']')
     def visit_desc_annotation(self, node):
         self.body.append(self.starttag(node, 'em'))
     def depart_desc_annotation(self, node):
-        self.body.append(u'</em>')
+        self.body.append('</em>')
     def visit_desc_content(self, node): pass
     def depart_desc_content(self, node): pass
     def visit_field_list(self, node):
          self.body.append(self.starttag(node, 'div', CLASS='code-fields'))
     def depart_field_list(self, node):
-        self.body.append(u'</div>')
+        self.body.append('</div>')
     def visit_field(self, node):
         self.body.append(self.starttag(node, 'div', CLASS='code-field'))
     def depart_field(self, node):
-        self.body.append(u'</div>')
+        self.body.append('</div>')
     def visit_field_name(self, node):
         self.body.append(self.starttag(node, 'div', CLASS='code-field-name'))
     def depart_field_name(self, node):
-        self.body.append(u'</div>')
+        self.body.append('</div>')
     def visit_field_body(self, node):
         self.body.append(self.starttag(node, 'div', CLASS='code-field-body'))
     def depart_field_body(self, node):
-        self.body.append(u'</div>')
+        self.body.append('</div>')
 
     def visit_glossary(self, node): pass
     def depart_glossary(self, node): pass
@@ -617,9 +617,9 @@ class BootstrapTranslator(nodes.NodeVisitor, object):
             classes = env.metadata[ref].get('types', 'tutorials')
             classes += ' toc-single-entry' if not toc else ' toc-section'
             self.body.append(self.starttag(node, 'div', CLASS="row " + classes))
-            self.body.append(u'<h2 class="col-sm-12">')
+            self.body.append('<h2 class="col-sm-12">')
             self.body.append(title if title else util.nodes.clean_astext(env.titles[ref]))
-            self.body.append(u'</h2>')
+            self.body.append('</h2>')
 
             entries = [(title, ref)] if not toc else ((e[0], e[1]) for e in toc[0]['entries'])
             for subtitle, subref in entries:
@@ -636,14 +636,14 @@ class BootstrapTranslator(nodes.NodeVisitor, object):
                     banner = '_static/' + cover
                     base, ext = os.path.splitext(banner)
                     small = "{}.small{}".format(base, ext)
-                    if os.path.isfile(urllib.url2pathname(small)):
+                    if os.path.isfile(urllib.request.url2pathname(small)):
                         banner = small
-                    style = u"background-image: url('{}')".format(
+                    style = "background-image: url('{}')".format(
                         util.relative_uri(baseuri, banner) or '#')
                 else:
-                    style = u''
+                    style = ''
 
-                self.body.append(u"""
+                self.body.append("""
                 <div class="col-sm-6 col-md-3">
                 <figure class="card">
                     <a href="{link}" class="card-img">
@@ -659,7 +659,7 @@ class BootstrapTranslator(nodes.NodeVisitor, object):
                     title=subtitle if subtitle else util.nodes.clean_astext(env.titles[subref]),
                 ))
 
-            self.body.append(u'</div>')
+            self.body.append('</div>')
         raise nodes.SkipNode
 
     def visit_index(self, node): raise nodes.SkipNode
@@ -683,9 +683,9 @@ class BootstrapTranslator(nodes.NodeVisitor, object):
     def visit_div(self, node):
         self.body.append(self.starttag(node, 'div'))
     def depart_div(self, node):
-        self.body.append(u'</div>\n')
+        self.body.append('</div>\n')
     def visit_address(self, node):
         self.body.append(self.starttag(node, 'address'))
     def depart_address(self, node):
-        self.body.append(u'</address>')
+        self.body.append('</address>')
     # TODO: inline elements

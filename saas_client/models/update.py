@@ -8,7 +8,7 @@ class publisher_warranty_contract(AbstractModel):
 
     def update_notification(self, cron_mode=True):
         url = self.env['ir.config_parameter'].get_param('saas_client.publisher_warranty_url')
-        print('update_notification', url)
+        print(('update_notification', url))
         if not url:
             return
         config.options["publisher_warranty_url"] = url

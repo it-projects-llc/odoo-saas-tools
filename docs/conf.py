@@ -45,8 +45,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Odoo SaaS Tools'
-copyright = u'IT-Projects LLC'
+project = 'Odoo SaaS Tools'
+copyright = 'IT-Projects LLC'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -129,7 +129,7 @@ html_theme_path = ['_extensions']
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
-html_add_permalinks = u''
+html_add_permalinks = ''
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
@@ -173,7 +173,7 @@ html_sidebars = {
 
 latex_elements = {
     'papersize': r'a4paper',
-    'preamble': u'''\\setcounter{tocdepth}{2}
+    'preamble': '''\\setcounter{tocdepth}{2}
 ''',
 }
 

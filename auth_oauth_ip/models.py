@@ -37,7 +37,7 @@ class res_users(models.Model):
         else:
             url = endpoint + '?' + params
         req = urllib.request.Request(url, headers={'host': host})
-        print('url', url)
+        print(('url', url))
         # f = urllib2.urlopen(url)
         f = urllib.request.urlopen(req)
 

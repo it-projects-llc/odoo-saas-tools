@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api
 import simplejson
-import mailgun
+from . import mailgun
 import logging
 _logger = logging.getLogger(__name__)
 
@@ -50,9 +50,9 @@ class SaasPortalClient(models.Model):
 
         sending_dns_records = domain_info.get('sending_dns_records')
         for r in sending_dns_records:
-            name = unicode(r['name'])
-            type = unicode(r['record_type'].lower())
-            value = unicode(r['value'])
+            name = str(r['name'])
+            type = str(r['record_type'].lower())
+            value = str(r['value'])
             self.server_id._update_zone(name=name, type=type, value=value)
 
 

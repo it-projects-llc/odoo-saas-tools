@@ -46,7 +46,7 @@ class OAuth2Validator(RequestValidator):
         encoding = req.encoding or 'utf-8'
 
         auth_string_decoded = base64.b64decode(auth_string).decode(encoding)
-        client_id, client_secret = map(unquote_plus, auth_string_decoded.split(':', 1))
+        client_id, client_secret = list(map(unquote_plus, auth_string_decoded.split(':', 1)))
 
         if self._load_application(client_id, req) is None:
             log.debug("Failed basic auth: Application %s does not exist" % client_id)

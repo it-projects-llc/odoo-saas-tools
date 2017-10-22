@@ -41,7 +41,7 @@ def _get_s3_conn(env):
     aws_secret_access_key = ir_params.get_param('saas_s3.saas_s3_aws_accesskey')
     aws_s3_bucket = ir_params.get_param('saas_s3.saas_s3_aws_bucket')
     if not aws_access_key_id or not aws_secret_access_key or not aws_s3_bucket:
-        raise exceptions.Warning( _(u'Please provide your AWS Access Key and ID \
+        raise exceptions.Warning( _('Please provide your AWS Access Key and ID \
         and also the S3 bucket to be used'))
     return boto.connect_s3(aws_access_key_id, aws_secret_access_key), aws_s3_bucket
 

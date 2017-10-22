@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from urllib import urlencode
+from urllib.parse import urlencode
 from ast import literal_eval
 import odoo
 from odoo import SUPERUSER_ID, exceptions
@@ -30,7 +30,7 @@ class SaasPortal(http.Controller):
         uid = request.session.uid
         if not uid:
             url = '/web/signup' if redirect_to_signup else '/web/login'
-            redirect = unicode('/saas_portal/add_new_client?' + urlencode(post))
+            redirect = str('/saas_portal/add_new_client?' + urlencode(post))
             query = {'redirect': redirect}
             return http.local_redirect(path=url, query=query)
 

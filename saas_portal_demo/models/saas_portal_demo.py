@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import requests
-import xmlrpclib
+import xmlrpc.client
 
 from odoo import models, fields, api
 from odoo import SUPERUSER_ID as SI
@@ -19,10 +19,10 @@ class SaasPortalServer(models.Model):
         db = db_name
         username = 'admin'
         password = self.password
-        common = xmlrpclib.ServerProxy('{}/xmlrpc/2/common'.format(url))
+        common = xmlrpc.client.ServerProxy('{}/xmlrpc/2/common'.format(url))
         uid = common.authenticate(db, username, password, {})
 
-        return db, uid, password, xmlrpclib.ServerProxy('{}/xmlrpc/2/object'.format(url))
+        return db, uid, password, xmlrpc.client.ServerProxy('{}/xmlrpc/2/object'.format(url))
 
     @api.multi
     def _get_odoo_version(self):
@@ -301,6 +301,6 @@ class SaasPortalDatabase(models.Model):
         db = self.name
         username = 'admin'
         password = self.password
-        common = xmlrpclib.ServerProxy('{}/xmlrpc/2/common'.format(url))
+        common = xmlrpc.client.ServerProxy('{}/xmlrpc/2/common'.format(url))
         uid = common.authenticate(db, username, password, {})
-        return db, uid, password, xmlrpclib.ServerProxy('{}/xmlrpc/2/object'.format(url))
+        return db, uid, password, xmlrpc.client.ServerProxy('{}/xmlrpc/2/object'.format(url))

@@ -4,10 +4,10 @@ import datetime
 from odoo import http
 from odoo.http import request
 
-from odoo.addons.website_portal.controllers.main import website_account
+from odoo.addons.portal.controllers.portal import CustomerPortal
 
 
-class WebsiteSaasDashboard(website_account):
+class WebsiteSaasDashboard(CustomerPortal):
     @http.route(['/my/home'], type='http', auth="user", website=True)
     def account(self, **kw):
         """ Add sales documents to main account page """

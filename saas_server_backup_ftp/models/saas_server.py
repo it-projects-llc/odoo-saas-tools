@@ -42,7 +42,7 @@ class SaasServerClient(models.Model):
                 try:
                     srv.chdir(currentDir)
                 except:
-                    print('(Part of the) path didn\'t exist. Creating it now at ' + currentDir)
+                    print(('(Part of the) path didn\'t exist. Creating it now at ' + currentDir))
                     # Make directory and then navigate into it
                     srv.mkdir(currentDir, mode=777)
                     srv.chdir(currentDir)

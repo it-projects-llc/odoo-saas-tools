@@ -17,8 +17,8 @@ try:
     from oauthlib.common import urlencode, urlencoded, quote
 except:
     pass
-from urlparse import urlparse
-from urlparse import urlunparse
+from urllib.parse import urlparse
+from urllib.parse import urlunparse
 
 
 # see https://oauthlib.readthedocs.org/en/latest/oauth2/server.html
@@ -48,14 +48,14 @@ class OAuth2(http.Controller):
         uri = self._get_escaped_full_path(request)
         http_method = request.httprequest.method
 
-        headers = dict(request.httprequest.headers.items())
+        headers = dict(list(request.httprequest.headers.items()))
         if 'wsgi.input' in headers:
             del headers['wsgi.input']
         if 'wsgi.errors' in headers:
             del headers['wsgi.errors']
         if 'HTTP_AUTHORIZATION' in headers:
             headers['Authorization'] = headers['HTTP_AUTHORIZATION']
-        body = urlencode(post_dict.items())
+        body = urlencode(list(post_dict.items()))
         return uri, http_method, body, headers
 
     def _response_from_error(self, e):
@@ -64,7 +64,7 @@ class OAuth2(http.Controller):
 
     def _response(self, headers, body, status=200):
         try:
-            fixed_headers = {str(k): v for k, v in headers.items()}
+            fixed_headers = {str(k): v for k, v in list(headers.items())}
         except:
             fixed_headers = headers
         response = werkzeug.Response(response=body, status=status, headers=fixed_headers)

@@ -51,7 +51,7 @@ class SaasPortalCategory(models.Model):
         ids = self.ids
         while len(ids):
             cr.execute('select distinct parent_id from saas_portal_category where id IN %s', (tuple(ids), ))
-            ids = filter(None, map(lambda x: x[0], cr.fetchall()))
+            ids = [_f for _f in [x[0] for x in cr.fetchall()] if _f]
             if not level:
                 raise Warning('Error! You cannot create recursive Categories')
             level -= 1

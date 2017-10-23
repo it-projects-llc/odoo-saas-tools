@@ -4,7 +4,7 @@ from odoo import http
 from odoo.http import request
 from odoo.addons.saas_portal.controllers.main import SaasPortal
 from odoo.addons.website_sale.controllers.main import WebsiteSale
-from odoo.addons.website_portal.controllers.main import website_account
+from odoo.addons.portal.controllers.portal import CustomerPortal
 
 
 def signup_redirect():
@@ -50,7 +50,7 @@ class WebsiteSaleCustom(WebsiteSale):
         return super(WebsiteSaleCustom, self).product(product=product, category=category, search=search, **kwargs)
 
 
-class WebsiteAccount(website_account):
+class WebsiteAccount(CustomerPortal):
 
     @http.route()
     def account(self, **kw):

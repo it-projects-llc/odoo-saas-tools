@@ -1,0 +1,2 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_ir_module_module_install_from_settings","ir_module_module install_from_settings","base.model_ir_module_module","group_install_module_from_settings",1,1,1,1

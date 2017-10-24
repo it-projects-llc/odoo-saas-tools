@@ -55,7 +55,11 @@ class SaasPortalPlan(models.Model):
                 }
         client_obj.upgrade(payload=payload)
         payload = {
-                'install_addons': ['access_restricted', 'access_apps'],
+                'install_addons': ['access_restricted', 'access_apps', 'custom2_security', 'res_partner_custom2'],
+                }
+        client_obj.upgrade(payload=payload)
+        payload = {
+                'access_owner_add': ['custom2_security.group_install_module_from_settings'],
                 }
         client_obj.upgrade(payload=payload)
         return res

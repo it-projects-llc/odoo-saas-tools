@@ -22,6 +22,7 @@
     "data": [
         'security/custom2_security.xml',
         'views/base_menu.xml',
+        'security/ir.model.access.csv',
     ],
     "qweb": [
     ],

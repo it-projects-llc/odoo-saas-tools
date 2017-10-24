@@ -21,8 +21,6 @@
     "external_dependencies": {"python": [], "bin": []},
     "data": [
         'views/res_partner_view.xml',
-        'security/custom2_security.xml',
-        'views/base_menu.xml',
     ],
     "qweb": [
     ],

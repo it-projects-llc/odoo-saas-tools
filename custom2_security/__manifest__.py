@@ -20,7 +20,8 @@
     ],
     "external_dependencies": {"python": [], "bin": []},
     "data": [
-        "data/account_accountant_data.xml",
+        'security/custom2_security.xml',
+        'views/base_menu.xml',
     ],
     "qweb": [
     ],

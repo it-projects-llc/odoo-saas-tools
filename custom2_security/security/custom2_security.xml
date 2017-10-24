@@ -4,16 +4,13 @@
     <record id="group_show_translations_menu" model="res.groups">
         <field name="name">Show translations menu</field>
         <field name="comment">Show translations menu</field>
+        <field name="users" eval="[(4, ref('base.user_root'))]"/>
     </record>
 
     <record id="group_show_system_parameters_menu" model="res.groups">
         <field name="name">Show system parameters menu</field>
         <field name="comment">Show system parameters menu</field>
-    </record>
-
-    <record id="base.group_system" model="res.groups">
-        <field name="implied_ids" eval="[(4, ref('res_partner_custom2.group_show_translations_menu')),
-                                        (4, ref('res_partner_custom2.group_show_system_parameters_menu'))]"/>
+        <field name="users" eval="[(4, ref('base.user_root'))]"/>
     </record>
 
 </odoo>

@@ -54,7 +54,7 @@ class SaasServerClient(models.Model):
 
     @api.one
     def registry(self, new=False, **kwargs):
-        m = odoo.modules.registry.RegistryManager
+        m = odoo.modules.registry.Registry
         if new:
             return m.new(self.name, **kwargs)
         else:

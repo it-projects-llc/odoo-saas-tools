@@ -45,27 +45,15 @@ class SaasPortalPlan(models.Model):
 
     @api.multi
     def create_new_database(self, **kwargs):
-        res = super(SaasPortalPlan, self).create_new_database(**kwargs)
+        res = super(SaasPortalPlan, self).create_new_database(addons=['custom2_security', 'res_partner_custom2'], **kwargs)
         client_obj = self.env['saas_portal.client'].browse(res.get('id'))
 
         payload = {
-                'access_owner_add': ['base.group_system'],
-                # 'access_owner_add': ['base.group_erp_manager'],
-                # 'install_addons': ['access_restricted'],
-                }
-        client_obj.upgrade(payload=payload)
-        payload = {
-                'install_addons': ['custom2_security', 'res_partner_custom2'],
-                }
-        client_obj.upgrade(payload=payload)
-        payload = {
-                'access_owner_add': ['custom2_security.group_install_module_from_settings'],
+                'access_owner_add': ['base.group_system', 'custom2_security.group_install_module_from_settings'],
                 }
         client_obj.upgrade(payload=payload)
         return res
 
     @api.multi
     def create_template(self, **kwargs):
-        res = super(SaasPortalPlan, self).create_template(**kwargs)
-        if self.template_id:
-            self.template_id.upgrade(payload={'install_addons': ['res_partner_custom2']})
+        return super(SaasPortalPlan, self).create_template(addons=['custom2_security', 'res_partner_custom2'], **kwargs)

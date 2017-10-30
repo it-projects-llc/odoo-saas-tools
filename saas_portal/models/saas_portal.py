@@ -248,7 +248,8 @@ class SaasPortalPlan(models.Model):
                              support_team_id=None,
                              async=None,
                              product_id=None,
-                             owner_password=None):
+                             owner_password=None,
+                             addons=None):
         self.ensure_one()
 
         server = self.server_id
@@ -315,6 +316,7 @@ class SaasPortalPlan(models.Model):
             'r': client.public_url + 'web',
             'owner_user': owner_user_data,
             't': client.trial,
+            'addons': addons or [],
         }
         if self.template_id:
             state.update({'db_template': self.template_id.name})

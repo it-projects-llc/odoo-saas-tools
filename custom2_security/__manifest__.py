@@ -17,6 +17,8 @@
 
     "depends": [
         "sale",
+        'access_restricted',
+        'access_apps',
     ],
     "external_dependencies": {"python": [], "bin": []},
     "data": [

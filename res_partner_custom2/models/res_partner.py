@@ -10,10 +10,10 @@ class Partner(models.Model):
     tax_code = fields.Char('Tax code')
     establishment_year = fields.Datetime(string='Year of establishment')
     employee_number = fields.Integer(string='Number of employee')
-    company_size = fields.Selection(string='Company size', selection='_get_company_sizes')
+    company_size = fields.Selection(string='Company size', selection='_get_company_sizes', translate=True)
     account_currency_id = fields.Many2one('res.currency', string='Banking account currency')
     previous_year_turnover = fields.Integer(string='Previous year turn-over')
-    gender = fields.Selection(string='Gender', selection='_get_genders')
+    gender = fields.Selection(string='Gender', selection='_get_genders', translate=True)
 
     @api.model
     def _get_company_sizes(self):

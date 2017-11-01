@@ -1,0 +1,70 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* res_partner_custom2
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 10.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-11-01 17:18+0000\n"
+"PO-Revision-Date: 2017-11-01 17:18+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: res_partner_custom2
+#: model:ir.model.fields,field_description:res_partner_custom2.field_res_partner_account_currency_id
+#: model:ir.model.fields,field_description:res_partner_custom2.field_res_users_account_currency_id
+msgid "Banking account currency"
+msgstr ""
+
+#. module: res_partner_custom2
+#: model:ir.model.fields,field_description:res_partner_custom2.field_res_partner_business_reg_no
+#: model:ir.model.fields,field_description:res_partner_custom2.field_res_users_business_reg_no
+msgid "Business Registration No."
+msgstr ""
+
+#. module: res_partner_custom2
+#: model:ir.model.fields,field_description:res_partner_custom2.field_res_partner_company_size
+#: model:ir.model.fields,field_description:res_partner_custom2.field_res_users_company_size
+msgid "Company size"
+msgstr ""
+
+#. module: res_partner_custom2
+#: model:ir.model.fields,field_description:res_partner_custom2.field_res_partner_dnb_number
+#: model:ir.model.fields,field_description:res_partner_custom2.field_res_users_dnb_number
+msgid "D&B Number"
+msgstr ""
+
+#. module: res_partner_custom2
+#: model:ir.model.fields,field_description:res_partner_custom2.field_res_partner_employee_number
+#: model:ir.model.fields,field_description:res_partner_custom2.field_res_users_employee_number
+msgid "Number of employee"
+msgstr ""
+
+#. module: res_partner_custom2
+#: model:ir.model,name:res_partner_custom2.model_res_partner
+msgid "Partner"
+msgstr ""
+
+#. module: res_partner_custom2
+#: model:ir.model.fields,field_description:res_partner_custom2.field_res_partner_previous_year_turnover
+#: model:ir.model.fields,field_description:res_partner_custom2.field_res_users_previous_year_turnover
+msgid "Previous year turn-over"
+msgstr ""
+
+#. module: res_partner_custom2
+#: model:ir.model.fields,field_description:res_partner_custom2.field_res_partner_tax_code
+#: model:ir.model.fields,field_description:res_partner_custom2.field_res_users_tax_code
+msgid "Tax code"
+msgstr ""
+
+#. module: res_partner_custom2
+#: model:ir.model.fields,field_description:res_partner_custom2.field_res_partner_establishment_year
+#: model:ir.model.fields,field_description:res_partner_custom2.field_res_users_establishment_year
+msgid "Year of establishment"
+msgstr ""
+

@@ -32,6 +32,7 @@ class SaasServerClient(models.Model):
                               ('pending', 'Pending'),
                               ('deleted', 'Deleted')],
                              'State', default='draft', track_visibility='onchange')
+    host = fields.Char('Host')
 
     _sql_constraints = [
         ('client_id_uniq', 'unique (client_id)', 'client_id should be unique!'),
@@ -131,7 +132,7 @@ class SaasServerClient(models.Model):
             client_env['ir.config_parameter'].set_param(key, value)
 
         # set web.base.url config
-        client_env['ir.config_parameter'].set_param('web.base.url', '%s://%s' % (server_requests_scheme, self.name))
+        client_env['ir.config_parameter'].set_param('web.base.url', '%s://%s' % (server_requests_scheme, self.host))
 
         # saas_client must be already installed
         oauth_provider = client_env.ref('saas_client.saas_oauth_provider')

@@ -299,6 +299,7 @@ class SaasPortalPlan(models.Model):
             'public_url': client.public_url,
             'e': trial and trial_expiration_datetime or initial_expiration_datetime,
             'r': client.public_url + 'web',
+            'h': client.host,
             'owner_user': owner_user_data,
             't': client.trial,
         }

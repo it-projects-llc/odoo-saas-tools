@@ -38,6 +38,7 @@ class SaasServer(http.Controller):
         state = simplejson.loads(post.get('state'))
         owner_user = state.get('owner_user')
         new_db = state.get('d')
+        host = state.get('h')
         public_url = state.get('public_url')
         trial = state.get('t')
         expiration_db = state.get('e')
@@ -59,7 +60,13 @@ class SaasServer(http.Controller):
         if saas_portal_user.get("error"):
             raise Exception(saas_portal_user['error'])
 
-        client_data = {'name': new_db, 'client_id': client_id, 'expiration_datetime': expiration_db, 'trial': trial}
+        client_data = {
+            'name': new_db,
+            'client_id': client_id,
+            'expiration_datetime': expiration_db,
+            'trial': trial,
+            'host': host,
+        }
         client = request.env['saas_server.client'].sudo().create(client_data)
         res = client.create_database(template_db, demo, lang)
         client.install_addons(addons=addons, is_template_db=is_template_db)
@@ -71,7 +78,8 @@ class SaasServer(http.Controller):
             owner_user=owner_user,
             is_template_db=is_template_db,
             access_token=access_token,
-            server_requests_scheme=request.httprequest.scheme)
+            server_requests_scheme=request.httprequest.scheme,
+        )
 
         if is_template_db:
             res.update({

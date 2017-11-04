@@ -11,7 +11,7 @@
     'data': [
         'data/mail_template_data.xml',
         'data/plan_sequence.xml',
-        'data/base_action_rule.xml',
+        'data/base_automation.xml',
         'data/cron.xml',
         'wizard/config_wizard.xml',
         'wizard/batch_delete.xml',

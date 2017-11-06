@@ -29,12 +29,11 @@ def webservice(f):
 
 class SaasServer(http.Controller):
 
-    @http.route('/saas_server/new_database', type='http', website=True, auth='public')
+    @http.route(['/saas_server/new_database'], type='http', website=True, auth='public')
     @fragment_to_query_string
     @webservice
     def new_database(self, **post):
         _logger.info('new_database post: %s', post)
-
         state = simplejson.loads(post.get('state'))
         owner_user = state.get('owner_user')
         new_db = state.get('d')
@@ -96,7 +95,7 @@ class SaasServer(http.Controller):
             }),
         })
 
-    @http.route('/saas_server/edit_database', type='http', auth='public', website=True)
+    @http.route(['/saas_server/edit_database'], type='http', auth='public', website=True)
     @fragment_to_query_string
     @webservice
     def edit_database(self, **post):
@@ -113,7 +112,7 @@ class SaasServer(http.Controller):
         url = url.format(public_url=public_url, params=werkzeug.url_encode(params))
         return werkzeug.utils.redirect(url)
 
-    @http.route('/saas_server/upgrade_database', type='http', auth='public')
+    @http.route(['/saas_server/upgrade_database'], type='http', auth='public')
     @fragment_to_query_string
     @webservice
     def upgrade_database(self, **post):
@@ -134,7 +133,7 @@ class SaasServer(http.Controller):
         result = client.upgrade_database(data=state.get('data'))[0]
         return simplejson.dumps({client.name: result})
 
-    @http.route('/saas_server/rename_database', type='http', website=True, auth='public')
+    @http.route(['/saas_server/rename_database'], type='http', website=True, auth='public')
     @fragment_to_query_string
     @webservice
     def rename_database(self, **post):
@@ -155,7 +154,7 @@ class SaasServer(http.Controller):
         client = request.env['saas_server.client'].sudo().search([('client_id', '=', client_id)])
         client.rename_database(new_dbname)
 
-    @http.route('/saas_server/delete_database', type='http', website=True, auth='public')
+    @http.route(['/saas_server/delete_database'], type='http', website=True, auth='public')
     @fragment_to_query_string
     @webservice
     def delete_database(self, **post):
@@ -298,7 +297,7 @@ class SaasServer(http.Controller):
             message = _("'You use a live preview. The database will be destroyed after %s hour%s.'") % (str(hours_remaining), plural)
         return message
 
-    @http.route('/saas_server/backup_database', type='http', website=True, auth='public')
+    @http.route(['/saas_server/backup_database'], type='http', website=True, auth='public')
     @fragment_to_query_string
     def backup_database(self, **post):
         _logger.info('backup_database post: %s', post)

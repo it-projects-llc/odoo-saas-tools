@@ -47,7 +47,7 @@
                                 help="Log in to client database."
                                 />
                         <button string="Configure" name="show_upgrade_wizard" type="object" attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}" icon="fa-cogs" />
-                        <button string="Delete" name="delete_database_server" type="object" attrs="{'invisible':['|',('state', 'in', ['draft', 'deleted'])]}" icon="fa-eraser" 
+                        <button string="Delete" name="delete_database_server" type="object" attrs="{'invisible':['|',('state', 'in', ['draft', 'deleted'])]}" icon="fa-eraser"
                         confirm="Are you sure to delete this database?"/>
                         <button string="Sync server" type="object" name="action_sync_server" icon="fa-refresh"/>
                         <button string="Sync client" type="object" name="sync_client" icon="fa-refresh"/>
@@ -325,7 +325,7 @@
                      <group>
                         <field name="id" invisible="1" />
                         <field name="action" readonly="1"/>
-                        
+
                      </group>
                      <notebook>
                      <page string="Result"  attrs="{'invisible': [('id', '=', False)]}">
@@ -403,7 +403,7 @@
             <field name="target">new</field>
             <field name="context">{'default_action': 'upgrade'}</field>
         </record>
-        
+
         <act_window
         id="act_configure_clients"
         name="Configure Clients"
@@ -423,13 +423,6 @@
             <field name="res_model">saas.config</field>
             <field name="view_type">form</field>
             <field name="target">new</field>
-        </record>
-
-        <record id="action_binding_updb" model="ir.values">
-            <field name="name">Configure Databases</field>
-            <field name="key2">client_action_multi</field>
-            <field name="model">saas.config</field>
-            <field name="value_unpickle" eval="'ir.actions.act_window,'+str(action_updb)"/>
         </record>
 
         <act_window

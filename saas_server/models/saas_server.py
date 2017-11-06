@@ -117,7 +117,7 @@ class SaasServerClient(models.Model):
         # set tz
         if tz:
             client_env['res.users'].search([]).write({'tz': tz})
-            client_env['ir.values'].set_default('res.partner', 'tz', tz)
+            client_env['ir.default'].set('res.partner', 'tz', tz)
 
         # update database.uuid
         client_env['ir.config_parameter'].set_param('database.uuid', client_id)

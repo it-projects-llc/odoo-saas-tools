@@ -55,10 +55,7 @@ class SaasServerClient(models.Model):
     @api.one
     def registry(self, new=False, **kwargs):
         m = odoo.modules.registry.Registry
-        if new:
-            return m.new(self.name, **kwargs)
-        else:
-            return m.get(self.name, **kwargs)
+        return m.new(self.name, **kwargs)
 
     @api.one
     def install_addons(self, addons, is_template_db):

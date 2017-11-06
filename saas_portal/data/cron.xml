@@ -10,7 +10,7 @@
             <field name="interval_type">days</field>
             <field name="numbercall">-1</field>
             <field name="doall" eval="False"/>
-            <field name="model_id" ref="saas_portal.client"/>
+            <field name="model_id" ref="model_saas_portal_client"/>
             <field name="function">_cron_suspend_expired_clients</field>
             <field name="args">()</field>
         </record>
@@ -22,7 +22,7 @@
             <field name="interval_type">days</field>
             <field name="numbercall">-1</field>
             <field name="doall" eval="False"/>
-            <field name="model_id" ref="saas_portal.client"/>
+            <field name="model_id" ref="model_saas_portal_client"/>
             <field name="function">_cron_notify_expired_clients</field>
             <field name="args">()</field>
         </record>
@@ -34,7 +34,7 @@
             <field name="interval_type">days</field>
             <field name="numbercall">-1</field>
             <field name="doall" eval="False"/>
-            <field name="model_id" ref="saas_portal.server"/>
+            <field name="model_id" ref="model_saas_portal_server"/>
             <field name="function">action_sync_server_all</field>
             <field name="args">()</field>
         </record>

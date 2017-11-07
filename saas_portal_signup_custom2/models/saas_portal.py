@@ -49,7 +49,9 @@ class SaasPortalPlan(models.Model):
         client_obj = self.env['saas_portal.client'].browse(res.get('id'))
 
         payload = {
-                'access_owner_add': ['base.group_system', 'access_apps.group_allow_apps_only_from_settings'],
+                'access_owner_add': ['base.group_system',
+                                     'access_apps.group_allow_apps_only_from_settings',
+                                     'access_restricted.group_allow_add_implied_from_settings'],
                 }
         client_obj.upgrade(payload=payload)
         return res

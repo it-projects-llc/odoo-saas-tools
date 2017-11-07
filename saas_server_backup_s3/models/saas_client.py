@@ -37,9 +37,9 @@ except:
 
 def _get_s3_conn(env):
     ir_params = env['ir.config_parameter']
-    aws_access_key_id = ir_params.get_param('saas_s3.saas_s3_aws_accessid')
-    aws_secret_access_key = ir_params.get_param('saas_s3.saas_s3_aws_accesskey')
-    aws_s3_bucket = ir_params.get_param('saas_s3.saas_s3_aws_bucket')
+    aws_access_key_id = ir_params.sudo().get_param('saas_s3.saas_s3_aws_accessid')
+    aws_secret_access_key = ir_params.sudo().get_param('saas_s3.saas_s3_aws_accesskey')
+    aws_s3_bucket = ir_params.sudo().get_param('saas_s3.saas_s3_aws_bucket')
     if not aws_access_key_id or not aws_secret_access_key or not aws_s3_bucket:
         raise exceptions.Warning( _('Please provide your AWS Access Key and ID \
         and also the S3 bucket to be used'))
@@ -149,9 +149,9 @@ class SaasServerClient(models.Model):
 
         if parallel_upload and sys.getsizeof(db_dump) > 5242880:
             ir_params = self.env['ir.config_parameter']
-            aws_key = ir_params.get_param('saas_s3.saas_s3_aws_accessid')
-            aws_secret = ir_params.get_param('saas_s3.saas_s3_aws_accesskey')
-            bucketname = ir_params.get_param('saas_s3.saas_s3_aws_bucket')
+            aws_key = ir_params.sudo().get_param('saas_s3.saas_s3_aws_accessid')
+            aws_secret = ir_params.sudo().get_param('saas_s3.saas_s3_aws_accesskey')
+            bucketname = ir_params.sudo().get_param('saas_s3.saas_s3_aws_bucket')
             self._transport_backup_parallel(db_dump, filename, aws_key, aws_secret, bucketname)
         else:
             conn, bucket_name = _get_s3_conn(self.env)

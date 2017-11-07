@@ -20,9 +20,9 @@ class SaasPortalConfigWizard(models.TransientModel):
     # base_saas_domain
     @api.model
     def get_default_base_saas_domain(self, fields):
-        base_saas_domain = self.env["ir.config_parameter"].get_param("saas_portal.base_saas_domain", default=None)
+        base_saas_domain = self.env["ir.config_parameter"].sudo().get_param("saas_portal.base_saas_domain", default=None)
         if base_saas_domain is None:
-            domain = self.env["ir.config_parameter"].get_param("web.base.url")
+            domain = self.env["ir.config_parameter"].sudo().get_param("web.base.url")
             try:
                 base_saas_domain = urllib.parse.urlsplit(domain).netloc.split(':')[0]
             except Exception:
@@ -38,7 +38,7 @@ class SaasPortalConfigWizard(models.TransientModel):
     # page_for_maximumdb
     @api.model
     def get_default_page_for_maximumdb(self, fields):
-        page_for_maximumdb = self.env["ir.config_parameter"].get_param("saas_portal.page_for_maximumdb", default='/')
+        page_for_maximumdb = self.env["ir.config_parameter"].sudo().get_param("saas_portal.page_for_maximumdb", default='/')
         return {'page_for_maximumdb': page_for_maximumdb or '/'}
 
     @api.multi
@@ -50,7 +50,7 @@ class SaasPortalConfigWizard(models.TransientModel):
     # page_for_maximumtrialdb
     @api.model
     def get_default_page_for_maximumtrialdb(self, fields):
-        page_for_maximumtrialdb = self.env["ir.config_parameter"].get_param("saas_portal.page_for_maximumtrialdb", default='/')
+        page_for_maximumtrialdb = self.env["ir.config_parameter"].sudo().get_param("saas_portal.page_for_maximumtrialdb", default='/')
         return {'page_for_maximumtrialdb': page_for_maximumtrialdb or '/'}
 
     @api.multi
@@ -62,7 +62,7 @@ class SaasPortalConfigWizard(models.TransientModel):
     # page_for_nonfree_subdomains
     @api.model
     def get_default_page_for_nonfree_subdomains(self, fields):
-        page_for_nonfree_subdomains = self.env["ir.config_parameter"].get_param("saas_portal.page_for_nonfree_subdomains", default='/')
+        page_for_nonfree_subdomains = self.env["ir.config_parameter"].sudo().get_param("saas_portal.page_for_nonfree_subdomains", default='/')
         return {'page_for_nonfree_subdomains': page_for_nonfree_subdomains or '/'}
 
     @api.multi
@@ -74,7 +74,7 @@ class SaasPortalConfigWizard(models.TransientModel):
     # expiration_notify_in_advance
     @api.model
     def get_default_expiration_notify_in_advance(self, fields):
-        expiration_notify_in_advance = self.env["ir.config_parameter"].get_param("saas_portal.expiration_notify_in_advance", default='0')
+        expiration_notify_in_advance = self.env["ir.config_parameter"].sudo().get_param("saas_portal.expiration_notify_in_advance", default='0')
         return {'expiration_notify_in_advance': expiration_notify_in_advance or '0'}
 
     @api.multi

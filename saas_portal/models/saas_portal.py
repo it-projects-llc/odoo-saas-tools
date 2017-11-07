@@ -27,7 +27,7 @@ _logger = logging.getLogger(__name__)
 
 @api.multi
 def _compute_host(self):
-    base_saas_domain = self.env['ir.config_parameter'].get_param('saas_portal.base_saas_domain')
+    base_saas_domain = self.env['ir.config_parameter'].sudo().get_param('saas_portal.base_saas_domain')
     for r in self:
         host = r.name
         if base_saas_domain and '.' not in r.name:
@@ -444,7 +444,7 @@ class SaasPortalDatabase(models.Model):
 
     @api.multi
     def _compute_host(self):
-        base_saas_domain = self.env['ir.config_parameter'].get_param('saas_portal.base_saas_domain')
+        base_saas_domain = self.env['ir.config_parameter'].sudo().get_param('saas_portal.base_saas_domain')
         base_saas_domain_1 = '.'.join(base_saas_domain.rsplit('.', 2)[-2:])
         name_dict = {
             'base_saas_domain': base_saas_domain,
@@ -689,7 +689,7 @@ class SaasPortalClient(models.Model):
     @api.model
     def _cron_notify_expired_clients(self):
         # send notification about expiration by email
-        notification_delta = int(self.env['ir.config_parameter'].get_param('saas_portal.expiration_notify_in_advance', '0'))
+        notification_delta = int(self.env['ir.config_parameter'].sudo().get_param('saas_portal.expiration_notify_in_advance', '0'))
         if notification_delta > 0:
             records = self.search([('expiration_datetime', '<=', (datetime.now() + timedelta(days=notification_delta)).strftime(DEFAULT_SERVER_DATETIME_FORMAT)),
                                    ('notification_sent', '=', False)])

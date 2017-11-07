@@ -12,5 +12,5 @@ class IrConfigParameter(models.Model):
         super(IrConfigParameter, self).init(force=force)
         if force:
             oauth_oe = self.env.ref('saas_client.saas_oauth_provider')
-            dbuuid = self.get_param('database.uuid')
+            dbuuid = self.sudo().get_param('database.uuid')
             oauth_oe.write({'client_id': dbuuid})

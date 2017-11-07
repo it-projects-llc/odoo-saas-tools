@@ -15,8 +15,8 @@ except:
 
 def _get_route53_conn(env):
     ir_params = env['ir.config_parameter']
-    aws_access_key_id = ir_params.get_param('saas_route53.saas_route53_aws_accessid')
-    aws_secret_access_key = ir_params.get_param('saas_route53.saas_route53_aws_accesskey')
+    aws_access_key_id = ir_params.sudo().get_param('saas_route53.saas_route53_aws_accessid')
+    aws_secret_access_key = ir_params.sudo().get_param('saas_route53.saas_route53_aws_accesskey')
     if not aws_access_key_id or not aws_secret_access_key:
         raise Warning('Please specify both your AWS Access key and ID')
     return boto.connect_route53(aws_access_key_id, aws_secret_access_key)

@@ -22,7 +22,7 @@ class SaasPortalClient(models.Model):
         self.ensure_one()
         '''Create domain on mailgun and return data to configure dns and smtp'''
         ir_params = self.env['ir.config_parameter']
-        api_key = ir_params.get_param('saas_mailgun.saas_mailgun_api_key')
+        api_key = ir_params.sudo().get_param('saas_mailgun.saas_mailgun_api_key')
         password = mailgun.random_password()
         if not self.mail_domain:
             self.mail_domain = self.name.split('.')[0] + '.' + self.server_id.aws_hosted_zone_id.name
@@ -33,7 +33,7 @@ class SaasPortalClient(models.Model):
         self.ensure_one()
         '''Create route on mailgun for storing incomming messages'''
         ir_params = self.env['ir.config_parameter']
-        api_key = ir_params.get_param('saas_mailgun.saas_mailgun_api_key')
+        api_key = ir_params.sudo().get_param('saas_mailgun.saas_mailgun_api_key')
         return mailgun.create_store_route(api_key=api_key, domain=self.name,
                                           mail_domain=self.mail_domain, request_scheme=self.server_id.request_scheme)
 
@@ -75,7 +75,7 @@ class SaasPortalPlan(models.Model):
             return res
 
         ir_params = self.env['ir.config_parameter']
-        api_key = ir_params.get_param('saas_mailgun.saas_mailgun_api_key')
+        api_key = ir_params.sudo().get_param('saas_mailgun.saas_mailgun_api_key')
         client_obj.upgrade(payload={'configure_outgoing_mail': [new_domain_info['domain']],
                                     'params': [{'key': 'mailgun.apikey', 'value': api_key, 'hidden': True},
                                                {'key': 'mail.catchall.domain', 'value': client_obj.mail_domain, 'hidden': True}]})

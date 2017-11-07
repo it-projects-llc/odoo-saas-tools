@@ -23,11 +23,11 @@ class SaasServerClient(models.Model):
             _logger.info('You have asked me not to rotate backups thus I am quitting')
             return
 
-        backup_rotate_yearly = int(config_parameter.get_param('saas_server_backup_rotate.backup_rotate_yearly', default=2))
-        backup_rotate_monthly = int(config_parameter.get_param('saas_server_backup_rotate.backup_rotate_monthly', default=12))
-        backup_rotate_weekly = int(config_parameter.get_param('saas_server_backup_rotate.backup_rotate_weekly', default=4))
-        backup_rotate_daily = int(config_parameter.get_param('saas_server_backup_rotate.backup_rotate_daily', default=7))
-        backup_rotate_hourly = int(config_parameter.get_param('saas_server_backup_rotate.backup_rotate_hourly', default=24))
+        backup_rotate_yearly = int(config_parameter.sudo().get_param('saas_server_backup_rotate.backup_rotate_yearly', default=2))
+        backup_rotate_monthly = int(config_parameter.sudo().get_param('saas_server_backup_rotate.backup_rotate_monthly', default=12))
+        backup_rotate_weekly = int(config_parameter.sudo().get_param('saas_server_backup_rotate.backup_rotate_weekly', default=4))
+        backup_rotate_daily = int(config_parameter.sudo().get_param('saas_server_backup_rotate.backup_rotate_daily', default=7))
+        backup_rotate_hourly = int(config_parameter.sudo().get_param('saas_server_backup_rotate.backup_rotate_hourly', default=24))
 
         rotation_scheme = {}
 

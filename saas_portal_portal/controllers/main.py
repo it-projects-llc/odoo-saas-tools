@@ -33,7 +33,7 @@ class WebsiteSaasDashboard(CustomerPortal):
             ('partner_id', '=', partner.id),
         ])
         config_obj = request.env['ir.config_parameter']
-        base_saas_domain = config_obj.get_param('base_saas_domain')
+        base_saas_domain = config_obj.sudo().get_param('base_saas_domain')
         values = {
             'domain_name': saas_portal_client and saas_portal_client[0].name or False,
             'saas_portal_client': saas_portal_client and saas_portal_client[0] or False,

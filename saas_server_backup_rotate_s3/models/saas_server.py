@@ -27,9 +27,9 @@ class SaasServerClient(models.Model):
     @api.multi
     def _rotate_backups(self, rotation_scheme):
         ir_params = self.env['ir.config_parameter']
-        aws_access_key_id = ir_params.get_param('saas_s3.saas_s3_aws_accessid')
-        aws_secret_access_key = ir_params.get_param('saas_s3.saas_s3_aws_accesskey')
-        aws_s3_bucket = ir_params.get_param('saas_s3.saas_s3_aws_bucket')
+        aws_access_key_id = ir_params.sudo().get_param('saas_s3.saas_s3_aws_accessid')
+        aws_secret_access_key = ir_params.sudo().get_param('saas_s3.saas_s3_aws_accesskey')
+        aws_s3_bucket = ir_params.sudo().get_param('saas_s3.saas_s3_aws_bucket')
 
         for client in self:
             include_list = [client.name + '*']

@@ -36,7 +36,7 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
     def get_saas_domain(self):
         config = request.env['ir.config_parameter']
         full_param = 'saas_portal.base_saas_domain'
-        base_saas_domain = config.get_param(full_param)
+        base_saas_domain = config.sudo().get_param(full_param)
         return base_saas_domain
 
     def do_signup(self, qcontext):

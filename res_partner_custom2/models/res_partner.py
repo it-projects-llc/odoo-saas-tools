@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from odoo import api, fields, models
+from odoo import api, fields, models, _
 
 
 class Partner(models.Model):
@@ -18,19 +18,19 @@ class Partner(models.Model):
     @api.model
     def _get_company_sizes(self):
         company_sizes = [
-                ('1-5', '< 5 employees'),
-                ('5-20', '5 - 20 employees'),
-                ('20-50', '20 - 50 employees'),
-                ('50-250', '20 - 250 employees'),
-                ('250-over', '> 250 employees'),
+                ('1-5', _('< 5 employees')),
+                ('5-20', _('5 - 20 employees')),
+                ('20-50', _('20 - 50 employees')),
+                ('50-250', _('20 - 250 employees')),
+                ('250-over', _('> 250 employees')),
                 ]
 
         return company_sizes
 
     def _get_genders(self):
         genders = [
-                ('male', 'Male'),
-                ('female', 'Female'),
+                ('male', _('Male')),
+                ('female', _('Female')),
                 ]
 
         return genders

@@ -40,7 +40,7 @@ class SaasPortalServer(models.Model):
     def _prepare_module(self, module, plan):
         attachment_name = 'addon_{0}_{1}.{2}'.format(self.odoo_version,
                                                      module['name'],
-                                                     self.env['ir.config_parameter'].get_param('saas_portal.base_saas_domain'))
+                                                     self.env['ir.config_parameter'].sudo().get_param('saas_portal.base_saas_domain'))
         ir_attachment = self.env['ir.attachment'].create({'name': attachment_name, 'type': 'binary', 'db_datas': module.get('icon_image')})
         return {
             'technical_name': module.get('name'),
@@ -65,7 +65,7 @@ class SaasPortalServer(models.Model):
             if version:
                 self.odoo_version = version.split('.', 1)[0]
         namestring = '{0}-{1}'
-        saas_domain = self.env['ir.config_parameter'].get_param('saas_portal.base_saas_domain')
+        saas_domain = self.env['ir.config_parameter'].sudo().get_param('saas_portal.base_saas_domain')
         template_name = namestring.format(demo_module['demo_url'], 't')
         plan_name = 'Demo for {0}.0 {1}'.format(self.odoo_version, demo_module['demo_url'])
 

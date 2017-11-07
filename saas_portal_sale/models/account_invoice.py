@@ -36,7 +36,7 @@ class AccountInvoice(models.Model):
 
             if plans:
                 template = self.env.ref('saas_portal_sale.email_template_create_saas')
-                self.with_context(saas_domain=self.env['ir.config_parameter'].get_param('saas_portal.base_saas_domain'),
+                self.with_context(saas_domain=self.env['ir.config_parameter'].sudo().get_param('saas_portal.base_saas_domain'),
                                   plans=plans).message_post_with_template(template.id, compositon_mode='comment')
             return super(AccountInvoice, self).action_invoice_paid()
 

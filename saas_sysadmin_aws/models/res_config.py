@@ -10,7 +10,7 @@ class SaasPortalConfigWizard(models.TransientModel):
 
     @api.model
     def get_default_saas_route53_aws_accessid(self, fields):
-        saas_route53_aws_accessid = self.env["ir.config_parameter"].get_param("saas_route53.saas_route53_aws_accessid", default=None)
+        saas_route53_aws_accessid = self.env["ir.config_parameter"].sudo().get_param("saas_route53.saas_route53_aws_accessid", default=None)
         return {'saas_route53_aws_accessid': saas_route53_aws_accessid or False}
 
     @api.multi
@@ -21,7 +21,7 @@ class SaasPortalConfigWizard(models.TransientModel):
 
     @api.model
     def get_default_saas_route53_aws_accesskey(self, fields):
-        saas_route53_aws_accesskey = self.env["ir.config_parameter"].get_param("saas_route53.saas_route53_aws_accesskey", default=None)
+        saas_route53_aws_accesskey = self.env["ir.config_parameter"].sudo().get_param("saas_route53.saas_route53_aws_accesskey", default=None)
         return {'saas_route53_aws_accesskey': saas_route53_aws_accesskey or False}
 
     @api.multi

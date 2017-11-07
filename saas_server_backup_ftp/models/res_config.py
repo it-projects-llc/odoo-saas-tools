@@ -26,7 +26,7 @@ class SaasPortalConfigWizard(models.TransientModel):
     # sftp_rsa_key_path
     @api.model
     def get_default_sftp_rsa_key_path(self, fields):
-        sftp_rsa_key_path = self.env["ir.config_parameter"].get_param(
+        sftp_rsa_key_path = self.env["ir.config_parameter"].sudo().get_param(
             "saas_server.sftp_rsa_key_path")
         return {'sftp_rsa_key_path': sftp_rsa_key_path or False}
 
@@ -39,7 +39,7 @@ class SaasPortalConfigWizard(models.TransientModel):
     # sftp_server
     @api.model
     def get_default_sftp_server(self, fields):
-        sftp_server = self.env["ir.config_parameter"].get_param("saas_server.sftp_server", default=None)
+        sftp_server = self.env["ir.config_parameter"].sudo().get_param("saas_server.sftp_server", default=None)
         return {'sftp_server': sftp_server or False}
 
     @api.multi
@@ -51,7 +51,7 @@ class SaasPortalConfigWizard(models.TransientModel):
     # sftp_username
     @api.model
     def get_default_sftp_username(self, fields):
-        sftp_username = self.env["ir.config_parameter"].get_param("saas_server.sftp_username", default=None)
+        sftp_username = self.env["ir.config_parameter"].sudo().get_param("saas_server.sftp_username", default=None)
         return {'sftp_username': sftp_username or False}
 
     @api.multi
@@ -63,7 +63,7 @@ class SaasPortalConfigWizard(models.TransientModel):
     # sftp_password
     @api.model
     def get_default_sftp_password(self, fields):
-        sftp_password = self.env["ir.config_parameter"].get_param("saas_server.sftp_password", default=None)
+        sftp_password = self.env["ir.config_parameter"].sudo().get_param("saas_server.sftp_password", default=None)
         return {'sftp_password': sftp_password or False}
 
     @api.multi
@@ -75,7 +75,7 @@ class SaasPortalConfigWizard(models.TransientModel):
     # sftp_path
     @api.model
     def get_default_sftp_path(self, fields):
-        sftp_path = self.env["ir.config_parameter"].get_param("saas_server.sftp_path", default=None)
+        sftp_path = self.env["ir.config_parameter"].sudo().get_param("saas_server.sftp_path", default=None)
         return {'sftp_path': sftp_path or False}
 
     @api.multi
@@ -85,11 +85,11 @@ class SaasPortalConfigWizard(models.TransientModel):
             config_parameters.set_param("saas_server.sftp_path", record.sftp_path or '')
 
     def test_sftp_connection(self):
-        server = self.env["ir.config_parameter"].get_param("saas_server.sftp_server", default=None)
-        username = self.env["ir.config_parameter"].get_param("saas_server.sftp_username", default=None)
-        password = self.env["ir.config_parameter"].get_param("saas_server.sftp_password", default=None)
-        path = self.env["ir.config_parameter"].get_param("saas_server.sftp_path", default=None)
-        sftp_rsa_key_path = self.env["ir.config_parameter"].get_param('saas_server.sftp_rsa_key_path')
+        server = self.env["ir.config_parameter"].sudo().get_param("saas_server.sftp_server", default=None)
+        username = self.env["ir.config_parameter"].sudo().get_param("saas_server.sftp_username", default=None)
+        password = self.env["ir.config_parameter"].sudo().get_param("saas_server.sftp_password", default=None)
+        path = self.env["ir.config_parameter"].sudo().get_param("saas_server.sftp_path", default=None)
+        sftp_rsa_key_path = self.env["ir.config_parameter"].sudo().get_param('saas_server.sftp_rsa_key_path')
 
         messageTitle = ""
         messageContent = ""

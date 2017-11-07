@@ -11,7 +11,7 @@ class SaasPortalConfigWizard(models.TransientModel):
 
     @api.model
     def get_default_saas_s3_aws_accessid(self, fields):
-        saas_s3_aws_accessid = self.env["ir.config_parameter"].get_param("saas_s3.saas_s3_aws_accessid", default=None)
+        saas_s3_aws_accessid = self.env["ir.config_parameter"].sudo().get_param("saas_s3.saas_s3_aws_accessid", default=None)
         return {'saas_s3_aws_accessid': saas_s3_aws_accessid or False}
 
     @api.multi
@@ -22,7 +22,7 @@ class SaasPortalConfigWizard(models.TransientModel):
 
     @api.model
     def get_default_saas_s3_aws_accesskey(self, fields):
-        saas_s3_aws_accesskey = self.env["ir.config_parameter"].get_param("saas_s3.saas_s3_aws_accesskey", default=None)
+        saas_s3_aws_accesskey = self.env["ir.config_parameter"].sudo().get_param("saas_s3.saas_s3_aws_accesskey", default=None)
         return {'saas_s3_aws_accesskey': saas_s3_aws_accesskey or False}
 
     @api.multi
@@ -33,7 +33,7 @@ class SaasPortalConfigWizard(models.TransientModel):
 
     @api.model
     def get_default_saas_s3_aws_bucket(self, fields):
-        saas_s3_aws_bucket = self.env["ir.config_parameter"].get_param("saas_s3.saas_s3_aws_bucket", default=None)
+        saas_s3_aws_bucket = self.env["ir.config_parameter"].sudo().get_param("saas_s3.saas_s3_aws_bucket", default=None)
         return {'saas_s3_aws_bucket': saas_s3_aws_bucket or False}
 
     @api.multi

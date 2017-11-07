@@ -9,7 +9,7 @@ class SaasPortalConfigWizard(models.TransientModel):
 
     @api.model
     def get_default_saas_mailgun_api_key(self, fields):
-        saas_mailgun_api_key = self.env["ir.config_parameter"].get_param("saas_mailgun.saas_mailgun_api_key", default=None)
+        saas_mailgun_api_key = self.env["ir.config_parameter"].sudo().get_param("saas_mailgun.saas_mailgun_api_key", default=None)
         return {'saas_mailgun_api_key': saas_mailgun_api_key or False}
 
     @api.multi

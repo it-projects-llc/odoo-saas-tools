@@ -124,7 +124,7 @@ class SaasServerClient(models.Model):
 
         # copy configs
         for key in self._config_parameters_to_copy():
-            value = self.env['ir.config_parameter'].get_param(key, default='')
+            value = self.env['ir.config_parameter'].sudo().get_param(key, default='')
             client_env['ir.config_parameter'].set_param(key, value)
 
         # set web.base.url config
@@ -164,7 +164,7 @@ class SaasServerClient(models.Model):
             res = client_env['res.users'].search(domain)
             if res:
                 user = res[0]
-                client_env['ir.config_parameter'].set_param('res.users.owner', user.id, groups=['saas_client.group_saas_support'])
+                client_env['ir.config_parameter'].set_param('res.users.owner', user.id)
 
             portal_owner_uid = owner_user.pop('user_id')
             res = client_env['res.users'].search([('oauth_uid', '=', portal_owner_uid)])
@@ -209,14 +209,14 @@ class SaasServerClient(models.Model):
 
     @api.one
     def _get_data(self, client_env, check_client_id):
-        client_id = client_env['ir.config_parameter'].get_param('database.uuid')
+        client_id = client_env['ir.config_parameter'].sudo().get_param('database.uuid')
         if check_client_id != client_id:
             return {'state': 'deleted'}
         users = client_env['res.users'].search([('share', '=', False), ('id', '!=', SUPERUSER_ID)])
         param_obj = client_env['ir.config_parameter']
-        max_users = param_obj.get_param('saas_client.max_users', '0').strip()
-        suspended = param_obj.get_param('saas_client.suspended', '0').strip()
-        total_storage_limit = param_obj.get_param('saas_client.total_storage_limit', '0').strip()
+        max_users = param_obj.sudo().get_param('saas_client.max_users', '0').strip()
+        suspended = param_obj.sudo().get_param('saas_client.suspended', '0').strip()
+        total_storage_limit = param_obj.sudo().get_param('saas_client.total_storage_limit', '0').strip()
         users_len = len(users)
         data_dir = odoo.tools.config['data_dir']
 
@@ -290,11 +290,11 @@ class SaasServerClient(models.Model):
             groups = []
             if obj.get('hidden'):
                 groups = ['saas_client.group_saas_support']
-            client_env['ir.config_parameter'].set_param(obj['key'], obj['value'] or ' ', groups=groups)
+            client_env['ir.config_parameter'].set_param(obj['key'], obj['value'] or ' ')
 
         # 6. Access rights
         access_owner_add = post.get('access_owner_add', [])
-        owner_id = client_env['ir.config_parameter'].get_param('res.users.owner', 0)
+        owner_id = client_env['ir.config_parameter'].sudo().get_param('res.users.owner', 0)
         owner_id = int(owner_id)
         if not owner_id:
             res['owner_id'] = "Owner's user is not found"

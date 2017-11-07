@@ -14,11 +14,11 @@ class SaasServerClient(models.Model):
 
     @api.model
     def _transport_backup(self, dump_db, filename=None):
-        server = self.env['ir.config_parameter'].get_param('saas_server.sftp_server', None)
-        username = self.env['ir.config_parameter'].get_param('saas_server.sftp_username', None)
-        password = self.env['ir.config_parameter'].get_param('saas_server.sftp_password', None)
-        path = self.env['ir.config_parameter'].get_param('saas_server.sftp_path', None)
-        sftp_rsa_key_path = self.env['ir.config_parameter'].get_param(
+        server = self.env['ir.config_parameter'].sudo().get_param('saas_server.sftp_server', None)
+        username = self.env['ir.config_parameter'].sudo().get_param('saas_server.sftp_username', None)
+        password = self.env['ir.config_parameter'].sudo().get_param('saas_server.sftp_password', None)
+        path = self.env['ir.config_parameter'].sudo().get_param('saas_server.sftp_path', None)
+        sftp_rsa_key_path = self.env['ir.config_parameter'].sudo().get_param(
             'saas_server.sftp_rsa_key_path', None)
 
         if sftp_rsa_key_path:

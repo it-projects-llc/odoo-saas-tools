@@ -1,0 +1,39 @@
+<odoo>
+
+        <record id="email_template_create_saas_for_demo" model="mail.template">
+            <field name="name">on new SaaS client instance for demo</field>
+            <field name="email_from">${(object.user_id.email or '')|safe}</field>
+            <field name="subject">Your demo instance for ${object.plan_id.name}</field>
+            <field name="partner_to">${object.partner_id.id}</field>
+            <field name="model_id" ref="saas_portal.model_saas_portal_client"/>
+            <field name="auto_delete" eval="True"/>
+            <field name="lang">${object.partner_id.lang}</field>
+            <field name="body_html"><![CDATA[
+
+            <p>
+                Hello ${object.partner_id.name},<br />
+                Your new ${object.plan_id.name} instance is ready.<br />
+                % if ctx['user'].partner_id.signup_valid:
+                        In order to get access to the instance, please accept an invitation to portal by clicking on the link below.
+                        After you have set your password you will be redirected to a page with a list of your instances. Just click on the name to open and starting testing.
+
+                        <div style="padding:0px;width:600px;margin:auto;background: #FFFFFF repeat top /100%;color:#777777">
+                            <div style="text-align: center; margin-top: 16px;">
+                                 <a href="${ctx['user'].signup_url}" style="padding: 5px 10px; font-size: 12px; line-height: 18px; color: #FFFFFF; border-color:#875A7B; text-decoration: none; display: inline-block; margin-bottom: 0px; font-weight: 400; text-align: center; vertical-align: middle; cursor: pointer; white-space: nowrap; background-image: none; background-color: #875A7B; border: 1px solid #875A7B; border-radius:3px">Accept invitation to portal</a>
+                            </div>
+                        </div>
+                % else:
+                        Here is the link to access:<br />
+                        <a href="${object.public_url}">${object.public_url}</a><br />
+                        <p>You can login using your email and password provided when signing up.</p>
+                % endif
+            </p>
+            <p>
+		Trial ends on ${object.expiration_datetime}.<br />
+            </p>
+            <p>Best regards,</p>
+
+            ]]></field>
+        </record>
+
+</odoo>

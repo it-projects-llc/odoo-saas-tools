@@ -10,7 +10,7 @@
                         <field name="name"/>
                         <field name="plan_id"/>
                         <field name="trial"/>
-                        <field name="user_id" class="oe_inline"/>
+                        <field name="user_id" class="oe_inline" context="{'no_reset_password': True, 'saas_signup': True}"/>
                         <field name="partner_id" class="oe_inline"/>
                         <field name="notify_user" class="oe_inline"/>
                         <field name="support_team_id" class="oe_inline"/>

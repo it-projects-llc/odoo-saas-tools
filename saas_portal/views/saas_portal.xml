@@ -193,6 +193,9 @@
                         <group string="Credentials for rpc">
                           <field name="password" password="True"/>
                         </group>
+                        <group string="Client Settings">
+                          <field name="clients_host_template"/>
+                        </group>
                     </group>
                     <field name="client_ids" readonly="1">
                         <tree>
@@ -285,7 +288,7 @@
                             <field name="block_on_expiration" class="oe_inline"/>
                             <field name="block_on_storage_exceed" class="oe_inline"/>
                             <field name="on_create"/>
-                            <field name="on_create_email_template" attrs="{'invisible': [('on_create', '!=', 'email')]}"/>
+                            <field name="on_create_email_template"/>
                         </group>
                         <separator string="Odoo DB Settings"/>
                         <group col="4">

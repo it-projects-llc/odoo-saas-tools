@@ -4,6 +4,7 @@ from odoo import http
 from odoo.http import request
 from odoo.addons.saas_portal.controllers.main import SaasPortal
 from odoo.addons.website_sale.controllers.main import WebsiteSale
+from odoo.addons.website_portal.controllers.main import website_account
 
 
 def signup_redirect():
@@ -47,3 +48,39 @@ class WebsiteSaleCustom(WebsiteSale):
             return werkzeug.utils.redirect(url)
 
         return super(WebsiteSaleCustom, self).product(product=product, category=category, search=search, **kwargs)
+
+
+class WebsiteAccount(website_account):
+
+    @http.route()
+    def account(self, **kw):
+        """ Add saas instance documents to main account page """
+        response = super(WebsiteAccount, self).account(**kw)
+        partner = request.env.user.partner_id
+
+        SaasPortalClient = request.env['saas_portal.client']
+        instance_count = SaasPortalClient.sudo().search_count([
+            ('partner_id', '=', partner.id),
+        ])
+
+        response.qcontext.update({
+            'instance_count': instance_count,
+        })
+        return response
+
+    #
+    # SaaS instances
+    #
+
+    @http.route(['/my/instances'], type='http', auth="user", website=True)
+    def portal_my_instances(self, **kw):
+        values = self._prepare_portal_layout_values()
+        partner = request.env.user.partner_id
+        SaasPortalClient = request.env['saas_portal.client']
+
+        instances = SaasPortalClient.sudo().search([('partner_id', '=', partner.id)])
+
+        values.update({
+            'instances': instances,
+        })
+        return request.render("saas_portal_demo.portal_my_instances", values)

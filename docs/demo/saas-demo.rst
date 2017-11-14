@@ -42,7 +42,7 @@ upload nginx_odoo_params
 
 ::
 
-  curl -s https://gist.githubusercontent.com/yelizariev/a359cea062a1579c5e34bfd0c40f1201/raw/nginx_odoo_params > odoo_params
+  curl -s https://raw.githubusercontent.com/it-projects-llc/odoo-saas-tools/10.0/docs/demo/nginx_odoo_params > odoo_params
   docker cp odoo_params odoo-nginx:/etc/nginx/odoo_params
 
 
@@ -74,49 +74,43 @@ Local saas repo. Optional. Path before colons depends on your system.
 Portal odoo docker
 ------------------
 
-* TODO: switch portal version to latest
-* TODO: don't expose ports ( requests are handled via nginx)
-
 ::
 
  docker run \
- -p 8069:8069 \
- -p 8072:8072 \
  -e ODOO_MASTER_PASS=$ODOO_MASTER_PASS \
  -e DB_PORT_5432_TCP_ADDR=db-portal \
  $DOCKER_PARAMS \
  --name odoo-portal \
  --network=saas-demo-network \
- -t itprojectsllc/install-odoo:8.0
+ -t itprojectsllc/install-odoo:10.0 \
+ -- \
+ --db-filter=^%h$
 
 press Ctrl-C
 
 init saas
 ^^^^^^^^^
 
-* TODO use /mnt/odoo-source/odoo-bin for odoo-10 portal
-
 ::
 
  INIT_SAAS_TOOLS_VALUE="\
  --portal-create \
- --odoo-script=/mnt/odoo-source/openerp-server \
+ --odoo-script=/mnt/odoo-source/odoo-bin \
  --odoo-config=/mnt/config/odoo-server.conf \
  --admin-password=${ODOO_MASTER_PASS} \
  --portal-db-name=${PORTAL_DB} \
  --install-modules=saas_portal_demo \
+ --odoo-without-demo \
  "
 
  docker exec -i -u root -t odoo-portal /bin/bash -c "export INIT_SAAS_TOOLS='$INIT_SAAS_TOOLS_VALUE'; bash /install-odoo-saas.sh"
- docker exec -i -u root -t odoo-portal /bin/bash -c "sed -i 's/dbfilter.*/dbfilter = ^%h$/' /mnt/config/odoo-server.conf"
- docker restart odoo-portal
 
 nginx
 ^^^^^
 
 ::
 
- curl -s https://gist.githubusercontent.com/yelizariev/a359cea062a1579c5e34bfd0c40f1201/raw/nginx_odoo.conf > portal.conf
+ curl -s https://raw.githubusercontent.com/it-projects-llc/odoo-saas-tools/10.0/docs/demo/nginx_odoo.conf > portal.conf
  sed -i "s/NGINX_SERVER_DOMAIN/${ODOO_DOMAIN}/g" portal.conf
  sed -i "s/SERVER_HOST/odoo-portal/g" portal.conf
  docker cp portal.conf odoo-nginx:/etc/nginx/conf.d/portal.conf
@@ -129,9 +123,9 @@ SaaS Server
 
 ::
 
- SERVER_NAME="odoo-8" ODOO_BRANCH="8.0"
- SERVER_NAME="odoo-9" ODOO_BRANCH="9.0"
- SERVER_NAME="odoo-10" ODOO_BRANCH="10.0"
+ SERVER_NAME="odoo-8" ODOO_BRANCH="8.0" ODOO_SCRIPT="/mnt/odoo-surce/openerp-server"
+ SERVER_NAME="odoo-9" ODOO_BRANCH="9.0 "ODOO_SCRIPT="/mnt/odoo-surce/openerp-server"
+ SERVER_NAME="odoo-10" ODOO_BRANCH="10.0" ODOO_SCRIPT="/mnt/odoo-surce/odoo-bin"
 
 * Then execute commands below. After that repeat it with another odoo version.
 
@@ -144,6 +138,7 @@ db
 
 Server odoo docker
 ------------------
+Note. Don't forget to update the ``DOCKER_PARAMS`` variable if you used it to create a bind mount (like this ``-v /HOST_DIR:/CONTAINER_DIR``) - use appropriate branch for repo that you are binding
 
 ::
 
@@ -152,37 +147,34 @@ Server odoo docker
  -e DB_PORT_5432_TCP_ADDR=db-$SERVER_NAME \
  $DOCKER_PARAMS \
  --network=saas-demo-network \
- -t itprojectsllc/install-odoo:$ODOO_BRANCH
+ -t itprojectsllc/install-odoo:$ODOO_BRANCH \
+ -- \
+ --db-filter=^%d$
 
 press Ctrl-C
 
-update dbfilter
-
-::
-
- docker exec -u root -i -t $SERVER_NAME /bin/bash -c "sed -i 's/dbfilter.*/dbfilter = ^%d$/' /mnt/config/odoo-server.conf"
- docker restart $SERVER_NAME
 
 Init saas
 ^^^^^^^^^
-Note. For odoo 10.0+ use
-``--odoo-script=/mnt/odoo-source/odoo-bin \``
 
 ::
 
  INIT_SAAS_TOOLS_VALUE="\
  --server-create \
- --odoo-script=/mnt/odoo-source/openerp-server \
+ --odoo-script=${ODOO_SCRIPT} \
  --odoo-config=/mnt/config/odoo-server.conf \
  --admin-password=${ODOO_MASTER_PASS} \
  --portal-db-name=${PORTAL_DB} \
  --server-db-name=${SERVER_NAME} \
+ --server-hosts-template={dbname}.${SERVER_NAME}.{base_saas_domain} \
  --local-portal-host=odoo-portal \
  --local-server-host=${SERVER_NAME} \
- --install-modules=saas_server_demo \
+ --install-modules=saas_server_demo,\
+ saas_server_autodelete \
  --demo-repositories=\
  /mnt/addons/it-projects-llc/misc-addons,\
  /mnt/addons/it-projects-llc/pos-addons \
+ --odoo-without-demo \
  "
 
  docker exec -u root -i -t $SERVER_NAME /bin/bash -c "export INIT_SAAS_TOOLS='$INIT_SAAS_TOOLS_VALUE'; bash /install-odoo-saas.sh"
@@ -208,7 +200,7 @@ nginx proxing
 
 ::
 
- curl -s https://gist.githubusercontent.com/yelizariev/a359cea062a1579c5e34bfd0c40f1201/raw/nginx_odoo.conf > nginx-${SERVER_NAME}.conf
+ curl -s https://raw.githubusercontent.com/it-projects-llc/odoo-saas-tools/10.0/docs/demo/nginx_odoo.conf > nginx-${SERVER_NAME}.conf
  sed -i "s/NGINX_SERVER_DOMAIN/.${SERVER_NAME}.${ODOO_DOMAIN}/g" nginx-${SERVER_NAME}.conf
  sed -i "s/SERVER_HOST/${SERVER_NAME}/g" nginx-${SERVER_NAME}.conf
  docker cp nginx-${SERVER_NAME}.conf odoo-nginx:/etc/nginx/conf.d/${SERVER_NAME}.conf

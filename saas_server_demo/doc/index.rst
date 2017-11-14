@@ -24,6 +24,7 @@ Parameters in __openerp__.py for demo modules
 * demo_addons_hidden
 * demo_url
 * demo_summary
+* demo_images
 
 The example of __openerp__.py file of ``reminder_base``:
 
@@ -49,10 +50,22 @@ The example of __openerp__.py file of ``reminder_base``:
     'demo_addons_hidden': ['website'],
     'demo_url': 'reminders-and-agenda',
     'demo_summary': 'The module provides easy way to configure instant or mail notifications for any supported record with date field.'
+    "demo_images": [
+        "static/description/icon.png",
+        "static/description/mail.png",
+        "static/description/notif.png",
+        "static/description/event-popup.png",
+        "static/description/event-form.png",
+        "static/description/calendar-week.png",
+        "static/description/calendar-month.png",
+        "static/description/calendar-day.png",
+        "static/description/admin-tool.png",
+        "static/description/add-reminder.png",
+    ]
  }
 
-Also you can add an image. Put it in the ``./static/description`` with the ``demo_image.png`` name. The Portal uses it in website page from where
-customers create their demo.
+* the first image in the demo_images list will be used as title image for product
+
 
 Demo modules list initialization
 --------------------------------

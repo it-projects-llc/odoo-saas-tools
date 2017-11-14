@@ -3,6 +3,7 @@ import requests
 import xmlrpclib
 
 from odoo import models, fields, api
+from odoo import SUPERUSER_ID as SI
 
 
 class SaasPortalServer(models.Model):
@@ -63,26 +64,37 @@ class SaasPortalServer(models.Model):
             version = self._get_odoo_version()
             if version:
                 self.odoo_version = version.split('.', 1)[0]
-        namestring = '{0}-{1}_odoo-{2}'
+        namestring = '{0}-{1}'
         saas_domain = self.env['ir.config_parameter'].get_param('saas_portal.base_saas_domain')
-        template_name = namestring.format(demo_module['demo_url'],
-                                          't',
-                                          self.odoo_version)
+        template_name = namestring.format(demo_module['demo_url'], 't')
         plan_name = 'Demo for {0}.0 {1}'.format(self.odoo_version, demo_module['demo_url'])
 
-        if template_obj.search_count([('name', '=', template_name)]) == 0:
+        if template_obj.search_count([('name', '=', template_name), ('server_id', '=', self.id)]) == 0:
             template = template_obj.create({'name': template_name, 'server_id': self.id})
             if plan_obj.search_count([('name', '=', plan_name)]) == 0:
                 plan = plan_obj.create({'name': plan_name,
                                         'server_id': self.id,
-                                        'dbname_template': namestring.format(demo_module['demo_url'],
-                                                                             '%i',
-                                                                             self.odoo_version,
-                                                                             saas_domain),
-                                        'template_id': template.id})
+                                        'dbname_template': namestring.format(demo_module['demo_url'], '%i'),
+                                        'template_id': template.id,
+                                        'on_create_email_template': self.env.ref('saas_portal_demo.email_template_create_saas_for_demo').id,
+                                        'expiration': 3,
+                                        'demo': True,
+                                        })
                 return plan
         else:
             return None
+
+
+    @api.multi
+    def _create_demo_images(self, demo_module):
+        self.ensure_one()
+
+        db, uid, password, models = self._get_xmlrpc_object(self.name)
+
+        images = models.execute_kw(db, uid, password, 'ir.module.module', 'get_demo_images', [demo_module['id']])
+
+        return images
+
 
     @api.multi
     def _create_demo_product(self, demo_module, plan):
@@ -98,6 +110,8 @@ class SaasPortalServer(models.Model):
         odoo_version_attrib = self.env.ref('saas_portal_demo.odoo_version_product_attribute')
         attrib_value = self.env.ref('saas_portal_demo.product_attribute_value_{}'.format(self.odoo_version))
 
+        images_res = self._create_demo_images(demo_module)
+
         if not product_template:
             vals = {
                 'name': product_template_name,
@@ -105,10 +119,11 @@ class SaasPortalServer(models.Model):
                 'website_published': True,
                 'seo_url': demo_module.get('demo_url'),
                 'description': demo_module.get('demo_summary'),
-                'image': demo_module.get('demo_image'),
+                'image': images_res and images_res.pop(0)[1] or None,
                 'sale_on_website': False,
                 'saas_demo': True,
                 'type': 'service',
+                'product_image_ids': images_res and [(0, 0, {'name': name, 'image': image}) for name, image in images_res] or None,
             }
             product_template = product_template_obj.with_context({
                 'create_product_product': False
@@ -179,6 +194,24 @@ class SaasPortalServer(models.Model):
                 plan.template_id.upgrade(payload=payload)
                 record.action_sync_server()
 
+                # after installing demo modules: make `owner_template` user a member of all the admin's security groups
+                db, uid, password, models = plan.template_id._get_xmlrpc_object()
+                admin_groups = models.execute_kw(db, uid, password,
+                        'res.users', 'search_read',
+                        [[['id', '=', SI]]],
+                        {'fields': ['groups_id']})
+                owner_user_id = models.execute_kw(db, uid, password,
+                        'res.users', 'search',
+                        [[['login', '=', 'owner_template']]])
+                models.execute_kw(db, uid, password,
+                        'res.users', 'write',
+                        [owner_user_id, {'groups_id': [(6, 0, admin_groups[0]['groups_id'])]}])
+                # configure outgoing mail service for using `postfix` docker container
+                mail_server_id = models.execute_kw(db, uid, password,
+                        'ir.mail_server', 'search', [[]], {'limit': 1})
+                models.execute_kw(db, uid, password,
+                        'ir.mail_server', 'write', [mail_server_id, {'name': 'postfix', 'smtp_host': 'postfix'}])
+
         return True
 
     @api.multi
@@ -206,8 +239,15 @@ class SaasPortalServer(models.Model):
                 db, uid, password, models = plan.template_id._get_xmlrpc_object()
                 id = models.execute_kw(db, uid, password, 'ir.module.module', 'search',
                                         [[['name', 'in', ['base']]]])
-                models.execute_kw(db, uid, password, 'ir.module.module', 'button_upgrade', [id])
+                models.execute_kw(db, uid, password, 'ir.module.module', 'button_immediate_upgrade', [id])
         return True
+
+
+    @api.model
+    def update_all_templates(self):
+        servers = self.env['saas_portal.server'].search([])
+        for server in servers:
+            server.update_templates()
 
 
 class SaaSPortalDemoPlanModule(models.Model):
@@ -255,7 +295,9 @@ class SaasPortalDatabase(models.Model):
     @api.multi
     def _get_xmlrpc_object(self):
         self.ensure_one()
-        url = self.server_id.local_request_scheme + '://' + self.local_host
+        url = self.server_id.local_request_scheme + '://' + self.server_id.local_host
+        if self.server_id.local_port:
+            url += ':' + self.server_id.local_port
         db = self.name
         username = 'admin'
         password = self.password

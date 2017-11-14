@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+import os
+from os import walk
+
 from odoo import models, fields, api, tools
 from odoo.addons.base.module.module import Module as A
 from odoo.modules import get_module_resource
@@ -14,8 +17,7 @@ class ModuleDemo(models.Model):
     demo_summary = fields.Char(string='Demo set summary')
     price = fields.Float(string='Price', default=0)
     currency = fields.Char("Currency", help="The currency the field is expressed in.")
-    demo_image_url = fields.Char('Demo image URL')
-    demo_image = fields.Binary(compute="_compute_demo_image")
+    demo_images = fields.Char(help="file names, the files should be placed in /static/description/demo of the module")
 
     @staticmethod
     def get_values_from_terp(terp):
@@ -28,16 +30,21 @@ class ModuleDemo(models.Model):
                     'demo_url': terp.get('demo_url', False),
                     'price': terp.get('price', False),
                     'currency': terp.get('currency', False),
+                    'demo_images': ','.join(terp.get('demo_images', [])),
                     })
         return res
 
     @api.multi
-    def _compute_demo_image(self):
-        for record in self:
-            path = get_module_resource(record.name, 'static', 'description', 'demo_image.png')
-            if path:
-                image_file = tools.file_open(path, 'rb')
-                try:
-                    record.demo_image = image_file.read().encode('base64')
-                finally:
-                    image_file.close()
+    def get_demo_images(self):
+        self.ensure_one()
+        demo_images = self.demo_images and self.demo_images.split(',')
+        res = []
+        mod_path = get_module_resource(self.name)
+        for image_name in demo_images:
+            full_name = os.path.join(mod_path, image_name)
+            try:
+                with tools.file_open(full_name, 'rb') as image_file:
+                    res.append((image_name, image_file.read().encode('base64')))
+            except:
+                pass
+        return res

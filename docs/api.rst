@@ -1,31 +1,14 @@
 :banner: banners/web_service_api.jpg
-:types: api
+:force-toc: True
 
-API integration
-===============
+=================
+ API integration
+=================
 
 To control SaaS via external tool `built-in XML-RPC <https://www.odoo.com/documentation/8.0/api_integration.html>`__ can be used.
 
-SaaS Portal API
-===============
-
-Operations covered:
- * Authenticate admin user with SaaS Portal
- * Signup a user on SaaS Portal
- * Create client database
- * Get id of client database record on SaaS Portal
- * Suspend client database
- * Limit number of users for client database
- * Limit storage usage for client database
- * Install/Uninstall modules in client database
- * Grant/restrict access rights for users in client database
- * Module lists for different subscription tiers
- * Right lists for different subscription roles
- * Upgrade and downgrade accounts
-
-
 Authenticate admin with SaaS Portal
-----------------------------------------
+===================================
 
 All operations on SaaS Portal with client databases require authentication.
 
@@ -51,13 +34,15 @@ To authenticate admin with SaaS Portal:
 
 
 Signup a user on SaaS Portal
-----------------------------
+============================
+
 
 Before client database can be created a user of this client database should already exist on SaaS Portal.
 There are several ways to create a new user in odoo.
 Signup procedure creates users and assign the following groups to them:
- * Portal
- * View Online Payment Options
+
+* Portal
+* View Online Payment Options
 
 Membership in these groups gives users minimum privileges on SaaS Portal.
 
@@ -78,7 +63,8 @@ To signup a user:
 
 
 Create client database
-----------------------
+======================
+
 
 To create client database:
 
@@ -106,7 +92,8 @@ Groups assigned to owner in his database after creation:
 
 
 Get id of client database record on SaaS Portal
------------------------------------------------
+===============================================
+
 
 Id of client database record on Portal should be known
 to manipulate the client database from SaaS Portal
@@ -114,28 +101,29 @@ to manipulate the client database from SaaS Portal
 There are many ways to get the id.
 
 * from plan_id and partner_id:
-::
+  ::
 
-   # these values are given from other searches
-   plan_id = 1
-   partner_id = 7
+     # these values are given from other searches
+     plan_id = 1
+     partner_id = 7
 
-   # search saas_portal.client on plan_id = 1 and partner_id = 7
-   ids = models.execute_kw(portal_db, admin_uid, admin_password,
-   'saas_portal.client', 'search',
-   [[['plan_id', '=', plan_id], ['partner_id', '=', partner_id]]])
+     # search saas_portal.client on plan_id = 1 and partner_id = 7
+     ids = models.execute_kw(portal_db, admin_uid, admin_password,
+     'saas_portal.client', 'search',
+     [[['plan_id', '=', plan_id], ['partner_id', '=', partner_id]]])
 
 * from name of database (name of database is equal to domain host name):
-::
+  ::
 
-   client_db = 'client.odoo.local'
-   ids = models.execute_kw(portal_db, admin_uid, admin_password,
-   'saas_portal.client', 'search',
-   [[['name', '=', client_db]]])
+     client_db = 'client.odoo.local'
+     ids = models.execute_kw(portal_db, admin_uid, admin_password,
+     'saas_portal.client', 'search',
+     [[['name', '=', client_db]]])
 
 
 Suspend client database
------------------------
+=======================
+
 
 To suspend client database its id should be known.
 
@@ -150,7 +138,7 @@ To suspend:
 
 To unsuspend/resume:
 ::
-   
+
    saas_portal_client_id = ids[0]
    data = {'params': [{'key': 'saas_client.suspended', 'value': '0', 'hidden': True}]}
    res = models.execute_kw(portal_db, admin_uid, admin_password,
@@ -160,7 +148,8 @@ To unsuspend/resume:
 
 
 Limit number of users for client database
------------------------------------------
+=========================================
+
 
 Id of client database should be known.
 
@@ -175,7 +164,8 @@ To limit number of users for client database by 4:
 
 
 Limit storage usage for client database
----------------------------------------
+=======================================
+
 
 Id of client database should be known.
 
@@ -190,7 +180,8 @@ To limit storage usage for client database by 500Mb:
 
 
 Install/Uninstall modules in client database
---------------------------------------------
+============================================
+
 
 Id of client database should be known.
 
@@ -214,7 +205,8 @@ To uninstall the module 'fleet' in client database:
 
 
 Grant/restrict access rights for users in client database
----------------------------------------------------------
+=========================================================
+
 
 To assign the sale manager and the stock manager groups to owner user:
 ::
@@ -235,7 +227,8 @@ To restrict access for all users by excluding them from the show modules menu gr
                         [data, saas_portal_client_id])
 
 Notes abouts API integration
-----------------------------
+============================
+
 
 * Be sure, that Portal module is installed at Main Database
 * Be sure, that "Allow external users to sign up" option from "Settings/General Settings" is enabled (this option is only available in Debug mode)

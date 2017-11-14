@@ -32,6 +32,7 @@ class SaasServerClient(models.Model):
                               ('pending', 'Pending'),
                               ('deleted', 'Deleted')],
                              'State', default='draft', track_visibility='onchange')
+    host = fields.Char('Host')
 
     _sql_constraints = [
         ('client_id_uniq', 'unique (client_id)', 'client_id should be unique!'),
@@ -131,7 +132,7 @@ class SaasServerClient(models.Model):
             client_env['ir.config_parameter'].set_param(key, value)
 
         # set web.base.url config
-        client_env['ir.config_parameter'].set_param('web.base.url', '%s://%s' % (server_requests_scheme, self.name))
+        client_env['ir.config_parameter'].set_param('web.base.url', '%s://%s' % (server_requests_scheme, self.host))
 
         # saas_client must be already installed
         oauth_provider = client_env.ref('saas_client.saas_oauth_provider')
@@ -169,22 +170,24 @@ class SaasServerClient(models.Model):
                 user = res[0]
                 client_env['ir.config_parameter'].set_param('res.users.owner', user.id, groups=['saas_client.group_saas_support'])
 
-            res = client_env['res.users'].search([('oauth_uid', '=', owner_user['user_id'])])
+            portal_owner_uid = owner_user.pop('user_id')
+            res = client_env['res.users'].search([('oauth_uid', '=', portal_owner_uid)])
             if res:
                 # user already exists (e.g. administrator)
                 user = res[0]
             if not user:
                 user = client_env['res.users'].browse(SUPERUSER_ID)
 
-            user.write({
-                'login': owner_user['login'],
-                'password': owner_user['password'] or random_password(),
-                'name': owner_user['name'],
-                'email': owner_user['email'],
+            vals = owner_user
+            vals.update({
                 'oauth_provider_id': oauth_provider.id,
-                'oauth_uid': owner_user['user_id'],
+                'oauth_uid': portal_owner_uid,
                 'oauth_access_token': access_token,
+                'country_id': owner_user.get('country_id') and self.env['res.country'].browse(owner_user['country_id']) and \
+                self.env['res.country'].browse(owner_user['country_id']).id,
             })
+
+            user.write(vals)
 
     @api.model
     def update_all(self):
@@ -371,7 +374,7 @@ class SaasServerClient(models.Model):
         '''
         backup transport agents should override this
         '''
-        raise exceptions.Warning('Transport agent has not been configured')
+        raise exceptions.Warning('Transport agent has not been configured. You need either install one of saas_server_backup_* or remove saas_portal_backup')
 
     @api.multi
     def backup_database(self):
@@ -402,5 +405,5 @@ class SaasServerClient(models.Model):
 
     @api.model
     def restart_server(self):
-        openerp.service.server.restart()
+        odoo.service.server.restart()
         return True

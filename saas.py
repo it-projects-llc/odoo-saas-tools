@@ -52,6 +52,7 @@ settings_group.add_argument('--odoo-config', dest='odoo_config', help='Path to o
 settings_group.add_argument('--odoo-data-dir', dest='odoo_data_dir', help='Path to odoo data dir', default=None)
 settings_group.add_argument('--odoo-xmlrpc-port', dest='xmlrpc_port', default='8069', help='Port to run odoo temporarly')
 settings_group.add_argument('--odoo-longpolling-port', dest='longpolling_port', default='8072', help='Port to run odoo temporarly')
+settings_group.add_argument('--use-existed-odoo', dest='use_existed_odoo', action='store_true', default=False, help='Wait infinitly for 8069 port. Usefull in docker environment.')
 settings_group.add_argument('--local-xmlrpc-port', dest='local_xmlrpc_port', default=None, help='Port to be used for server-wide requests')
 settings_group.add_argument('--local-portal-host', dest='local_portal_host', help='Address for internal connection to portal', default="localhost")
 settings_group.add_argument('--local-server-host', dest='local_server_host', help='Address for internal connection to portal', default="localhost")
@@ -80,6 +81,8 @@ server_group = parser.add_argument_group('Server creation')
 server_group.add_argument('--server-create', dest='server_create', help='Create SaaS Server database', action='store_true')
 server_group.add_argument('--server-db-name', dest='server_db_name', default='server-1.saas-portal-{suffix}.local')
 server_group.add_argument('--server-modules', dest='server_install_modules', help='Comma-separated list of modules to install on Server')
+server_group.add_argument('--server-hosts-template', dest='server_hosts_template',
+                          help='server-wide host name template of client instances, i.e. {dbname}.odoo-10.{base_saas_domain}, {dbname} is the default')
 
 plan_group = parser.add_argument_group('Plan creation')
 plan_group.add_argument('--plan-create', dest='plan_create', help='Create Plan', action='store_true')
@@ -106,7 +109,7 @@ args = vars(parser.parse_args())
 # format vars
 suffix = args['suffix']
 for a in args:
-    if isinstance(args[a], str):
+    if isinstance(args[a], str) and not a == 'server_hosts_template':
         args[a] = args[a].format(suffix=suffix)
 
 
@@ -172,7 +175,7 @@ def main():
     plan_id = None
     pid = None
 
-    port_is_open = wait_net_service('127.0.0.1', int(xmlrpc_port), 3)
+    port_is_open = wait_net_service('127.0.0.1', int(xmlrpc_port), 3 if not args.get('use_existed_odoo') else False)
     if port_is_open:
         log('Port is used. Probably, odoo is already running. Let\'s try to use it. It it will fail, you need either stop odoo or pass another port to saas.py via --xmlrpc-port arg')
     else:
@@ -243,7 +246,7 @@ def createdb(dbname):
 
     # create db if not exist
     created = False
-    log('create database via xmlrpc')
+    log('create database via xmlrpc', dbname)
     try:
         rpc_db.create_database(master_password, dbname, demo, lang, admin_password)
         created = True
@@ -346,15 +349,17 @@ def rpc_add_server_to_portal(portal_db_name):
     auth = rpc_auth(portal_db_name, admin_password=args.get('admin_password'), host=args.get('local_portal_host'))
     server_db_name = args.get('server_db_name')
     uuid = rpc_get_uuid(server_db_name)
-    rpc_execute_kw(auth, 'saas_portal.server', 'create', [
-        {
+    vals = {
             'name': server_db_name,
             'client_id': uuid,
             'local_port': local_xmlrpc_port,
             'local_host': args.get('local_server_host'),
             'password': args.get('admin_password'),
-        }
-    ])
+    }
+    server_hosts_template = args.get('server_hosts_template')
+    if server_hosts_template:
+        vals.update({'clients_host_template': server_hosts_template})
+    rpc_execute_kw(auth, 'saas_portal.server', 'create', [vals])
 
 
 def rpc_add_demo_repositories(demo_repositories):

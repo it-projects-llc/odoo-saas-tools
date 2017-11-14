@@ -12,6 +12,12 @@
           <div class="col-xs-12">
 
             <div class="row">
+              <div class="col-lg-12 col-md-12 col-sm-12">
+                <p class="text-center">The following modules are included in this demonstration:</p>
+              </div>
+            </div>
+
+            <div class="row">
               <t t-foreach="product.product_variant_ids" t-as="product_variant">
                 <t t-if="set(product_variant.attribute_value_ids.ids) &amp; attrib_set">
                   <div t-foreach="product_variant.variant_plan_id.demo_plan_module_ids" t-as="module" class="col-lg-3 col-md-6 col-sm-6">
@@ -46,13 +52,13 @@
               </t>
             </div>
 
-            <div class="row">
-              <div class="col-lg-12 col-md-12 col-sm-12">
-                <p class="text-center">Powered by <a href="https://it-projects-llc.github.io/odoo-saas-tools/">Odoo Saas Tools</a></p>
-              </div>
-            </div>
-
           </div>
+        </div>
+      </xpath>
+
+      <xpath expr="//div[@itemscope='itemscope']" position="after">
+        <div>
+            <p class="text-center">Powered by <a href="https://it-projects-llc.github.io/odoo-saas-tools/">Odoo Saas Tools</a></p>
         </div>
       </xpath>
 
@@ -62,9 +68,15 @@
         </t>
       </xpath>
 
+      <!-- <xpath expr="//hr" position="replace"> -->
+      <!--   <t t-if="not product.module_name"> -->
+      <!--       <hr /> -->
+      <!--   </t> -->
+      <!-- </xpath> -->
+
       <xpath expr="//div[@id='product_details']/p[@class='text-muted']" position="replace">
         <p class="text-muted">
-         Prices are quoted without included dependencies
+         Prices are quoted without dependencies
         </p>
       </xpath>
 
@@ -98,9 +110,16 @@
       <xpath expr="//a[@id='try_trial']" position="replace">
         <t t-foreach="product.product_variant_ids" t-as="product_variant">
           <t t-if="set(product_variant.attribute_value_ids.ids) &amp; attrib_set">
-            <a id="try_trial" style="margin-left: 8px" class="btn btn-default btn-lg mt8" t-attf-href="/trial?plan_id=#{product_variant.variant_plan_id.id}">Try trial</a>
+              <a id="try_trial" style="margin-left: 8px" class="btn btn-primary btn-default btn-lg mt8"
+                  t-attf-href="/saas_portal/add_new_client?redirect_to_signup=1&amp;plan_id=#{product_variant.variant_plan_id.id}&amp;trial=1">Try trial</a>
           </t>
         </t>
+      </xpath>
+    </template>
+
+    <template id="demo_products_item" inherit_id="website_sale.products_item">
+      <xpath expr="//div[@class='product_price']" position="attributes">
+          <attribute name="t-if">len(product.product_variant_ids.mapped('variant_plan_id'))==0</attribute>
       </xpath>
     </template>
 

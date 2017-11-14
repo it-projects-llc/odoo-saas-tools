@@ -57,6 +57,8 @@ class SaasPortalServer(models.Model):
     host = fields.Char('Host', compute=_compute_host)
     odoo_version = fields.Char('Odoo version', readonly=True)
     password = fields.Char()
+    clients_host_template = fields.Char('Template for clients host names',
+                                        help='The possible dynamic parts of the host names are: {dbname}, {base_saas_domain}, {base_saas_domain_1}')
 
     @api.model
     def create(self, vals):
@@ -196,8 +198,7 @@ class SaasPortalPlan(models.Model):
 
     on_create = fields.Selection([
         ('login', 'Log into just created instance'),
-        ('email', 'Go to information page that says to check email for credentials')
-    ], string="Workflow on create", default='email')
+    ], string="Workflow on create", default='login')
     on_create_email_template = fields.Many2one('mail.template',
                                                default=lambda self: self.env.ref('saas_portal.email_template_create_saas'))
 
@@ -219,11 +220,29 @@ class SaasPortalPlan(models.Model):
         return vals
 
     @api.multi
+    def _prepare_owner_user_data(self, user_id):
+        """
+        Prepare the dict of values to update owner user data in client instalnce. This method may be
+        overridden to implement custom values (making sure to call super() to establish
+        a clean extension chain).
+        """
+        self.ensure_one()
+        owner_user = self.env['res.users'].browse(user_id) or self.env.user
+        owner_user_data = {
+            'user_id': owner_user.id,
+            'login': owner_user.login,
+            'name': owner_user.name,
+            'email': owner_user.email,
+            'password_crypt': owner_user.password_crypt,
+        }
+        return owner_user_data
+
+    @api.multi
     def create_new_database(self, **kwargs):
         return self._create_new_database(**kwargs)
 
     @api.multi
-    def _create_new_database(self, dbname=None, client_id=None, partner_id=None, user_id=None, notify_user=False, trial=False, support_team_id=None, async=None, owner_password=None):
+    def _create_new_database(self, dbname=None, client_id=None, partner_id=None, user_id=None, notify_user=True, trial=False, support_team_id=None, async=None):
         self.ensure_one()
 
         server = self.server_id
@@ -270,17 +289,7 @@ class SaasPortalPlan(models.Model):
             client = self.env['saas_portal.client'].create(vals)
         client_id = client.client_id
 
-        if user_id:
-            owner_user = self.env['res.users'].browse(user_id)
-        else:
-            owner_user = self.env.user
-        owner_user_data = {
-            'user_id': owner_user.id,
-            'login': owner_user.login,
-            'password': owner_password,
-            'name': owner_user.name,
-            'email': owner_user.email,
-        }
+        owner_user_data = self._prepare_owner_user_data(user_id)
 
         client.period_initial = trial and self.expiration
         trial_expiration_datetime = (fields.Datetime.from_string(client.create_date) + timedelta(hours=client.period_initial)).strftime(DEFAULT_SERVER_DATETIME_FORMAT)
@@ -290,6 +299,7 @@ class SaasPortalPlan(models.Model):
             'public_url': client.public_url,
             'e': trial and trial_expiration_datetime or initial_expiration_datetime,
             'r': client.public_url + 'web',
+            'h': client.host,
             'owner_user': owner_user_data,
             't': client.trial,
         }
@@ -310,17 +320,15 @@ class SaasPortalPlan(models.Model):
         }
         url = '{url}?{params}'.format(url=data.get('url'), params=werkzeug.url_encode(params))
         auth_url = url
-        if self.on_create == 'email':
-            url = '/information'
 
-        # send email
-        # TODO: get rid of such attributes as ``notify_user``, ``trial`` - move them on plan settings (use different plans for trials and non-trials)
-        if notify_user or self.on_create == 'email':
-            template = self.on_create_email_template
-            if template:
-                client.message_post_with_template(template.id, composition_mode='comment')
+        # send email if there is mail template record
+        template = self.on_create_email_template
+        if template and notify_user:
+            # we have to have a user in this place (how to user without a user?)
+            user = self.env['res.users'].browse(user_id)
+            client.with_context(user=user).message_post_with_template(template.id, composition_mode='comment')
 
-        client.write({'expiration_datetime': initial_expiration_datetime})
+        client.write({'expiration_datetime': trial and trial_expiration_datetime or initial_expiration_datetime})
 
         client.send_params_to_client_db()
         # TODO make async call of action_sync_server here
@@ -431,12 +439,26 @@ class SaasPortalDatabase(models.Model):
                               ('template', 'Template'),
                               ],
                              'State', default='draft', track_visibility='onchange')
-    host = fields.Char('Host', compute=_compute_host)
-    public_url = fields.Char(compute='_compute_public_url', store=True)
+    host = fields.Char('Host', compute='_compute_host')
+    public_url = fields.Char(compute='_compute_public_url')
     password = fields.Char()
 
     @api.multi
-    @api.depends('server_id.request_port', 'server_id.request_scheme', 'host')
+    def _compute_host(self):
+        base_saas_domain = self.env['ir.config_parameter'].get_param('saas_portal.base_saas_domain')
+        base_saas_domain_1 = '.'.join(base_saas_domain.rsplit('.', 2)[-2:])
+        name_dict = {
+            'base_saas_domain': base_saas_domain,
+            'base_saas_domain_1': base_saas_domain_1,
+        }
+        for record in self:
+            if record.server_id.clients_host_template:
+                name_dict.update({'dbname': record.name})
+                record.host = record.server_id.clients_host_template.format(**name_dict)
+            else:
+                _compute_host(self)
+
+    @api.multi
     def _compute_public_url(self):
         for record in self:
             scheme = record.server_id.request_scheme

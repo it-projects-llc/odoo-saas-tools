@@ -130,14 +130,14 @@ class SaasPortalCreateClient(models.TransientModel):
         plan_id = self._default_plan_id()
         if plan_id:
             plan = self.env['saas_portal.plan'].browse(plan_id)
-            return plan.generate_dbname(raise_error=False)[0]
+            return plan.generate_dbname(raise_error=False)
         return ''
 
     name = fields.Char('Database name', required=True, default=_default_name)
     plan_id = fields.Many2one('saas_portal.plan', string='Plan', readonly=True, default=_default_plan_id)
     partner_id = fields.Many2one('res.partner', string='Partner')
     user_id = fields.Many2one('res.users', string='User')
-    notify_user = fields.Boolean(help='Notify user by email when database will have been created', default=False)
+    notify_user = fields.Boolean(help='Notify user by email when database will have been created', default=True)
     support_team_id = fields.Many2one('saas_portal.support_team', 'Support Team', default=lambda self: self.env.user.support_team_id)
     async_creation = fields.Boolean('Asynchronous', default=False, help='Asynchronous creation of client base')
     trial = fields.Boolean('Trial')

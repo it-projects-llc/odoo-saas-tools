@@ -7,7 +7,7 @@ from odoo.addons.saas_portal.controllers.main import SaasPortal
 
 class SaasPortalSale(SaasPortal):
 
-    @http.route(['/saas_portal/add_new_client'], type='http', auth='user', website=True)
+    @http.route()
     def add_new_client(self, **post):
         plan = self.get_plan(int(post.get('plan_id', 0) or 0))
 

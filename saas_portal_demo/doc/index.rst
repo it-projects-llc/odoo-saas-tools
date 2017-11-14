@@ -62,6 +62,29 @@ Adding demonstration products for online shop
 Whenever new demonstrative plan is created the new product for demonstration shop is created also.
 For different versions of odoo there will be different product variants, e.g. 8.0, 9.0, etc.
 
+Adding demonstration link on odoo apps site
+-------------------------------------------
+
+There is ``live_test_url`` parameter in odoo modules manifest files.
+It is a way to provide the link on your demo environment from ``odoo.com/apps``.
+In this case it is the link to saas portal shop page.
+And it should look like:
+
+::
+
+ {base_saas_domain}.shop/product/{demo_url}?version={odoo version}
+
+Where
+
+``{base_saas_domain}`` is domain of your saas portal, i.e. ``apps.it-projects.info``,
+
+``{demo_url}`` is the parameter specified along with ``live_test_url`` inside of manifest file of the module to demonstrate,
+i.e. ``reminderes-and-agenda``
+
+and ``{odoo_version}`` is one of the ``8.0``, ``9.0``, ``10.0``, etc.
+
+As an example - this is our ``live_test_url`` for the reminders modules: ``http://apps.it-projects.info/shop/product/reminders-and-agenda?version=8.0``
+
 nginx configuration
 -------------------
 

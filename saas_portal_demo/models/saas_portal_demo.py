@@ -77,7 +77,7 @@ class SaasPortalServer(models.Model):
                                         'dbname_template': namestring.format(demo_module['demo_url'], '%i'),
                                         'template_id': template.id,
                                         'on_create_email_template': self.env.ref('saas_portal_demo.email_template_create_saas_for_demo').id,
-                                        'expiration': 3,
+                                        'expiration': 48,
                                         'demo': True,
                                         })
                 return plan

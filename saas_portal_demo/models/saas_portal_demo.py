@@ -77,7 +77,7 @@ class SaasPortalServer(models.Model):
                                         'dbname_template': namestring.format(demo_module['demo_url'], '%i'),
                                         'template_id': template.id,
                                         'on_create_email_template': self.env.ref('saas_portal_demo.email_template_create_saas_for_demo').id,
-                                        'expiration': 3,
+                                        'expiration': 48,
                                         'demo': True,
                                         })
                 return plan
@@ -239,7 +239,7 @@ class SaasPortalServer(models.Model):
                 db, uid, password, models = plan.template_id._get_xmlrpc_object()
                 id = models.execute_kw(db, uid, password, 'ir.module.module', 'search',
                                         [[['name', 'in', ['base']]]])
-                models.execute_kw(db, uid, password, 'ir.module.module', 'button_upgrade', [id])
+                models.execute_kw(db, uid, password, 'ir.module.module', 'button_immediate_upgrade', [id])
         return True
 
 

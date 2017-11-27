@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ODOO_VERSION = 10
 SUPERUSER_ID = 1

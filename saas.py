@@ -6,7 +6,10 @@ SUPERUSER_ID = 1
 SAAS_PORTAL_MODULES_REGEXP = '(saas_portal.*|saas_sysadmin.*)'
 SAAS_SERVER_MODULES_REGEXP = '(saas_server.*)'
 
-import configparser
+try:
+    import configparser as ConfigParser
+except ImportError:
+    import ConfigParser
 import argparse
 import contextlib
 import datetime
@@ -118,7 +121,7 @@ def get_odoo_config():
     config_file = args.get('odoo_config') or os.environ.get("OPENERP_SERVER")
     if not config_file:
         return res
-    p = configparser.ConfigParser()
+    p = ConfigParser.ConfigParser()
     log('Read odoo config', config_file)
     p.read(config_file)
     for (name, value) in p.items('options'):

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-ODOO_VERSION = 10
+ODOO_VERSION = 11
 SUPERUSER_ID = 1
 SAAS_PORTAL_MODULES_REGEXP = '(saas_portal.*|saas_sysadmin.*)'
 SAAS_SERVER_MODULES_REGEXP = '(saas_server.*)'

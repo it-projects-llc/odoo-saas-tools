@@ -3,7 +3,6 @@ import re
 import werkzeug
 import urllib.request, urllib.error, urllib.parse
 import json
-import urllib.parse
 
 from odoo import models, fields, api
 

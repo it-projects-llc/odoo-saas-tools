@@ -349,7 +349,7 @@ class SaasServerClient(models.Model):
         return res
 
     @api.model
-    def delete_expired_databases(self):
+    def _cron_delete_expired_databases(self):
         now = time.strftime(DEFAULT_SERVER_DATETIME_FORMAT)
 
         res = self.search([('state', 'not in', ['deleted', 'template']), ('expiration_datetime', '<=', now), ('trial', '=', True)])

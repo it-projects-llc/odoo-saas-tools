@@ -318,7 +318,7 @@ def rpc_init_portal(dbname):
     base_saas_domain = dbname
     if args.get('base_domain') and '.' not in dbname:
         base_saas_domain = args.get('base_domain')
-    if not arg.get('dynamic_base_domain'):
+    if not args.get('dynamic_base_domain'):
         rpc_execute_kw(auth, 'ir.config_parameter', 'set_param', ['saas_portal.base_saas_domain', base_saas_domain])
 
     # Allow external users to sign up

@@ -58,6 +58,9 @@ class SaasPortalServer(models.Model):
     def _create_demo_plan(self, demo_module):
         self.ensure_one()
 
+        if not demo_module.get('installable', True):
+            return None
+
         template_obj = self.env['saas_portal.database']
         plan_obj = self.env['saas_portal.plan']
         if not self.odoo_version:

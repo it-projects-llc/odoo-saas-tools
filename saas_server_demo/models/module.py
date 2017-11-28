@@ -18,6 +18,7 @@ class ModuleDemo(models.Model):
     price = fields.Float(string='Price', default=0)
     currency = fields.Char("Currency", help="The currency the field is expressed in.")
     demo_images = fields.Char(help="file names, the files should be placed in /static/description/demo of the module")
+    installable = fields.Boolean()
 
     @staticmethod
     def get_values_from_terp(terp):
@@ -31,6 +32,7 @@ class ModuleDemo(models.Model):
                     'price': terp.get('price', False),
                     'currency': terp.get('currency', False),
                     'demo_images': ','.join(terp.get('demo_images', [])),
+                    'installable': bool(terp.get('installable', False)),
                     })
         return res
 

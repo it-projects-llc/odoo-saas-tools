@@ -38,11 +38,10 @@ class res_users(models.Model):
             url = endpoint + '?' + params
         req = urllib.request.Request(url, headers={'host': host})
         print(('url', url))
-        # f = urllib2.urlopen(url)
-        f = urllib.request.urlopen(req)
 
-        response = f.read()
-        return json.loads(response)
+        with urllib.request.urlopen(req) as response:
+            html = response.read()
+            return json.loads(html.decode("utf-8"))
 
     @api.model
     def _auth_oauth_validate(self, provider, access_token):

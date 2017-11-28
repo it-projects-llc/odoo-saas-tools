@@ -16,5 +16,9 @@
       <field name="name">10.0</field>
       <field name="attribute_id" ref="odoo_version_product_attribute"/>
     </record>
+    <record id="product_attribute_value_11" model="product.attribute.value">
+      <field name="name">11.0</field>
+      <field name="attribute_id" ref="odoo_version_product_attribute"/>
+    </record>
 
 </odoo>

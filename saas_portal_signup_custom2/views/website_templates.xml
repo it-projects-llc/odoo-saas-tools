@@ -17,7 +17,7 @@
 </template>
 
 <template id="login_layout" inherit_id="website.login_layout" name="Website Login Layout">
-  <xpath expr="//div[hasclass('field-confirm_password')]" position="attributes">
+  <xpath expr="//div[hasclass('field-confirm_password')]/../../../.." position="attributes">
     <attribute name="class" add="container-fluid" separator=" "/>
 	</xpath>
 </template>

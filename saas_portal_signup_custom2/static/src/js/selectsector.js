@@ -9,5 +9,8 @@ odoo.define('saas_portal_signup_custom2.selectsector', function(require){
 		    autoWidth: false,
 		});
 	    });
+    if ($('.field-confirm_password').length) {
+      $('.oe_website_login_container').css({width: '970px;'});
+    }
 	});
 });

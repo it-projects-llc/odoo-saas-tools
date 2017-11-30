@@ -27,7 +27,6 @@
                 'saas_portal_portal',
                 'website_sale',
                 'res_partner_custom2',
-                'theme_kit',
                 ],
 
     # always loaded

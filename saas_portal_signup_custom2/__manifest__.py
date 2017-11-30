@@ -27,6 +27,7 @@
                 'saas_portal_portal',
                 'website_sale',
                 'res_partner_custom2',
+                'website_login_background',
                 ],
 
     # always loaded

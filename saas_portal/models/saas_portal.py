@@ -291,9 +291,10 @@ class SaasPortalPlan(models.Model):
 
         owner_user_data = self._prepare_owner_user_data(user_id)
 
-        client.period_initial = trial and self.expiration
-        trial_expiration_datetime = (fields.Datetime.from_string(client.create_date) + timedelta(hours=client.period_initial)).strftime(DEFAULT_SERVER_DATETIME_FORMAT)
-        initial_expiration_datetime = (fields.Datetime.from_string(client.create_date) + timedelta(self.grace_period)).strftime(DEFAULT_SERVER_DATETIME_FORMAT)
+        client.trial_hours = trial and self.expiration
+        trial_expiration_datetime = (fields.Datetime.from_string(client.create_date) + timedelta(hours=client.trial_hours)).strftime(DEFAULT_SERVER_DATETIME_FORMAT)
+        initial_expiration_datetime = client.create_date
+        client.expiration_datetime = trial and trial_expiration_datetime or initial_expiration_datetime
         state = {
             'd': client.name,
             'public_url': client.public_url,
@@ -590,23 +591,18 @@ class SaasPortalClient(models.Model):
     name = fields.Char(required=True)
     partner_id = fields.Many2one('res.partner', string='Partner', track_visibility='onchange', readonly=True)
     plan_id = fields.Many2one('saas_portal.plan', string='Plan', track_visibility='onchange', ondelete='restrict', readonly=True)
-    expired = fields.Boolean('Expired', compute='_compute_expiration', store=True)
+    expiration_datetime = fields.Datetime(string="Expiration")
+    expired = fields.Boolean('Expired')
     user_id = fields.Many2one('res.users', default=lambda self: self.env.user, string='Salesperson')
     notification_sent = fields.Boolean(default=False, readonly=True, help='notification about oncoming expiration has sent')
     support_team_id = fields.Many2one('saas_portal.support_team', 'Support Team')
-    expiration_datetime_sent = fields.Datetime(help='updates every time send_expiration_info is executed')
     active = fields.Boolean(default=True, compute='_compute_active', store=True)
     block_on_expiration = fields.Boolean('Block clients on expiration', default=False)
     block_on_storage_exceed = fields.Boolean('Block clients on storage exceed', default=False)
     storage_exceed = fields.Boolean('Storage limit has been exceed', default=False)
-    subscription_start = fields.Datetime(string="Subscription start", track_visibility='onchange', readonly=True)
-    expiration_datetime = fields.Datetime(string="Expiration", compute='_compute_expiration',
-                                          store=True)
-    period_paid = fields.Integer('Subscribed period (paid days)', readonly=True)
-    period_initial = fields.Integer('Initial period for trial (hours)',
-                                   help='Subsription initial period in hours for trials',
-                                   readonly=True)
-    subscription_log_ids = fields.One2many('saas_portal.subscription_log', 'client_id')
+    trial_hours = fields.Integer('Initial period for trial (hours)',
+                                 help='Subsription initial period in hours for trials',
+                                 readonly=True)
 
     # TODO: use new api for tracking
     _track = {
@@ -616,50 +612,6 @@ class SaasPortalClient(models.Model):
         }
     }
 
-    @api.multi
-    def change_subscription(self, expiration=None, reason=None):
-        if expiration:
-            expiration_dt = fields.Datetime.from_string(expiration)
-            log_obj = self.env['saas_portal.subscription_log']
-            for record in self:
-                record_expiration_dt = record.expiration_datetime and \
-                        fields.Datetime.from_string(record.expiration_datetime)
-                if record_expiration_dt != expiration_dt:
-                    record.upgrade(payload={'params':
-                                            [{'key': 'saas_client.expiration_datetime',
-                                                'value': expiration, 'hidden': True}]})
-                    # after expiration_datetime is computed on subscription_log_ids change
-                    # base.action.rule triggers send_expiration_info with record.upgrade but not in 8.0
-                    log_obj.create({
-                        'client_id': record.id,
-                        'expiration': record.expiration_datetime,
-                        'expiration_new': expiration,
-                        'reason': reason,
-                        })
-
-    @api.multi
-    def get_manual_timedelta(self):
-        self.ensure_one()
-        td = timedelta()
-        for log_record in self.subscription_log_ids:
-            td += fields.Datetime.from_string(log_record.expiration_new) - \
-                    fields.Datetime.from_string(log_record.expiration)
-        return td
-
-    @api.multi
-    @api.depends('period_paid', 'create_date', 'subscription_start', 'period_initial', 'trial', 'subscription_log_ids')
-    def _compute_expiration(self):
-        for record in self:
-            start = record.subscription_start or record.create_date
-
-            expiration_datetime = fields.Datetime.from_string(start) + \
-                timedelta(record.period_paid) + record.get_manual_timedelta() + \
-                timedelta(record.plan_id.grace_period)
-            if record.trial:
-                expiration_datetime = expiration_datetime + timedelta(hours=record.period_initial)
-            record.expiration_datetime = expiration_datetime
-            now = fields.Datetime.from_string(fields.Datetime.now())
-            record.expired = expiration_datetime < now
 
     @api.multi
     @api.depends('state')
@@ -802,25 +754,6 @@ class SaasPortalClient(models.Model):
         return data
 
     @api.multi
-    def send_expiration_info(self):
-        for record in self:
-            if record.state not in ['draft', 'deleted'] and \
-                    record.expiration_datetime_sent and \
-                    record.expiration_datetime and \
-                    record.expiration_datetime_sent != record.expiration_datetime:
-                record.expiration_datetime_sent = record.expiration_datetime
-
-                payload = record.get_upgrade_database_payload()
-                if payload:
-                    self.env['saas.config'].do_upgrade_database(payload, record)
-
-                record.send_expiration_info_to_partner()
-                # expiration date has been changed, flush expiration notification flag
-                record.notification_sent = False
-            else:
-                record.expiration_datetime_sent = record.expiration_datetime
-
-    @api.multi
     def get_upgrade_database_payload(self):
         self.ensure_one()
         return {'params': [{'key': 'saas_client.expiration_datetime', 'value': self.expiration_datetime, 'hidden': True}]}
@@ -841,14 +774,6 @@ class SaasPortalClient(models.Model):
             if record.expiration_datetime:
                 template = self.env.ref('saas_portal.email_template_expiration_datetime_updated')
                 record.message_post_with_template(template.id, composition_mode='comment')
-
-    @api.one
-    def write(self, vals):
-        if 'expiration_datetime' in vals and vals['expiration_datetime']:
-            self.env['saas.config'].do_upgrade_database(
-                {'params': [{'key': 'saas_client.expiration_datetime', 'value': vals['expiration_datetime'], 'hidden': True}]},
-                self)
-        return super(SaasPortalClient, self).write(vals)
 
     @api.multi
     def storage_usage_monitoring(self):

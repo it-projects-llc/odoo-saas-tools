@@ -106,8 +106,8 @@
       </xpath>
     </template>
 
-    <template id="demo_product" inherit_id="saas_portal_sale_online.product">
-      <xpath expr="//a[@id='try_trial']" position="replace">
+    <template id="demo_product" inherit_id="website_sale.product">
+      <xpath expr="//a[@id='add_to_cart']" position="after">
         <t t-foreach="product.product_variant_ids" t-as="product_variant">
           <t t-if="set(product_variant.attribute_value_ids.ids) &amp; attrib_set">
               <a id="try_trial" style="margin-left: 8px" class="btn btn-primary btn-default btn-lg mt8"

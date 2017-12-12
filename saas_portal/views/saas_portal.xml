@@ -28,7 +28,6 @@
                     <button name="show_upgrade_wizard" attrs="{'invisible':[('state', 'in', ['deleted'])]}" type="object" icon="fa-cogs" help="Configure client database"/>
                     <button name="delete_database_server" type="object" attrs="{'invisible':[('state', 'in', ['draft', 'deleted'])]}" icon="fa-eraser" help="Delete client database"
                     confirm="Are you sure to delete this database?"/>
-                    <button name="%(action_view_subscription_wizard)d" string="Manage subscription" type="action" attrs="{'invisible':[('state', 'not in', ['open', 'pending'])]}"/>
                 </tree>
             </field>
         </record>
@@ -52,8 +51,6 @@
                         <button string="Sync server" type="object" name="action_sync_server" icon="fa-refresh"/>
                         <button string="Sync client" type="object" name="sync_client" icon="fa-refresh"/>
                         <button name="%(saas_portal.action_rename_database)d" string="Rename Database" type="action"/>
-                        <button name="%(action_view_subscription_wizard)d" string="Manage subscription"
-                          type="action" context="{'default_client_id': id, 'default_expiration': expiration_datetime}"/>
                         <field name="state" widget="statusbar" statusbar_visible="open,pending,deleted" clickable=""/>
                     </header>
                     <sheet>
@@ -74,9 +71,7 @@
                         </group>
                         <group name="subscription">
                             <field name="trial"/>
-                            <field name="subscription_start"/>
                             <field name="expiration_datetime"/>
-                            <field name="expired"/>
                         </group>
                     </group>
                     <group string="Settings" name="settings">
@@ -84,25 +79,6 @@
                         <field name="block_on_storage_exceed" class="oe_inline"/>
                     </group>
                     <notebook>
-                        <!--
-                        <page string="OAuth Users">
-                            <field name="token_ids" readonly="1">
-                                <tree>
-                                    <field name="user_id"/>
-                                    <field name="expires"/>
-                                </tree>
-                            </field>
-                        </page>
-                        -->
-                      <page string="Subscription Log (manual changes only)">
-                        <field name="subscription_log_ids" widget="one2many_list" colspan="4" nolabel="1" mode="tree" attrs="{'readonly': 1}">
-                          <tree string="Subsctiption Log" create="0" delete="false">
-                            <field name="expiration"/>
-                            <field name="expiration_new"/>
-                            <field name="reason"/>
-                          </tree>
-                        </field>
-                      </page>
                     </notebook>
                     </sheet>
                     <div class="oe_chatter">

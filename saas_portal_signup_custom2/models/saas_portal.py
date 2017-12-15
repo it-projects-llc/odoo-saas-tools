@@ -53,6 +53,7 @@ class SaasPortalPlan(models.Model):
                 'access_owner_add': ['base.group_system',
                                      'access_apps.group_allow_apps_only_from_settings',
                                      'access_restricted.group_allow_add_implied_from_settings'],
+                'params': [{'key': 'auth_signup.reset_password', 'value': True}],
                 }
         client_obj.upgrade(payload=payload)
         return res

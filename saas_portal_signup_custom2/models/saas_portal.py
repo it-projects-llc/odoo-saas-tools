@@ -11,8 +11,9 @@ class SaasPortalPlan(models.Model):
     on_create = fields.Selection(default='home')
 
     @api.multi
-    def _prepare_owner_user_data(self, owner_user, owner_password):
-        owner_user_data = super(SaasPortalPlan, self)._prepare_owner_user_data(owner_user, owner_password)
+    def _prepare_owner_user_data(self, user_id):
+        owner_user_data = super(SaasPortalPlan, self)._prepare_owner_user_data(user_id)
+        owner_user = self.env['res.users'].browse(user_id) or self.env.user
         owner_user_data.update({
             'company_name': owner_user.parent_id.name,
             'website': owner_user.parent_id.website,

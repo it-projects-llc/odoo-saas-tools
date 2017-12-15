@@ -28,7 +28,6 @@ class SaasPortal(http.Controller):
     def add_new_client(self, **post):
         dbname = self.get_full_dbname(post.get('dbname'))
         user_id = request.session.uid
-        owner_password = post.get('password')
         product_id = post.get('product_id')
         trial = post.get('trial')
         partner_id = None
@@ -41,8 +40,7 @@ class SaasPortal(http.Controller):
                                            user_id=user_id,
                                            partner_id=partner_id,
                                            trial=trial,
-                                           product_id=product_id,
-                                           owner_password=owner_password)
+                                           product_id=product_id)
         except MaximumDBException:
             url = request.env['ir.config_parameter'].sudo().get_param('saas_portal.page_for_maximumdb', '/')
             return werkzeug.utils.redirect(url)

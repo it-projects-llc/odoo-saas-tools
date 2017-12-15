@@ -217,19 +217,20 @@ class SaasPortalPlan(models.Model):
         return vals
 
     @api.multi
-    def _prepare_owner_user_data(self, owner_user, owner_password):
+    def _prepare_owner_user_data(self, user_id):
         """
         Prepare the dict of values to update owner user data in client instalnce. This method may be
         overridden to implement custom values (making sure to call super() to establish
         a clean extension chain).
         """
         self.ensure_one()
+        owner_user = self.env['res.users'].browse(user_id) or self.env.user
         owner_user_data = {
             'user_id': owner_user.id,
             'login': owner_user.login,
-            'password': owner_password,
             'name': owner_user.name,
             'email': owner_user.email,
+            'password_crypt': owner_user.password_crypt,
         }
         return owner_user_data
 
@@ -248,7 +249,6 @@ class SaasPortalPlan(models.Model):
                              support_team_id=None,
                              async=None,
                              product_id=None,
-                             owner_password=None,
                              addons=None):
         self.ensure_one()
 
@@ -303,7 +303,7 @@ class SaasPortalPlan(models.Model):
         else:
             owner_user = self.env.user
 
-        owner_user_data = self._prepare_owner_user_data(owner_user, owner_password)
+        owner_user_data = self._prepare_owner_user_data(user_id)
 
         client.trial_hours = trial and self.expiration
         trial_expiration_datetime = (fields.Datetime.from_string(client.create_date) + timedelta(hours=client.trial_hours)).strftime(DEFAULT_SERVER_DATETIME_FORMAT)

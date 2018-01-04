@@ -1,4 +1,4 @@
-[![Build Status](http://runbot.it-projects.info/runbot/badge/flat/odoo-saas-tools/10.0.svg)](http://runbot.it-projects.info/demo/odoo-saas-tools/10.0)
+[![Build Status](http://runbot.it-projects.info/runbot/badge/flat/odoo-saas-tools/10.0.svg)](http://runbot.it-projects.info/demo/odoo-saas-tools/11.0)
 
 Odoo SaaS Tools
 ==================

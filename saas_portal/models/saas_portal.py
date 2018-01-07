@@ -781,14 +781,14 @@ class SaasPortalClient(models.Model):
             'params': [{'key': 'saas_client.suspended', 'value': '1', 'hidden': True}],
         }
         for r in self:
-            if r.total_storage_limit < r.file_storage + r.db_storage and r.storage_exceed is False:
+            if r.total_storage_limit and r.total_storage_limit < r.file_storage + r.db_storage and r.storage_exceed is False:
                 r.write({'storage_exceed': True})
                 template = self.env.ref('saas_portal.email_template_storage_exceed')
                 r.message_post_with_template(template.id, composition_mode='comment')
 
                 if r.block_on_storage_exceed:
                     self.env['saas.config'].do_upgrade_database(payload, r)
-            if r.total_storage_limit >= r.file_storage + r.db_storage and r.storage_exceed is True:
+            if not r.total_storage_limit or r.total_storage_limit >= r.file_storage + r.db_storage and r.storage_exceed is True:
                 r.write({'storage_exceed': False})
 
 

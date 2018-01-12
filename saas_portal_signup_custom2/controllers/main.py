@@ -61,8 +61,8 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
 
         if kw.get('dbname', False) and kw.get('product_id', False):
             redirect = '/saas_portal/add_new_client'
-            kw['redirect'] = '%s?dbname=%s&product_id=%s&password=%s&trial_or_working=%s' % (
-                redirect, kw['dbname'], kw['product_id'], kw['password'], kw['trial_or_working'])
+            kw['redirect'] = '%s?dbname=%s&product_id=%s&trial_or_working=%s' % (
+                redirect, kw['dbname'], kw['password'], kw['trial_or_working'])
 
         # return super(AuthSignupHome, self).web_auth_signup(*args, **kw)
 # imp parent code: instead of showing ``Could not create a new account`` show assertion error text (e.g. if the passwords don't match)

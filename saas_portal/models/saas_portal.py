@@ -665,6 +665,20 @@ class SaasPortalClient(models.Model):
         return super(SaasPortalClient, self).unlink()
 
     @api.multi
+    def write(self, values):
+        if 'expiration_datetime' in values:
+            payload = {
+                'params': [{'key': 'saas_client.expiration_datetime', 'value': values['expiration_datetime'], 'hidden': True}],
+            }
+
+            for record in self:
+                record.upgrade(payload)
+
+        result = super(SaasPortalClient, self).write(values)
+
+        return result
+
+    @api.multi
     def rename_database(self, new_dbname):
         self.ensure_one()
         # TODO async

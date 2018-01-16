@@ -169,7 +169,7 @@ class SaasPortalPlan(models.Model):
     maximum_allowed_trial_dbs_per_partner = fields.Integer(help='maximum allowed trial databases per customer', require=True, default=0)
 
     max_users = fields.Char('Initial Max users', default='0', help='leave 0 for no limit')
-    total_storage_limit = fields.Integer('Total storage limit (MB)')
+    total_storage_limit = fields.Integer('Total storage limit (MB)', help='leave 0 for no limit')
     block_on_expiration = fields.Boolean('Block clients on expiration', default=False)
     block_on_storage_exceed = fields.Boolean('Block clients on storage exceed', default=False)
 
@@ -590,7 +590,7 @@ class SaasPortalClient(models.Model):
 
     name = fields.Char(required=True)
     partner_id = fields.Many2one('res.partner', string='Partner', track_visibility='onchange', readonly=True)
-    plan_id = fields.Many2one('saas_portal.plan', string='Plan', track_visibility='onchange', ondelete='restrict', readonly=True)
+    plan_id = fields.Many2one('saas_portal.plan', string='Plan', track_visibility='onchange', ondelete='set null', readonly=True)
     expiration_datetime = fields.Datetime(string="Expiration")
     expired = fields.Boolean('Expired')
     user_id = fields.Many2one('res.users', default=lambda self: self.env.user, string='Salesperson')
@@ -663,6 +663,20 @@ class SaasPortalClient(models.Model):
             #    user_model.unlink(user_ids)
             # odoo.service.db.exp_drop(obj.name)
         return super(SaasPortalClient, self).unlink()
+
+    @api.multi
+    def write(self, values):
+        if 'expiration_datetime' in values:
+            payload = {
+                'params': [{'key': 'saas_client.expiration_datetime', 'value': values['expiration_datetime'], 'hidden': True}],
+            }
+
+            for record in self:
+                record.upgrade(payload)
+
+        result = super(SaasPortalClient, self).write(values)
+
+        return result
 
     @api.multi
     def rename_database(self, new_dbname):

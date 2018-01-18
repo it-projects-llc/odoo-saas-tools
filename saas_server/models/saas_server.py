@@ -245,14 +245,16 @@ class SaasServerClient(models.Model):
             data.update({'state': 'pending'})
         return data
 
-    @api.one
+    @api.multi
     def upgrade_database(self, **kwargs):
+        self.ensure_one()
         with self.registry()[0].cursor() as cr:
             env = api.Environment(cr, SUPERUSER_ID, self._context)
-            return self._upgrade_database(env, **kwargs)[0]
+            return self._upgrade_database(env, **kwargs)
 
-    @api.one
+    @api.multi
     def _upgrade_database(self, client_env, data):
+        self.ensure_one()
         # "data" comes from saas_portal/models/wizard.py::upgrade_database
         post = data
         module = client_env['ir.module.module']

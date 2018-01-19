@@ -237,6 +237,14 @@ class SaasPortalPlan(models.Model):
         return owner_user_data
 
     @api.multi
+    def _get_expiration(self, trial):
+        self.ensure_one()
+        trial_hours = trial and self.expiration
+        initial_expiration_datetime = datetime.now()
+        trial_expiration_datetime = (initial_expiration_datetime + timedelta(hours=trial_hours)).strftime(DEFAULT_SERVER_DATETIME_FORMAT)
+        return trial and trial_expiration_datetime or initial_expiration_datetime.strftime(DEFAULT_SERVER_DATETIME_FORMAT)
+
+    @api.multi
     def create_new_database(self, **kwargs):
         return self._create_new_database(**kwargs)
 
@@ -268,12 +276,14 @@ class SaasPortalPlan(models.Model):
             if trial_db_count >= self.maximum_allowed_trial_dbs_per_partner:
                 raise MaximumTrialDBException("Limit of trial databases for this plan is %(maximum)s reached" % {'maximum': self.maximum_allowed_trial_dbs_per_partner})
 
+        client_expiration = self._get_expiration(trial)
         vals = {'name': dbname or self.generate_dbname(),
                 'server_id': server.id,
                 'plan_id': self.id,
                 'partner_id': partner_id,
                 'trial': trial,
                 'support_team_id': support_team_id,
+                'expiration_datetime': client_expiration,
                 }
         client = None
         if client_id:
@@ -290,13 +300,10 @@ class SaasPortalPlan(models.Model):
 
         owner_user_data = self._prepare_owner_user_data(user_id)
 
-        client.period_initial = trial and self.expiration
-        trial_expiration_datetime = (fields.Datetime.from_string(client.create_date) + timedelta(hours=client.period_initial)).strftime(DEFAULT_SERVER_DATETIME_FORMAT)
-        initial_expiration_datetime = (fields.Datetime.from_string(client.create_date) + timedelta(self.grace_period)).strftime(DEFAULT_SERVER_DATETIME_FORMAT)
         state = {
             'd': client.name,
             'public_url': client.public_url,
-            'e': trial and trial_expiration_datetime or initial_expiration_datetime,
+            'e': client_expiration,
             'r': client.public_url + 'web',
             'owner_user': owner_user_data,
             't': client.trial,
@@ -325,8 +332,6 @@ class SaasPortalPlan(models.Model):
             template = self.on_create_email_template
             if template:
                 client.message_post_with_template(template.id, composition_mode='comment')
-
-        client.write({'expiration_datetime': initial_expiration_datetime})
 
         client.send_params_to_client_db()
         # TODO make async call of action_sync_server here

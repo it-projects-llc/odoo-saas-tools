@@ -73,7 +73,6 @@ class SaasConfig(models.TransientModel):
 
     @api.model
     def do_upgrade_database(self, payload, database_record):
-        self.ensure_one()
         state = {
             'data': payload,
         }

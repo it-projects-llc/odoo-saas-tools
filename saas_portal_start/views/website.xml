@@ -15,7 +15,7 @@
       </xpath>
     </template>
 
-    <template id="website.start" name="Create new database" page="True" priority="29">
+    <template id="website.start" name="Create new database" priority="29">
       <t t-call="website.layout">
         <div id="wrap" class="oe_structure oe_empty">
           <section class="odoo_secondary_A">

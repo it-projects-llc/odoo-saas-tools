@@ -16,7 +16,7 @@
         </template>
 -->
 
-        <template id="select_template" name="Odoo templates" page="True">
+        <template id="select_template" name="Odoo templates">
             <t t-call="website.layout">
                 <div id="wrap" class="oe_structure oe_empty">
                     <section class="mt0 mb0">

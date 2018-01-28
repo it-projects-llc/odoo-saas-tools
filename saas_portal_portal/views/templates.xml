@@ -6,7 +6,7 @@
 	</template>
 
 
-  <template id="saas_custom_panel" name="SaaS Custom Panel" inherit_id='website_portal.portal_layout'>
+  <template id="saas_custom_panel" name="SaaS Custom Panel" inherit_id='portal.portal_layout'>
     <xpath expr="//div[@id='o_my_sidebar']" position="inside">
       <t t-if="saas_portal_client">
         <div class="oe_structure">
@@ -63,7 +63,7 @@
   </template>
 
   <template id="account" name="Account" inherit_id="website_portal.portal_layout">
-    <xpath expr="//div[contains(@class,'mb64')]/div[1]" position="inside">
+    <xpath expr="//div[contains(@class,'mb64')]" position="inside">
       <t t-call="saas_portal_portal.stats" />
     </xpath>
   </template>

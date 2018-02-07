@@ -169,7 +169,7 @@ class SaasPortalPlan(models.Model):
     maximum_allowed_trial_dbs_per_partner = fields.Integer(help='maximum allowed trial databases per customer', require=True, default=0)
 
     max_users = fields.Char('Initial Max users', default='0', help='leave 0 for no limit')
-    total_storage_limit = fields.Integer('Total storage limit (MB)')
+    total_storage_limit = fields.Integer('Total storage limit (MB)', help='leave 0 for no limit')
     block_on_expiration = fields.Boolean('Block clients on expiration', default=False)
     block_on_storage_exceed = fields.Boolean('Block clients on storage exceed', default=False)
 
@@ -238,6 +238,14 @@ class SaasPortalPlan(models.Model):
         return owner_user_data
 
     @api.multi
+    def _get_expiration(self, trial):
+        self.ensure_one()
+        trial_hours = trial and self.expiration
+        initial_expiration_datetime = datetime.now()
+        trial_expiration_datetime = (initial_expiration_datetime + timedelta(hours=trial_hours)).strftime(DEFAULT_SERVER_DATETIME_FORMAT)
+        return trial and trial_expiration_datetime or initial_expiration_datetime.strftime(DEFAULT_SERVER_DATETIME_FORMAT)
+
+    @api.multi
     def create_new_database(self, **kwargs):
         return self._create_new_database(**kwargs)
 
@@ -269,12 +277,14 @@ class SaasPortalPlan(models.Model):
             if trial_db_count >= self.maximum_allowed_trial_dbs_per_partner:
                 raise MaximumTrialDBException("Limit of trial databases for this plan is %(maximum)s reached" % {'maximum': self.maximum_allowed_trial_dbs_per_partner})
 
+        client_expiration = self._get_expiration(trial)
         vals = {'name': dbname or self.generate_dbname(),
                 'server_id': server.id,
                 'plan_id': self.id,
                 'partner_id': partner_id,
                 'trial': trial,
                 'support_team_id': support_team_id,
+                'expiration_datetime': client_expiration,
                 }
         client = None
         if client_id:
@@ -291,14 +301,10 @@ class SaasPortalPlan(models.Model):
 
         owner_user_data = self._prepare_owner_user_data(user_id)
 
-        client.trial_hours = trial and self.expiration
-        trial_expiration_datetime = (fields.Datetime.from_string(client.create_date) + timedelta(hours=client.trial_hours)).strftime(DEFAULT_SERVER_DATETIME_FORMAT)
-        initial_expiration_datetime = client.create_date
-        client.expiration_datetime = trial and trial_expiration_datetime or initial_expiration_datetime
         state = {
             'd': client.name,
             'public_url': client.public_url,
-            'e': trial and trial_expiration_datetime or initial_expiration_datetime,
+            'e': client_expiration,
             'r': client.public_url + 'web',
             'h': client.host,
             'owner_user': owner_user_data,
@@ -328,8 +334,6 @@ class SaasPortalPlan(models.Model):
             # we have to have a user in this place (how to user without a user?)
             user = self.env['res.users'].browse(user_id)
             client.with_context(user=user).message_post_with_template(template.id, composition_mode='comment')
-
-        client.write({'expiration_datetime': trial and trial_expiration_datetime or initial_expiration_datetime})
 
         client.send_params_to_client_db()
         # TODO make async call of action_sync_server here
@@ -590,7 +594,7 @@ class SaasPortalClient(models.Model):
 
     name = fields.Char(required=True)
     partner_id = fields.Many2one('res.partner', string='Partner', track_visibility='onchange', readonly=True)
-    plan_id = fields.Many2one('saas_portal.plan', string='Plan', track_visibility='onchange', ondelete='restrict', readonly=True)
+    plan_id = fields.Many2one('saas_portal.plan', string='Plan', track_visibility='onchange', ondelete='set null', readonly=True)
     expiration_datetime = fields.Datetime(string="Expiration")
     expired = fields.Boolean('Expired')
     user_id = fields.Many2one('res.users', default=lambda self: self.env.user, string='Salesperson')
@@ -663,6 +667,20 @@ class SaasPortalClient(models.Model):
             #    user_model.unlink(user_ids)
             # odoo.service.db.exp_drop(obj.name)
         return super(SaasPortalClient, self).unlink()
+
+    @api.multi
+    def write(self, values):
+        if 'expiration_datetime' in values:
+            payload = {
+                'params': [{'key': 'saas_client.expiration_datetime', 'value': values['expiration_datetime'], 'hidden': True}],
+            }
+
+            for record in self:
+                record.upgrade(payload)
+
+        result = super(SaasPortalClient, self).write(values)
+
+        return result
 
     @api.multi
     def rename_database(self, new_dbname):

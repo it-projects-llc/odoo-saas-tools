@@ -122,34 +122,35 @@ class SaasPortalServer(models.Model):
         self.search([]).action_sync_server()
         self.env['saas_portal.client'].search([]).storage_usage_monitoring()
 
-    @api.one
+    @api.multi
     def action_sync_server(self, updating_client_ID=None):
-        state = {
-            'd': self.name,
-            'client_id': self.client_id,
-            'updating_client_ID': updating_client_ID,
-        }
-        req, req_kwargs = self._request_server(path='/saas_server/sync_server', state=state, client_id=self.client_id)
-        res = requests.Session().send(req, **req_kwargs)
+        for server in self:
+            state = {
+                'd': server.name,
+                'client_id': server.client_id,
+                'updating_client_ID': updating_client_ID,
+            }
+            req, req_kwargs = server._request_server(path='/saas_server/sync_server', state=state, client_id=server.client_id)
+            res = requests.Session().send(req, **req_kwargs)
 
-        if not res.ok:
-            raise Warning('Reason: %s \n Message: %s' % (res.reason, res.content))
-        try:
-            data = simplejson.loads(res.text)
-        except:
-            _logger.error('Error on parsing response: %s\n%s' % ([req.url, req.headers, req.body], res.text))
-            raise
-        for r in data:
-            r['server_id'] = self.id
-            client = self.env['saas_portal.client'].with_context(active_test=False).search([('client_id', '=', r.get('client_id'))])
-            if not client:
-                database = self.env['saas_portal.database'].search([('client_id', '=', r.get('client_id'))])
-                if database:
-                    database.write(r)
-                    continue
-                client = self.env['saas_portal.client'].create(r)
-            else:
-                client.write(r)
+            if not res.ok:
+                raise Warning('Reason: %s \n Message: %s' % (res.reason, res.content))
+            try:
+                data = simplejson.loads(res.text)
+            except:
+                _logger.error('Error on parsing response: %s\n%s' % ([req.url, req.headers, req.body], res.text))
+                raise
+            for r in data:
+                r['server_id'] = server.id
+                client = server.env['saas_portal.client'].with_context(active_test=False).search([('client_id', '=', r.get('client_id'))])
+                if not client:
+                    database = server.env['saas_portal.database'].search([('client_id', '=', r.get('client_id'))])
+                    if database:
+                        database.write(r)
+                        continue
+                    client = server.env['saas_portal.client'].create(r)
+                else:
+                    client.write(r)
         return None
 
     @api.model

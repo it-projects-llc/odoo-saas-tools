@@ -4,10 +4,7 @@ import requests
 import random
 from datetime import datetime, timedelta
 
-from odoo import api
-from odoo import exceptions
-from odoo import fields
-from odoo import models
+from odoo import api, exceptions, fields, models
 from odoo.tools import scan_languages
 from odoo.tools.translate import _
 from odoo.addons.base.res.res_partner import _tz_get
@@ -147,7 +144,7 @@ class SaasPortalServer(models.Model):
             res = requests.Session().send(req, **req_kwargs)
 
             if not res.ok:
-                raise Warning('Reason: %s \n Message: %s' %
+                raise Warning(_('Reason: %s \n Message: %s') %
                               (res.reason, res.content))
             try:
                 data = simplejson.loads(res.text)

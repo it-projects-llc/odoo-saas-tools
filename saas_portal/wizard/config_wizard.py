@@ -3,7 +3,8 @@ import werkzeug
 import simplejson
 
 from odoo.http import request
-from odoo import api, fields, models, _
+from odoo import api, fields, models
+from odoo.tools.translate import _
 
 
 class SaasConfig(models.TransientModel):

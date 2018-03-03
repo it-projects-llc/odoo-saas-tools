@@ -4,9 +4,7 @@ import werkzeug
 import simplejson
 
 from odoo.http import request
-from odoo import api
-from odoo import fields
-from odoo import models
+from odoo import api, fields, models, _
 
 
 class SaasConfig(models.TransientModel):
@@ -15,17 +13,23 @@ class SaasConfig(models.TransientModel):
     def _default_database_ids(self):
         return self._context.get('active_ids')
 
-    action = fields.Selection([('edit', 'Edit'), ('upgrade', 'Configure'), ('delete', 'Delete')],
+    action = fields.Selection([('edit', 'Edit'),
+                               ('upgrade', 'Configure'),
+                               ('delete', 'Delete')],
                               'Action')
-    database_ids = fields.Many2many('saas_portal.client', string='Database', default=_default_database_ids)
+    database_ids = fields.Many2many(
+        'saas_portal.client', string='Database', default=_default_database_ids)
     update_addons_list = fields.Boolean('Update Addon List', default=True)
     update_addons = fields.Char('Update Addons', size=256)
     install_addons = fields.Char('Install Addons', size=256)
     uninstall_addons = fields.Char('Uninstall Addons', size=256)
     access_owner_add = fields.Char('Grant access to Owner')
-    access_remove = fields.Char('Restrict access', help='Restrict access for all users except super-user.\nNote, that ')
+    access_remove = fields.Char(
+        'Restrict access',
+        help='Restrict access for all users except super-user.\nNote, that ')
     fix_ids = fields.One2many('saas.config.fix', 'config_id', 'Fixes')
-    limit_line_ids = fields.One2many('saas.config.limit_number_of_records_line', 'config_id', 'Limit line')
+    limit_line_ids = fields.One2many(
+        'saas.config.limit_number_of_records_line', 'config_id', 'Limit line')
     param_ids = fields.One2many('saas.config.param', 'config_id', 'Parameters')
     description = fields.Text('Result')
 
@@ -55,8 +59,13 @@ class SaasConfig(models.TransientModel):
             'access_owner_add': obj.access_owner_add.split(',') if obj.access_owner_add else [],
             'access_remove': obj.access_remove.split(',') if obj.access_remove else [],
             'fixes': [[x.model, x.method] for x in obj.fix_ids],
-            'params': [{'key': x.key, 'value': x.value, 'hidden': x.hidden} for x in obj.param_ids],
-            'limit_nuber_of_records': [{'model': x.model, 'max_records': x.max_records, 'domain': x.domain} for x in obj.limit_line_ids],
+            'params': [{'key': x.key,
+                        'value': x.value,
+                        'hidden': x.hidden} for x in obj.param_ids],
+            'limit_nuber_of_records': [{
+                'model': x.model,
+                'max_records': x.max_records,
+                'domain': x.domain} for x in obj.limit_line_ids],
         }
         res = self.database_ids.upgrade(payload=payload)
 
@@ -78,12 +87,13 @@ class SaasConfig(models.TransientModel):
         }
         req, req_kwargs = database_record.server_id._request_server(
             path='/saas_server/upgrade_database',
-            client_id = database_record.client_id,
+            client_id=database_record.client_id,
             state=state,
         )
         res = requests.Session().send(req, **req_kwargs)
         if not res.ok:
-            raise Warning('Reason: %s \n Message: %s' % (res.reason, res.content))
+            raise Warning(_('Reason: %s \n Message: %s') %
+                          (res.reason, res.content))
         return res.text
 
 
@@ -109,12 +119,14 @@ class SaasConfigParam(models.TransientModel):
 
     def _get_keys(self):
         return [
-            ('saas_client.max_users', 'Max Users (obsolete)'), # this parameter is obsolete. use access_limit_records_number module
+            # this parameter is obsolete.Use access_limit_records_number module
+            ('saas_client.max_users', 'Max Users (obsolete)'),
             ('saas_client.suspended', 'Suspended'),
             ('saas_client.total_storage_limit', 'Total storage limit'),
         ]
 
-    key = fields.Selection(selection=_get_keys, string='Key', required=1, size=64)
+    key = fields.Selection(selection=_get_keys,
+                           string='Key', required=1, size=64)
     value = fields.Char('Value', required=1, size=64)
     config_id = fields.Many2one('saas.config', 'Config')
     hidden = fields.Boolean('Hidden parameter', default=True)
@@ -134,12 +146,20 @@ class SaasPortalCreateClient(models.TransientModel):
         return ''
 
     name = fields.Char('Database name', required=True, default=_default_name)
-    plan_id = fields.Many2one('saas_portal.plan', string='Plan', readonly=True, default=_default_plan_id)
+    plan_id = fields.Many2one(
+        'saas_portal.plan', string='Plan',
+        readonly=True, default=_default_plan_id)
     partner_id = fields.Many2one('res.partner', string='Partner')
     user_id = fields.Many2one('res.users', string='User')
-    notify_user = fields.Boolean(help='Notify user by email when database will have been created', default=True)
-    support_team_id = fields.Many2one('saas_portal.support_team', 'Support Team', default=lambda self: self.env.user.support_team_id)
-    async_creation = fields.Boolean('Asynchronous', default=False, help='Asynchronous creation of client base')
+    notify_user = fields.Boolean(
+        help='Notify user by email when database will have been created',
+        default=True)
+    support_team_id = fields.Many2one(
+        'saas_portal.support_team', 'Support Team',
+        default=lambda self: self.env.user.support_team_id)
+    async_creation = fields.Boolean(
+        'Asynchronous',
+        default=False, help='Asynchronous creation of client base')
     trial = fields.Boolean('Trial')
 
     @api.onchange('user_id')
@@ -149,12 +169,15 @@ class SaasPortalCreateClient(models.TransientModel):
 
     @api.multi
     def apply(self):
-        wizard = self[0]
-        res = wizard.plan_id.create_new_database(dbname=wizard.name, partner_id=wizard.partner_id.id, user_id=self.user_id.id,
-                                                 notify_user=self.notify_user,
-                                                 support_team_id=self.support_team_id.id,
-                                                 async=self.async_creation,
-                                                 trial=self.trial)
+        plan_id = self[0].plan_id
+        res = plan_id.create_new_database(
+            dbname=wizard.name,
+            partner_id=wizard.partner_id.id,
+            user_id=self.user_id.id,
+            notify_user=self.notify_user,
+            support_team_id=self.support_team_id.id,
+            async=self.async_creation,
+            trial=self.trial)
         if self.async_creation:
             return
         client = self.env['saas_portal.client'].browse(res.get('id'))
@@ -190,9 +213,12 @@ class SaasPortalDuplicateClient(models.TransientModel):
         return ''
 
     name = fields.Char('Database Name', required=True)
-    client_id = fields.Many2one('saas_portal.client', string='Base Client', readonly=True, default=_default_client_id)
+    client_id = fields.Many2one(
+        'saas_portal.client', string='Base Client',
+        readonly=True, default=_default_client_id)
     expiration = fields.Integer('Expiration', default=_default_expiration)
-    partner_id = fields.Many2one('res.partner', string='Partner', default=_default_partner)
+    partner_id = fields.Many2one(
+        'res.partner', string='Partner', default=_default_partner)
 
     @api.multi
     def apply(self):
@@ -218,7 +244,9 @@ class SaasPortalRenameDatabase(models.TransientModel):
         return self._context.get('active_id')
 
     name = fields.Char('New Name', required=True)
-    client_id = fields.Many2one('saas_portal.client', string='Base Client', readonly=True, default=_default_client_id)
+    client_id = fields.Many2one(
+        'saas_portal.client', string='Base Client',
+        readonly=True, default=_default_client_id)
 
     @api.multi
     def apply(self):
@@ -248,5 +276,6 @@ class SaasPortalEditDatabase(models.TransientModel):
         if res['active_model'] == 'saas_portal.plan':
             active_record = active_record.template_id
         res['name'] = active_record.name
-        res['edit_database_url'] = active_record._request_url('/saas_server/edit_database')
+        res['edit_database_url'] = active_record._request_url(
+            '/saas_server/edit_database')
         return res

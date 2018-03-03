@@ -206,7 +206,7 @@ class SaasPortalPlan(models.Model):
     tz = fields.Selection(_tz_get, 'TimeZone', default=_default_tz)
     sequence = fields.Integer('Sequence')
     state = fields.Selection([('draft', 'Draft'), ('confirmed', 'Confirmed')],
-                             'State', compute='_get_state', store=True)
+                             'State', compute='_compute_get_state', store=True)
     expiration = fields.Integer(
         'Expiration (hours)', help='time to delete database. Use for demo')
     _order = 'sequence'
@@ -230,7 +230,7 @@ class SaasPortalPlan(models.Model):
 
     @api.multi
     @api.depends('template_id.state')
-    def _get_state(self):
+    def _compute_get_state(self):
         self.ensure_one()
         if self.template_id.state == 'template':
             self.state = 'confirmed'
@@ -420,8 +420,8 @@ class SaasPortalPlan(models.Model):
         res = requests.Session().send(req, **req_kwargs)
 
         if not res.ok:
-            raise Warning(_('Error on request: %s\nReason: %s \n Message: %s') % (
-                req.url, res.reason, res.content))
+            raise Warning(_('Error on request: %s\nReason: %s \n Message: %s') %
+                          (req.url, res.reason, res.content))
         try:
             data = simplejson.loads(res.text)
         except Exception as e:
@@ -458,17 +458,20 @@ class OauthApplication(models.Model):
     _inherit = 'oauth.application'
 
     client_id = fields.Char('Database UUID')
-    last_connection = fields.Char(compute='_get_last_connection',
+    last_connection = fields.Char(compute='_compute_get_last_connection',
                                   string='Last Connection', size=64)
     server_db_ids = fields.One2many(
-        'saas_portal.server', 'oauth_application_id', string='Server Database')
+        'saas_portal.server', 'oauth_application_id',
+        string='Server Database')
     template_db_ids = fields.One2many(
-        'saas_portal.database', 'oauth_application_id', string='Template Database')
+        'saas_portal.database', 'oauth_application_id',
+        string='Template Database')
     client_db_ids = fields.One2many(
-        'saas_portal.client', 'oauth_application_id', string='Client Database')
+        'saas_portal.client', 'oauth_application_id',
+        string='Client Database')
 
     @api.multi
-    def _get_last_connection(self):
+    def _compute_get_last_connection(self):
         for r in self:
             oat = self.env['oauth.access_token']
             to_search = [('application_id', '=', r.id)]
@@ -485,9 +488,11 @@ class SaasPortalDatabase(models.Model):
 
     name = fields.Char('Database name', readonly=False)
     oauth_application_id = fields.Many2one(
-        'oauth.application', 'OAuth Application', required=True, ondelete='cascade')
+        'oauth.application', 'OAuth Application',
+        required=True, ondelete='cascade')
     server_id = fields.Many2one(
-        'saas_portal.server', ondelete='restrict', string='Server', readonly=True)
+        'saas_portal.server', ondelete='restrict',
+        string='Server', readonly=True)
     state = fields.Selection([('draft', 'New'),
                               ('open', 'In Progress'),
                               ('cancelled', 'Cancelled'),
@@ -495,7 +500,8 @@ class SaasPortalDatabase(models.Model):
                               ('deleted', 'Deleted'),
                               ('template', 'Template'),
                               ],
-                             'State', default='draft', track_visibility='onchange')
+                             'State', default='draft',
+                             track_visibility='onchange')
     host = fields.Char('Host', compute='_compute_host')
     public_url = fields.Char(compute='_compute_public_url')
     password = fields.Char()
@@ -626,7 +632,8 @@ class SaasPortalDatabase(models.Model):
         if force_delete:
             state['force_delete'] = 1
         req, req_kwargs = self.server_id._request_server(
-            path='/saas_server/delete_database', state=state, client_id=self.client_id)
+            path='/saas_server/delete_database',
+            state=state, client_id=self.client_id)
         res = requests.Session().send(req, **req_kwargs)
         _logger.info('delete database: %s', res.text)
         if res.status_code != 500:

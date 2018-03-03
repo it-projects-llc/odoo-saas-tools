@@ -357,7 +357,7 @@ class SaasPortalPlan(models.Model):
                                                  scope=scope,)
         res = requests.Session().send(req, **req_kwargs)
         if res.status_code != 200:
-            raise Warning('Error on request: %s\nReason: %s \n Message: %s' % (
+            raise Warning(_('Error on request: %s\nReason: %s \n Message: %s') % (
                 req.url, res.reason, res.content))
         data = simplejson.loads(res.text)
         params = {
@@ -420,12 +420,12 @@ class SaasPortalPlan(models.Model):
         res = requests.Session().send(req, **req_kwargs)
 
         if not res.ok:
-            raise Warning('Error on request: %s\nReason: %s \n Message: %s' % (
+            raise Warning(_('Error on request: %s\nReason: %s \n Message: %s') % (
                 req.url, res.reason, res.content))
         try:
             data = simplejson.loads(res.text)
         except Exception as e:
-            _logger.error('Error on parsing response: %s\n%s' %
+            _logger.error(_('Error on parsing response: %s\n%s') %
                           ([req.url, req.headers, req.body], res.text))
             raise
 
@@ -545,14 +545,14 @@ class SaasPortalDatabase(models.Model):
         res = requests.Session().send(req, **req_kwargs)
         _logger.info('backup database: %s', res.text)
         if not res.ok:
-            raise Warning('Reason: %s \n Message: %s' %
+            raise Warning(_('Reason: %s \n Message: %s') %
                           (res.reason, res.content))
         data = simplejson.loads(res.text)
         if not isinstance(data[0], dict):
             raise Warning(data)
         if data[0]['status'] != 'success':
             warning = data[0].get(
-                'message', 'Could not backup database; please check your logs')
+                'message', _('Could not backup database; please check your logs'))
             raise Warning(warning)
         return True
 
@@ -838,7 +838,7 @@ class SaasPortalClient(models.Model):
         res = requests.Session().send(req, **req_kwargs)
 
         if not res.ok:
-            raise Warning('Reason: %s \n Message: %s' %
+            raise Warning(_('Reason: %s \n Message: %s') %
                           (res.reason, res.content))
         try:
             data = simplejson.loads(res.text)

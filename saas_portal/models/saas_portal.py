@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import simplejson
 import werkzeug
 import requests

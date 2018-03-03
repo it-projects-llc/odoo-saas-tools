@@ -72,8 +72,10 @@ class SaasPortalServer(models.Model):
         record.oauth_application_id._get_access_token(create=True)
         return record
 
-    @api.one
-    def _request_params(self, path='/web', scheme=None, port=None, state={}, scope=None, client_id=None):
+    @api.multi
+    def _request_params(self, path='/web', scheme=None,
+                        port=None, state={}, scope=None, client_id=None):
+        self.ensure_one()
         scheme = scheme or self.request_scheme
         port = port or self.request_port
         scope = scope or ['userinfo', 'force_login', 'trial', 'skiptheuse']
@@ -89,8 +91,9 @@ class SaasPortalServer(models.Model):
         }
         return params
 
-    @api.one
+    @api.multi
     def _request(self, **kwargs):
+        self.ensure_one()
         params = self._request_params(**kwargs)[0]
         url = '/oauth2/auth?%s' % werkzeug.url_encode(params)
         return url
@@ -229,9 +232,10 @@ class SaasPortalPlan(models.Model):
     on_create_email_template = fields.Many2one('mail.template',
                                                default=lambda self: self.env.ref('saas_portal.email_template_create_saas'))
 
-    @api.one
+    @api.multi
     @api.depends('template_id.state')
     def _get_state(self):
+        self.ensure_one()
         if self.template_id.state == 'template':
             self.state = 'confirmed'
         else:
@@ -556,9 +560,10 @@ class SaasPortalDatabase(models.Model):
             raise Warning(warning)
         return True
 
-    @api.one
+    @api.multi
     def action_sync_server(self):
-        self.server_id.action_sync_server()
+        for record in self:
+            record.server_id.action_sync_server()
 
     @api.model
     def _proceed_url(self, url):
@@ -610,12 +615,14 @@ class SaasPortalDatabase(models.Model):
                     payload.copy(), database_obj))
         return res
 
-    @api.one
+    @api.multi
     def delete_database_server(self, **kwargs):
+        self.ensure_one()
         return self._delete_database_server(**kwargs)
 
-    @api.one
+    @api.multi
     def _delete_database_server(self, force_delete=False):
+        self.ensure_one()
         state = {
             'd': self.name,
             'client_id': self.client_id,

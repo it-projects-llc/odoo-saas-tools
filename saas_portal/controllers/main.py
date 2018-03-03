@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from urllib.parse import urlencode
 from ast import literal_eval
 import odoo

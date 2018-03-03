@@ -1,12 +1,12 @@
-# -*- coding: utf-8 -*-
-
 from odoo import api, fields, models
 
 
 class ResUsers(models.Model):
     _inherit = 'res.users'
 
-    support_team_id = fields.Many2one('saas_portal.support_team', 'Support Team', help='Support team for SaaS')
+    support_team_id = fields.Many2one('saas_portal.support_team',
+                                      'Support Team',
+                                      help='Support team for SaaS')
 
     def __init__(self, pool, cr):
         init_res = super(ResUsersSaaS, self).__init__(pool, cr)

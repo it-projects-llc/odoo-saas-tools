@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 {
     'name': 'SaaS Portal',
     'version': '11.0.1.0.0',

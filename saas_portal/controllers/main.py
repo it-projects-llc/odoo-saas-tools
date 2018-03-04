@@ -11,6 +11,9 @@ import simplejson
 from datetime import datetime, timedelta
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 
+import logging
+_logger = logging.getLogger(__name__)
+
 
 class SignupError(Exception):
     pass
@@ -40,16 +43,18 @@ class SaasPortal(http.Controller):
             user = request.env['res.users'].browse(user_id)
             partner_id = user.partner_id.id
         plan = self.get_plan(int(post.get('plan_id', 0) or 0))
-        trial = bool(post.get('trial'))
+        trial = bool(post.get('trial', False))
         try:
             res = plan.create_new_database(dbname=dbname,
                                            user_id=user_id,
                                            partner_id=partner_id,
                                            trial=trial,)
         except MaximumDBException:
+            _logger.info("MaximumDBException")
             url = request.env['ir.config_parameter'].sudo().get_param('saas_portal.page_for_maximumdb', '/')
             return werkzeug.utils.redirect(url)
         except MaximumTrialDBException:
+            _logger.info("MaximumTrialDBException")
             url = request.env['ir.config_parameter'].sudo().get_param('saas_portal.page_for_maximumtrialdb', '/')
             return werkzeug.utils.redirect(url)
 

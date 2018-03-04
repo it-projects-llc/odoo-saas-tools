@@ -15,5 +15,3 @@ Values for the codes should be assigned in Sales->Configuration->Product Categor
 
 Known issues
 ============
-
-Tested on Odoo 9.0 901a3e030c4b11a219abf391839a471025bab4b3

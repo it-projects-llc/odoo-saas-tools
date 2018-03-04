@@ -2,13 +2,6 @@
 <openerp>
     <data>
 
-
-    <template id="theme" inherit_id="website.assets_frontend" name="saas portal assets">
-      <xpath expr="//link[last()]" position="after">
-        <link rel='stylesheet' href='/saas_portal_start/static/src/css/odoo.css' t-ignore="true"/>
-      </xpath>
-    </template>
-
     <template id="assets_frontend" inherit_id="website.assets_frontend" name="saas portal assets">
       <xpath expr="." position="inside">
         <script type='text/javascript' src='/saas_portal_start/static/src/js/main.js'/>
@@ -33,12 +26,12 @@
                                                         <strong>Create!</strong> <span class="hidden-xs"></span>
                                                     </button>
                                                 </div>
-                                                
+
                                                 <div class="input-group">
                                                     <input data-placement="bottom" name="odoo_db_name" data-trigger="manual" type="text" placeholder="your-company-name" class="form-control odoo_db_name" data-original-title="" title=""/>
                                                         <span class="input-group-addon">.<t t-raw="base_saas_domain"/></span>
 
-                                                    </div>                
+                                                    </div>
                                                 </form>
                                             </div>
                                             <p class="mt4 text-muted" id="cta_footer"></p>

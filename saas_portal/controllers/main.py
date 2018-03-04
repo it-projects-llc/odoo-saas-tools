@@ -73,7 +73,7 @@ class SaasPortal(http.Controller):
     def get_config_parameter(self, param):
         config = request.env['ir.config_parameter']
         full_param = 'saas_portal.%s' % param
-        return config.get_param(full_param)
+        return config.sudo().get_param(full_param)
 
     def get_full_dbname(self, dbname):
         if not dbname:

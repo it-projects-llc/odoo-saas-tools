@@ -90,7 +90,7 @@ class SaasPortalServer(models.Model):
     @api.multi
     def _request(self, **kwargs):
         self.ensure_one()
-        params = self._request_params(**kwargs)[0]
+        params = self._request_params(**kwargs)
         url = '/oauth2/auth?%s' % werkzeug.url_encode(params)
         return url
 
@@ -100,7 +100,7 @@ class SaasPortalServer(models.Model):
         scheme = scheme or self.local_request_scheme or self.request_scheme
         host = self.local_host or self.host
         port = port or self.local_port or self.request_port
-        params = self._request_params(**kwargs)[0]
+        params = self._request_params(**kwargs)
         access_token = self.oauth_application_id.sudo()._get_access_token(create=True)
         params.update({
             'token_type': 'Bearer',

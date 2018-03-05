@@ -8,7 +8,6 @@ from odoo import api, exceptions, fields, models
 from odoo.tools import scan_languages
 from odoo.tools.translate import _
 from odoo.addons.base.res.res_partner import _tz_get
-from datetime import datetime, timedelta
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 
 from odoo.addons.saas_base.exceptions import MaximumTrialDBException

@@ -1,16 +1,22 @@
 language: python
 
 python:
-  - "2.7"
+  - "3.5"
 
 sudo: false
-cache: pip
+cache:
+  apt: true
+  directories:
+    - $HOME/.cache/pip
 
 addons:
   apt:
     packages:
-      - expect-dev  # provides unbuffer utility
-      - python-lxml  # because pip installation is slow
+      - expect-dev
+      - python-lxml
+      - python-simplejson
+      - python-serial
+      - python-yaml
 
 env:
   global:
@@ -24,9 +30,6 @@ env:
   - TESTS="1" ODOO_REPO="odoo/odoo"
   - TESTS="1" ODOO_REPO="OCA/OCB"
   - TRANSIFEX="1"
-
-virtualenv:
-  system_site_packages: true
 
 install:
   - pip install anybox.testing.openerp

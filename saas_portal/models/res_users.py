@@ -13,7 +13,6 @@ class ResUsers(models.Model):
         # duplicate list to avoid modifying the original reference
         self.SELF_WRITEABLE_FIELDS = list(self.SELF_WRITEABLE_FIELDS)
         self.SELF_WRITEABLE_FIELDS.extend(['support_team_id'])
-        return init_res
 
     @api.model
     def create(self, values):

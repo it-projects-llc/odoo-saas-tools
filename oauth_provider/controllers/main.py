@@ -18,7 +18,6 @@ import werkzeug
 _logger = logging.getLogger(__name__)
 
 
-
 # see https://oauthlib.readthedocs.org/en/latest/oauth2/server.html
 class OAuth2(http.Controller):
 

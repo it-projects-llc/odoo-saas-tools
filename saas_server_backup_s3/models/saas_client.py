@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import os
 import sys
 from multiprocessing.pool import Pool
@@ -12,7 +11,6 @@ from odoo import _
 from odoo import api
 from odoo import exceptions
 from odoo import models
-import psycopg2
 
 import logging
 _logger = logging.getLogger(__name__)
@@ -21,7 +19,7 @@ _logger = logging.getLogger(__name__)
 try:
     import boto
     from boto.s3.key import Key
-except:
+except Exception as e:
     _logger.debug('SAAS Sysadmin Bacnkup Agent S3 Requires the python library Boto which is not \
     found on your installation')
 
@@ -30,7 +28,7 @@ try:
     parallel_upload = False
     from filechunkio import FileChunkIO
     parallel_upload = True
-except:
+except Exception as e:
     _logger.debug('SAAS Sysadmin Bacnkup Agent S3 performs better with large '
                   'files if you have FileChunkIO installed')
 
@@ -38,10 +36,11 @@ except:
 def _get_s3_conn(env):
     ir_params = env['ir.config_parameter']
     aws_access_key_id = ir_params.sudo().get_param('saas_s3.saas_s3_aws_accessid')
-    aws_secret_access_key = ir_params.sudo().get_param('saas_s3.saas_s3_aws_accesskey')
+    aws_secret_access_key = ir_params.sudo().get_param(
+        'saas_s3.saas_s3_aws_accesskey')
     aws_s3_bucket = ir_params.sudo().get_param('saas_s3.saas_s3_aws_bucket')
     if not aws_access_key_id or not aws_secret_access_key or not aws_s3_bucket:
-        raise exceptions.Warning( _('Please provide your AWS Access Key and ID \
+        raise exceptions.Warning(_('Please provide your AWS Access Key and ID \
         and also the S3 bucket to be used'))
     return boto.connect_s3(aws_access_key_id, aws_secret_access_key), aws_s3_bucket
 
@@ -55,7 +54,7 @@ def _upload_part(bucketname, aws_key, aws_secret, multipart_id, part_num,
     def _upload(retries_left=amount_of_retries):
         try:
             _logger.info('Start uploading part # %d ...' % part_num)
-            conn = boto.connect_s3(aws_key, aws_secret)
+            conn, bucket_name = _get_s3_conn(self.env)
             bucket = conn.get_bucket(bucketname)
             for mp in bucket.get_all_multipart_uploads():
                 if mp.id == multipart_id:
@@ -79,13 +78,15 @@ class SaasServerClient(models.Model):
     _inherit = 'saas_server.client'
 
     def upload(myfile):
+        conn, bucket_name = _get_s3_conn(self.env)
         bucket = conn.get_bucket("parallel_upload_tests")
-        key = bucket.new_key(myfile).set_contents_from_string('some content')
+        bucket.new_key(myfile).set_contents_from_string('some content')
         return myfile
 
     @staticmethod
     def _transport_backup_simple(conn, bucket_name, data, filename):
         _logger.info('Backing up via S3 simple agent')
+        conn, bucket_name = _get_s3_conn(self.env)
         bucket = conn.get_bucket(bucket_name)
         k = Key(bucket)
         k.key = filename
@@ -100,14 +101,15 @@ class SaasServerClient(models.Model):
         headers = {}
         _logger.info('Backing up via S3 parallel multipart upload agent')
         keyname = filename
-        tempInFile = NamedTemporaryFile(suffix='.zip', prefix='db-backup-', delete=False)
+        tempInFile = NamedTemporaryFile(
+            suffix='.zip', prefix='db-backup-', delete=False)
         tempInFile.write(data)
         tempInFile.close()
         source_path = tempInFile.name
         source_size = os.stat(source_path).st_size
         parallel_processes = (multiprocessing.cpu_count() * 2) + 1
 
-        conn = boto.connect_s3(aws_key, aws_secret)
+        conn, bucket_name = _get_s3_conn(self.env)
         bucket = conn.get_bucket(bucketname)
 
         mtype = 'application/zip, application/octet-stream'
@@ -152,7 +154,8 @@ class SaasServerClient(models.Model):
             aws_key = ir_params.sudo().get_param('saas_s3.saas_s3_aws_accessid')
             aws_secret = ir_params.sudo().get_param('saas_s3.saas_s3_aws_accesskey')
             bucketname = ir_params.sudo().get_param('saas_s3.saas_s3_aws_bucket')
-            self._transport_backup_parallel(db_dump, filename, aws_key, aws_secret, bucketname)
+            self._transport_backup_parallel(
+                db_dump, filename, aws_key, aws_secret, bucketname)
         else:
             conn, bucket_name = _get_s3_conn(self.env)
             self._transport_backup_simple(conn, bucket_name, db_dump, filename)

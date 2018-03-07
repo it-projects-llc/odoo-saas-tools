@@ -14,7 +14,8 @@
         'contract',
     ],
     'data': [
-        'views/product_views.xml',
+        'views/product_template_views.xml',
+        'views/product_attribute_views.xml',
         'views/saas_portal.xml',
         'data/mail_template_data.xml',
         'data/ir_config_parameter.xml',

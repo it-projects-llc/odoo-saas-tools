@@ -239,10 +239,14 @@ class SaasPortalPlan(models.Model):
     @api.multi
     def _new_database_vals(self, vals):
         self.ensure_one()
-        vals['max_users'] = self.max_users
-        vals['total_storage_limit'] = self.total_storage_limit
-        vals['block_on_expiration'] = self.block_on_expiration
-        vals['block_on_storage_exceed'] = self.block_on_storage_exceed
+        vals['max_users'] = vals.get('max_users',
+                                     self.max_users)
+        vals['total_storage_limit'] = vals.get('total_storage_limit',
+                                               self.total_storage_limit)
+        vals['block_on_expiration'] = vals.get('block_on_expiration',
+                                               self.block_on_expiration)
+        vals['block_on_storage_exceed'] = vals.get('block_on_storage_exceed',
+                                                   self.block_on_storage_exceed)
         return vals
 
     @api.multi

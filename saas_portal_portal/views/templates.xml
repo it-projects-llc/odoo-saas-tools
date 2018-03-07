@@ -11,9 +11,9 @@
       <t t-if="saas_portal_client">
         <div class="oe_structure">
           <h3 class="page-header">Domain <a href="/my/domain" class="btn btn-default btn-xs">Change</a></h3>
-          
+
           <p><t t-esc="saas_portal_client.name"/></p>
-          
+
         </div>
       </t>
     </xpath>
@@ -62,7 +62,7 @@
     </t>
   </template>
 
-  <template id="account" name="Account" inherit_id="website_portal.portal_layout">
+  <template id="account" name="Account" inherit_id="portal.portal_layout">
     <xpath expr="//div[contains(@class,'mb64')]" position="inside">
       <t t-call="saas_portal_portal.stats" />
     </xpath>

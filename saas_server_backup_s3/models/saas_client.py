@@ -77,16 +77,9 @@ def _upload_part(bucketname, aws_key, aws_secret, multipart_id, part_num,
 class SaasServerClient(models.Model):
     _inherit = 'saas_server.client'
 
-    def upload(myfile):
-        conn, bucket_name = _get_s3_conn(self.env)
-        bucket = conn.get_bucket("parallel_upload_tests")
-        bucket.new_key(myfile).set_contents_from_string('some content')
-        return myfile
-
     @staticmethod
     def _transport_backup_simple(conn, bucket_name, data, filename):
         _logger.info('Backing up via S3 simple agent')
-        conn, bucket_name = _get_s3_conn(self.env)
         bucket = conn.get_bucket(bucket_name)
         k = Key(bucket)
         k.key = filename
@@ -109,7 +102,7 @@ class SaasServerClient(models.Model):
         source_size = os.stat(source_path).st_size
         parallel_processes = (multiprocessing.cpu_count() * 2) + 1
 
-        conn, bucket_name = _get_s3_conn(self.env)
+        conn = boto.connect_s3(aws_key, aws_secret)
         bucket = conn.get_bucket(bucketname)
 
         mtype = 'application/zip, application/octet-stream'

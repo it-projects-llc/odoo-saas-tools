@@ -1,6 +1,4 @@
 import requests
-import werkzeug
-import simplejson
 
 from odoo.http import request
 from odoo import api, fields, models
@@ -49,7 +47,6 @@ class SaasConfig(models.TransientModel):
     def upgrade_database(self):
         self.ensure_one()
         obj = self[0]
-        scheme = request.httprequest.scheme
         payload = {
             # TODO: add configure mail server option here
             'update_addons_list': (obj.update_addons_list or ''),
@@ -169,10 +166,11 @@ class SaasPortalCreateClient(models.TransientModel):
 
     @api.multi
     def apply(self):
-        plan_id = self[0].plan_id
+        self.ensure_one()
+        plan_id = self.plan_id
         res = plan_id.create_new_database(
-            dbname=wizard.name,
-            partner_id=wizard.partner_id.id,
+            dbname=self.name,
+            partner_id=self.partner_id.id,
             user_id=self.user_id.id,
             notify_user=self.notify_user,
             support_team_id=self.support_team_id.id,

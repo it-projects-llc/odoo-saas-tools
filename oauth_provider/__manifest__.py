@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 {
     'name': 'OAuth2 provider',
     'version': '1.0.0',

@@ -1,6 +1,4 @@
 from odoo import models, fields, api
-from datetime import datetime, timedelta
-from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 
 
 class SaasPortalPlan(models.Model):

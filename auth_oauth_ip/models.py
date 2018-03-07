@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 import re
 import werkzeug
-import urllib.request, urllib.error, urllib.parse
+import urllib.request
+import urllib.error
+import urllib.parse
 import json
 
 from odoo import models, fields, api
@@ -11,8 +13,10 @@ class auth_oauth_provider(models.Model):
 
     _inherit = 'auth.oauth.provider'
 
-    local_host = fields.Char('Local IP', help='Address to be used in server-wide requests')
-    local_port = fields.Char('Local Port', help='Address to be used in server-wide requests')
+    local_host = fields.Char(
+        'Local IP', help='Address to be used in server-wide requests')
+    local_port = fields.Char(
+        'Local Port', help='Address to be used in server-wide requests')
 
 
 class res_users(models.Model):
@@ -24,7 +28,7 @@ class res_users(models.Model):
         host = None
         try:
             host = re.match(".*//([^/]*)/", endpoint).group(1)
-        except:
+        except Exception as e:
             pass
 
         if not (host and local_host and local_port):
@@ -46,10 +50,12 @@ class res_users(models.Model):
     def _auth_oauth_validate(self, provider, access_token):
         """ return the validation data corresponding to the access token """
         p = self.env['auth.oauth.provider'].browse(provider)
-        validation = self._auth_oauth_rpc(p.validation_endpoint, access_token, local_host=p.local_host, local_port=p.local_port)
+        validation = self._auth_oauth_rpc(
+            p.validation_endpoint, access_token, local_host=p.local_host, local_port=p.local_port)
         if validation.get("error"):
             raise Exception(validation['error'])
         if p.data_endpoint:
-            data = self._auth_oauth_rpc(p.data_endpoint, access_token, local_host=p.local_host, local_port=p.local_port)
+            data = self._auth_oauth_rpc(
+                p.data_endpoint, access_token, local_host=p.local_host, local_port=p.local_port)
             validation.update(data)
         return validation

@@ -18,7 +18,7 @@
         "website_seo_url",
         "website_seo_url_product",
         "website_sale_add_to_cart_disable",
-        "website_portal",
+        "portal",
     ],
     "external_dependencies": {"python": ['requests'], "bin": []},
     "data": [

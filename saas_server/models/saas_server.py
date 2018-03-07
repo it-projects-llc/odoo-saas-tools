@@ -6,6 +6,7 @@ import string
 import odoo
 from datetime import datetime
 from odoo.service import db
+from odoo.tools.translate import _
 from odoo.addons.saas_base.tools import get_size
 from odoo import api, models, fields, SUPERUSER_ID, exceptions
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
@@ -114,8 +115,10 @@ class SaasServerClient(models.Model):
         return ['saas_client.ab_location', 'saas_client.ab_register', 'saas_client.saas_dashboard']
 
     @api.multi
-    def _prepare_database(self, client_env, owner_user=None, is_template_db=False, addons=[], access_token=None, tz=None, server_requests_scheme='http'):
+    def _prepare_database(self, client_env, owner_user=None, is_template_db=False, addons=None, access_token=None, tz=None, server_requests_scheme='http'):
         self.ensure_one()
+        if not addons:
+            addons = []
         client_id = self.client_id
 
         # update saas_server.client state
@@ -302,7 +305,7 @@ class SaasServerClient(models.Model):
         # 4. Run fixes
         fixes = post.get('fixes', [])
         for model, method in fixes:
-            getattr(request.registry[model], method)()
+            getattr(self.env[model], method)()
 
         # 5. update parameters
         params = post.get('params', [])

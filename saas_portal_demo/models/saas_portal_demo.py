@@ -1,4 +1,3 @@
-import requests
 import xmlrpc.client
 
 from odoo import models, fields, api
@@ -149,7 +148,7 @@ class SaasPortalServer(models.Model):
             product_attribute_line.update(
                 {'value_ids': [(4, attrib_value.id, 0)]})
 
-        product_product = product_product_obj.create({
+        product_product_obj.create({
             'product_tmpl_id': product_template.id,
             'attribute_value_ids': [(4, attrib_value.id)],
             'variant_plan_id': plan.id,

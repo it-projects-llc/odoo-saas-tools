@@ -69,8 +69,10 @@ class SaasPortalServer(models.Model):
 
     @api.multi
     def _request_params(self, path='/web', scheme=None,
-                        port=None, state={}, scope=None, client_id=None):
+                        port=None, state=None, scope=None, client_id=None):
         self.ensure_one()
+        if not state:
+            state = {}
         scheme = scheme or self.request_scheme
         port = port or self.request_port
         scope = scope or ['userinfo', 'force_login', 'trial', 'skiptheuse']

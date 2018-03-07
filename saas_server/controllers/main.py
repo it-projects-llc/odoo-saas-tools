@@ -146,7 +146,6 @@ class SaasServer(http.Controller):
         _logger.info('delete_database post: %s', post)
         state = simplejson.loads(post.get('state'))
         client_id = state.get('client_id')
-        db = state.get('d')
         new_dbname = state.get('new_dbname')
         saas_oauth_provider = request.env.ref('saas_server.saas_oauth_provider').sudo()
 
@@ -283,7 +282,6 @@ class SaasServer(http.Controller):
                 'client_id': client.client_id,
                 'users_len': client.users_len,
                 'max_users': client.max_users,
-                'state': client.state,
                 'file_storage': client.file_storage,
                 'db_storage': client.db_storage,
                 'total_storage_limit': client.total_storage_limit,
@@ -308,7 +306,6 @@ class SaasServer(http.Controller):
 
         state = simplejson.loads(post.get('state'))
         client_id = state.get('client_id')
-        db = state.get('d')
         access_token = post['access_token']
         saas_oauth_provider = request.env.ref('saas_server.saas_oauth_provider').sudo()
 

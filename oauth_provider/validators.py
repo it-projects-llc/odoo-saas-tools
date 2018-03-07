@@ -1,11 +1,14 @@
 # some code taken from https://github.com/evonove/django-oauth-toolkit/
 import base64
 import logging
+
 try:
     from oauthlib.oauth2 import RequestValidator, MobileApplicationServer
 except Exception as e:
     RequestValidator = object
     MobileApplicationServer = False
+from urllib.parse import unquote_plus
+
 from datetime import datetime, timedelta
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 

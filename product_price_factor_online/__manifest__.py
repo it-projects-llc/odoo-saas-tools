@@ -1,10 +1,9 @@
-# -*- coding: utf-8 -*-
 {
     'name': "Product price factor for web shop",
     'summary': """Multiplies price depending on product attributes""",
     'category': 'Website',
     'license': 'LGPL-3',
-    'author': "IT-Projects LLC, Ildar Nasyrov",
+    'author': "IT-Projects LLC, Ildar Nasyrov, Nicolas JEUDY",
     'price': 20.00,
     'currency': 'EUR',
     'images': ['images/1.png'],

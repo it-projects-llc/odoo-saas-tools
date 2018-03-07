@@ -136,7 +136,7 @@ class SaasServer(http.Controller):
         client_id = post.get('client_id')
         client = request.env['saas_server.client'].sudo().search([('client_id', '=', client_id)])
 
-        result = client.upgrade_database(data=state.get('data'))
+        result = client.upgrade_database(data=data)
         return simplejson.dumps({client.name: result})
 
     @http.route(['/saas_server/rename_database'], type='http', website=True, auth='public')
@@ -263,9 +263,7 @@ class SaasServer(http.Controller):
         _logger.info('sync_server post: %s', post)
 
         state = simplejson.loads(post.get('state'))
-        client_id = state.get('client_id')
         updating_client_ID = state.get('updating_client_ID')
-        db = state.get('d')
         access_token = post['access_token']
         saas_oauth_provider = request.env.ref('saas_server.saas_oauth_provider').sudo()
 

@@ -1,5 +1,4 @@
 from odoo import models, fields, api
-import urllib.parse
 
 
 class SaasPortalConfigWizard(models.TransientModel):

@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-from odoo import models, fields, api, SUPERUSER_ID
+from odoo import models, api, SUPERUSER_ID
 
 
 class SaasPortalPlan(models.Model):

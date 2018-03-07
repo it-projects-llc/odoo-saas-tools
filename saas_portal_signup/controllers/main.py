@@ -40,7 +40,8 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
         return base_saas_domain
 
     def do_signup(self, qcontext):
-        values = dict((key, qcontext.get(key)) for key in ('login', 'name', 'password'))
+        values = dict((key, qcontext.get(key))
+                      for key in ('login', 'name', 'password'))
         values['email'] = qcontext['login']
         if qcontext.get('country_id', False):
             values['country_id'] = qcontext['country_id']
@@ -48,10 +49,14 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
             f_dbname = '%s.%s' % (qcontext['dbname'], self.get_saas_domain())
             full_dbname = f_dbname.replace('www.', '')
             db_exists = odoo.service.db.exp_db_exist(full_dbname)
-            assert re.match('[a-zA-Z0-9_.-]+$', qcontext.get('dbname')), "Only letters or numbers are allowed in domain."
-            assert db_exists == False, "Domain exists"
-        assert re.match("^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\.([a-zA-Z]{2,3}|[0-9]{1,3})(\\]?)$", values['email']), "Please enter a valid email address."
-        assert any([k for k in list(values.values())]), "The form was not properly filled in."
-        assert values.get('password') == qcontext.get('confirm_password'), "Passwords do not match; please retype them."
+            assert re.match('[a-zA-Z0-9_.-]+$', qcontext.get('dbname')
+                            ), "Only letters or numbers are allowed in domain."
+            assert db_exists is False, "Domain exists"
+        assert re.match(
+            "^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\.([a-zA-Z]{2,3}|[0-9]{1,3})(\\]?)$", values['email']), "Please enter a valid email address."
+        assert any([k for k in list(values.values())]
+                   ), "The form was not properly filled in."
+        assert values.get('password') == qcontext.get(
+            'confirm_password'), "Passwords do not match; please retype them."
         self._signup_with_values(qcontext.get('token'), values)
         request.cr.commit()

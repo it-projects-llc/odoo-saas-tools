@@ -127,6 +127,8 @@ class SaasPortalServer(models.Model):
 
     @api.model
     def action_sync_server_all(self):
+        p_client = self.env['saas_portal.client']
+
         self.search([]).action_sync_server()
         p_client.search([]).storage_usage_monitoring()
 
@@ -168,6 +170,7 @@ class SaasPortalServer(models.Model):
 
     @api.model
     def get_saas_server(self):
+        p_server = self.env['saas_portal.server']
         saas_server_list = p_server.sudo().search([])
         return saas_server_list[random.randint(0, len(saas_server_list) - 1)]
 
@@ -402,7 +405,7 @@ class SaasPortalPlan(models.Model):
 
     @api.multi
     def create_template_button(self):
-        res = self.create_template()
+        return self.create_template()
 
     @api.multi
     def create_template(self, addons=None):
@@ -798,6 +801,8 @@ class SaasPortalClient(models.Model):
     @api.multi
     def duplicate_database(self, dbname=None, partner_id=None, expiration=None):
         self.ensure_one()
+        p_client = self.env['saas_portal.client']
+        p_server = self.env['saas_portal.server']
 
         owner_user = self.env['res.users'].search(
             [('partner_id', '=', partner_id)], limit=1) or self.env.user
@@ -844,7 +849,8 @@ class SaasPortalClient(models.Model):
 
         req, req_kwargs = server._request_server(path='/saas_server/new_database',
                                                  state=state,
-                                                 client_id=client_id)
+                                                 client_id=client_id,
+                                                 scope=scope,)
         res = requests.Session().send(req, **req_kwargs)
 
         if not res.ok:

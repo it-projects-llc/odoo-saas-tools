@@ -9,7 +9,7 @@ class ResUsers(models.Model):
                                       help='Support team for SaaS')
 
     def __init__(self, pool, cr):
-        init_res = super(ResUsers, self).__init__(pool, cr)
+        super(ResUsers, self).__init__(pool, cr)
         # duplicate list to avoid modifying the original reference
         self.SELF_WRITEABLE_FIELDS = list(self.SELF_WRITEABLE_FIELDS)
         self.SELF_WRITEABLE_FIELDS.extend(['support_team_id'])

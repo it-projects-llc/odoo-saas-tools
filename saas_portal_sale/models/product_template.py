@@ -14,14 +14,16 @@ class ProductTemplateSaaS(models.Model):
     on_create_email_template = fields.Many2one(
         'mail.template',
         string='credentials mail')
-
-
-class ProductVariant(models.Model):
-    _inherit = 'product.product'
-
     saas_plan_id = fields.Many2one('saas_portal.plan',
                                    string='Related SaaS Plan',
                                    ondelete='restrict')
-    saas_signup_default = fields.Boolean(
-        'Use as a default product on SaaS signup form',
-        help='Use as default SaaS product variant on signup form')
+
+
+class ProductAttributeSaaS(models.Model):
+    _inherit = "product.attribute"
+
+    saas_code = fields.Selection('_get_saas_codes')
+
+    def _get_saas_codes(self):
+        return [('max_users', 'max_users'),
+                ('total_storage_limit', 'total_storage_limit')]

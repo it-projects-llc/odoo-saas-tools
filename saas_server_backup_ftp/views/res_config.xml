@@ -17,6 +17,8 @@
                             </div>
                             <field name="sftp_server" placeholder="192.168.0.1"/>
                         </div>
+                    </div>
+                    <div class="col-xs-12 col-md-6 o_setting_box">
                         <div>
                             <label for="sftp_username"/>
                             <div class="text-muted">
@@ -24,6 +26,8 @@
                             </div>
                             <field name="sftp_username" placeholder="username"/>
                         </div>
+                    </div>
+                    <div class="col-xs-12 col-md-6 o_setting_box">
                         <div>
                             <label for="sftp_password"/>
                             <div class="text-muted">
@@ -40,6 +44,8 @@
                             </div>
                             <field name="sftp_path" placeholder="/odoo/backups/"/>
                         </div>
+                    </div>
+                    <div class="col-xs-12 col-md-6 o_setting_box">
                         <div>
                             <label for="sftp_rsa_key_path"/>
                             <div class="text-muted">

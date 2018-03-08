@@ -1,8 +1,9 @@
-# -*- coding: utf-8 -*-
 import tempfile
 from odoo import api, models
+
 import logging
 _logger = logging.getLogger(__name__)
+
 try:
     import pysftp
 except ImportError:

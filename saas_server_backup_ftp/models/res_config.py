@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from odoo import models, fields, api
 from odoo import _
 from odoo.exceptions import Warning as UserError
@@ -13,7 +12,7 @@ except ImportError:
 
 
 class SaasPortalConfigWizard(models.TransientModel):
-    _inherit = 'saas_server.config.settings'
+    _inherit = 'res.config.settings'
 
     sftp_server = fields.Char(string='SFTP Server Address',
                               help='IP address of your remote server. For example 192.168.0.1')
@@ -28,75 +27,28 @@ class SaasPortalConfigWizard(models.TransientModel):
         help="The location to the folder where the rsa key is saved. "
              "For example /opt/odoo/.ssh/id_rsa.")
 
-    # sftp_rsa_key_path
-    @api.model
-    def get_default_sftp_rsa_key_path(self, fields):
-        sftp_rsa_key_path = self.env["ir.config_parameter"].sudo().get_param(
-            "saas_server.sftp_rsa_key_path")
-        return {'sftp_rsa_key_path': sftp_rsa_key_path or False}
-
     @api.multi
-    def set_sftp_rsa_key_path(self):
-        config_parameters = self.env["ir.config_parameter"]
-        for record in self:
-            config_parameters.set_param("saas_server.sftp_rsa_key_path",
-                                        record.sftp_rsa_key_path or '')
-    # sftp_server
+    def set_values(self):
+        super(SaasPortalConfigWizard, self).set_values()
+        ICPSudo = self.env['ir.config_parameter'].sudo()
+        ICPSudo.set_param("saas_server.sftp_server", self.sftp_server)
+        ICPSudo.set_param("saas_server.sftp_username", self.sftp_username)
+        ICPSudo.set_param("saas_server.sftp_password", self.sftp_password)
+        ICPSudo.set_param("saas_server.sftp_path", self.sftp_path)
+        ICPSudo.set_param("saas_server.sftp_rsa_key_path", self.sftp_rsa_key_path)
 
     @api.model
-    def get_default_sftp_server(self, fields):
-        sftp_server = self.env["ir.config_parameter"].sudo().get_param(
-            "saas_server.sftp_server", default=None)
-        return {'sftp_server': sftp_server or False}
-
-    @api.multi
-    def set_sftp_server(self):
-        config_parameters = self.env["ir.config_parameter"]
-        for record in self:
-            config_parameters.set_param(
-                "saas_server.sftp_server", record.sftp_server or '')
-
-    # sftp_username
-    @api.model
-    def get_default_sftp_username(self, fields):
-        sftp_username = self.env["ir.config_parameter"].sudo().get_param(
-            "saas_server.sftp_username", default=None)
-        return {'sftp_username': sftp_username or False}
-
-    @api.multi
-    def set_sftp_username(self):
-        config_parameters = self.env["ir.config_parameter"]
-        for record in self:
-            config_parameters.set_param(
-                "saas_server.sftp_username", record.sftp_username or '')
-
-    # sftp_password
-    @api.model
-    def get_default_sftp_password(self, fields):
-        sftp_password = self.env["ir.config_parameter"].sudo().get_param(
-            "saas_server.sftp_password", default=None)
-        return {'sftp_password': sftp_password or False}
-
-    @api.multi
-    def set_sftp_password(self):
-        config_parameters = self.env["ir.config_parameter"]
-        for record in self:
-            config_parameters.set_param(
-                "saas_server.sftp_password", record.sftp_password or '')
-
-    # sftp_path
-    @api.model
-    def get_default_sftp_path(self, fields):
-        sftp_path = self.env["ir.config_parameter"].sudo().get_param(
-            "saas_server.sftp_path", default=None)
-        return {'sftp_path': sftp_path or False}
-
-    @api.multi
-    def set_sftp_path(self):
-        config_parameters = self.env["ir.config_parameter"]
-        for record in self:
-            config_parameters.set_param(
-                "saas_server.sftp_path", record.sftp_path or '')
+    def get_values(self):
+        res = super(SaasPortalConfigWizard, self).get_values()
+        ICPSudo = self.env['ir.config_parameter'].sudo()
+        res.update(
+            base_saas_domain=ICPSudo.get_param('saas_server.sftp_server'),
+            page_for_maximumdb=ICPSudo.get_param('saas_server.sftp_username'),
+            page_for_maximumtrialdb=ICPSudo.get_param('saas_server.sftp_password'),
+            page_for_nonfree_subdomains=ICPSudo.get_param('saas_server.sftp_path'),
+            expiration_notify_in_advance=ICPSudo.get_param('saas_server.sftp_rsa_key_path'),
+        )
+        return res
 
     def test_sftp_connection(self):
         server = self.env["ir.config_parameter"].sudo().get_param(

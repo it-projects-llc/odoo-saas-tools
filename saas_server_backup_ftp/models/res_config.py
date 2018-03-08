@@ -42,11 +42,11 @@ class SaasPortalConfigWizard(models.TransientModel):
         res = super(SaasPortalConfigWizard, self).get_values()
         ICPSudo = self.env['ir.config_parameter'].sudo()
         res.update(
-            base_saas_domain=ICPSudo.get_param('saas_server.sftp_server'),
-            page_for_maximumdb=ICPSudo.get_param('saas_server.sftp_username'),
-            page_for_maximumtrialdb=ICPSudo.get_param('saas_server.sftp_password'),
-            page_for_nonfree_subdomains=ICPSudo.get_param('saas_server.sftp_path'),
-            expiration_notify_in_advance=ICPSudo.get_param('saas_server.sftp_rsa_key_path'),
+            sftp_server=ICPSudo.get_param('saas_server.sftp_server'),
+            sftp_username=ICPSudo.get_param('saas_server.sftp_username'),
+            sftp_password=ICPSudo.get_param('saas_server.sftp_password'),
+            sftp_path=ICPSudo.get_param('saas_server.sftp_path'),
+            sftp_rsa_key_path=ICPSudo.get_param('saas_server.sftp_rsa_key_path'),
         )
         return res
 

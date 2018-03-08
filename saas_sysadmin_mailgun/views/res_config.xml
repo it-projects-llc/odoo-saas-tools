@@ -1,17 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<openerp>
-  <data>
-    <record model="ir.ui.view" id="view_saas_portal_config_settings">
-      <field name="name">saas_portal.config.settings.inherit</field>
-      <field name="model">saas_portal.config.settings</field>
-      <field name="inherit_id" ref="saas_portal.view_saas_portal__config_settings" />
-      <field name="arch" type="xml">
-        <xpath expr="//group[1]" position="after">
-          <group string="Mailgun Access">
-            <field name="saas_mailgun_api_key" />
-          </group>
-        </xpath>
-      </field>
+<odoo>
+    <record id="res_config_settings_view_form_inherited_sys_mailgun" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.sys_maigun</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="20"/>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@id=('saas_portal')]" position="inside">
+                <h2>Sysadmin Mailgun Settings</h2>
+                <div class="row mt16 o_settings_container">
+                    <div class="col-xs-12 col-md-6 o_setting_box">
+                        <label for="saas_mailgun_api_key"/>
+                        <div class="text-muted">
+                            Mailgun API Key.
+                        </div>
+                        <field name="saas_mailgun_api_key"/>
+                    </div>
+                </div>
+            </xpath>
+        </field>
     </record>
-  </data>
-</openerp>
+</odoo>

@@ -7,7 +7,7 @@
         <field name="inherit_id" ref="base.res_config_settings_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//div[hasclass('settings')]" position="inside">
-                <div class="app_settings_block" data-string="Saas Portal" string="Saas Portal" data-key="saas_portal">
+                <div class="app_settings_block" id="saas_portal" data-string="Saas Portal" string="Saas Portal" data-key="saas_portal">
                     <h2>Domain</h2>
                     <div class="row mt16 o_settings_container">
                         <div class="col-xs-12 col-md-12 o_setting_box">
@@ -22,26 +22,26 @@
                     </div>
                     <h2>Error pages</h2>
                     <div class="row mt16 o_settings_container">
-                        <div class="col-xs-12 col-md-6 o_setting_box">
-                            <div>
-                                <label for="page_for_maximumdb"/>
-                                <div class="text-muted">
-                                    Redirection url for maximum non-trial databases limit exception.
-                                </div>
-                                <field name="page_for_maximumtrialdb"/>
-                                <label for="page_for_maximumtrialdb"/>
-                                <div class="text-muted">
-                                    Redirection url for maximum trial databases limit exception.
-                                </div>
-                                <field name="page_for_maximumtrialdb"/>
+                        <div class="col-xs-12 col-md-4 o_setting_box">
+                            <label for="page_for_maximumdb"/>
+                            <div class="text-muted">
+                                Redirection url for maximum non-trial databases limit exception.
                             </div>
-                            <div>
-                                <label for="page_for_nonfree_subdomains"/>
-                                <div class="text-muted">
-                                    Redirection url from /page/start when subdomains is not free and not paid.
-                                </div>
-                                <field name="page_for_nonfree_subdomains"/>
+                            <field name="page_for_maximumdb"/>
+                        </div>
+                        <div class="col-xs-12 col-md-4 o_setting_box">
+                            <label for="page_for_maximumtrialdb"/>
+                            <div class="text-muted">
+                                Redirection url for maximum trial databases limit exception.
                             </div>
+                            <field name="page_for_maximumtrialdb"/>
+                        </div>
+                        <div class="col-xs-12 col-md-4 o_setting_box">
+                            <label for="page_for_nonfree_subdomains"/>
+                            <div class="text-muted">
+                                Redirection url from /page/start when subdomains is not free and not paid.
+                            </div>
+                            <field name="page_for_nonfree_subdomains"/>
                         </div>
                     </div>
                     <h2>Notifications</h2>

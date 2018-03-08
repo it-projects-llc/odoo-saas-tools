@@ -6,8 +6,8 @@
           <field name="priority" eval="20"/>
           <field name="inherit_id" ref="base.res_config_settings_view_form"/>
           <field name="arch" type="xml">
-              <xpath expr="//div[hasclass('app_settings_block')]" position="inside">
-                <h2>SFTP Backup Settings</h2>
+              <xpath expr="//div[@id=('saas_portal')]" position="inside">
+                <h2>Rotate Backup Settings</h2>
                 <div class="row mt16 o_settings_container">
                     <div class="col-xs-12 col-md-12 o_setting_box">
                       <div>
@@ -21,35 +21,35 @@
                         <div attrs="{'invisible':[('backup_rotate_unlimited','=', True)]}">
                             <label for="backup_rotate_yearly"/>
                             <div class="text-muted">
-                                The username where the SFTP connection should be made with. This is the user on the external server.
+                              Set the number of yearly backups to preserve during rotation.
                             </div>
                             <field name="backup_rotate_yearly" placeholder="2"/>
                         </div>
                         <div attrs="{'invisible':[('backup_rotate_unlimited','=', True)]}">
                             <label for="backup_rotate_monthly"/>
                             <div class="text-muted">
-                                The password from the user where the SFTP connection should be made with. This is the password from the user on the external server.
+                              Set the number of monthly backups to preserve during rotation.
                             </div>
                             <field name="backup_rotate_monthly" placeholder="12"/>
                         </div>
                         <div attrs="{'invisible':[('backup_rotate_unlimited','=', True)]}">
                             <label for="backup_rotate_weekly"/>
                             <div class="text-muted">
-                                The location to the folder where the dumps should be written to. For example /odoo/backups/.\nFiles will then be written to /odoo/backups/ on your remote server.
+                              Set the number of weekly backups to preserve during rotation.
                             </div>
                             <field name="backup_rotate_weekly" placeholder="4"/>
                         </div>
                         <div attrs="{'invisible':[('backup_rotate_unlimited','=', True)]}">
                             <label for="backup_rotate_daily"/>
                             <div class="text-muted">
-                              The location to the folder where the rsa key is saved.
+                              Set the number of daily backups to preserve during rotation.
                             </div>
                             <field name="backup_rotate_daily" placeholder="7"/>
                         </div>
                         <div attrs="{'invisible':[('backup_rotate_unlimited','=', True)]}">
                             <label for="backup_rotate_hourly"/>
                             <div class="text-muted">
-                              The location to the folder where the rsa key is saved.
+                              Set the number of hourly backups to preserve during rotation.
                             </div>
                             <field name="backup_rotate_hourly" placeholder="24"/>
                         </div>

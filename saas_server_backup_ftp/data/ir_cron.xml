@@ -2,7 +2,7 @@
 <openerp>
   <data noupdate="1">
     <record id="ir_cron_backup_saas_scheduler0" model="ir.cron">
-      <field name="model">saas_server.client</field>
+      <field name="model_id" ref="model_saas_server_client"/>
       <field name="name">Backup saas databases scheduler</field>
       <field name="function">schedule_saas_databases_backup</field>
       <field name="interval_type">days</field>
@@ -16,4 +16,3 @@
         </record>
   </data>
 </openerp>
- 

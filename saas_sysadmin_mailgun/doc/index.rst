@@ -13,7 +13,7 @@ As suggested in ``Q. How do I get started with Amazon Route 53?`` question you
 should first register your domain name.
 
 If you are familiar with DNS then you may register domain
-on any other DNS registrator, for example, on https://www.godaddy.com 
+on any other DNS registrator, for example, on https://www.godaddy.com
 and then delegate it to Amazon Route 53.
 
 * install boto - python interface library to Amazon Web Services:
@@ -81,7 +81,7 @@ On Portal:
 
 * Open ``SaaS / SaaS / Plans`` and select the Plan where you want mail feature
 * Click ``[Log in to template DB]``. You should first allow pop-up windows from SaaS Portal in your browser settings.
-  
+
 In template database:
 
 * Activate debug mode
@@ -100,7 +100,7 @@ Configure mail Aliases for users in client databases
 
 * Owner of client database or Administrator should configure mail Alias for every user in his database including his own:
 
- * Open menu ``Settings / Users / Users`` and select User 
+ * Open menu ``Settings / Users / Users`` and select User
  * Click ``[Edit]`` button
  * Open ``Preferences`` tab
  * Edit ``Messaging Alias`` field there
@@ -110,7 +110,7 @@ Usage
 =====
 
 * Try to create client database as usual
-* On creating new client database a new mail domain will be created for it in your account of mailgun.com 
+* On creating new client database a new mail domain will be created for it in your account of mailgun.com
 * This mail domain will be validated using Route53, all necessary dns records will be created
 * In the client database Outgoing mail configuration will be done
 * If you have installed this module https://github.com/it-projects-llc/mail-addons/tree/9.0/mailgun on

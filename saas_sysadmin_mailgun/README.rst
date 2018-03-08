@@ -13,6 +13,7 @@ Amazon Web Services Route 53 account are required for this purpose.
 Contributors
 ============
 * Ildar Nasyrov <Nasyrov@it-projects.info>
+* Nicolas JEUDY <https://github.com/njeudy>
 
 Sponsors
 ========

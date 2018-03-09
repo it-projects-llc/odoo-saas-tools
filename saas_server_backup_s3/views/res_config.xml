@@ -1,23 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<openerp>
-    <data>
-        <record model="ir.ui.view" id="view_saas_server_config_settings">
-            <field name="name">saas_server.config.settings.inherit</field>
-            <field name="model">saas_server.config.settings</field>
-            <field name="inherit_id"
-                ref="saas_server.view_saas_server_config_settings" />
-            <field name="arch" type="xml">
-                <header position="after">
-                    <div>
-
-                        <group string="AWS S3 Access">
-                            <field name="saas_s3_aws_accessid" />
-                            <field name="saas_s3_aws_accesskey" />
-                            <field name="saas_s3_aws_bucket" />
-                        </group>
+<odoo>
+    <record id="res_config_settings_view_form_inherited_backup_ftp" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.backup_s3</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="20"/>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@id=('saas_portal')]" position="inside">
+                <h2>AWS S3 Access</h2>
+                <div class="row mt16 o_settings_container">
+                    <div class="col-xs-12 col-md-6 o_setting_box">
+                        <div>
+                            <label for="saas_s3_aws_accessid"/>
+                            <div class="text-muted">
+                                AWS Access ID.
+                            </div>
+                            <field name="saas_s3_aws_accessid"/>
+                        </div>
                     </div>
-                </header>
-            </field>
-        </record>
-    </data>
-</openerp>
+                    <div class="col-xs-12 col-md-6 o_setting_box">
+                        <div>
+                            <label for="saas_s3_aws_accesskey"/>
+                            <div class="text-muted">
+                                AWS Secret Key.
+                            </div>
+                            <field name="saas_s3_aws_accesskey"/>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-md-6 o_setting_box">
+                        <div>
+                            <label for="saas_s3_aws_bucket"/>
+                            <div class="text-muted">
+                                S3 Bucket.
+                            </div>
+                            <field name="saas_s3_aws_bucket"/>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

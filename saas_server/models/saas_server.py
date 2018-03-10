@@ -73,7 +73,7 @@ class SaasServerClient(models.Model):
             addons.add('saas_client')
         if not addons:
             return
-        with self.registry()[0].cursor() as cr:
+        with self.registry().cursor() as cr:
             env = api.Environment(cr, SUPERUSER_ID, self._context)
             self._install_addons(env, addons)
 
@@ -106,7 +106,7 @@ class SaasServerClient(models.Model):
     @api.multi
     def prepare_database(self, **kwargs):
         self.ensure_one()
-        with self.registry()[0].cursor() as cr:
+        with self.registry().cursor() as cr:
             env = api.Environment(cr, SUPERUSER_ID, self._context)
             self._prepare_database(env, **kwargs)
 
@@ -212,18 +212,18 @@ class SaasServerClient(models.Model):
 
     @api.multi
     def update(self):
-        self.ensure_one()
-        try:
-            registry = self.registry()[0]
-            with registry.cursor() as client_cr:
-                client_env = api.Environment(
-                    client_cr, SUPERUSER_ID, self._context)
-                data = self._get_data(client_env, self.client_id)[0]
-                self.write(data)
-        except psycopg2.OperationalError:
-            if self.state != 'draft':
-                self.state = 'deleted'
-            return
+        for record in self:
+            try:
+                registry = record.registry()
+                with registry.cursor() as client_cr:
+                    client_env = api.Environment(
+                        client_cr, SUPERUSER_ID, record._context)
+                    data = record._get_data(client_env, record.client_id)
+                    record.write(data)
+            except psycopg2.OperationalError:
+                if record.state != 'draft':
+                    record.state = 'deleted'
+                return
 
     @api.multi
     def _get_data(self, client_env, check_client_id):
@@ -265,10 +265,10 @@ class SaasServerClient(models.Model):
 
     @api.multi
     def upgrade_database(self, **kwargs):
-        self.ensure_one()
-        with self.registry()[0].cursor() as cr:
-            env = api.Environment(cr, SUPERUSER_ID, self._context)
-            return self._upgrade_database(env, **kwargs)
+        for record in self:
+            with record.registry().cursor() as cr:
+                env = api.Environment(cr, SUPERUSER_ID, record._context)
+                return record._upgrade_database(env, **kwargs)
 
     @api.multi
     def _upgrade_database(self, client_env, data):

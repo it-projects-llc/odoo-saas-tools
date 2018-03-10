@@ -42,7 +42,7 @@ class SaasServerWizard(models.TransientModel):
 
     @api.model
     def get_values(self):
-        res = super(SaasPortalConfigWizard, self).get_values()
+        res = super(SaasServerWizard, self).get_values()
         ICPSudo = self.env['ir.config_parameter'].sudo()
         res.update(
             backup_rotate_unlimited=bool(int(ICPSudo.get_param('saas_server.backup_rotate_unlimited', False))),

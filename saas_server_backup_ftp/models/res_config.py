@@ -63,14 +63,16 @@ class SaasPortalConfigWizard(models.TransientModel):
         return res
 
     def test_sftp_connection(self):
-        server = self.env["ir.config_parameter"].sudo().get_param(
-            "saas_server.sftp_server", default=None)
-        username = self.env["ir.config_parameter"].sudo().get_param(
-            "saas_server.sftp_username", default=None)
-        password = self.env["ir.config_parameter"].sudo().get_param(
-            "saas_server.sftp_password", default=None)
-        sftp_rsa_key_path = self.env["ir.config_parameter"].sudo(
-        ).get_param('saas_server.sftp_rsa_key_path')
+        server = self.env["ir.config_parameter"].get_param("saas_server.sftp_server", default=None)
+        username = self.env["ir.config_parameter"].get_param("saas_server.sftp_username", default=None)
+        password = self.env["ir.config_parameter"].get_param("saas_server.sftp_password", default=None)
+        path = self.env["ir.config_parameter"].get_param("saas_server.sftp_path", default=None)
+        sftp_rsa_key_path = self.env["ir.config_parameter"].get_param('saas_server.sftp_rsa_key_path')
+        
+        params = {
+            "host": server,
+            "username": username,
+        }
 
         messageTitle = ""
         messageContent = ""
@@ -79,12 +81,13 @@ class SaasPortalConfigWizard(models.TransientModel):
             # Connect with external server over SFTP,
             # so we know sure that everything works.
             if sftp_rsa_key_path:
-                srv = pysftp.Connection(host=server, username=username,
-                                        private_key=sftp_rsa_key_path,
-                                        private_key_pass=password)
+                params["private_key"] = sftp_rsa_key_path
+                if password:
+                    params["private_key_pass"] = self.sftp_password
+                srv = pysftp.Connection(**params)
             else:
-                srv = pysftp.Connection(
-                    host=server, username=username, password=password)
+                params["password"] = password
+                srv = pysftp.Connection(**params)
             srv.close()
             # We have a success.
             messageTitle = "Connection Test Succeeded!"
@@ -92,8 +95,8 @@ class SaasPortalConfigWizard(models.TransientModel):
         except Exception as e:
             messageTitle = "Connection Test Failed!\n"
             messageContent += "Here is what we got instead:\n"
-            if "Failed" in messageTitle:
-                msg = _('{}{}{}'.format(messageTitle, messageContent, e))
-                raise UserError(msg)
-            else:
-                _logger.info(_(messageTitle), _(messageContent))
+        if "Failed" in messageTitle:
+            msg = _('{}{}{}'.format(messageTitle, messageContent, e))
+            raise UserError(msg)
+        else:
+            _logger.info(_(messageTitle), _(messageContent))

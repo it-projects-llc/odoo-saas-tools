@@ -85,17 +85,14 @@ class SaasPortalConfigWizard(models.TransientModel):
             if sftp_rsa_key_path:
                 params["private_key"] = sftp_rsa_key_path
                 if password:
-                    params["private_key_pass"] = self.sftp_password
+                    params["private_key_pass"] = sftp_password
             else:
                 params["password"] = password
 
             with pysftp.Connection(**params):
                 raise exceptions.Warning(_("Connection Test Succeeded!"))
-        except Exception as e:
+        except (pysftp.CredentialException,
+                pysftp.ConnectionException,
+                pysftp.SSHException):
             _logger.info("Connection Test Failed!", exc_info=True)
             raise exceptions.Warning(_("Connection Test Failed!"))
-        if "Failed" in messageTitle:
-            msg = _('{}{}{}'.format(messageTitle, messageContent, e))
-            raise UserError(msg)
-        else:
-            _logger.info(_(messageTitle), _(messageContent))

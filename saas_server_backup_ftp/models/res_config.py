@@ -1,5 +1,5 @@
 from odoo import models, fields, api
-from odoo import _
+from odoo import _, exceptions
 from odoo.exceptions import Warning as UserError
 
 import logging

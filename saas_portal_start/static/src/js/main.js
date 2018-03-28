@@ -1,7 +1,8 @@
-$(document).ready(function () {
+$(document).ready(function() {
     // check that we are on /page/start page
-    if (!$('.odoo_call_action_bg').length)
-        return;
+    if (!$('.odoo_call_action_bg').length) {
+      return;
+    }
 
     var height = $(window).innerHeight();
     var headerHeight = $('header').innerHeight();
@@ -16,8 +17,9 @@ $(document).ready(function () {
     var base_saas_domain = $("input[name='base_saas_domain']").attr('value');
 
     var db_sel = 'input.odoo_db_name';
-    var getUrlVars= function() {
-        var vars = [], hash;
+    var getUrlVars = function() {
+        var vars = [],
+        var hash = [];
         var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
         for (var i = 0; i < hashes.length; i++) {
             hash = hashes[i].split('=');
@@ -41,20 +43,21 @@ $(document).ready(function () {
         } else if (db_name.length < 4) {
             $input.attr('data-content', "Your domain must be at least 4 characters long");
             error = true;
-        } else if(!/^([a-z0-9\-]{2,})$/.test(db_name)) {
+        } else if (!/^([a-z0-9\-]{2,})$/.test(db_name)) {
             $input.attr('data-content', "Special characters are not allowed in domain names");
             error = true;
         }
 
         if (error) {
             $input.popover('show');
-        }
-        else {
+        } else {
             //$input.popover('hide');
             var params = {
                 jsonrpc: '2.0',
                 method: 'call',
-                params: {dbname: db_name},
+                params: {
+                    dbname: db_name
+                },
                 id: _.uniqueId('r'),
             };
 
@@ -74,13 +77,39 @@ $(document).ready(function () {
 
                         // Google analytics for goal
                         if (cta_from) {
-                          var ce = new CustomEvent('gaw', {'detail': {'type': 'vpv', 'id': 'trial_start', 'params': {'page': _.str.sprintf('/stats/cta/trial_start/%s', cta_from)}}});
-                          window.dispatchEvent(ce);
+                            ce = new CustomEvent('gaw', {
+                                'detail': {
+                                    'type': 'vpv',
+                                    'id': 'trial_start',
+                                    'params': {
+                                        'page': _.str.sprintf('/stats/cta/trial_start/%s', cta_from)
+                                    }
+                                }
+                            });
+                            window.dispatchEvent(ce);
                         }
 
-                        var ce = new CustomEvent('gaw', {'detail': {'type': 'vpv', 'id': 'trial_start', 'params': {'page': _.str.sprintf('/stats/trial_start/%s', app)}}});
+                        ce = new CustomEvent('gaw', {
+                            'detail': {
+                                'type': 'vpv',
+                                'id': 'trial_start',
+                                'params': {
+                                    'page': _.str.sprintf('/stats/trial_start/%s', app)
+                                }
+                            }
+                        });
                         window.dispatchEvent(ce);
-                        var ce = new CustomEvent('gaw', {'detail': {'type': 'event', 'id': 'trial_start', 'params': {'category': 'saas trial', 'action':'start', 'label':'register' }}});
+                        ce = new CustomEvent('gaw', {
+                            'detail': {
+                                'type': 'event',
+                                'id': 'trial_start',
+                                'params': {
+                                    'category': 'saas trial',
+                                    'action': 'start',
+                                    'label': 'register'
+                                }
+                            }
+                        });
                         window.dispatchEvent(ce);
 
                         var lang = 'en_US';
@@ -92,12 +121,11 @@ $(document).ready(function () {
                         browser_offset += _.str.sprintf("%02d", Math.abs(offset % 60));
 
                         var new_url = _.str.sprintf('/saas_portal/add_new_client?lang=%s&dbname=%s&tz=%s&hosting=%s&app=%s&plan_id=%s',
-                                                    lang, db_name, browser_offset, hosting, app, plan_id);
+                            lang, db_name, browser_offset, hosting, app, plan_id);
                         window.location = new_url;
-                    }
-                    else {
-                        var db_url = 'https://'+db_name+'.'+base_saas_domain+'/web';
-                        $input.attr('data-content', 'This name is already taken, sorry.<br/>If you are the owner, please <a href="'+db_url+'">sign in</a>.');
+                    } else {
+                        var db_url = 'https://' + db_name + '.' + base_saas_domain + '/web';
+                        $input.attr('data-content', 'This name is already taken, sorry.<br/>If you are the owner, please <a href="' + db_url + '">sign in</a>.');
                         $input.popover('show');
                     }
                 }
@@ -115,7 +143,9 @@ $(document).ready(function () {
         check_database($db_input);
     });
 
-    $(db_sel).popover({html: true});
+    $(db_sel).popover({
+        html: true
+    });
     $(db_sel).on('keyup', function() {
         var $input = $(this);
         $input.popover('hide');

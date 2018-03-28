@@ -16,7 +16,8 @@ _logger = logging.getLogger(__name__)
 
 
 def random_password(len=32):
-    return ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(len))
+    return ''.join(random.SystemRandom().choice(
+        string.ascii_uppercase + string.digits) for _ in range(len))
 
 
 class SaasServerClient(models.Model):
@@ -32,11 +33,14 @@ class SaasServerClient(models.Model):
                               ('cancelled', 'Cancelled'),
                               ('pending', 'Pending'),
                               ('deleted', 'Deleted')],
-                             'State', default='draft', track_visibility='onchange')
+                             'State', default='draft',
+                             track_visibility='onchange')
     host = fields.Char('Host')
 
     _sql_constraints = [
-        ('client_id_uniq', 'unique (client_id)', 'client_id should be unique!'),
+        ('client_id_uniq',
+         'unique (client_id)',
+         'client_id should be unique!'),
     ]
 
     @api.multi
@@ -95,7 +99,8 @@ class SaasServerClient(models.Model):
 
     @api.multi
     def _install_addons(self, client_env, addons):
-        for addon in client_env['ir.module.module'].search([('name', 'in', list(addons))]):
+        for addon in client_env['ir.module.module'].search([
+                ('name', 'in', list(addons))]):
             addon.button_install()
 
     @api.multi
@@ -112,10 +117,19 @@ class SaasServerClient(models.Model):
 
     @api.model
     def _config_parameters_to_copy(self):
-        return ['saas_client.ab_location', 'saas_client.ab_register', 'saas_client.saas_dashboard']
+        return ['saas_client.ab_location',
+                'saas_client.ab_register',
+                'saas_client.saas_dashboard']
 
     @api.multi
-    def _prepare_database(self, client_env, owner_user=None, is_template_db=False, addons=None, access_token=None, tz=None, server_requests_scheme='http'):
+    def _prepare_database(self,
+                          client_env,
+                          owner_user=None,
+                          is_template_db=False,
+                          addons=None,
+                          access_token=None,
+                          tz=None,
+                          server_requests_scheme='http'):
         self.ensure_one()
         if not addons:
             addons = []
@@ -151,7 +165,10 @@ class SaasServerClient(models.Model):
                 'saas_server.saas_oauth_provider')
 
             oauth_provider_data = {'enabled': False, 'client_id': client_id}
-            for attr in ['name', 'auth_endpoint', 'scope', 'validation_endpoint', 'data_endpoint', 'css_class', 'body', 'enabled', 'local_host', 'local_port']:
+            for attr in ['name', 'auth_endpoint', 'scope',
+                         'validation_endpoint', 'data_endpoint',
+                         'css_class', 'body', 'enabled', 'local_host',
+                         'local_port']:
                 oauth_provider_data[attr] = getattr(saas_oauth_provider, attr)
             oauth_provider = client_env.ref('saas_client.saas_oauth_provider')
             oauth_provider.write(oauth_provider_data)
@@ -195,7 +212,8 @@ class SaasServerClient(models.Model):
                 'oauth_provider_id': oauth_provider.id,
                 'oauth_uid': portal_owner_uid,
                 'oauth_access_token': access_token,
-                'country_id': owner_user.get('country_id') and self.env['res.country'].browse(owner_user['country_id']) and
+                'country_id': owner_user.get('country_id') and
+                self.env['res.country'].browse(owner_user['country_id']) and
                 self.env['res.country'].browse(owner_user['country_id']).id,
             })
 
@@ -235,8 +253,10 @@ class SaasServerClient(models.Model):
         users = client_env['res.users'].search(
             [('share', '=', False), ('id', '!=', SUPERUSER_ID)])
         param_obj = client_env['ir.config_parameter']
-        max_users = param_obj.sudo().get_param('saas_client.max_users', '0').strip()
-        suspended = param_obj.sudo().get_param('saas_client.suspended', '0').strip()
+        max_users = param_obj.sudo().get_param(
+            'saas_client.max_users', '0').strip()
+        suspended = param_obj.sudo().get_param(
+            'saas_client.suspended', '0').strip()
         total_storage_limit = param_obj.sudo().get_param(
             'saas_client.total_storage_limit', '0').strip()
         users_len = len(users)
@@ -354,8 +374,10 @@ class SaasServerClient(models.Model):
         data = post.get('configure_outgoing_mail', [])
         for mail_conf in data:
             ir_mail_server = client_env['ir.mail_server']
-            ir_mail_server.create({'name': 'mailgun', 'smtp_host': 'smtp.mailgun.org',
-                                   'smtp_user': mail_conf['smtp_login'], 'smtp_pass': mail_conf['smtp_password']})
+            ir_mail_server.create({'name': 'mailgun',
+                                   'smtp_host': 'smtp.mailgun.org',
+                                   'smtp_user': mail_conf['smtp_login'],
+                                   'smtp_pass': mail_conf['smtp_password']})
 
         # 8.Limit number of records
         model_obj = client_env['ir.model']
@@ -367,13 +389,15 @@ class SaasServerClient(models.Model):
                 limit_record = base_limit_records_number_obj.search(
                     [('model_id', '=', model.id)])
                 if limit_record:
-                    limit_record.update({'domain': limit_line['domain'],
-                                         'max_records': limit_line['max_records'], })
+                    limit_record.update(
+                        {'domain': limit_line['domain'],
+                         'max_records': limit_line['max_records'], })
                 else:
-                    base_limit_records_number_obj.create({'name': 'limit_' + limit_line['model'],
-                                                          'model_id': model.id,
-                                                          'domain': limit_line['domain'],
-                                                          'max_records': limit_line['max_records'], })
+                    base_limit_records_number_obj.create(
+                        {'name': 'limit_' + limit_line['model'],
+                         'model_id': model.id,
+                         'domain': limit_line['domain'],
+                         'max_records': limit_line['max_records'], })
             else:
                 res['limit'] = "there is no model named %s" % limit_line['model']
 
@@ -384,7 +408,8 @@ class SaasServerClient(models.Model):
         now = time.strftime(DEFAULT_SERVER_DATETIME_FORMAT)
 
         res = self.search([('state', 'not in', ['deleted', 'template']),
-                           ('expiration_datetime', '<=', now), ('trial', '=', True)])
+                           ('expiration_datetime', '<=', now),
+                           ('trial', '=', True)])
         _logger.info('delete_expired_databases %s', res)
         res.delete_database()
 
@@ -406,7 +431,9 @@ class SaasServerClient(models.Model):
         backup transport agents should override this
         '''
         raise exceptions.Warning(
-            _('Transport agent has not been configured. You need either install one of saas_server_backup_* or remove saas_portal_backup'))
+            _('''Transport agent has not been configured. You need either
+              install one of saas_server_backup_* or remove
+              saas_portal_backup'''))
 
     @api.multi
     def backup_database(self):

@@ -1,10 +1,9 @@
-# -*- coding: utf-8 -*-
 {
     "name": """Saas Server Demo""",
     "summary": """new parameters in __openerp__.py for demonstrative modules, control repositories for demonstration""",
     "category": "SaaS",
     "images": [],
-    "version": "1.0.0",
+    "version": "11.0.1.0.0",
 
     "author": "IT-Projects LLC, Ildar Nasyrov",
     "website": "https://it-projects.info",

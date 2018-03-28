@@ -1,4 +1,4 @@
-$(document).ready(function () {
+$(document).ready(function() {
 
     var client_id = $("input[name='client_id']").attr('value')
     var base_saas_domain = $("input[name='base_saas_domain']").attr('value')
@@ -18,31 +18,32 @@ $(document).ready(function () {
         } else if (db_name.length < 4) {
             $input.attr('data-content', "Your domain must be at least 4 characters long");
             error = true;
-        } else if(!/^(?!:\/\/)([a-zA-Z0-9]+\.)?[a-zA-Z0-9][a-zA-Z0-9-]+\.[a-zA-Z]{2,6}?$/i.test(db_name)) {
+        } else if (!/^(?!:\/\/)([a-zA-Z0-9]+\.)?[a-zA-Z0-9][a-zA-Z0-9-]+\.[a-zA-Z]{2,6}?$/i.test(db_name)) {
             $input.attr('data-content', "Domain name isn't valid");
             error = true;
         }
 
         if (error) {
             $input.popover('show');
-        }
-        else {
+        } else {
             var new_url = _.str.sprintf('/saas_portal/rename_client?client_id=%s&dbname=%s',
-                                        client_id, db_name);
+                client_id, db_name);
             window.location = new_url;
         }
     };
 
 
-	  $('button#change_domain').on('click', function(event) {
+    $('button#change_domain').on('click', function(event) {
         event.preventDefault();
-	      var $self = $(this);
-	      var $db_input = $self.parent().parent().find(new_domain_sel);
+        var $self = $(this);
+        var $db_input = $self.parent().parent().find(new_domain_sel);
         check_database($db_input)
-	  });
+    });
 
-	  $(new_domain_sel).popover({html: true});
-	  $(new_domain_sel).on('keyup', function() {
+    $(new_domain_sel).popover({
+        html: true
+    });
+    $(new_domain_sel).on('keyup', function() {
         var $input = $(this);
         $input.popover('hide');
     });

@@ -1,18 +1,22 @@
-# -*- coding: utf-8 -*-
 from odoo import models, fields, api
-from datetime import datetime, timedelta
-from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 
 
 class SaasPortalPlan(models.Model):
     _inherit = 'saas_portal.plan'
 
-    free_subdomains = fields.Boolean(help='allow to choose subdomains for trials otherwise allow only after payment', default=True)
-    non_trial_instances = fields.Selection([('from_trial', 'From trial'), ('create_new', 'Create new')], string='Non-trial instances',
-                                           help='Whether to use trial database or create new one when user make payment', required=True, default='create_new')
+    free_subdomains = fields.Boolean(
+        help='allow to choose subdomains for trials otherwise allow only after payment',
+        default=True)
+    non_trial_instances = fields.Selection(
+        [('from_trial', 'From trial'), ('create_new', 'Create new')],
+        string='Non-trial instances',
+        help='Whether to use trial database or create new one when user make payment',
+        required=True, default='create_new')
     product_tmpl_id = fields.Many2one('product.template', 'Product')
 
-    product_variant_ids = fields.One2many('product.product', 'saas_plan_id', 'Product variants')
+    product_variant_ids = fields.One2many('product.product',
+                                          'saas_plan_id',
+                                          'Product variants')
 
     @api.multi
     def _new_database_vals(self, vals):

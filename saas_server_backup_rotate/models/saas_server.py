@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 from odoo import api
 from odoo import models
-import psycopg2
 
 import logging
 _logger = logging.getLogger(__name__)

@@ -1,16 +1,16 @@
-# -*- coding: utf-8 -*-
 from urllib.parse import urlencode
 from ast import literal_eval
 import odoo
-from odoo import SUPERUSER_ID, exceptions
+from odoo import exceptions
 from odoo.tools.translate import _
 from odoo import http
 from odoo.http import request
 from odoo.addons.saas_base.exceptions import MaximumDBException, MaximumTrialDBException
 import werkzeug
 import simplejson
-from datetime import datetime, timedelta
-from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
+
+import logging
+_logger = logging.getLogger(__name__)
 
 
 class SignupError(Exception):
@@ -41,16 +41,18 @@ class SaasPortal(http.Controller):
             user = request.env['res.users'].browse(user_id)
             partner_id = user.partner_id.id
         plan = self.get_plan(int(post.get('plan_id', 0) or 0))
-        trial = bool(post.get('trial'))
+        trial = bool(post.get('trial', False))
         try:
             res = plan.create_new_database(dbname=dbname,
                                            user_id=user_id,
                                            partner_id=partner_id,
                                            trial=trial,)
         except MaximumDBException:
+            _logger.info("MaximumDBException")
             url = request.env['ir.config_parameter'].sudo().get_param('saas_portal.page_for_maximumdb', '/')
             return werkzeug.utils.redirect(url)
         except MaximumTrialDBException:
+            _logger.info("MaximumTrialDBException")
             url = request.env['ir.config_parameter'].sudo().get_param('saas_portal.page_for_maximumtrialdb', '/')
             return werkzeug.utils.redirect(url)
 
@@ -74,7 +76,7 @@ class SaasPortal(http.Controller):
     def get_config_parameter(self, param):
         config = request.env['ir.config_parameter']
         full_param = 'saas_portal.%s' % param
-        return config.get_param(full_param)
+        return config.sudo().get_param(full_param)
 
     def get_full_dbname(self, dbname):
         if not dbname:

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-import requests
 import xmlrpc.client
 
 from odoo import models, fields, api
@@ -32,16 +30,17 @@ class SaasPortalServer(models.Model):
                                 [[['name', '=', 'base']]],
                                 )
         base_module = models.execute_kw(db, uid, password,
-                                    'ir.module.module',
-                                    'read', [ids],
-                                    {'fields': ['latest_version']})
+                                        'ir.module.module',
+                                        'read', [ids],
+                                        {'fields': ['latest_version']})
         return base_module[0].get('latest_version')
 
     def _prepare_module(self, module, plan):
         attachment_name = 'addon_{0}_{1}.{2}'.format(self.odoo_version,
                                                      module['name'],
                                                      self.env['ir.config_parameter'].sudo().get_param('saas_portal.base_saas_domain'))
-        ir_attachment = self.env['ir.attachment'].create({'name': attachment_name, 'type': 'binary', 'db_datas': module.get('icon_image')})
+        ir_attachment = self.env['ir.attachment'].create(
+            {'name': attachment_name, 'type': 'binary', 'db_datas': module.get('icon_image')})
         return {
             'technical_name': module.get('name'),
             'demo_plan_id': plan.id,
@@ -68,12 +67,13 @@ class SaasPortalServer(models.Model):
             if version:
                 self.odoo_version = version.split('.', 1)[0]
         namestring = '{0}-{1}'
-        saas_domain = self.env['ir.config_parameter'].sudo().get_param('saas_portal.base_saas_domain')
         template_name = namestring.format(demo_module['demo_url'], 't')
-        plan_name = 'Demo for {0}.0 {1}'.format(self.odoo_version, demo_module['demo_url'])
+        plan_name = 'Demo for {0}.0 {1}'.format(
+            self.odoo_version, demo_module['demo_url'])
 
         if template_obj.search_count([('name', '=', template_name), ('server_id', '=', self.id)]) == 0:
-            template = template_obj.create({'name': template_name, 'server_id': self.id})
+            template = template_obj.create(
+                {'name': template_name, 'server_id': self.id})
             if plan_obj.search_count([('name', '=', plan_name)]) == 0:
                 plan = plan_obj.create({'name': plan_name,
                                         'server_id': self.id,
@@ -87,17 +87,16 @@ class SaasPortalServer(models.Model):
         else:
             return None
 
-
     @api.multi
     def _create_demo_images(self, demo_module):
         self.ensure_one()
 
         db, uid, password, models = self._get_xmlrpc_object(self.name)
 
-        images = models.execute_kw(db, uid, password, 'ir.module.module', 'get_demo_images', [demo_module['id']])
+        images = models.execute_kw(
+            db, uid, password, 'ir.module.module', 'get_demo_images', [demo_module['id']])
 
         return images
-
 
     @api.multi
     def _create_demo_product(self, demo_module, plan):
@@ -108,10 +107,13 @@ class SaasPortalServer(models.Model):
         product_attribute_line_obj = self.env['product.attribute.line']
 
         product_template_name = demo_module['demo_title']
-        product_template = product_template_obj.search([('module_name', '=', demo_module['name'])], limit=1)
+        product_template = product_template_obj.search(
+            [('module_name', '=', demo_module['name'])], limit=1)
 
-        odoo_version_attrib = self.env.ref('saas_portal_demo.odoo_version_product_attribute')
-        attrib_value = self.env.ref('saas_portal_demo.product_attribute_value_{}'.format(self.odoo_version))
+        odoo_version_attrib = self.env.ref(
+            'saas_portal_demo.odoo_version_product_attribute')
+        attrib_value = self.env.ref(
+            'saas_portal_demo.product_attribute_value_{}'.format(self.odoo_version))
 
         images_res = self._create_demo_images(demo_module)
 
@@ -143,9 +145,10 @@ class SaasPortalServer(models.Model):
                                                                         'value_ids': [(4, attrib_value.id, 0)],
                                                                         })
         elif not product_attribute_line.value_ids.filtered(lambda r: r.id == attrib_value.id):
-            product_attribute_line.update({'value_ids': [(4, attrib_value.id, 0)]})
+            product_attribute_line.update(
+                {'value_ids': [(4, attrib_value.id, 0)]})
 
-        product_product = product_product_obj.create({
+        product_product_obj.create({
             'product_tmpl_id': product_template.id,
             'attribute_value_ids': [(4, attrib_value.id)],
             'variant_plan_id': plan.id,
@@ -160,7 +163,8 @@ class SaasPortalServer(models.Model):
             ids = models.execute_kw(db, uid, password, 'ir.module.module', 'search',
                                     [[['demo_url', '!=', False]]],
                                     )
-            modules = models.execute_kw(db, uid, password, 'ir.module.module', 'read', [ids])
+            modules = models.execute_kw(
+                db, uid, password, 'ir.module.module', 'read', [ids])
             for module in modules:
                 plan = record._create_demo_plan(module)
 
@@ -172,15 +176,18 @@ class SaasPortalServer(models.Model):
                 record._create_demo_product(module, plan)
                 if module.get('demo_addons'):
                     ids = models.execute_kw(db, uid, password, 'ir.module.module', 'search',
-                                            [[['name', 'in', module['demo_addons'].split(',')]]],
+                                            [[['name', 'in',
+                                                module['demo_addons'].split(',')]]],
                                             {'limit': 10})
-                    addon_modules = models.execute_kw(db, uid, password, 'ir.module.module', 'read', [ids])
+                    addon_modules = models.execute_kw(
+                        db, uid, password, 'ir.module.module', 'read', [ids])
                     for addon in addon_modules:
                         vals = record._prepare_module(addon, plan)
                         demo_plan_module_obj.create(vals)
                 if module.get('demo_addons_hidden'):
                     for addon in module['demo_addons_hidden'].split(','):
-                        demo_plan_hidden_module_obj.create({'technical_name': addon, 'demo_plan_id': plan.id})
+                        demo_plan_hidden_module_obj.create(
+                            {'technical_name': addon, 'demo_plan_id': plan.id})
 
         return True
 
@@ -188,11 +195,13 @@ class SaasPortalServer(models.Model):
     def create_demo_templates(self):
         plan_obj = self.env['saas_portal.plan']
         for record in self:
-            demo_plan_ids = plan_obj.search([('server_id', '=', record.id), ('template_id.state', '=', 'draft')])
+            demo_plan_ids = plan_obj.search(
+                [('server_id', '=', record.id), ('template_id.state', '=', 'draft')])
             for plan in demo_plan_ids:
                 plan.with_context({'skip_sync_server': True}).create_template()
                 addons = plan.demo_plan_module_ids.mapped('technical_name')
-                addons.extend(plan.demo_plan_hidden_module_ids.mapped('technical_name'))
+                addons.extend(
+                    plan.demo_plan_hidden_module_ids.mapped('technical_name'))
                 payload = {'install_addons': addons}
                 plan.template_id.upgrade(payload=payload)
                 record.action_sync_server()
@@ -200,20 +209,20 @@ class SaasPortalServer(models.Model):
                 # after installing demo modules: make `owner_template` user a member of all the admin's security groups
                 db, uid, password, models = plan.template_id._get_xmlrpc_object()
                 admin_groups = models.execute_kw(db, uid, password,
-                        'res.users', 'search_read',
-                        [[['id', '=', SI]]],
-                        {'fields': ['groups_id']})
+                                                 'res.users', 'search_read',
+                                                 [[['id', '=', SI]]],
+                                                 {'fields': ['groups_id']})
                 owner_user_id = models.execute_kw(db, uid, password,
-                        'res.users', 'search',
-                        [[['login', '=', 'owner_template']]])
+                                                  'res.users', 'search',
+                                                  [[['login', '=', 'owner_template']]])
                 models.execute_kw(db, uid, password,
-                        'res.users', 'write',
-                        [owner_user_id, {'groups_id': [(6, 0, admin_groups[0]['groups_id'])]}])
+                                  'res.users', 'write',
+                                  [owner_user_id, {'groups_id': [(6, 0, admin_groups[0]['groups_id'])]}])
                 # configure outgoing mail service for using `postfix` docker container
                 mail_server_id = models.execute_kw(db, uid, password,
-                        'ir.mail_server', 'search', [[]], {'limit': 1})
+                                                   'ir.mail_server', 'search', [[]], {'limit': 1})
                 models.execute_kw(db, uid, password,
-                        'ir.mail_server', 'write', [mail_server_id, {'name': 'postfix', 'smtp_host': 'postfix'}])
+                                  'ir.mail_server', 'write', [mail_server_id, {'name': 'postfix', 'smtp_host': 'postfix'}])
 
         return True
 
@@ -221,30 +230,34 @@ class SaasPortalServer(models.Model):
     def update_repositories(self):
         for record in self:
             db, uid, password, models = record._get_xmlrpc_object(record.name)
-            ids = models.execute_kw(db, uid, password, 'saas_server.repository', 'search', [[]],)
-            models.execute_kw(db, uid, password, 'saas_server.repository', 'update', [ids])
+            ids = models.execute_kw(
+                db, uid, password, 'saas_server.repository', 'search', [[]],)
+            models.execute_kw(db, uid, password,
+                              'saas_server.repository', 'update', [ids])
         return True
 
     @api.multi
     def restart_server(self):
         for record in self:
             db, uid, password, models = record._get_xmlrpc_object(record.name)
-            models.execute_kw(db, uid, password, 'saas_server.client', 'restart_server', [])
+            models.execute_kw(db, uid, password,
+                              'saas_server.client', 'restart_server', [])
         return True
 
     @api.multi
     def update_templates(self):
         for record in self:
             plans = self.env['saas_portal.plan'].search([('server_id', '=', record.id),
-                                                         ('demo_plan_module_ids', '!=', False),
+                                                         ('demo_plan_module_ids',
+                                                          '!=', False),
                                                          ('template_id.state', '=', 'template')])
             for plan in plans:
                 db, uid, password, models = plan.template_id._get_xmlrpc_object()
                 id = models.execute_kw(db, uid, password, 'ir.module.module', 'search',
-                                        [[['name', 'in', ['base']]]])
-                models.execute_kw(db, uid, password, 'ir.module.module', 'button_immediate_upgrade', [id])
+                                       [[['name', 'in', ['base']]]])
+                models.execute_kw(
+                    db, uid, password, 'ir.module.module', 'button_immediate_upgrade', [id])
         return True
-
 
     @api.model
     def update_all_templates(self):
@@ -259,7 +272,8 @@ class SaaSPortalDemoPlanModule(models.Model):
 
     technical_name = fields.Char('Technical Name')
     url = fields.Char('url', compute="_compute_url", store=True)
-    demo_plan_id = fields.Many2one('saas_portal.plan', string='Demo plan where the module intended to be installed', ondelete='cascade', require=True)
+    demo_plan_id = fields.Many2one(
+        'saas_portal.plan', string='Demo plan where the module intended to be installed', ondelete='cascade', require=True)
     shortdesc = fields.Char('Module Name', readonly=True, translate=True)
     author = fields.Char("Author", readonly=True)
     icon_attachment_id = fields.Many2one('ir.attachment', ondelete='restrict')
@@ -272,7 +286,8 @@ class SaaSPortalDemoPlanModule(models.Model):
     @api.depends('technical_name')
     def _compute_url(self):
         for record in self:
-            record.url = "https://www.odoo.com/apps/modules/%s.0/%s/" % (record.demo_plan_id.server_id.odoo_version, record.technical_name)
+            record.url = "https://www.odoo.com/apps/modules/%s.0/%s/" % (
+                record.demo_plan_id.server_id.odoo_version, record.technical_name)
 
 
 class SaaSPortalHiddenDemoPlanModule(models.Model):
@@ -280,7 +295,8 @@ class SaaSPortalHiddenDemoPlanModule(models.Model):
     _rec_name = 'technical_name'
 
     technical_name = fields.Char('Technical Name')
-    demo_plan_id = fields.Many2one('saas_portal.plan', string='Demo plan where the module intended to be installed', ondelete='cascade')
+    demo_plan_id = fields.Many2one(
+        'saas_portal.plan', string='Demo plan where the module intended to be installed', ondelete='cascade')
 
 
 class SaasPortalDemoPlan(models.Model):
@@ -289,7 +305,7 @@ class SaasPortalDemoPlan(models.Model):
     demo_plan_module_ids = fields.One2many('saas_portal.demo_plan_module', 'demo_plan_id',
                                            help="The modules that should be in this demo plan", string='Modules')
     demo_plan_hidden_module_ids = fields.One2many('saas_portal.hidden_demo_plan_module', 'demo_plan_id',
-                                           help="The modules that should be in this demo plan", string='Modules')
+                                                  help="The modules that should be in this demo plan", string='Modules')
 
 
 class SaasPortalDatabase(models.Model):

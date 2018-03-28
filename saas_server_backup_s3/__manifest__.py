@@ -1,8 +1,7 @@
-# -*- coding: utf-8 -*-
 {
     'name': 'SaaS Server Backup S3',
-    'version': '1.0.0',
-    'author': 'Salton Massally<smassally@idtlabs.sl>',
+    'version': '11.0.1.0.0',
+    'author': 'Salton Massally, Nicolas JEUDY',
     'license': 'LGPL-3',
     'category': 'SaaS',
     "support": "apps@it-projects.info",

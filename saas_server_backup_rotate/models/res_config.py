@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
 from odoo import models, fields, api
 
 
 class SaasServerWizard(models.TransientModel):
-    _inherit = 'saas_server.config.settings'
+    _inherit = 'res.config.settings'
 
     backup_rotate_unlimited = fields.Boolean(
         'Unlimited Backup',
@@ -30,24 +29,27 @@ class SaasServerWizard(models.TransientModel):
         description='Set the number of hourly backups to preserve during rotation'
     )
 
-    @api.model
-    def get_default_backup_rotate_strategy(self, fields):
-        config_parameter = self.env["ir.config_parameter"]
-        return {
-            'backup_rotate_yearly': int(config_parameter.sudo().get_param('saas_server_backup_rotate.backup_rotate_yearly', default=2)),
-            'backup_rotate_monthly': int(config_parameter.sudo().get_param('saas_server_backup_rotate.backup_rotate_monthly', default=12)),
-            'backup_rotate_weekly': int(config_parameter.sudo().get_param('saas_server_backup_rotate.backup_rotate_weekly', default=4)),
-            'backup_rotate_daily': int(config_parameter.sudo().get_param('saas_server_backup_rotate.backup_rotate_daily', default=7)),
-            'backup_rotate_hourly': int(config_parameter.sudo().get_param('saas_server_backup_rotate.backup_rotate_hourly', default=24)),
-            'backup_rotate_unlimited': bool(int(config_parameter.sudo().get_param('saas_server_backup_rotate.backup_rotate_unlimited', False))),
-        }
+    @api.multi
+    def set_values(self):
+        super(SaasServerWizard, self).set_values()
+        ICPSudo = self.env['ir.config_parameter'].sudo()
+        ICPSudo.set_param("saas_server.backup_rotate_unlimited", str(int(self.backup_rotate_unlimited)))
+        ICPSudo.set_param("saas_server.backup_rotate_yearly", self.backup_rotate_yearly)
+        ICPSudo.set_param("saas_server.backup_rotate_monthly", self.backup_rotate_monthly)
+        ICPSudo.set_param("saas_server.backup_rotate_weekly", self.backup_rotate_weekly)
+        ICPSudo.set_param("saas_server.backup_rotate_daily", self.backup_rotate_daily)
+        ICPSudo.set_param("saas_server.backup_rotate_hourly", self.backup_rotate_hourly)
 
-    @api.one
-    def set_backup_rotate_strategy(self):
-        config_parameter = self.env["ir.config_parameter"]
-        config_parameter.set_param('saas_server_backup_rotate.backup_rotate_yearly', self.backup_rotate_yearly)
-        config_parameter.set_param('saas_server_backup_rotate.backup_rotate_monthly', self.backup_rotate_monthly)
-        config_parameter.set_param('saas_server_backup_rotate.backup_rotate_weekly', self.backup_rotate_weekly)
-        config_parameter.set_param('saas_server_backup_rotate.backup_rotate_daily', self.backup_rotate_daily)
-        config_parameter.set_param('saas_server_backup_rotate.backup_rotate_hourly', self.backup_rotate_hourly)
-        config_parameter.set_param('saas_server_backup_rotate.backup_rotate_unlimited', str(int(self.backup_rotate_unlimited)))
+    @api.model
+    def get_values(self):
+        res = super(SaasServerWizard, self).get_values()
+        ICPSudo = self.env['ir.config_parameter'].sudo()
+        res.update(
+            backup_rotate_unlimited=bool(int(ICPSudo.get_param('saas_server.backup_rotate_unlimited', False))),
+            backup_rotate_yearly=ICPSudo.get_param('saas_server.backup_rotate_yearly', default=2),
+            backup_rotate_monthly=ICPSudo.get_param('saas_server.backup_rotate_monthly', default=12),
+            backup_rotate_weekly=ICPSudo.get_param('saas_server.backup_rotate_weekly', default=4),
+            backup_rotate_daily=ICPSudo.get_param('saas_server.backup_rotate_daily', default=7),
+            backup_rotate_hourly=ICPSudo.get_param('saas_server.backup_rotate_hourly', default=24),
+        )
+        return res

@@ -11,6 +11,7 @@ Contributors
 ============
 * Ildar Nasyrov <Nasyrov@it-projects.info>
 * Salton Massally <smassally@idtlabs.sl> (iDT Labs)
+* Nicolas JEUDY <https://github.com/njeudy>
 
 Sponsors
 ========

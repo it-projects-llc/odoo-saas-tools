@@ -1,8 +1,7 @@
-# -*- coding: utf-8 -*-
 {
     'name': 'SaaS Server Rotate Backup S3',
-    'version': '1.0.0',
-    'author': 'Salton Masssally',
+    'version': '11.0.1.0.0',
+    'author': 'Salton Masssally, Nicolas JEUDY',
     'license': 'GPL-3',
     'category': 'SaaS',
     "support": "apps@it-projects.info",

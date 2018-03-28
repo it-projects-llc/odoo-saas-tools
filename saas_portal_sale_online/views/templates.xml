@@ -1,9 +1,9 @@
  <odoo>
-    
-        <!-- <template id="product" inherit_id="website_sale.product"> -->
-        <!--     <xpath expr="//a[@id='add_to_cart']" position="after"> -->
-        <!--         <a id="try_trial" style="margin-left: 8px" class="btn btn-default btn-lg mt8" t-attf-href="/saas_portal/add_new_client?plan_id=#{product.plan_id.id}&amp;product_id=#{product.id}">Try trial</a> -->
-        <!--     </xpath> -->
-        <!-- </template> -->
-   
+
+        <template id="product" inherit_id="website_sale.product">
+          <xpath expr="//a[@id='add_to_cart']" position="after">
+              <a id="try_trial" style="margin-left: 8px" class="btn btn-default btn-lg mt8" t-attf-href="/saas_portal/add_new_client?trial=1&amp;plan_id=#{product.product_variant_id.saas_plan_id.id}">Try trial</a>
+           </xpath>
+       </template>
+
 </odoo>

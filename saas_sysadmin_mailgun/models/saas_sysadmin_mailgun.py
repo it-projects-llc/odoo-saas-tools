@@ -1,13 +1,13 @@
-# -*- coding: utf-8 -*-
 from odoo import models, fields, api
 import simplejson
 from . import mailgun
+
 import logging
 _logger = logging.getLogger(__name__)
 
 try:
     pass
-except:
+except exception as e:
     _logger.critical('SAAS Route53 Requires the python library Boto which is not \
     found on your installation')
 
@@ -19,8 +19,9 @@ class SaasPortalClient(models.Model):
 
     @api.multi
     def _create_domain_on_mailgun(self):
-        self.ensure_one()
         '''Create domain on mailgun and return data to configure dns and smtp'''
+
+        self.ensure_one()
         ir_params = self.env['ir.config_parameter']
         api_key = ir_params.sudo().get_param('saas_mailgun.saas_mailgun_api_key')
         password = mailgun.random_password()
@@ -30,8 +31,9 @@ class SaasPortalClient(models.Model):
 
     @api.multi
     def _create_route_on_mailgun(self):
-        self.ensure_one()
         '''Create route on mailgun for storing incomming messages'''
+
+        self.ensure_one()
         ir_params = self.env['ir.config_parameter']
         api_key = ir_params.sudo().get_param('saas_mailgun.saas_mailgun_api_key')
         return mailgun.create_store_route(api_key=api_key, domain=self.name,

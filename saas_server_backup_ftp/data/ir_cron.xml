@@ -1,19 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<openerp>
+<odoo>
   <data noupdate="1">
     <record id="ir_cron_backup_saas_scheduler0" model="ir.cron">
-      <field name="model">saas_server.client</field>
-      <field name="name">Backup saas databases scheduler</field>
-      <field name="function">schedule_saas_databases_backup</field>
+      <field name="model_id" ref="model_saas_server_client"/>
+      <field name="name">Backup SaaS Databases Scheduler</field>
+      <field name="interval_number">1</field>
       <field name="interval_type">days</field>
       <field name="user_id" ref="base.user_root"/>
       <field name="numbercall">-1</field>
-            <field eval="&quot;&quot;&quot;2010-01-07 11:35:28&quot;&quot;&quot;" name="nextcall"/>
-            <field eval="5" name="priority"/>
-            <field eval="0" name="doall"/>
-            <field eval="False" name="active"/>
-            <field eval="1" name="interval_number"/>
-        </record>
+      <field name="nextcall" eval="(datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d 03:00:00')"/>
+      <field name="state">code</field>
+      <field name="code">model.schedule_saas_databases_backup()</field>
+    </record>
   </data>
-</openerp>
- 
+</odoo>

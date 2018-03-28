@@ -1,41 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<openerp>
-    <data>
-         <record id="view_saas_server_config_settings" model="ir.ui.view">
-            <field name="name">saas_server.config.settings.inherit</field>
-            <field name="model">saas_server.config.settings</field>
-            <field name="inherit_id" ref="saas_server.view_saas_server_config_settings" />
-            <field name="arch" type="xml">
-                <header position="after">
-                    <div>
-                        <group string="Backup Settings">
-                            <field name="sftp_server" />
-                            <field name="sftp_username" />
-                            <field name="sftp_password" password="True" />
-              <field name="sftp_path" />
-                            <field name="sftp_rsa_key_path" />
-              <button name="test_sftp_connection" type="object" string="Test SFTP Connection" icon="fa-server"/>
-              <separator string="Help" colspan="2" />
-              <div>
-                            This configures the sftp server for store backups of client databases.
-                            <br />
-                            Automatic backups of the database can be scheduled as follows: 
-                            <ol>
-                                <li>
-                                    Go to Settings / Technical / Automation / Scheduled Actions.
-                                </li>
-                                <li>
-                                    Search the action named 'Backup saas databases scheduler'.
-                                </li>
-                                <li>
-                                    Set the scheduler to active and fill in how often you want backups generated.
-                                </li>
-                            </ol>
+<odoo>
+      <record id="res_config_settings_view_form_inherited_backup_ftp" model="ir.ui.view">
+          <field name="name">res.config.settings.view.form.inherit.backup_ftp</field>
+          <field name="model">res.config.settings</field>
+          <field name="priority" eval="20"/>
+          <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+          <field name="arch" type="xml">
+              <xpath expr="//div[@id=('saas_portal')]" position="inside">
+                <h2>SFTP Backup Settings</h2>
+                <div class="row mt16 o_settings_container">
+                    <div class="col-xs-12 col-md-6 o_setting_box">
+                        <div>
+                            <label for="sftp_server"/>
+                            <div class="text-muted">
+                                IP address of your remote server. For example 192.168.0.1
+                            </div>
+                            <field name="sftp_server" placeholder="192.168.0.1"/>
                         </div>
-                        </group>
                     </div>
-                </header>
+                    <div class="col-xs-12 col-md-6 o_setting_box">
+                        <div>
+                            <label for="sftp_username"/>
+                            <div class="text-muted">
+                                The username where the SFTP connection should be made with. This is the user on the external server.
+                            </div>
+                            <field name="sftp_username" placeholder="username"/>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-md-6 o_setting_box">
+                        <div>
+                            <label for="sftp_password"/>
+                            <div class="text-muted">
+                                The password from the user where the SFTP connection should be made with. This is the password from the user on the external server.
+                            </div>
+                            <field name="sftp_password" password="True"/>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-md-6 o_setting_box">
+                        <div>
+                            <label for="sftp_path"/>
+                            <div class="text-muted">
+                                The location to the folder where the dumps should be written to. For example /odoo/backups/.<br/>Files will then be written to /odoo/backups/ on your remote server.
+                            </div>
+                            <field name="sftp_path" placeholder="/odoo/backups/"/>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-md-6 o_setting_box">
+                        <div>
+                            <label for="sftp_rsa_key_path"/>
+                            <div class="text-muted">
+                              The location to the folder where the rsa key is saved.
+                            </div>
+                            <field name="sftp_rsa_key_path" placeholder="/opt/odoo/.ssh/id_rsa"/>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-md-12 o_setting_box">
+                        <button name="test_sftp_connection" type="object" string="Test SFTP Connection" icon="fa-server"/>
+                        <separator string="Help"/>
+                        <div>
+                          This configures the sftp server for store backups of client databases.
+                          <br />
+                          Automatic backups of the database can be scheduled as follows:
+                          <ol>
+                              <li>
+                                  Go to Settings / Technical / Automation / Scheduled Actions.
+                              </li>
+                              <li>
+                                  Search the action named 'Backup saas databases scheduler'.
+                              </li>
+                              <li>
+                                  Set the scheduler to active and fill in how often you want backups generated.
+                              </li>
+                          </ol>
+                      </div>
+                    </div>
+                </div>
+              </xpath>
             </field>
-        </record>
-    </data>
-</openerp>
+          </record>
+
+</odoo>

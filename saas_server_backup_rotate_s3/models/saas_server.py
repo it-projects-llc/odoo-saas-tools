@@ -1,22 +1,12 @@
-# -*- coding: utf-8 -*-
 from odoo import api
 from odoo import models
-import psycopg2
 
 import logging
 _logger = logging.getLogger(__name__)
 
-
-try:
-    import boto
-    from boto.s3.key import Key
-except:
-    _logger.debug('SAAS Sysadmin Bacnkup Agent S3 Requires the python library Boto which is not \
-    found on your installation')
-
 try:
     from rotate_backups_s3 import S3RotateBackups
-except:
+except Exception as e:
     _logger.debug('SAAS Server Backup Rotate S3 Requires the python library'
                   'rotate-backups-s3; grab it from pypi')
 

@@ -1,13 +1,14 @@
-# -*- coding: utf-8 -*-
 # some code taken from https://github.com/evonove/django-oauth-toolkit/
-
-from odoo import SUPERUSER_ID
+import base64
 import logging
+
 try:
     from oauthlib.oauth2 import RequestValidator, MobileApplicationServer
-except:
+except Exception as e:
     RequestValidator = object
     MobileApplicationServer = False
+from urllib.parse import unquote_plus
+
 from datetime import datetime, timedelta
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 
@@ -46,13 +47,16 @@ class OAuth2Validator(RequestValidator):
         encoding = req.encoding or 'utf-8'
 
         auth_string_decoded = base64.b64decode(auth_string).decode(encoding)
-        client_id, client_secret = list(map(unquote_plus, auth_string_decoded.split(':', 1)))
+        client_id, client_secret = list(
+            map(unquote_plus, auth_string_decoded.split(':', 1)))
 
         if self._load_application(client_id, req) is None:
-            log.debug("Failed basic auth: Application %s does not exist" % client_id)
+            log.debug(
+                "Failed basic auth: Application %s does not exist" % client_id)
             return False
         elif req.client.client_secret != client_secret:
-            log.debug("Failed basic auth: wrong client secret %s" % client_secret)
+            log.debug("Failed basic auth: wrong client secret %s" %
+                      client_secret)
             return False
         else:
             return True
@@ -73,10 +77,12 @@ class OAuth2Validator(RequestValidator):
             return False
 
         if self._load_application(client_id, req) is None:
-            log.debug("Failed body auth: Application %s does not exists" % client_id)
+            log.debug(
+                "Failed body auth: Application %s does not exists" % client_id)
             return False
         elif req.client.client_secret != client_secret:
-            log.debug("Failed body auth: wrong client secret %s" % client_secret)
+            log.debug("Failed body auth: wrong client secret %s" %
+                      client_secret)
             return False
         else:
             return True
@@ -140,8 +146,10 @@ class OAuth2Validator(RequestValidator):
         proceed only if the client exists and it's not of type 'Confidential'.
         Also assign Application instance to req.client.
         """
-        if self._load_application(client_id, req) is not None:
-            log.debug("Application %s has type %s" % (client_id, req.client.client_type))
+        Application = self._load_application(client_id, req)
+        if Application is not None:
+            log.debug("Application %s has type %s" %
+                      (client_id, req.client.client_type))
             return req.client.client_type != Application.CLIENT_CONFIDENTIAL
         return False
 
@@ -168,7 +176,7 @@ class OAuth2Validator(RequestValidator):
         #    req.user = req.client.user
 
         access_token_obj = request.env['oauth.access_token'].sudo()
-        access_token = access_token_obj.create({
+        access_token_obj.create({
             'user_id': req.user.id,
             'scope': token['scope'],
             'expires': expires.strftime(DEFAULT_SERVER_DATETIME_FORMAT),

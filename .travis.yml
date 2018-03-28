@@ -1,20 +1,26 @@
 language: python
 
 python:
-  - "2.7"
-  
+  - "3.5"
+
 sudo: false
-cache: pip
+cache:
+  apt: true
+  directories:
+    - $HOME/.cache/pip
 
 addons:
   apt:
     packages:
-      - expect-dev  # provides unbuffer utility
-      - python-lxml  # because pip installation is slow
+      - expect-dev
+      - python-lxml
+      - python-simplejson
+      - python-serial
+      - python-yaml
 
 env:
   global:
-  - VERSION="10.0" TESTS="0" LINT_CHECK="0" TRANSIFEX="0" UNIT_TEST="0"
+  - VERSION="11.0" TESTS="0" LINT_CHECK="0" TRANSIFEX="0" UNIT_TEST="0"
   - PYLINT_ODOO_JSLINTRC="/home/travis/maintainer-quality-tools/travis/cfg/.jslintrc"
   - TRANSIFEX_USER='i18n-bot@it-projects.info'
   - secure: "M8lzKGFpvd9QJ/ZD4hjD21MNq65OzA6tMw0e7cxYzFBrLoWEHaPaEHBmKBPHE9WDBrZ1/he5egkosgT5Ln7Kg3qrz8ynIjs1n/kXC3E9+59zUoIg0DHtAk8qo5lQdD1amCOtCirOsQymSaUgEDpjFXw7oIJiW9YfLlqB7Sb+GMqMsE5+zsBAK93eU0RziXceCh2YDFhu/H595lyS/wueLquI2Y5e/Vx7PyJnpBN+yNcNn0paVcaWc5HH2iyRJUqNjp6OB1B1XBk+XFNASZFtKPgj/96OkaQZop+uMhiA9+Dg0MSdqc3H6UP+V+ADkH9ogIbCvsJwsD6RX/TanvvJP8subyH224WXTDR/diKocOcxCwq/MMJ1H693wjLMpV38C5ZB0i/21YTkc21yBJ35r+1Ew6SJBZOEAiC2ocs8eHwAg1Mp0HYLLeh1v35OjzouUkl1Ej6WQye+TEs4WXRUkWL8ATTU13u5HopJHrQT7FVr/GzokTwZWw/0V3x59unNRqtyhZBTFBDp2cRkw5RX54IRKn/GVsT/5wMwOlC5HOw+SLN/AnNAQSmt0QruTmOpa417H11d/9mL6HSlR5ClOf71yUgEhbVDg7iC7w8I7OO7WGXgJ4N6MCK3jPv4G6Vcmj3oShDNGU5wFpNL0x2hRd2a5lRa/Yg+6pJNl8drnNo="
@@ -24,9 +30,6 @@ env:
   - TESTS="1" ODOO_REPO="odoo/odoo"
   - TESTS="1" ODOO_REPO="OCA/OCB"
   - TRANSIFEX="1"
-
-virtualenv:
-  system_site_packages: true
 
 install:
   - pip install anybox.testing.openerp

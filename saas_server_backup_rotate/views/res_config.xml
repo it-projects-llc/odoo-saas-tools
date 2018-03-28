@@ -1,26 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<openerp>
-    <data>
-        <record model="ir.ui.view" id="view_saas_server_config_settings">
-            <field name="name">saas_server.config.settings.inherit</field>
-            <field name="model">saas_server.config.settings</field>
-            <field name="inherit_id"
-                ref="saas_server.view_saas_server_config_settings" />
-            <field name="arch" type="xml">
-                <header position="after">
-                    <div>
-
-                        <group string="Backup Rotate Strategy">
-                            <field name="backup_rotate_unlimited" />
-                            <field name="backup_rotate_yearly" attrs="{'invisible':[('backup_rotate_unlimited','=', True)]}"/>
-                            <field name="backup_rotate_monthly" attrs="{'invisible':[('backup_rotate_unlimited','=', True)]}" />
-                            <field name="backup_rotate_weekly" attrs="{'invisible':[('backup_rotate_unlimited','=', True)]}"/>
-                            <field name="backup_rotate_daily" attrs="{'invisible':[('backup_rotate_unlimited','=', True)]}"/>
-                            <field name="backup_rotate_hourly" attrs="{'invisible':[('backup_rotate_unlimited','=', True)]}" />
-                        </group>
+<odoo>
+    <record id="res_config_settings_view_form_inherited_saas_portal" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.saas_portal</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="20"/>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@id=('saas_portal')]" position="inside">
+                <h2>Rotate Backup Settings</h2>
+                <div class="row mt16 o_settings_container">
+                    <div class="col-xs-12 col-md-12 o_setting_box">
+                        <div>
+                            <div class="o_setting_left_pane">
+                                <field name="backup_rotate_unlimited"/>
+                            </div>
+                            <div class="o_setting_right_pane">
+                                <label for="backup_rotate_unlimited"/>
+                            </div>
+                        </div>
                     </div>
-                </header>
-            </field>
-        </record>
-    </data>
-</openerp>
+                    <div class="col-xs-12 col-md-6 o_setting_box">
+                        <div attrs="{'invisible':[('backup_rotate_unlimited','=', True)]}">
+                            <label for="backup_rotate_yearly"/>
+                            <div class="text-muted">
+                                Set the number of yearly backups to preserve during rotation.
+                            </div>
+                            <field name="backup_rotate_yearly" placeholder="2"/>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-md-6 o_setting_box">
+                        <div attrs="{'invisible':[('backup_rotate_unlimited','=', True)]}">
+                            <label for="backup_rotate_monthly"/>
+                            <div class="text-muted">
+                                Set the number of monthly backups to preserve during rotation.
+                            </div>
+                            <field name="backup_rotate_monthly" placeholder="12"/>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-md-6 o_setting_box">
+                        <div attrs="{'invisible':[('backup_rotate_unlimited','=', True)]}">
+                            <label for="backup_rotate_weekly"/>
+                            <div class="text-muted">
+                                Set the number of weekly backups to preserve during rotation.
+                            </div>
+                            <field name="backup_rotate_weekly" placeholder="4"/>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-md-6 o_setting_box">
+                        <div attrs="{'invisible':[('backup_rotate_unlimited','=', True)]}">
+                            <label for="backup_rotate_daily"/>
+                            <div class="text-muted">
+                                Set the number of daily backups to preserve during rotation.
+                            </div>
+                            <field name="backup_rotate_daily" placeholder="7"/>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-md-6 o_setting_box">
+                        <div attrs="{'invisible':[('backup_rotate_unlimited','=', True)]}">
+                            <label for="backup_rotate_hourly"/>
+                            <div class="text-muted">
+                                Set the number of hourly backups to preserve during rotation.
+                            </div>
+                            <field name="backup_rotate_hourly" placeholder="24"/>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

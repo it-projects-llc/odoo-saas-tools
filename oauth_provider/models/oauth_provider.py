@@ -1,11 +1,10 @@
-# -*- coding: utf-8 -*-
 from odoo import models, fields, api
 from datetime import datetime, timedelta
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 
 try:
     from oauthlib import common as oauthlib_common
-except:
+except Exception as e:
     pass
 
 import uuid

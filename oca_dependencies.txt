@@ -1,3 +1,4 @@
-e-commerce https://github.com/OCA/e-commerce
-access-addons https://github.com/it-projects-llc/access-addons
-website-addons https://github.com/it-projects-llc/website-addons
+e-commerce https://github.com/vauxoo-dev/e-commerce.git 11.0-migrate_sale_require_login_10-2-11
+access-addons https://github.com/it-projects-llc/access-addons 11.0
+website-addons https://github.com/it-projects-llc/website-addons 11.0
+contract https://github.com/OCA/contract.git 11.0

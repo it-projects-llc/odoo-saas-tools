@@ -1,24 +1,21 @@
-# -*- coding: utf-8 -*-
 import logging
 import simplejson
 import traceback
+from ..validators import server
+from urllib.parse import urlparse
+from urllib.parse import urlunparse
 
-from odoo import SUPERUSER_ID
+try:
+    from oauthlib.oauth2.rfc6749 import errors
+    from oauthlib.common import urlencode, urlencoded, quote
+except Exception as e:
+    pass
+
 from odoo import http
 from odoo.http import request
 import werkzeug
 
 _logger = logging.getLogger(__name__)
-
-from ..validators import server
-
-try:
-    from oauthlib.oauth2.rfc6749 import errors
-    from oauthlib.common import urlencode, urlencoded, quote
-except:
-    pass
-from urllib.parse import urlparse
-from urllib.parse import urlunparse
 
 
 # see https://oauthlib.readthedocs.org/en/latest/oauth2/server.html
@@ -65,9 +62,10 @@ class OAuth2(http.Controller):
     def _response(self, headers, body, status=200):
         try:
             fixed_headers = {str(k): v for k, v in list(headers.items())}
-        except:
+        except Exception as e:
             fixed_headers = headers
-        response = werkzeug.Response(response=body, status=status, headers=fixed_headers)
+        response = werkzeug.Response(
+            response=body, status=status, headers=fixed_headers)
         return response
 
     @http.route('/oauth2/auth', type='http', auth='public')

@@ -1,8 +1,9 @@
-# -*- coding: utf-8 -*-
 import tempfile
 from odoo import api, models
+
 import logging
 _logger = logging.getLogger(__name__)
+
 try:
     import pysftp
 except ImportError:
@@ -41,7 +42,7 @@ class SaasServerClient(models.Model):
                 currentDir += dirElement + '/'
                 try:
                     srv.chdir(currentDir)
-                except:
+                except Exception as e:
                     print(('(Part of the) path didn\'t exist. Creating it now at ' + currentDir))
                     # Make directory and then navigate into it
                     srv.mkdir(currentDir, mode=777)

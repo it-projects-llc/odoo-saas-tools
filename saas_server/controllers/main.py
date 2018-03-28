@@ -1,16 +1,14 @@
-# -*- coding: utf-8 -*-
 import functools
 import datetime
+import werkzeug.utils
+import simplejson
+
 from odoo import api, SUPERUSER_ID
 from odoo import http
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 from odoo.tools.translate import _
 from odoo.http import request
 from odoo.addons.auth_oauth.controllers.main import fragment_to_query_string
-
-import werkzeug.utils
-import simplejson
-
 
 import logging
 _logger = logging.getLogger(__name__)
@@ -88,7 +86,7 @@ class SaasServer(http.Controller):
             })
             return simplejson.dumps(res)
 
-        with client.registry()[0].cursor() as cr:
+        with client.registry().cursor() as cr:
             client_env = api.Environment(cr, SUPERUSER_ID, request.context)
             oauth_provider_id = client_env.ref('saas_client.saas_oauth_provider').id
             action_id = client_env.ref(action).id
@@ -138,7 +136,7 @@ class SaasServer(http.Controller):
         client_id = post.get('client_id')
         client = request.env['saas_server.client'].sudo().search([('client_id', '=', client_id)])
 
-        result = client.upgrade_database(data=state.get('data'))
+        result = client.upgrade_database(data=data)
         return simplejson.dumps({client.name: result})
 
     @http.route(['/saas_server/rename_database'], type='http', website=True, auth='public')
@@ -148,7 +146,6 @@ class SaasServer(http.Controller):
         _logger.info('delete_database post: %s', post)
         state = simplejson.loads(post.get('state'))
         client_id = state.get('client_id')
-        db = state.get('d')
         new_dbname = state.get('new_dbname')
         saas_oauth_provider = request.env.ref('saas_server.saas_oauth_provider').sudo()
 
@@ -265,9 +262,7 @@ class SaasServer(http.Controller):
         _logger.info('sync_server post: %s', post)
 
         state = simplejson.loads(post.get('state'))
-        client_id = state.get('client_id')
         updating_client_ID = state.get('updating_client_ID')
-        db = state.get('d')
         access_token = post['access_token']
         saas_oauth_provider = request.env.ref('saas_server.saas_oauth_provider').sudo()
 
@@ -287,7 +282,6 @@ class SaasServer(http.Controller):
                 'client_id': client.client_id,
                 'users_len': client.users_len,
                 'max_users': client.max_users,
-                'state': client.state,
                 'file_storage': client.file_storage,
                 'db_storage': client.db_storage,
                 'total_storage_limit': client.total_storage_limit,
@@ -312,7 +306,6 @@ class SaasServer(http.Controller):
 
         state = simplejson.loads(post.get('state'))
         client_id = state.get('client_id')
-        db = state.get('d')
         access_token = post['access_token']
         saas_oauth_provider = request.env.ref('saas_server.saas_oauth_provider').sudo()
 

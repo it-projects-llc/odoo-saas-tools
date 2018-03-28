@@ -1,10 +1,7 @@
-# -*- coding: utf-8 -*-
 from odoo import models, fields, api
-import urllib.parse
 
 
 class SaasPortalConfigWizard(models.TransientModel):
-    _name = 'saas_portal.config.settings'
     _inherit = 'res.config.settings'
 
     base_saas_domain = fields.Char('Base SaaS domain')
@@ -16,69 +13,28 @@ class SaasPortalConfigWizard(models.TransientModel):
     expiration_notify_in_advance = fields.Char(help='Notify partners when less then defined number of days left befor expiration')
 
     module_saas_portal_sale_online = fields.Boolean(string='Sale SaaS from website shop', help='Use saas_portal_sale_online module')
-
-    # base_saas_domain
-    @api.model
-    def get_default_base_saas_domain(self, fields):
-        base_saas_domain = self.env["ir.config_parameter"].sudo().get_param("saas_portal.base_saas_domain", default=None)
-        if base_saas_domain is None:
-            domain = self.env["ir.config_parameter"].sudo().get_param("web.base.url")
-            try:
-                base_saas_domain = urllib.parse.urlsplit(domain).netloc.split(':')[0]
-            except Exception:
-                pass
-        return {'base_saas_domain': base_saas_domain or False}
+    module_saas_server_backup_ftp = fields.Boolean(string='Use SFTP Backup profile', help='Use saas_server_backup_ftp module')
+    module_saas_server_backup_rotate = fields.Boolean(string='Rotate backups', help='Use saas_server_backup_rotate module')
 
     @api.multi
-    def set_base_saas_domain(self):
-        config_parameters = self.env["ir.config_parameter"]
-        for record in self:
-            config_parameters.set_param("saas_portal.base_saas_domain", record.base_saas_domain or '')
+    def set_values(self):
+        super(SaasPortalConfigWizard, self).set_values()
+        ICPSudo = self.env['ir.config_parameter'].sudo()
+        ICPSudo.set_param("saas_portal.base_saas_domain", self.base_saas_domain)
+        ICPSudo.set_param("saas_portal.page_for_maximumdb", self.page_for_maximumdb)
+        ICPSudo.set_param("saas_portal.page_for_maximumtrialdb", self.page_for_maximumtrialdb)
+        ICPSudo.set_param("saas_portal.page_for_nonfree_subdomains", self.page_for_nonfree_subdomains)
+        ICPSudo.set_param("saas_portal.expiration_notify_in_advance", self.expiration_notify_in_advance)
 
-    # page_for_maximumdb
     @api.model
-    def get_default_page_for_maximumdb(self, fields):
-        page_for_maximumdb = self.env["ir.config_parameter"].sudo().get_param("saas_portal.page_for_maximumdb", default='/')
-        return {'page_for_maximumdb': page_for_maximumdb or '/'}
-
-    @api.multi
-    def set_page_for_maxumumdb(self):
-        config_parameters = self.env["ir.config_parameter"]
-        for record in self:
-            config_parameters.set_param("saas_portal.page_for_maximumdb", record.page_for_maximumdb or '/')
-
-    # page_for_maximumtrialdb
-    @api.model
-    def get_default_page_for_maximumtrialdb(self, fields):
-        page_for_maximumtrialdb = self.env["ir.config_parameter"].sudo().get_param("saas_portal.page_for_maximumtrialdb", default='/')
-        return {'page_for_maximumtrialdb': page_for_maximumtrialdb or '/'}
-
-    @api.multi
-    def set_page_for_maxumumtrialdb(self):
-        config_parameters = self.env["ir.config_parameter"]
-        for record in self:
-            config_parameters.set_param("saas_portal.page_for_maximumtrialdb", record.page_for_maximumtrialdb or '/')
-
-    # page_for_nonfree_subdomains
-    @api.model
-    def get_default_page_for_nonfree_subdomains(self, fields):
-        page_for_nonfree_subdomains = self.env["ir.config_parameter"].sudo().get_param("saas_portal.page_for_nonfree_subdomains", default='/')
-        return {'page_for_nonfree_subdomains': page_for_nonfree_subdomains or '/'}
-
-    @api.multi
-    def set_page_for_nonfree_subdomains(self):
-        config_parameters = self.env["ir.config_parameter"]
-        for record in self:
-            config_parameters.set_param("saas_portal.page_for_nonfree_subdomains", record.page_for_nonfree_subdomains or '/')
-
-    # expiration_notify_in_advance
-    @api.model
-    def get_default_expiration_notify_in_advance(self, fields):
-        expiration_notify_in_advance = self.env["ir.config_parameter"].sudo().get_param("saas_portal.expiration_notify_in_advance", default='0')
-        return {'expiration_notify_in_advance': expiration_notify_in_advance or '0'}
-
-    @api.multi
-    def set_expiration_notify_in_advance(self):
-        config_parameters = self.env["ir.config_parameter"]
-        for record in self:
-            config_parameters.set_param("saas_portal.expiration_notify_in_advance", record.expiration_notify_in_advance or '0')
+    def get_values(self):
+        res = super(SaasPortalConfigWizard, self).get_values()
+        ICPSudo = self.env['ir.config_parameter'].sudo()
+        res.update(
+            base_saas_domain=ICPSudo.get_param('saas_portal.base_saas_domain'),
+            page_for_maximumdb=ICPSudo.get_param('saas_portal.page_for_maximumdb'),
+            page_for_maximumtrialdb=ICPSudo.get_param('saas_portal.page_for_maximumtrialdb'),
+            page_for_nonfree_subdomains=ICPSudo.get_param('saas_portal.page_for_nonfree_subdomains'),
+            expiration_notify_in_advance=ICPSudo.get_param('saas_portal.expiration_notify_in_advance'),
+        )
+        return res

@@ -5,7 +5,7 @@
     "images": [],
     "version": "11.0.1.0.0",
 
-    "author": "IT-Projects LLC, Cesar Lage, Ivan Yelizariev",
+    "author": "IT-Projects LLC, Cesar Lage, Ivan Yelizariev, Nicolas JEUDY",
     "website": "https://it-projects.info",
     "license": "GPL-3",
     # "price": 9.00,

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import odoo
 from odoo import http, SUPERUSER_ID
 from odoo.http import request

@@ -1,14 +1,12 @@
-# -*- coding: utf-8 -*-
 from odoo import api
 from odoo import models
 try:
     from odoo.addons.connector.queue.job import job
     from odoo.addons.connector.session import ConnectorSession
-except:
+except Exception as e:
     def empty_decorator(func):
         return func
     job = empty_decorator
-
 
 
 @job
@@ -28,7 +26,9 @@ class SaasPortalPlan(models.Model):
     def create_new_database(self, async=None, **kwargs):
         if async:
             session = ConnectorSession(self._cr, self._uid, self._context)
-            job_uuid = async_client_create.delay(session, self._name, self.id, async=async, **kwargs)
+            job_uuid = async_client_create.delay(
+                session, self._name, self.id, async=async, **kwargs)
         else:
-            res = super(SaasPortalPlan, self)._create_new_database(async=async, **kwargs)
+            res = super(SaasPortalPlan, self)._create_new_database(
+                async=async, **kwargs)
             return res

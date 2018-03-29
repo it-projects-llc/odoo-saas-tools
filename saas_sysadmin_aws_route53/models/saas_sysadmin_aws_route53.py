@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from odoo import models, fields, api
 from odoo.exceptions import Warning
 
@@ -8,7 +7,7 @@ _logger = logging.getLogger(__name__)
 try:
     import boto
     from boto.route53.exception import DNSServerError
-except:
+except Exception as e:
     _logger.critical('SAAS Route53 Requires the python library Boto which is not \
     found on your installation')
 

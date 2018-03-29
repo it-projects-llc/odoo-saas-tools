@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from odoo.models import AbstractModel
 from odoo.tools.config import config
 

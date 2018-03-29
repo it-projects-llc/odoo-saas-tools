@@ -1,5 +1,6 @@
 {
     'name': "Product price factor for web shop",
+    'version': '11.0.1.0.1',
     'summary': """Multiplies price depending on product attributes""",
     'category': 'Website',
     'license': 'LGPL-3',

@@ -1,8 +1,7 @@
-# -*- coding: utf-8 -*-
 {
     'name': 'SaaS Portal Sign Up',
-    'version': '1.0.0',
-    'author': 'Cesar Lage',
+    'version': '11.0.1.0.0',
+    'author': 'Cesar Lage, Nicolas JEUDY',
     'license': 'LGPL-3',
     'category': 'SaaS',
     "support": "apps@it-projects.info",

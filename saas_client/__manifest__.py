@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 {
     'name': 'SaaS Client',
-    'version': '1.0.0',
+    'version': '11.0.1.0.0',
     'author': 'Ivan Yelizariev, Nicolas JEUDY',
     'license': 'LGPL-3',
     'category': 'SaaS',

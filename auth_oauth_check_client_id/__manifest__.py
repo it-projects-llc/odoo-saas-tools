@@ -10,7 +10,4 @@
     'depends': ['auth_oauth'],
     'data': [],
     'installable': True,
-
-    'description': '''
-    ''',
 }

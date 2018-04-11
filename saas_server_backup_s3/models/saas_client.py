@@ -54,7 +54,7 @@ def _upload_part(bucketname, aws_key, aws_secret, multipart_id, part_num,
     def _upload(retries_left=amount_of_retries):
         try:
             _logger.info('Start uploading part # %d ...' % part_num)
-            conn, bucket_name = _get_s3_conn(self.env)
+            conn = boto.connect_s3(aws_key, aws_secret)
             bucket = conn.get_bucket(bucketname)
             for mp in bucket.get_all_multipart_uploads():
                 if mp.id == multipart_id:

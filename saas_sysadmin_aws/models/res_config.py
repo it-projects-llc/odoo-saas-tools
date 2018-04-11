@@ -16,7 +16,7 @@ class SaasPortalConfigWizard(models.TransientModel):
 
     @api.model
     def get_values(self):
-        res = super(SaasPortalConfigConfigWizard, self).get_values()
+        res = super(SaasPortalConfigWizard, self).get_values()
         ICPSudo = self.env['ir.config_parameter'].sudo()
         res.update(
             saas_route53_aws_accessid=ICPSudo.get_param('saas_route53.saas_route53_aws_accessid'),

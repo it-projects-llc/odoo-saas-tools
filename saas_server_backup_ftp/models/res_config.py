@@ -1,6 +1,5 @@
 from odoo import models, fields, api
 from odoo import _, exceptions
-from odoo.exceptions import Warning as UserError
 
 import logging
 _logger = logging.getLogger(__name__)
@@ -63,17 +62,16 @@ class SaasPortalConfigWizard(models.TransientModel):
         return res
 
     def test_sftp_connection(self):
-        server = self.env["ir.config_parameter"].get_param(
+        server = self.env["ir.config_parameter"].sudo().get_param(
             "saas_server.sftp_server", default=None)
-        username = self.env["ir.config_parameter"].get_param(
+        username = self.env["ir.config_parameter"].sudo().get_param(
             "saas_server.sftp_username", default=None)
-        password = self.env["ir.config_parameter"].get_param(
+        password = self.env["ir.config_parameter"].sudo().get_param(
             "saas_server.sftp_password", default=None)
-        path = self.env["ir.config_parameter"].get_param(
-            "saas_server.sftp_path", default=None)
-        sftp_rsa_key_path = self.env["ir.config_parameter"].get_param(
+        sftp_rsa_key_path = self.env["ir.config_parameter"].sudo().get_param(
             'saas_server.sftp_rsa_key_path')
-
+        sftp_password = self.env["ir.config_parameter"].sudo().get_param(
+            'saas_server.sftp_password')
         params = {
             "host": server,
             "username": username,

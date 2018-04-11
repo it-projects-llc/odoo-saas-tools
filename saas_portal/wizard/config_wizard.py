@@ -1,6 +1,5 @@
 import requests
 
-from odoo.http import request
 from odoo import api, fields, models
 from odoo.tools.translate import _
 

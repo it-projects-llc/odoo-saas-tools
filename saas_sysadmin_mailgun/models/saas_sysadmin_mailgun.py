@@ -7,7 +7,7 @@ _logger = logging.getLogger(__name__)
 
 try:
     pass
-except exception as e:
+except Exception as e:
     _logger.critical('SAAS Route53 Requires the python library Boto which is not \
     found on your installation')
 

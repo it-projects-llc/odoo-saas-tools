@@ -14,7 +14,7 @@ class SaasPortalConfigWizard(models.TransientModel):
 
     @api.model
     def get_values(self):
-        res = super(SaasPortalConfigConfigWizard, self).get_values()
+        res = super(SaasPortalConfigWizard, self).get_values()
         ICPSudo = self.env['ir.config_parameter'].sudo()
         res.update(
             saas_mailgun_api_key=ICPSudo.get_param('saas_mailgun.saas_mailgun_api_key'),

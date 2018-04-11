@@ -145,16 +145,16 @@ class SaasServerClient(models.Model):
             client_env['ir.default'].set('res.partner', 'tz', tz)
 
         # update database.uuid
-        client_env['ir.config_parameter'].set_param('database.uuid', client_id)
+        client_env['ir.config_parameter'].sudo().set_param('database.uuid', client_id)
 
         # copy configs
         for key in self._config_parameters_to_copy():
             value = self.env['ir.config_parameter'].sudo(
             ).get_param(key, default='')
-            client_env['ir.config_parameter'].set_param(key, value)
+            client_env['ir.config_parameter'].sudo().set_param(key, value)
 
         # set web.base.url config
-        client_env['ir.config_parameter'].set_param(
+        client_env['ir.config_parameter'].sudo().set_param(
             'web.base.url', '%s://%s' % (server_requests_scheme, self.host))
 
         # saas_client must be already installed
@@ -195,7 +195,7 @@ class SaasServerClient(models.Model):
             res = client_env['res.users'].search(domain)
             if res:
                 user = res[0]
-                client_env['ir.config_parameter'].set_param(
+                client_env['ir.config_parameter'].sudo().set_param(
                     'res.users.owner', user.id)
 
             portal_owner_uid = owner_user.pop('user_id')
@@ -334,10 +334,10 @@ class SaasServerClient(models.Model):
                 self.expiration_datetime = obj['value']
             if obj['key'] == 'saas_client.trial' and obj['value'] == 'False':
                 self.trial = False
-            groups = []
-            if obj.get('hidden'):
-                groups = ['saas_client.group_saas_support']
-            client_env['ir.config_parameter'].set_param(
+            # groups = []
+            # if obj.get('hidden'):
+            #     groups = ['saas_client.group_saas_support']
+            client_env['ir.config_parameter'].sudo().set_param(
                 obj['key'], obj['value'] or ' ')
 
         # 6. Access rights

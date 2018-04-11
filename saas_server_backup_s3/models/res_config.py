@@ -10,7 +10,7 @@ class SaasPortalConfigWizard(models.TransientModel):
 
     @api.multi
     def set_values(self):
-        super(SaasServerWizard, self).set_values()
+        super(SaasPortalConfigWizard, self).set_values()
         ICPSudo = self.env['ir.config_parameter'].sudo()
         ICPSudo.set_param("saas_s3.saas_s3_aws_accessid", str(int(self.saas_s3_aws_accessid)))
         ICPSudo.set_param("saas_s3.saas_s3_aws_accesskey", self.saas_s3_aws_accesskey)

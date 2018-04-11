@@ -7,21 +7,9 @@ Installation
 
 * `Install <https://odoo-development.readthedocs.io/en/latest/odoo/usage/install-module.html>`__ this module in a usual way
 
-Configuration
-=============
-
-{Instruction how to configure the module before start to use it}
-
-TODO
-
 Usage
 =====
 
-{Instruction for daily usage. It should describe how to check that module works. What shall user do and what would user get.}
+On product form click `Variant Prices button`
 
-TODO
-
-Uninstallation
-==============
-
-{Optional section for uninstallation notes. Delete it if you don't have notes for uninstallation.}
+Then you can add a price factor for an attribute instead of a price for attribute.

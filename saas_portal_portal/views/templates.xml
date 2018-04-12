@@ -33,6 +33,7 @@
             </div>
           </div>
           <h1>Domain name</h1>
+          <t t-if="saas_portal_client">
           <form role="form" class="form-inline">
             <input type="hidden" name="client_id" t-att-value="saas_portal_client.id"/>
             <input type="hidden" name="base_saas_domain" t-att-value="base_saas_domain"/>
@@ -57,6 +58,7 @@
   </div>
 
   </form>
+</t>
         </div>
       </div>
     </t>

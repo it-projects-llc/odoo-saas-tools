@@ -18,9 +18,9 @@ $(document).ready(function() {
 
     var db_sel = 'input.odoo_db_name';
     var getUrlVars = function() {
-        var vars = [],
-        var hash = [];
-        var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+        vars = [],
+        hash = [];
+        hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
         for (var i = 0; i < hashes.length; i++) {
             hash = hashes[i].split('=');
             vars.push(hash[0]);

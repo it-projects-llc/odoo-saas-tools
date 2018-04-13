@@ -7,7 +7,7 @@ _logger = logging.getLogger(__name__)
 
 
 class WebsiteSaasDashboard(CustomerPortal):
-    @http.route(['/my/home'], type='http', auth="user", website=True)
+    @http.route()
     def account(self, redirect=None, **post):
         """ Add sales documents to main account page """
         response = super(WebsiteSaasDashboard, self).account(redirect=redirect, **post)

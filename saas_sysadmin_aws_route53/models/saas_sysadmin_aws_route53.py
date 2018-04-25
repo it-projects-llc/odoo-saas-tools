@@ -9,7 +9,7 @@ try:
     import boto
     from boto.route53.exception import DNSServerError
 except:
-    _logger.critical('SAAS Route53 Requires the python library Boto which is not \
+    _logger.debug('SAAS Route53 Requires the python library Boto which is not \
     found on your installation')
 
 

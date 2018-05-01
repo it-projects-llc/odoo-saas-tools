@@ -334,6 +334,7 @@ class SaasPortalPlan(models.Model):
                     'default_use_template': bool(template),
                     'default_template_id': template.id,
                     'default_composition_mode': 'comment',
+                }
 
         client.send_params_to_client_db()
         # TODO make async call of action_sync_server here

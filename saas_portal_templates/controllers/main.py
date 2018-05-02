@@ -13,7 +13,7 @@ class SaasPortalTemplates(saas_portal_controller):
         fields = ['id', 'name', 'summary']
         templates = request.env['saas_portal.plan'].sudo().search_read(domain=domain, fields=fields)
         values = {'templates': templates}
-        return request.website.render("saas_portal_templates.select_template", values)
+        return request.render("saas_portal_templates.select_template", values)
 
     @http.route(['/saas_portal_templates/new_database'], type='http', auth='public', website=True)
     def new_database(self, **post):

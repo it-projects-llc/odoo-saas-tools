@@ -39,7 +39,7 @@ class ModuleDemo(models.Model):
     @api.multi
     def get_demo_images(self):
         self.ensure_one()
-        demo_images = self.demo_images and self.demo_images.split(',')
+        demo_images = self.demo_images and self.demo_images.split(',') or []
         res = []
         mod_path = get_module_resource(self.name)
         for image_name in demo_images:

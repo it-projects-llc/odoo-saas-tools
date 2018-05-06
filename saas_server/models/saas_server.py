@@ -192,8 +192,8 @@ class SaasServerClient(models.Model):
 
     @api.multi
     def update_one(self):
-        self.ensure_one()
-        self.sudo().update()
+        for r in self:
+            r.sudo().update()
 
     @api.one
     def update(self):

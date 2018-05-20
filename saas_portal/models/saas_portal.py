@@ -235,11 +235,11 @@ class SaasPortalPlan(models.Model):
     @api.multi
     @api.depends('template_id.state')
     def _compute_get_state(self):
-        self.ensure_one()
-        if self.template_id.state == 'template':
-            self.state = 'confirmed'
-        else:
-            self.state = 'draft'
+        for plan in self:
+            if plan.template_id.state == 'template':
+                plan.state = 'confirmed'
+            else:
+                plan.state = 'draft'
 
     @api.multi
     def _new_database_vals(self, vals):

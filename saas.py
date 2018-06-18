@@ -434,7 +434,7 @@ def rpc_create_plan(portal_db_name):
 
     template_id = rpc_execute_kw(auth, 'saas_portal.database', 'create', [{'name': plan_template_db_name}])
 
-    plan_id = rpc_execute_kw(auth, 'saas_portal.plan', 'create', [{'name': plan_name, 'server_id': server_id, 'template_id': template_id, 'dbname_template': plan_clients}])
+    plan_id = rpc_execute_kw(auth, 'saas_portal.plan', 'create', [{'name': plan_name, 'server_id': server_id, 'template_id': template_id, 'dbname_template': plan_clients, 'demo': not args.get('without_demo')}])
 
     #      * click [Create Template DB].
     #      * wait couple minutes while Database is being created.

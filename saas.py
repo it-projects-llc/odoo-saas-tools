@@ -72,7 +72,7 @@ settings_group.add_argument('--install-modules', dest='install_modules', help='C
 #settings_group.add_argument('--db_user', dest='db_user', help='database user name')
 settings_group.add_argument('-s', '--simulate', dest='simulate', action='store_true', help='Don\'t make actual changes. Just show what script is going to do.')
 settings_group.add_argument('--drop-databases', dest='drop_databases', help='Drop existed databases before creating portal or server', action='store_true', default=False)
-
+settings_group.add_argument('--db-lang', dest='db_lang', help='DB language', default='en_US')
 
 portal_group = parser.add_argument_group('Portal creation')
 portal_group.add_argument('--portal-create', dest='portal_create', help='Create SaaS Portal database', action='store_true')
@@ -241,7 +241,7 @@ def createdb(dbname):
     without_demo = args.get('without_demo')
     main_url = 'http://localhost:%s' % xmlrpc_port
     demo = not without_demo
-    lang = 'en_US'  # TODO
+    lang = args.get('db_lang')
     admin_password = args.get('admin_password')
 
     rpc_db = xmlrpc.client.ServerProxy('{}/xmlrpc/2/db'.format(main_url))

@@ -200,7 +200,7 @@ class SaasPortalPlan(models.Model):
         'Block clients on storage exceed', default=False)
 
     def _get_default_lang(self):
-        return self.env.lang
+        return self.env.user.lang
 
     def _default_tz(self):
         return self.env.user.tz

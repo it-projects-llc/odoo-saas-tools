@@ -427,7 +427,9 @@ def rpc_create_plan(portal_db_name):
     #      * click [Save]
 
     # TODO: use rpc_get_server_id
-    res = rpc_execute_kw(auth, 'saas_portal.server', 'search', [[]])
+    res = rpc_execute_kw(auth, 'saas_portal.server', 'search', [[('name', '=', args.get('server_db_name'))]])
+    if not res:
+        res = rpc_execute_kw(auth, 'saas_portal.server', 'search', [[]])
     # use last created server
     log('search server', res)
     server_id = res[0]

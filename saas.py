@@ -120,7 +120,7 @@ def get_odoo_config():
     config_file = args.get('odoo_config') or os.environ.get("OPENERP_SERVER")
     if not config_file:
         return res
-    p = ConfigParser.ConfigParser()
+    p = ConfigParser.RawConfigParser()
     log('Read odoo config', config_file)
     p.read(config_file)
     for (name, value) in p.items('options'):

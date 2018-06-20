@@ -11,7 +11,7 @@
       <field name="numbercall">-1</field>
       <field name="nextcall" eval="(DateTime.now().replace(hour=23, minute=00, second=00)).strftime('%Y-%m-%d %H:%M:%S')" />
       <field name="doall" eval="False"/>
-      <field name="model" eval="'saas_portal.server'"/>
+      <field name="model_id" ref="model_saas_portal_server"/>
       <field name="function" eval="'update_repositories'"/>
       <field name="args" eval="'()'"/>
     </record>
@@ -25,7 +25,7 @@
       <field name="numbercall">-1</field>
       <field name="nextcall" eval="(DateTime.now().replace(hour=23, minute=30, second=00)).strftime('%Y-%m-%d %H:%M:%S')" />
       <field name="doall" eval="False"/>
-      <field name="model" eval="'saas_portal.server'"/>
+      <field name="model_id" ref="model_saas_portal_server"/>
       <field name="function" eval="'restart_server'"/>
       <field name="args" eval="'()'"/>
     </record>
@@ -39,7 +39,7 @@
       <field name="numbercall">-1</field>
       <field name="nextcall" eval="(DateTime.now().replace(hour=00, minute=00, second=00)).strftime('%Y-%m-%d %H:%M:%S')" />
       <field name="doall" eval="False"/>
-      <field name="model" eval="'saas_portal.server'"/>
+      <field name="model_id" ref="model_saas_portal_server"/>
       <field name="function" eval="'update_all_templates'"/>
       <field name="args" eval="'()'"/>
     </record>

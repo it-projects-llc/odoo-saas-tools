@@ -58,9 +58,9 @@ class WebsiteSaleCustom(WebsiteSale):
 class WebsiteAccount(CustomerPortal):
 
     @http.route()
-    def account(self, redirect=None, **post):
+    def home(self, **kw):
         """ Add saas instance documents to main account page """
-        response = super(WebsiteAccount, self).account(redirect=redirect, **post)
+        response = super(WebsiteAccount, self).home(**kw)
         partner = request.env.user.partner_id
 
         SaasPortalClient = request.env['saas_portal.client']

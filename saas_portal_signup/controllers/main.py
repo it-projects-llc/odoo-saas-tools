@@ -29,13 +29,19 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
         if not qcontext.get('countries', False):
             qcontext['countries'] = request.env['res.country'].search([])
         if not qcontext.get('base_saas_domain', False):
-            qcontext['base_saas_domain'] = self.get_saas_domain()
+            qcontext['base_saas_domain'] = self.get_saas_domain(qcontext.get('plan_id'))
         return qcontext
 
-    def get_saas_domain(self):
-        config = request.env['ir.config_parameter']
-        full_param = 'saas_portal.base_saas_domain'
-        base_saas_domain = config.sudo().get_param(full_param)
+    def get_saas_domain(self, plan_id):
+        # config = request.env['ir.config_parameter']
+        # full_param = 'saas_portal.base_saas_domain'
+        # base_saas_domain = config.sudo().get_param(full_param)
+        if plan_id:
+            Plan = request.env['saas_portal.plan'].sudo()
+            plan = Plan.browse(int(plan_id))
+            base_saas_domain = plan.server_id.local_host
+        else:
+            base_saas_domain = 'select plan'
         return base_saas_domain
 
     def do_signup(self, qcontext):
@@ -45,9 +51,7 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
         if qcontext.get('country_id', False):
             values['country_id'] = qcontext['country_id']
         if qcontext.get('dbname', False):
-            Plan = request.env['saas_portal.plan'].sudo()
-            plan = Plan.browse(int(qcontext['plan_id']))
-            f_dbname = '%s.%s' % (qcontext['dbname'], plan.server_id.local_host)
+            f_dbname = '%s.%s' % (qcontext['dbname'], self.get_saas_domain(qcontext['plan_id'])
             full_dbname = f_dbname.replace('www.', '')
             db_exists = odoo.service.db.exp_db_exist(full_dbname)
             assert re.match('[a-zA-Z0-9_.-]+$', qcontext.get('dbname')

@@ -51,7 +51,7 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
         if qcontext.get('country_id', False):
             values['country_id'] = qcontext['country_id']
         if qcontext.get('dbname', False):
-            f_dbname = '%s.%s' % (qcontext['dbname'], self.get_saas_domain(qcontext['plan_id'])
+            f_dbname = '%s.%s' % (qcontext['dbname'], self.get_saas_domain(qcontext['plan_id']))
             full_dbname = f_dbname.replace('www.', '')
             db_exists = odoo.service.db.exp_db_exist(full_dbname)
             assert re.match('[a-zA-Z0-9_.-]+$', qcontext.get('dbname')

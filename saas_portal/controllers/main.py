@@ -34,7 +34,7 @@ class SaasPortal(http.Controller):
             query = {'redirect': redirect}
             return http.local_redirect(path=url, query=query)
 
-        dbname = self.get_full_dbname(post.get('dbname'))
+        dbname = self.get_full_dbname(post.get('dbname'), post.get('plan_id'))
         user_id = request.session.uid
         partner_id = None
         if user_id:
@@ -78,10 +78,13 @@ class SaasPortal(http.Controller):
         full_param = 'saas_portal.%s' % param
         return config.sudo().get_param(full_param)
 
-    def get_full_dbname(self, dbname):
-        if not dbname:
+    def get_full_dbname(self, dbname, plan_id):
+        if not dbname or not plan_id:
             return None
-        full_dbname = '%s.%s' % (dbname, self.get_config_parameter('base_saas_domain'))
+        Plan = request.env['saas_portal.plan'].sudo()
+        plan = Plan.browse(int(plan_id))
+        base_saas_domain = plan.server_id.local_host
+        full_dbname = '%s.%s' % (dbname, base_saas_domain)
         return full_dbname.replace('www.', '')
 
     def get_plan(self, plan_id=None):

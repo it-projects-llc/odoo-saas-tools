@@ -41,7 +41,7 @@ class AuthSignupHome(auth_signup.controllers.main.AuthSignupHome):
             plan = Plan.browse(int(plan_id))
             base_saas_domain = plan.server_id.local_host
         else:
-            base_saas_domain = 'select plan'
+            base_saas_domain = 'depends on the plan'
         return base_saas_domain
 
     def do_signup(self, qcontext):

@@ -3,6 +3,11 @@
     <data>
         <menuitem name="SaaS" id="menu_base_saas" sequence="30" />
         <menuitem id="menu_saas" parent="menu_base_saas" name="SaaS" sequence="1" web_icon="saas_portal,static/description/icon.png" />
+        <menuitem id="menu_saas_portal_config"
+            name="Configuration"
+            parent="menu_base_saas"
+            sequence="6"
+            groups="base.group_system"/>
 
         <!-- Client -->
         <record id="view_clients_tree" model="ir.ui.view">

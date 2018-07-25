@@ -26,4 +26,14 @@
       </xpath>
     </field>
   </record>
+  <record id="action_saas_server_config_settings" model="ir.actions.act_window">
+    <field name="name">Settings</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">res.config.settings</field>
+    <field name="view_id" ref="res_config_settings_view_form_inherit_saas_server"/>
+    <field name="view_mode">form</field>
+    <field name="target">inline</field>
+    <field name="context">{'module' : 'saas_server'}</field>
+  </record>
+  <menuitem id="menu_saas_server_general_settings" name="Settings" parent="menu_saas_server_config" sequence="0" action="action_saas_server_config_settings" groups="base.group_system"/>
 </odoo>

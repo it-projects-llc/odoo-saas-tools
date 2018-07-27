@@ -24,8 +24,8 @@ class SaasServerClient(models.Model):
         password = ICPSudo.get_param('saas_server.sftp_password', None)
         path = ICPSudo.get_param('saas_server.sftp_path', None)
         rsa_key_path = ICPSudo.get_param('saas_server.rsa_key_path', None)
-        rsa_key_passphrase=ICPSudo.get_param('saas_server.rsa_key_passphrase'),
-        sftp_public_key=ICPSudo.get_param('saas_server.sftp_public_key'),
+        rsa_key_passphrase=ICPSudo.get_param('saas_server.rsa_key_passphrase')
+        sftp_public_key=ICPSudo.get_param('saas_server.sftp_public_key')
 
         params = {
             "host": server,
@@ -41,43 +41,34 @@ class SaasServerClient(models.Model):
         cnopts = pysftp.CnOpts()
         if sftp_public_key:
             key = paramiko.RSAKey(data=base64.b64decode(sftp_public_key))
-            cnopts.hostkeys.add(self.sftp_server, 'ssh-rsa', key)
+            cnopts.hostkeys.add(server, 'ssh-rsa', key)
         else:
             cnopts.hostkeys = None
 
-        try:
-            srv = pysftp.Connection(**params, cnopts=cnopts):
+        with pysftp.Connection(**params, cnopts=cnopts) as sftp:
 
-        except (pysftp.CredentialException,
-                pysftp.ConnectionException,
-                pysftp.SSHException):
-            _logger.info("Connection to spft server Failed!", exc_info=True)
-            raise
+            # set keepalive to prevent socket closed / connection dropped error
+            sftp._transport.set_keepalive(30)
+            import wdb; wdb.set_trace()
+            try:
+                sftp.chdir(path)
+            except IOError:
+                # Create directory and subdirs if they do not exist.
+                currentDir = ''
+                for dirElement in path.split('/'):
+                    currentDir += dirElement + '/'
+                    try:
+                        sftp.chdir(currentDir)
+                    except Exception as e:
+                        print(('(Part of the) path doesn\'t exist. Creating it now at ' + currentDir))
+                        # Make directory and then navigate into it
+                        sftp.mkdir(currentDir, mode=777)
+                        sftp.chdir(currentDir)
 
-        # set keepalive to prevent socket closed / connection dropped error
-        srv._transport.set_keepalive(30)
-
-        try:
-            srv.chdir(path)
-        except IOError:
-            # Create directory and subdirs if they do not exist.
-            currentDir = ''
-            for dirElement in path.split('/'):
-                currentDir += dirElement + '/'
-                try:
-                    srv.chdir(currentDir)
-                except Exception as e:
-                    print(('(Part of the) path didn\'t exist. Creating it now at ' + currentDir))
-                    # Make directory and then navigate into it
-                    srv.mkdir(currentDir, mode=777)
-                    srv.chdir(currentDir)
-
-        srv.chdir(path)
-        with tempfile.TemporaryFile() as t:
-            dump_db(t)
-            t.seek(0)
-            srv.putfo(t, filename)
-        srv.close()
+            with tempfile.TemporaryFile() as t:
+                dump_db(t)
+                t.seek(0)
+                sftp.putfo(t, filename)
 
     @api.model
     def schedule_saas_databases_backup(self):

@@ -1,3 +1,6 @@
+import base64
+import paramiko
+
 from odoo import models, fields, api
 from odoo import _, exceptions
 
@@ -31,10 +34,16 @@ class SaasPortalConfigWizard(models.TransientModel):
         help='''The location to the folder where the dumps should be written
              to. For example /odoo/backups/.\nFiles will then be written to
              /odoo/backups/ on your remote server.''')
-    sftp_rsa_key_path = fields.Char(
-        string='Path rsa key',
+    sftp_public_key = fields.Char("SFTP-Server public key",
+                                  help="""Verify SFTP server's identity using its public rsa-key
+                                  The host key verification protects you from man-in-the-middle attacks""")
+    rsa_key_path = fields.Char(
+        string='Path to RSA key on Odoo server',
         help="The location to the folder where the rsa key is saved. "
              "For example /opt/odoo/.ssh/id_rsa.")
+    rsa_key_passphrase = fields.Char(
+        string='Passphrase for RSA key',
+        help='''Passphrase used when rsa key was generated''')
 
     @api.multi
     def set_values(self):
@@ -44,8 +53,9 @@ class SaasPortalConfigWizard(models.TransientModel):
         ICPSudo.set_param("saas_server.sftp_username", self.sftp_username)
         ICPSudo.set_param("saas_server.sftp_password", self.sftp_password)
         ICPSudo.set_param("saas_server.sftp_path", self.sftp_path)
-        ICPSudo.set_param("saas_server.sftp_rsa_key_path",
-                          self.sftp_rsa_key_path)
+        ICPSudo.set_param("saas_server.rsa_key_path", self.rsa_key_path)
+        ICPSudo.set_param("saas_server.rsa_key_passphrase", self.rsa_key_passphrase)
+        ICPSudo.set_param("saas_server.sftp_public_key", self.sftp_public_key)
 
     @api.model
     def get_values(self):
@@ -56,39 +66,39 @@ class SaasPortalConfigWizard(models.TransientModel):
             sftp_username=ICPSudo.get_param('saas_server.sftp_username'),
             sftp_password=ICPSudo.get_param('saas_server.sftp_password'),
             sftp_path=ICPSudo.get_param('saas_server.sftp_path'),
-            sftp_rsa_key_path=ICPSudo.get_param(
-                'saas_server.sftp_rsa_key_path'),
+            rsa_key_path=ICPSudo.get_param('saas_server.rsa_key_path'),
+            rsa_key_passphrase=ICPSudo.get_param('saas_server.rsa_key_passphrase'),
+            sftp_public_key=ICPSudo.get_param('saas_server.sftp_public_key'),
         )
         return res
 
     def test_sftp_connection(self):
-        server = self.env["ir.config_parameter"].sudo().get_param(
-            "saas_server.sftp_server", default=None)
-        username = self.env["ir.config_parameter"].sudo().get_param(
-            "saas_server.sftp_username", default=None)
-        password = self.env["ir.config_parameter"].sudo().get_param(
-            "saas_server.sftp_password", default=None)
-        sftp_rsa_key_path = self.env["ir.config_parameter"].sudo().get_param(
-            'saas_server.sftp_rsa_key_path')
-        sftp_password = self.env["ir.config_parameter"].sudo().get_param(
-            'saas_server.sftp_password')
         params = {
-            "host": server,
-            "username": username,
+            "host": self.sftp_server,
+            "username": self.sftp_username,
         }
 
         try:
             # Connect with external server over SFTP,
             # so we know sure that everything works.
-            if sftp_rsa_key_path:
-                params["private_key"] = sftp_rsa_key_path
-                if password:
-                    params["private_key_pass"] = sftp_password
+            if self.rsa_key_path:
+                params["private_key"] = self.rsa_key_path
+                if self.rsa_key_passphrase:
+                    params["private_key_pass"] = self.rsa_key_passphrase
             else:
-                params["password"] = password
+                params["password"] = self.sftp_password
 
-            with pysftp.Connection(**params):
+            # not empty sftp_public_key means that we should verify sftp server with it
+            cnopts = pysftp.CnOpts()
+            if self.sftp_public_key:
+                key = paramiko.RSAKey(data=base64.b64decode(self.sftp_public_key))
+                cnopts.hostkeys.add(self.sftp_server, 'ssh-rsa', key)
+            else:
+                cnopts.hostkeys = None
+
+            with pysftp.Connection(**params, cnopts=cnopts):
                 raise exceptions.Warning(_("Connection Test Succeeded!"))
+
         except (pysftp.CredentialException,
                 pysftp.ConnectionException,
                 pysftp.SSHException):

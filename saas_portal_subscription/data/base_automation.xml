@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="send_saas_expiration_info_action" model="ir.actions.server">
+        <field name="name">Send SaaS expiration info</field>
+        <field name="condition">True</field>
+        <field name="type">ir.actions.server</field>
+        <field name="model_id" ref="saas_portal.model_saas_portal_client"/>
+        <field name="state">code</field>
+        <field name="code">records.send_expiration_info()</field>
+    </record>
+
+    <record id="saas_send_expiration_action_rule" model="base.automation">
+        <field name="name">Send SaaS expiration info</field>
+        <field eval="True" name="active" />
+        <field name="model_id" ref="saas_portal.model_saas_portal_client"/>
+        <field name="trigger">on_write</field>
+        <field name="action_server_id" ref="saas_portal_subscription.send_saas_expiration_info_action"/>
+    </record>
+</odoo>

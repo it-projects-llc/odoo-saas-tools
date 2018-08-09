@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <menuitem name="SaaS Server" id="menu_base_saas" sequence="30"/>
-    <menuitem id="menu_saas" parent="menu_base_saas" name="SaaS" sequence="1" web_icon="saas_server,static/description/icon.png"/>
+    <menuitem name="SaaS Server" id="menu_base_saas" sequence="30" web_icon="saas_server,static/description/icon.png"/>
+    <menuitem id="menu_saas" parent="menu_base_saas" name="SaaS" sequence="1"/>
     <menuitem id="menu_saas_server_config" name="Configuration" parent="menu_base_saas" sequence="6" groups="base.group_system"/>
     <!-- Client -->
     <!-- TODO create some template to unduplicate this source with one in saas_portal -->

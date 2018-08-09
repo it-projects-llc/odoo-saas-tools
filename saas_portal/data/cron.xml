@@ -11,8 +11,8 @@
             <field name="numbercall">-1</field>
             <field name="doall" eval="False"/>
             <field name="model_id" ref="model_saas_portal_client"/>
-            <field name="function">_cron_suspend_expired_clients</field>
-            <field name="args">()</field>
+            <field name="state">code</field>
+            <field name="code">model._cron_suspend_expired_clients()</field>
         </record>
         <record forcecreate="True" id="saas_portal_notify_before_expiration" model="ir.cron">
             <field name="name">Saas portal - notify expired clients</field>
@@ -23,8 +23,8 @@
             <field name="numbercall">-1</field>
             <field name="doall" eval="False"/>
             <field name="model_id" ref="model_saas_portal_client"/>
-            <field name="function">_cron_notify_expired_clients</field>
-            <field name="args">()</field>
+            <field name="state">code</field>
+            <field name="code">model._cron_notify_expired_clients()</field>
         </record>
         <record forcecreate="True" id="saas_portal_sync_server" model="ir.cron">
             <field name="name">SaaS Portal sync server</field>
@@ -35,8 +35,8 @@
             <field name="numbercall">-1</field>
             <field name="doall" eval="False"/>
             <field name="model_id" ref="model_saas_portal_server"/>
-            <field name="function">action_sync_server_all</field>
-            <field name="args">()</field>
+            <field name="state">code</field>
+            <field name="code">model.action_sync_server_all()</field>
         </record>
     </data>
 </openerp>

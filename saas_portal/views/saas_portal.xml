@@ -15,7 +15,7 @@
             <field name="model">saas_portal.client</field>
             <field name="priority">4</field>
             <field name="arch" type="xml">
-                <tree string="Clients" colors="red:expired" create="false" delete="false" edit="false">
+                <tree string="Clients" decoration-danger="expired" create="false" delete="false" edit="false">
                     <field name="name"/>
                     <field name="plan_id"/>
                     <field name="state"/>
@@ -43,7 +43,6 @@
             <field name="model">saas_portal.client</field>
             <field name="arch" type="xml">
                 <form string="Clients" create="false" delete="false" edit="true">
-                    <field name="expired" invisible="1"/>
                     <header>
                         <button string="Log in" name="%(action_edit_database)d" type="action"
                                 attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}"
@@ -77,6 +76,7 @@
                         <group name="subscription">
                             <field name="trial"/>
                             <field name="expiration_datetime"/>
+                            <field name="expired"/>
                         </group>
                     </group>
                     <group string="Settings" name="settings">

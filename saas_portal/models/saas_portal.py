@@ -676,7 +676,7 @@ class SaasPortalClient(models.Model):
     plan_id = fields.Many2one('saas_portal.plan', string='Plan',
                               track_visibility='onchange', ondelete='set null', readonly=True)
     expiration_datetime = fields.Datetime(string="Expiration")
-    expired = fields.Boolean('Expired')
+    expired = fields.Boolean('Expired', readonly=True)
     user_id = fields.Many2one(
         'res.users', default=lambda self: self.env.user, string='Salesperson')
     notification_sent = fields.Boolean(

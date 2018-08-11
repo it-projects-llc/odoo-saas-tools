@@ -65,17 +65,17 @@
   </template>
 
   <template id="account" name="Account" inherit_id="portal.portal_layout">
-    <xpath expr="//div[contains(@class,'mb64')]" position="inside">
+    <xpath expr="//div[@id='o_my_sidebar']" position="inside">
       <t t-call="saas_portal_portal.stats" />
     </xpath>
   </template>
 
   <template id="stats" name="SaaS_Stats">
     <h3 class="page-header">SaaS stats</h3>
-    <t t-if="saas_portal_client">
-      <p>Current number of users: <t t-esc="saas_portal_client.users_len"/></p>
-      <p>File storage usage: <t t-esc="saas_portal_client.file_storage"/></p>
-      <p>Database storage usage: <t t-esc="saas_portal_client.db_storage"/></p>
+    <t t-if="saas_portal_clients">
+      <p>Current number of users: <t t-esc="sum([saas_portal_client.users_len for saas_portal_client in saas_portal_clients]) "/></p>
+      <p>File storage usage: <t t-esc="sum([saas_portal_client.file_storage for saas_portal_client in saas_portal_clients])"/></p>
+      <p>Database storage usage: <t t-esc="sum([saas_portal_client.db_storage for saas_portal_client in saas_portal_clients])"/></p>
     </t>
   </template>
 

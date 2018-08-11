@@ -7,20 +7,20 @@ _logger = logging.getLogger(__name__)
 
 
 class WebsiteSaasDashboard(CustomerPortal):
-    @http.route()
-    def account(self, redirect=None, **post):
+
+    def _prepare_portal_layout_values(self):
         """ Add sales documents to main account page """
-        response = super(WebsiteSaasDashboard, self).account(redirect=redirect, **post)
+        values = super(WebsiteSaasDashboard, self)._prepare_portal_layout_values()
         partner = request.env.user.partner_id
 
         res_saas_portal_client = request.env['saas_portal.client']
-        saas_portal_client = res_saas_portal_client.sudo().search([
-            ('partner_id.id', '=', partner.id),
+        saas_portal_clients = res_saas_portal_client.sudo().search([
+            ('partner_id', '=', partner.id),
         ])
-        response.qcontext.update({
-            'saas_portal_client': saas_portal_client and saas_portal_client[0] or False,
+        values.update({
+            'saas_portal_clients': saas_portal_clients or False,
         })
-        return response
+        return values
 
     @http.route(['/my/domain'], type='http', auth='user', website=True)
     def change_domain(self, redirect=None, **post):

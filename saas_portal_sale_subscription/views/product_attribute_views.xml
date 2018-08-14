@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="product_attribute_value_view_tree" model="ir.ui.view">
+        <field name="name">product.attribute.value.view.tree.saas</field>
+        <field name="model">product.attribute.value</field>
+        <field name="inherit_id" ref="product.product_attribute_value_view_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="saas_code_value"/>
+            </xpath>
+        </field>
+    </record>
+    
+    <record id="variants_tree_view" model="ir.ui.view">
+        <field name="name">product.attribute.value.tree.saas</field>
+        <field name="model">product.attribute.value</field>
+        <field name="inherit_id" ref="product.variants_tree_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="saas_code_value"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_clients_form" model="ir.ui.view">
+        <field name="name">saas_portal.client.form.sale.subscription</field>
+        <field name="model">saas_portal.client</field>
+        <field name="inherit_id" ref="saas_portal.view_clients_form"/>
+        <field name="arch" type="xml">
+            <field name="expiration_datetime" position="before">
+                <field name="subscription_start"/>
+            </field>
+            <xpath expr="//notebook" position="inside">
+                <page string='Invoice lines'>
+                    <field name="invoice_line_ids">
+                        <tree>
+                            <field name="date_invoice"/>
+                            <field name="invoice_id"/>
+                            <field name="product_id"/>
+                            <field name="quantity"/>
+                            <field name="saas_subscription_period"/>
+                            <field name="state"/>
+                        </tree>
+                        <form>
+                            <group>
+                                <group>
+                                    <field name="date_invoice"/>
+                                    <field name="invoice_id"/>
+                                    <field name="state"/>
+                                </group>
+                                <group>
+                                    <field name="product_id"/>
+                                    <field name="quantity"/>
+                                    <field name="saas_subscription_period"/>
+                                </group>
+                            </group>
+                        </form>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

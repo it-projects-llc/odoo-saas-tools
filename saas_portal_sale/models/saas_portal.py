@@ -25,7 +25,7 @@ class SaasPortalPlan(models.Model):
         contract = self.env['account.analytic.account'].sudo().create({
             'name': vals['name'],
             'partner_id': vals['partner_id'],
-            'recurring_invoices': True,
+            'recurring_invoices': False,
         })
 
         vals['contract_id'] = contract.id

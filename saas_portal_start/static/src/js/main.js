@@ -36,7 +36,6 @@ $(document).ready(function() {
             $input.attr('data-content', "Please choose your domain name");
             error = true;
         }
-        db_name = _.str.slugify(db_name);
         if (!error && (/\s/.test(db_name))) {
             $input.attr('data-content', "Spaces are not allowed in domain names");
             error = true;

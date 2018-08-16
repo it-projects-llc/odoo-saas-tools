@@ -1,3 +1,8 @@
+`1.1.1`
+------------
+
+- **Fix:** fix ckecking database name js regex - previous one restricted number of levels in a domain name
+
 `1.1.0`
 ------------
 

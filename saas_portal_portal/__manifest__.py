@@ -8,7 +8,7 @@
     'website': 'https://it-projects.info',
     'depends': ['portal', 'saas_portal'],
     'data': [
-        'views/templates.xml',
+        'views/website_instance_templates.xml',
     ],
     'installable': True,
 }

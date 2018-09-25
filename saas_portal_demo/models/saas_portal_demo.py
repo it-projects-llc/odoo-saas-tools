@@ -274,11 +274,11 @@ class SaaSPortalDemoPlanModule(models.Model):
     url = fields.Char('url', compute="_compute_url", store=True)
     demo_plan_id = fields.Many2one(
         'saas_portal.plan', string='Demo plan where the module intended to be installed', ondelete='cascade', require=True)
-    shortdesc = fields.Char('Module Name', readonly=True, translate=True)
-    author = fields.Char("Author", readonly=True)
+    shortdesc = fields.Char('Module Name', translate=True)
+    author = fields.Char("Author")
     icon_attachment_id = fields.Many2one('ir.attachment', ondelete='restrict')
     icon = fields.Binary()
-    summary = fields.Char('Summary', readonly=True)
+    summary = fields.Char('Summary')
     price = fields.Float(string='Price')
     currency = fields.Char("Currency")
 

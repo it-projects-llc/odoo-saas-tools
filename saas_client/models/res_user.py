@@ -19,7 +19,7 @@ class ResUsers(models.Model):
         if max_users:
             cur_users = self.env['res.users'].search_count([('share', '=', False), ('id', '!=', SI)])
             if cur_users >= max_users:
-                raise exceptions.Warning(_('Maximimum allowed users is %(max_users)s, while you already have %(cur_users)s') % {'max_users': max_users, 'cur_users': cur_users})
+                raise exceptions.Warning(_('Maximum allowed users is %(max_users)s, while you already have %(cur_users)s') % {'max_users': max_users, 'cur_users': cur_users})
         return super(ResUsers, self).create(vals)
 
     @classmethod

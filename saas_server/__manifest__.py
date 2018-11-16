@@ -20,5 +20,5 @@
         'data/ir_config_parameter.xml',
         'data/pre_install.yml',
     ],
-    'installable': True,
+    'installable': False,
 }

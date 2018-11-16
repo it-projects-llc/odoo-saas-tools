@@ -8,5 +8,5 @@
     'website': 'https://it-projects.info',
     'depends': ['saas_utils'],
     'data': [],
-    'installable': True,
+    'installable': False,
 }

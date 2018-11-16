@@ -10,5 +10,5 @@
     'data': [
         'views/website_instance_templates.xml',
     ],
-    'installable': True,
+    'installable': False,
 }

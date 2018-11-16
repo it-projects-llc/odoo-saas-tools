@@ -9,5 +9,5 @@
 
     'depends': ['auth_oauth'],
     'data': [],
-    'installable': True,
+    'installable': False,
 }

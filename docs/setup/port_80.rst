@@ -1,3 +1,6 @@
+:banner: banners/server.jpeg
+:force-toc: True
+
 Web server
 ==========
 

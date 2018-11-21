@@ -1,3 +1,6 @@
+:banner: banners/dependence.jpeg 
+:force-toc: True
+
 ==============
  Dependencies
 ==============

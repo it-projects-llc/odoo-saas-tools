@@ -1,5 +1,3 @@
-:types: setting_up
-
 ==========
 Setting Up
 ==========
@@ -12,3 +10,4 @@ Setting Up
     setup/client
     setup/odoo-configuration
     setup/port_80
+    setup/domain

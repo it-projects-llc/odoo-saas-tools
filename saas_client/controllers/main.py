@@ -28,5 +28,6 @@ class SaaSClientLogin(Home):
         suspended = param_model.sudo().get_param('saas_client.suspended', '0')
         page_for_suspended = param_model.sudo().get_param('saas_client.page_for_suspended', '/')
         if suspended == '1':
+            request.params['login_success'] = False
             return werkzeug.utils.redirect(page_for_suspended, 303)
         return super(SaaSClientLogin, self).web_login(redirect, **kw)

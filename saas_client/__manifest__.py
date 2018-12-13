@@ -1,6 +1,6 @@
 {
     'name': 'SaaS Client',
-    'version': '11.0.1.0.0',
+    'version': '12.0.1.0.0',
     'author': 'Ivan Yelizariev, Nicolas JEUDY',
     'license': 'LGPL-3',
     'category': 'SaaS',
@@ -10,7 +10,7 @@
         'auth_oauth',
         'auth_oauth_ip',
         'auth_oauth_check_client_id',
-        'saas_utils',
+        'saas_base',
         'mail',
         'web_settings_dashboard',
         'access_limit_records_number',
@@ -25,7 +25,7 @@
         'data/ir_config_parameter.xml',
         'data/ir_actions.xml',
     ],
-    'installable': False,
+    'installable': True,
     'qweb': [
         'static/src/xml/saas_dashboard.xml',
     ],

@@ -1,4 +1,5 @@
 import odoo
+from . import ADMINUSER_ID
 from odoo.http import OpenERPSession
 from odoo.addons.base_sparse_field.models.fields import monkey_patch
 from odoo.addons.saas_base.exceptions import SuspendedDBException
@@ -10,7 +11,7 @@ def check_security(self):
         uid = self.uid
         env = odoo.api.Environment(cr, uid, {})
         suspended = env['ir.config_parameter'].sudo().get_param('saas_client.suspended', '0')
-        if suspended == "1" and uid != odoo.SUPERUSER_ID:
+        if suspended == "1" and uid not in (odoo.SUPERUSER_ID, ADMINUSER_ID):
             raise SuspendedDBException
     return check_security.super(self)
 

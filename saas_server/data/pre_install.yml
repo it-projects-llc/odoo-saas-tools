@@ -1,8 +1,0 @@
--
-  !python {model: res.users}: |
-    SUPERUSER_ID = 1
-    oauth_provider_id = ref('saas_server.saas_oauth_provider')
-    self.browse(SUPERUSER_ID).write({'oauth_provider_id': oauth_provider_id, 'oauth_uid': SUPERUSER_ID})
-
-    dbuuid = self.env['ir.config_parameter'].sudo().get_param('database.uuid')
-    self.env['auth.oauth.provider'].browse(oauth_provider_id).write({'client_id': dbuuid})

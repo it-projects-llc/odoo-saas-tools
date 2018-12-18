@@ -17,7 +17,7 @@
                               <field name="current_domain" class="oe_inline"/>
                           </div>
                           <div class="content-group">
-                              <div class="mt16 row">
+                              <div class="mt16">
                                   <field name="domain_change_link" class="oe_inline"/>
                               </div>
                           </div>

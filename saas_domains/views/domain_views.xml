@@ -1,0 +1,56 @@
+<odoo>
+    <data>
+
+        <menuitem id="menu_saas_domains" parent="saas_portal.menu_base_saas" name="Domains"/>
+
+        <record id="view_domain_zone_tree" model="ir.ui.view">
+            <field name="name">view.domain.zone.tree</field>
+            <field name="model">saas_sysadmin.domain.zone</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="soa_email"/>
+                    <field name="dns_provider"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_domain_zone_form" model="ir.ui.view">
+            <field name="name">view.domain.zone.form</field>
+            <field name="model">saas_sysadmin.domain.zone</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <button name="action_pull_records" string="Pull Records" type="object" icon="fa-cog"/>
+                    </header>
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="soa_email"/>
+                            <field name="dns_provider"/>
+                        </group>
+                        <group string="A/AAA Records">
+                            <field name="a_record_ids" nolabel="1">
+                                <tree editable="bottom">
+                                    <field name="hostname" string="Hostname"/>
+                                    <field name="ip_address"/>
+                                    <field name="ttl_value"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_domain_zone" model="ir.actions.act_window">
+            <field name="name">Domain Zone</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">saas_sysadmin.domain.zone</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem action="action_domain_zone" id="menu_domain_zone" parent="menu_saas_domains" sequence="10"/>
+    </data>
+</odoo>

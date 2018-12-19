@@ -29,9 +29,11 @@
                     <field name="expired" invisible="1"/>
                     <button name="%(action_edit_database)d" type="action"
                             icon="fa-sign-in" attrs="{'invisible':[('state', 'in', ['deleted', 'draft'])]}"
+                            aria-label="Log in"
+                            title="Log in"
                             help="Log in to client database."/>
-                    <button name="show_upgrade_wizard" attrs="{'invisible':[('state', 'in', ['deleted'])]}" type="object" icon="fa-cogs" help="Configure client database"/>
-                    <button name="delete_database_server" type="object" attrs="{'invisible':[('state', 'in', ['draft', 'deleted'])]}" icon="fa-eraser" help="Delete client database"
+                    <button name="show_upgrade_wizard" attrs="{'invisible':[('state', 'in', ['deleted'])]}" type="object" icon="fa-cogs" title="Configure" aria-label="Configure" help="Configure client database"/>
+                    <button name="delete_database_server" type="object" attrs="{'invisible':[('state', 'in', ['draft', 'deleted'])]}" icon="fa-eraser" title="Delete" aria-label="Delete" help="Delete client database"
                     confirm="Are you sure to delete this database?"/>
                 </tree>
             </field>
@@ -48,13 +50,14 @@
                         <button string="Log in" name="%(action_edit_database)d" type="action"
                                 attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}"
                                 icon="fa-sign-in" class="oe_highlight"
+                                aria-label="Log in"
                                 help="Log in to client database."
                                 />
-                        <button string="Configure" name="show_upgrade_wizard" type="object" attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}" icon="fa-cogs" />
-                        <button string="Delete" name="delete_database_server" type="object" attrs="{'invisible':['|',('state', 'in', ['draft', 'deleted'])]}" icon="fa-eraser"
+                        <button string="Configure" name="show_upgrade_wizard" type="object" attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}" aria-label="Configure" icon="fa-cogs" />
+                        <button string="Delete" name="delete_database_server" type="object" attrs="{'invisible':['|',('state', 'in', ['draft', 'deleted'])]}" aria-label="Delete" icon="fa-eraser"
                         confirm="Are you sure to delete this database?"/>
-                        <button string="Sync server" type="object" name="action_sync_server" icon="fa-refresh"/>
-                        <button string="Sync client" type="object" name="sync_client" icon="fa-refresh"/>
+                        <button string="Sync server" type="object" name="action_sync_server" aria-label="Synchronize server" icon="fa-refresh"/>
+                        <button string="Sync client" type="object" name="sync_client" aria-label="Synchronize client" icon="fa-refresh"/>
                         <button name="%(saas_portal.action_rename_database)d" string="Rename Database" type="action"/>
                         <field name="state" widget="statusbar" statusbar_visible="open,pending,deleted" clickable=""/>
                     </header>
@@ -104,7 +107,7 @@
                     <separator/>
                     <field name="partner_id" string="Contact" filter_domain="[('partner_id', 'child_of', self)]"/>
                     <group expand="0" string="Group By">
-                        <filter string="Plan" domain="[]" context="{'group_by':'plan_id'}"/>
+                        <filter string="Plan" name="plan" domain="" context="{'group_by':'plan_id'}"/>
                     </group>
                 </search>
             </field>

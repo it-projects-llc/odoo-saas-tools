@@ -1,8 +1,9 @@
-openerp.saas_client = function(instance){
-    var _t = instance.web._t,
-       _lt = instance.web._lt;
+odoo.define('saas_client', function (require) {
 
-    instance.web.WebClient.include({
+    var WebClient = require('web.WebClient');
+
+
+    WebClient.include({
         _ab_location: function(dbuuid) {
             var ab_register = _.str.sprintf('%s/%s', this._ab_register_value, dbuuid);
             $('#announcement_bar_table').find('.url a').attr('href', ab_register);
@@ -26,4 +27,4 @@ openerp.saas_client = function(instance){
         });
         }
     });
-};
+});

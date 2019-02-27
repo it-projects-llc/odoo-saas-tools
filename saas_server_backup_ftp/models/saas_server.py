@@ -49,7 +49,6 @@ class SaasServerClient(models.Model):
 
             # set keepalive to prevent socket closed / connection dropped error
             sftp._transport.set_keepalive(30)
-            import wdb; wdb.set_trace()
             try:
                 sftp.chdir(path)
             except IOError:

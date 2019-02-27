@@ -6,7 +6,7 @@
     'category': 'SaaS',
     "support": "apps@it-projects.info",
     'website': 'https://it-projects.info',
-    'depends': ['saas_utils'],
+    'depends': ['base'],
     'data': [],
     'installable': True,
 }

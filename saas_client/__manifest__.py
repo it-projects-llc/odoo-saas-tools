@@ -10,7 +10,6 @@
         'auth_oauth',
         'auth_oauth_ip',
         'auth_oauth_check_client_id',
-        'saas_utils',
         'mail',
         'web_settings_dashboard',
         'access_limit_records_number',

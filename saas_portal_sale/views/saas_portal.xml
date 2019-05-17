@@ -9,7 +9,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//group[@name='settings']" position="after">
                     <group string="Invoicing" name="invoicing">
-                        <field name="contract_id"/>
+                        <field name="contract_id" context="{'form_view_ref': 'account.invoice_form'}"/>
                     </group>
                 </xpath>
             </field>

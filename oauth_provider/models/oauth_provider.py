@@ -77,7 +77,7 @@ class OauthAccessToken(models.Model):
     @api.multi
     def is_expired(self):
         self.ensure_one()
-        return datetime.now() > datetime.strptime(self.expires, DEFAULT_SERVER_DATETIME_FORMAT)
+        return datetime.now() > self.expires
 
     @api.multi
     def _allow_scopes(self, scopes):

@@ -6,7 +6,7 @@
     </xpath>
   </template>
   <template id="portal_my_home_saas" name="Portal My Home : saas instances" inherit_id="portal.portal_my_home" priority="20">
-    <xpath expr="//ul[hasclass('o_portal_docs')]" position="inside">
+    <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
       <li t-if="instance_count" class="list-group-item">
         <span class="badge" t-esc="instance_count"/>
         <a href="/my/instances">Instances</a>

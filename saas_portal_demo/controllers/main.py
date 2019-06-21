@@ -25,9 +25,9 @@ class SaasPortalDemo(SaasPortal):
         plan = request.env['saas_portal.plan'].sudo().search(domain)
         if not plan:
             # TODO: maybe in this case we can redirect to saas_portal_templates.select_template
-            return request.website.render("saas_portal_demo.unavailable_plan")
+            return request.render("saas_portal_demo.unavailable_plan")
         values = {'plan': plan[0]}
-        return request.website.render("saas_portal_demo.show_plan", values)
+        return request.render("saas_portal_demo.show_plan", values)
 
 
 class WebsiteSaleCustom(WebsiteSale):

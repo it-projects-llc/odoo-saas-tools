@@ -27,12 +27,12 @@
                     <field name="trial"/>
                     <field name="expiration_datetime"/>
                     <field name="expired" invisible="1"/>
-                    <button name="%(action_edit_database)d" type="action"
+                    <!--<button name="%(action_edit_database)d" type="action"
                             icon="fa-sign-in" attrs="{'invisible':[('state', 'in', ['deleted', 'draft'])]}"
                             help="Log in to client database."/>
                     <button name="show_upgrade_wizard" attrs="{'invisible':[('state', 'in', ['deleted'])]}" type="object" icon="fa-cogs" help="Configure client database"/>
                     <button name="delete_database_server" type="object" attrs="{'invisible':[('state', 'in', ['draft', 'deleted'])]}" icon="fa-eraser" help="Delete client database"
-                    confirm="Are you sure to delete this database?"/>
+                    confirm="Are you sure to delete this database?"/>-->
                 </tree>
             </field>
         </record>
@@ -104,7 +104,7 @@
                     <separator/>
                     <field name="partner_id" string="Contact" filter_domain="[('partner_id', 'child_of', self)]"/>
                     <group expand="0" string="Group By">
-                        <filter string="Plan" domain="[]" context="{'group_by':'plan_id'}"/>
+                        <filter name ="plan" string="Plan" domain="[]" context="{'group_by':'plan_id'}"/>
                     </group>
                 </search>
             </field>

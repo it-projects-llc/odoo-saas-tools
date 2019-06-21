@@ -11,7 +11,7 @@
         'saas_portal',
         'connector',
     ],
-    'installable': False,
+    'installable': True,
     'application': False,
     'data': [
         'views/wizard.xml',

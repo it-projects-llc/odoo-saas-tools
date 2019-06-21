@@ -104,7 +104,7 @@ class SaasPortalServer(models.Model):
 
         product_template_obj = self.env['product.template']
         product_product_obj = self.env['product.product']
-        product_attribute_line_obj = self.env['product.attribute.line']
+        product_attribute_line_obj = self.env['product.template.attribute.line']
 
         product_template_name = demo_module['demo_title']
         product_template = product_template_obj.search(

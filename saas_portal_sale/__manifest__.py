@@ -20,5 +20,5 @@
         'data/mail_template_data.xml',
         'data/ir_config_parameter.xml',
     ],
-    'installable': False,
+    'installable': True,
 }

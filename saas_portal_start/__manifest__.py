@@ -6,9 +6,9 @@
     'category': 'SaaS',
     "support": "apps@it-projects.info",
     'website': 'https://it-projects.info',
-    'depends': ['website', 'saas_portal'],
+    'depends': ['portal', 'saas_portal'],
     'data': [
-        'views/website.xml',
+        'views/portal.xml',
     ],
-    'installable': False,
+    'installable': True,
 }

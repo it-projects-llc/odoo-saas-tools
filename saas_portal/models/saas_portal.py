@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from odoo import api, exceptions, fields, models
 from odoo.tools import scan_languages
 from odoo.tools.translate import _
-from odoo.addons.base.res.res_partner import _tz_get
+from odoo.addons.base.models.res_partner import _tz_get
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 
 from odoo.addons.saas_base.exceptions import MaximumTrialDBException
@@ -268,7 +268,7 @@ class SaasPortalPlan(models.Model):
             'login': owner_user.login,
             'name': owner_user.name,
             'email': owner_user.email,
-            'password_crypt': owner_user.password_crypt,
+            'password': owner_user.password,
         }
         return owner_user_data
 
@@ -883,7 +883,7 @@ class SaasPortalClient(models.Model):
                 'params': [{'key': 'saas_client.max_users',
                             'value': record.max_users, 'hidden': True},
                            {'key': 'saas_client.expiration_datetime',
-                            'value': record.expiration_datetime,
+                            'value': fields.Datetime.to_string(record.expiration_datetime),
                             'hidden': True},
                            {'key': 'saas_client.total_storage_limit',
                             'value': record.total_storage_limit,

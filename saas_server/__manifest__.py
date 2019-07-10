@@ -10,7 +10,6 @@
         'auth_oauth',
         'auth_oauth_ip',
         'saas_base',
-        'saas_utils',
         'website',
     ],
     'data': [

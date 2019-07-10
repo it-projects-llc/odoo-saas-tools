@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="subscription_wizard_view_form" model="ir.ui.view">
+        <field name="name">Manage subscription</field>
+        <field name="model">saas_portal.subscription_wizard</field>
+        <field name="inherit_id" ref="saas_portal_subscription.subscription_wizard_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <field name="invoice_lines_count" invisible="1"/>
+                <div attrs="{'invisible': [('invoice_lines_count', '&lt;=', 0)]}">
+                    <p class="oe_view_nocontent_create">
+                        The following invoice lines can be used for subscription.
+                        Delete lines that you don't want to use and apply
+                    </p>
+                </div>
+                <field name="invoice_line_ids" attrs="{'invisible': [('invoice_lines_count', '&lt;=', 0)]}">
+                    <tree create="0">
+                        <field name="date_invoice"/>
+                        <field name="invoice_id"/>
+                        <field name="product_id"/>
+                        <field name="quantity"/>
+                        <field name="saas_subscription_period"/>
+                        <field name="state"/>
+                    </tree>
+                    <form>
+                        <group>
+                            <group>
+                                <field name="date_invoice"/>
+                                <field name="invoice_id" readonly="1" options="{'no_open': True}"/>
+                                <field name="state"/>
+                            </group>
+                            <group>
+                                <field name="product_id" readonly="1" options="{'no_open': True}"/>
+                                <field name="quantity" readonly="1"/>
+                                <field name="saas_subscription_period"/>
+                            </group>
+                        </group>
+                    </form>
+                </field>
+            </xpath>
+        </field>
+    </record>
+</odoo>

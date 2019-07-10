@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="invoice_form" model="ir.ui.view">
+        <field name="name">account.invoice.form.saas</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="account.invoice_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='product_id']" position="after">
+                <field name="saas_plan_id" invisible="1"/>
+                <field name="saas_client_id" domain="[('partner_id', '=', parent.partner_id), ('plan_id', '=', saas_plan_id)]"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_invoice_line_form" model="ir.ui.view">
+        <field name="name">account.invoice.line.form.saas</field>
+        <field name="model">account.invoice.line</field>
+        <field name="inherit_id" ref="account.view_invoice_line_form"/>
+        <field name="arch" type="xml">
+            <field name="product_id" position="after">
+                <field name="saas_client_id"/>
+            </field>
+        </field>
+    </record>
+</odoo>

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
     <data>
-        <menuitem name="SaaS" id="menu_base_saas" sequence="30" />
-        <menuitem id="menu_saas" parent="menu_base_saas" name="SaaS" sequence="1" web_icon="saas_portal,static/description/icon.png" />
+        <menuitem name="SaaS" id="menu_base_saas" sequence="30" web_icon="saas_portal,static/description/icon.png"/>
+        <menuitem id="menu_saas" parent="menu_base_saas" name="SaaS" sequence="1"/>
         <menuitem id="menu_saas_portal_config"
             name="Configuration"
             parent="menu_base_saas"
@@ -15,7 +15,7 @@
             <field name="model">saas_portal.client</field>
             <field name="priority">4</field>
             <field name="arch" type="xml">
-                <tree string="Clients" colors="red:expired" create="false" delete="false" edit="false">
+                <tree string="Clients" decoration-danger="expired" create="false" delete="false" edit="false">
                     <field name="name"/>
                     <field name="plan_id"/>
                     <field name="state"/>
@@ -43,7 +43,6 @@
             <field name="model">saas_portal.client</field>
             <field name="arch" type="xml">
                 <form string="Clients" create="false" delete="false" edit="true">
-                    <field name="expired" invisible="1"/>
                     <header>
                         <button string="Log in" name="%(action_edit_database)d" type="action"
                                 attrs="{'invisible':[('state', 'in', ['deleted','draft'])]}"
@@ -77,6 +76,7 @@
                         <group name="subscription">
                             <field name="trial"/>
                             <field name="expiration_datetime"/>
+                            <field name="expired"/>
                         </group>
                     </group>
                     <group string="Settings" name="settings">

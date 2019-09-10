@@ -5,7 +5,7 @@
     "support": "apps@it-projects.info",
     'website': "https://twitter.com/nasyrov_ildar",
     'category': 'SaaS',
-    'version': '11.0.1.0.0',
+    'version': '12.0.1.0.0',
     'depends': ['saas_portal'],
     'data': [
         'views/res_config.xml',

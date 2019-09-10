@@ -1,6 +1,6 @@
 {
     'name': 'SaaS Portal Asynchronous database creation',
-    'version': '11.0.1.0.0',
+    'version': '12.0.1.0.0',
     'author': 'IT-Projects LLC, Nicolas JEUDY',
     "support": "apps@it-projects.info",
     'website': "https://it-projects.info",

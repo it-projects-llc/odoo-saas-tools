@@ -1,6 +1,6 @@
 {
     'name': 'SaaS Server Backup S3',
-    'version': '11.0.1.0.0',
+    'version': '12.0.1.0.0',
     'author': 'Salton Massally, Nicolas JEUDY',
     'license': 'LGPL-3',
     'category': 'SaaS',

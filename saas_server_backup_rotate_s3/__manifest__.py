@@ -10,5 +10,5 @@
     "external_dependencies": {"python": ['boto', 'rotate_backups_s3'], "bin": []},
     'data': [
     ],
-    'installable': False,
+    'installable': True,
 }

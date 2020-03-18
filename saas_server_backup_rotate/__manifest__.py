@@ -11,5 +11,5 @@
         'data/ir_cron.xml',
         'views/res_config.xml',
     ],
-    'installable': False,
+    'installable': True,
 }

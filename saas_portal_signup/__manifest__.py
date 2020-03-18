@@ -8,7 +8,7 @@
     'website': 'https://it-projects.info',
     'depends': ['auth_signup', 'saas_portal'],
     'data': ['views/signup.xml'],
-    'installable': False,
+    'installable': True,
 
     'description': '''
 Module to book a new client in SaaS Portal from sign up

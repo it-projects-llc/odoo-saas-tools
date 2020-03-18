@@ -143,7 +143,7 @@ class SaasServer(http.Controller):
     @fragment_to_query_string
     @webservice
     def rename_database(self, **post):
-        _logger.info('rename_database post: %s', post)
+        _logger.info('delete_database post: %s', post)
         state = simplejson.loads(post.get('state'))
         client_id = state.get('client_id')
         new_dbname = state.get('new_dbname')
@@ -197,17 +197,81 @@ class SaasServer(http.Controller):
         # return werkzeug.utils.redirect('/auth_oauth/signin?%s' % werkzeug.url_encode(params))
         return werkzeug.utils.redirect('/web')
 
+    @http.route(['/saas_server/ab/css/<dbuuid>.css'], type='http', auth='public')
+    def ab_css(self, dbuuid=None):
+        content = ''
+        message = self._get_message(dbuuid)
+        if message:
+            content = '''
+.odoo .announcement_bar{
+        display:block;
+}
+
+.announcement_bar>span.message:before{
+    content: %s
+}
+
+.announcement_bar>.url>a:before{
+    content: 'Contact Us'
+}
+
+.announcement_bar .close {
+    height: 15px;
+    width: 15px;
+    background : url(/web/static/src/img/icons/fa-close.png) no-repeat;
+    background-size : 15px 15px;
+    opacity: 1;
+}
+
+.announcement_bar {
+    color: # ffffff;
+    height: 30px;
+    vertical-align: middle !important;
+    text-align: center !important;
+    width: 100%;
+
+    border: 0 !important;
+    margin: 0 !important;
+    padding: 8px !important;
+
+    background-color: # 8785C0;
+    background-image: -webkit-linear-gradient(135deg, rgba(255, 255, 255, 0.05) 25%, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.05) 50%, rgba(255, 255, 255, 0.05) 75%, rgba(255, 255, 255, 0) 75%, rgba(255, 255, 255, 0) 100% );
+    background-size: 40px 40px;
+    -webkit-transition: all 350ms ease;
+    text-shadow: 0px 0px 2px rgba(0,0,0,0.2);
+    box-shadow: 0px 2px 10px rgba(0,0,0,0.38) inset;
+    display: none;
+}
+
+.announcement_bar a {
+    font-weight: bold;
+    color: # d3ffb0 !important;
+    text-decoration: none !important;
+    border-radius: 3px;
+    padding: 5px 8px;
+    cursor: pointer;
+    -webkit-transition: all 350ms ease;
+}
+        '''
+            content = content.replace('%s', message)
+        return http.Response(content, mimetype='text/css')
+
     @http.route(['/saas_server/sync_server'], type='http', auth='public')
     @webservice
     def stats(self, **post):
         _logger.info('sync_server post: %s', post)
 
         state = simplejson.loads(post.get('state'))
+        print("state          ", state)
         updating_client_ID = state.get('updating_client_ID')
+        print ("updating_client_ID        ", updating_client_ID)
         access_token = post['access_token']
+        print ("access_token         ", access_token)
         saas_oauth_provider = request.env.ref('saas_server.saas_oauth_provider').sudo()
+        print ("saas_oauth_provider        ", saas_oauth_provider)
 
         user_data = request.env['res.users'].sudo()._auth_oauth_rpc(saas_oauth_provider.validation_endpoint, access_token, local_host=saas_oauth_provider.local_host, local_port=saas_oauth_provider.local_port)
+        print ("user_data       ", user_data)
         if user_data.get("error"):
             raise Exception(user_data['error'])
 
@@ -227,7 +291,20 @@ class SaasServer(http.Controller):
                 'db_storage': client.db_storage,
                 'total_storage_limit': client.total_storage_limit,
             })
+            print ("res        ",  res)
+            print ("simplejson.dumps(res)   ",simplejson.dumps(res))
         return simplejson.dumps(res)
+
+    def _get_message(self, dbuuid):
+        message = False
+        domain = [('client_id', '=', dbuuid)]
+        client = request.env['saas_server.client'].sudo().search(domain)
+        if client:
+            diff = datetime.datetime.strptime(client.expiration_datetime, DEFAULT_SERVER_DATETIME_FORMAT) - datetime.datetime.now()
+            hours_remaining = diff.seconds / 3600 + 1
+            plural = hours_remaining > 1 and 's' or ''
+            message = _("'You use a live preview. The database will be destroyed after %s hour%s.'") % (str(hours_remaining), plural)
+        return message
 
     @http.route(['/saas_server/backup_database'], type='http', website=True, auth='public')
     @fragment_to_query_string

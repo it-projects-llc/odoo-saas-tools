@@ -1,6 +1,6 @@
 {
     'name': 'SaaS Client',
-    'version': '12.0.1.0.0',
+    'version': '11.0.1.0.0',
     'author': 'Ivan Yelizariev, Nicolas JEUDY',
     'license': 'LGPL-3',
     'category': 'SaaS',
@@ -10,14 +10,13 @@
         'auth_oauth',
         'auth_oauth_ip',
         'auth_oauth_check_client_id',
-        'saas_base',
         'mail',
         'web_settings_dashboard',
         'access_limit_records_number',
     ],
     'data': [
         'views/saas_client.xml',
-        'views/res_config.xml',
+        # 'views/res_config.xml',
         'security/rules.xml',
         'security/groups.xml',
         'data/ir_cron.xml',

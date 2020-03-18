@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
     <t t-extend="DashboardMain">
-        <t t-jquery="div.form-row" t-operation="append">
-            <div class="col-12 col-lg-4 o_web_settings_dashboard_col">
+        <t t-jquery="div.row" t-operation="append">
+            <div class="col-md-3 col-sm-6 col-xs-12 o_web_settings_dashboard_col">
                 <div class="text-center o_web_settings_dashboard_saas"></div>
             </div>
         </t>

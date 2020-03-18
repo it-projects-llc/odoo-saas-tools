@@ -104,7 +104,7 @@
                     <separator/>
                     <field name="partner_id" string="Contact" filter_domain="[('partner_id', 'child_of', self)]"/>
                     <group expand="0" string="Group By">
-                        <filter string="Plan" domain="[]" context="{'group_by':'plan_id'}"/>
+                        <filter string="Plan" name="plan" domain="[]" context="{'group_by':'plan_id'}"/>
                     </group>
                 </search>
             </field>

@@ -9,5 +9,5 @@
     'data': [
         'views/saas_portal_views.xml',
     ],
-    'installable': False,
+    'installable': True,
 }

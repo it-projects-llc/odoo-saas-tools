@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from odoo import api, exceptions, fields, models
 from odoo.tools import scan_languages
 from odoo.tools.translate import _
-from odoo.addons.base.res.res_partner import _tz_get
+from odoo.addons.base.models.res_partner import _tz_get
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 
 from odoo.addons.saas_base.exceptions import MaximumTrialDBException
@@ -74,11 +74,16 @@ class SaasPortalServer(models.Model):
         if not state:
             state = {}
         scheme = scheme or self.request_scheme
+        print ("scheme   ", scheme)
         port = port or self.request_port
+        print ("port", port)
         scope = scope or ['userinfo', 'force_login', 'trial', 'skiptheuse']
+        print ("scope 1   ", scope)
         scope = ' '.join(scope)
+        print ("scope 2", scope)
         client_id = client_id or self.env['oauth.application'].generate_client_id(
         )
+        print ("client id ", client_id)
         params = {
             'scope': scope,
             'state': simplejson.dumps(state),
@@ -86,6 +91,7 @@ class SaasPortalServer(models.Model):
             'response_type': 'token',
             'client_id': client_id,
         }
+        print ("paramas  ______________", params)
         return params
 
     @api.multi
@@ -99,10 +105,15 @@ class SaasPortalServer(models.Model):
     def _request_server(self, path=None, scheme=None, port=None, **kwargs):
         self.ensure_one()
         scheme = scheme or self.local_request_scheme or self.request_scheme
+        print("scheme     ", scheme)
         host = self.local_host or self.host
+        print ("host     ", host)
         port = port or self.local_port or self.request_port
+        print ("port", port)
         params = self._request_params(**kwargs)
+        print ("params", params)
         access_token = self.oauth_application_id.sudo()._get_access_token(create=True)
+        print ("access_token", access_token)
         params.update({
             'token_type': 'Bearer',
             'access_token': access_token,
@@ -110,9 +121,13 @@ class SaasPortalServer(models.Model):
         })
         url = '{scheme}://{host}:{port}{path}'.format(
             scheme=scheme, host=host, port=port, path=path)
+        print ("url", url)
         req = requests.Request('GET', url, data=params,
                                headers={'host': self.host})
+        print ("req", req)
         req_kwargs = {'verify': self.verify_ssl}
+        print ("req_kwargs", req_kwargs)
+        print ("req.prepare() ", req.prepare())
         return req.prepare(), req_kwargs
 
     @api.multi
@@ -142,10 +157,12 @@ class SaasPortalServer(models.Model):
                 'client_id': server.client_id,
                 'updating_client_ID': updating_client_ID,
             }
-            req, req_kwargs = server._request_server(
-                path='/saas_server/sync_server', state=state, client_id=server.client_id)
+            req, req_kwargs = server._request_server(path='/saas_server/sync_server', state=state, client_id=server.client_id)
             res = requests.Session().send(req, **req_kwargs)
-
+            print ("state    ", state)
+            print ("req", req)
+            print ("req_kwargs", req_kwargs);
+            print ("res      ", res)
             if not res.ok:
                 raise Warning(_('Reason: %s \n Message: %s') %
                               (res.reason, res.content))

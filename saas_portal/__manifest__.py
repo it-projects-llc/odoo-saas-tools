@@ -6,11 +6,12 @@
     'category': 'SaaS',
     "support": "apps@it-projects.info",
     'website': 'https://it-projects.info',
-    'depends': ['oauth_provider',
-                'website',
-                'auth_signup',
-                'saas_base',
-                'saas_utils'],
+    'depends': [
+        'oauth_provider',
+        'website',
+        'auth_signup',
+        'saas_base',
+    ],
     'data': [
         'data/mail_template_data.xml',
         'data/plan_sequence.xml',
@@ -26,5 +27,5 @@
         'data/res_users.xml',
         'security/ir.model.access.csv',
     ],
-    'installable': False,
+    'installable': True,
 }

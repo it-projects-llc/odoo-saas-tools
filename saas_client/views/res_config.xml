@@ -1,28 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<odoo>
+<openerp>
+  <data>
     <record id="view_saas_general_configuration" model="ir.ui.view">
       <field name="name">General Settings</field>
       <field name="model">res.config.settings</field>
       <field name="inherit_id" ref="base_setup.res_config_settings_view_form"/>
       <field name="arch" type="xml">
-        <field name="company_id" position="after">
-          <h2>Saas Tools</h2>
-          <div class="row mt16 o_settings_container" name="saas_client_domain">
-            <div class="col-xs-12 col-md-6 o_setting_box">
-              <div class="o_setting_right_pane">
-                <label string="Your domain" for="current_domain"/>
-                <div class="text-muted">
-                    <field name="current_domain" class="oe_inline"/>
+        <data>
+          <field name="company_id" position="after">
+            <h2>Saas Tools</h2>
+              <div class="row mt16 o_settings_container" name="saas_client_domain">
+                <div class="col-xs-12 col-md-6 o_setting_box">
+                  <div class="o_setting_right_pane">
+                          <label string="Your domain"/>
+                          <div class="text-muted">
+                              <field name="current_domain" class="oe_inline"/>
+                          </div>
+                          <div class="content-group">
+                              <div class="mt16">
+                                  <field name="domain_change_link" class="oe_inline"/>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
                 </div>
-                <div class="content-group">
-                    <div class="mt16">
-                        <field name="domain_change_link" class="oe_inline"/>
-                    </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </field>
+          </field>
+        </data>
       </field>
     </record>
-</odoo>
+  </data>
+</openerp>

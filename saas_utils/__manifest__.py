@@ -28,5 +28,5 @@
     'website': 'http://www.openjaf.com',
     'category': 'Base',
     'depends': ['base'],
-    'installable': False
+    'installable': True
 }

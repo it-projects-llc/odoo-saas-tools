@@ -11,5 +11,5 @@
         'views/saas_portal_tagging_views.xml',
         'views/wizard.xml'
     ],
-    'installable': False,
+    'installable': True,
 }

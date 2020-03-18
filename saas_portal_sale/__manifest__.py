@@ -9,7 +9,7 @@
     'depends': [
         'sale',
         'saas_portal',
-        'product_price_factor',
+        # 'product_price_factor',
         'saas_portal_start',
         'contract',
     ],
@@ -20,5 +20,4 @@
         'data/mail_template_data.xml',
         'data/ir_config_parameter.xml',
     ],
-    'installable': False,
 }

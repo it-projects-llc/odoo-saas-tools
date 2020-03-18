@@ -1,5 +1,4 @@
-from odoo import SUPERUSER_ID
-from .. import ADMINUSER_ID
+from odoo import SUPERUSER_ID as SI
 from odoo import api
 from odoo import exceptions
 from odoo import models, fields
@@ -18,7 +17,7 @@ class ResUsers(models.Model):
         max_users = self.env["ir.config_parameter"].sudo().get_param("saas_client.max_users")
         max_users = int(max_users)
         if max_users:
-            cur_users = self.env['res.users'].search_count([('share', '=', False), ('id', 'not in', (SUPERUSER_ID, ADMINUSER_ID))])
+            cur_users = self.env['res.users'].search_count([('share', '=', False), ('id', '!=', SI)])
             if cur_users >= max_users:
                 raise exceptions.Warning(_('Maximum allowed users is %(max_users)s, while you already have %(cur_users)s') % {'max_users': max_users, 'cur_users': cur_users})
         return super(ResUsers, self).create(vals)
@@ -30,7 +29,7 @@ class ResUsers(models.Model):
         try:
             self = api.Environment(cr, uid, {})[cls._name]
             suspended = self.env['ir.config_parameter'].sudo().get_param('saas_client.suspended', '0')
-            if suspended == "1" and uid not in (SUPERUSER_ID, ADMINUSER_ID):
+            if suspended == "1" and uid != SI:
                 raise SuspendedDBException
         finally:
             cr.close()

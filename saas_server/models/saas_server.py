@@ -9,7 +9,6 @@ from odoo.service import db
 from odoo.tools.translate import _
 from odoo.addons.saas_base.tools import get_size
 from odoo import api, models, fields, SUPERUSER_ID, exceptions
-from .. import ADMINUSER_ID
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 
 import logging
@@ -118,7 +117,9 @@ class SaasServerClient(models.Model):
 
     @api.model
     def _config_parameters_to_copy(self):
-        return ['saas_client.saas_dashboard']
+        return ['saas_client.ab_location',
+                'saas_client.ab_register',
+                'saas_client.saas_dashboard']
 
     @api.multi
     def _prepare_database(self,
@@ -184,7 +185,7 @@ class SaasServerClient(models.Model):
                 'email': 'onwer-email@example.com',
             })
 
-            client_env['res.users'].browse(ADMINUSER_ID).write({
+            client_env['res.users'].browse(SUPERUSER_ID).write({
                 'oauth_provider_id': oauth_provider.id,
                 'oauth_uid': SUPERUSER_ID,
                 'oauth_access_token': access_token
@@ -204,7 +205,7 @@ class SaasServerClient(models.Model):
                 # user already exists (e.g. administrator)
                 user = res[0]
             if not user:
-                user = client_env['res.users'].browse(ADMINUSER_ID)
+                user = client_env['res.users'].browse(SUPERUSER_ID)
 
             vals = owner_user
             vals.update({
@@ -250,8 +251,7 @@ class SaasServerClient(models.Model):
         if check_client_id != client_id:
             return {'state': 'deleted'}
         users = client_env['res.users'].search(
-            [('share', '=', False),
-             ('id', 'not in', (SUPERUSER_ID, ADMINUSER_ID))])
+            [('share', '=', False), ('id', '!=', SUPERUSER_ID)])
         param_obj = client_env['ir.config_parameter']
         max_users = param_obj.sudo().get_param(
             'saas_client.max_users', '0').strip()
@@ -366,7 +366,7 @@ class SaasServerClient(models.Model):
                     continue
                 users = []
                 for u in g.users:
-                    if u.id not in (SUPERUSER_ID, ADMINUSER_ID):
+                    if u.id != SUPERUSER_ID:
                         users.append((3, u.id, 0))
                 g.write({'users': users})
 

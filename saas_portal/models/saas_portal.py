@@ -695,6 +695,9 @@ class SaasPortalClient(models.Model):
                                  help='Subsription initial period in hours for trials',
                                  readonly=True)
 
+    visible_addons = fields.Char('Visible addons',
+                                 help='Comma separated addons, what are visible in Apps page')
+
     # TODO: use new api for tracking
     _track = {
         'expired': {
@@ -761,13 +764,19 @@ class SaasPortalClient(models.Model):
 
     @api.multi
     def write(self, values):
+        payload_params = []
         if 'expiration_datetime' in values:
-            payload = {
-                'params': [{'key': 'saas_client.expiration_datetime', 'value': values['expiration_datetime'], 'hidden': True}],
-            }
+            payload_params.append({
+                'key': 'saas_client.expiration_datetime', 'value': values['expiration_datetime'], 'hidden': True,
+            })
 
-            for record in self:
-                record.upgrade(payload)
+        if 'visible_addons' in values:
+            payload_params.append({
+                'key': 'saas_client.visible_modules', 'value': values['visible_addons'], 'hidden': False,
+            })
+
+        for record in self:
+            record.upgrade({"params": payload_params})
 
         result = super(SaasPortalClient, self).write(values)
 

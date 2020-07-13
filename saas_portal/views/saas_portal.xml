@@ -72,6 +72,7 @@
                             <field name="server_id"/>
                             <field name="notification_sent"/>
                             <field name="support_team_id"/>
+                            <field name="visible_addons"/>
                         </group>
                         <group name="subscription">
                             <field name="trial"/>

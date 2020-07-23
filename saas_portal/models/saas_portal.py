@@ -843,7 +843,6 @@ class SaasPortalClient(models.Model):
             'login': owner_user.login,
             'name': owner_user.name,
             'email': owner_user.email,
-            'password': None,
         }
 
         state = {

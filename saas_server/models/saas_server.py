@@ -277,9 +277,9 @@ class SaasServerClient(models.Model):
             'db_storage': db_storage,
             'total_storage_limit': total_storage_limit,
         }
-        if suspended == '0' and self.state == 'pending':
+        if suspended == '0' and self.state in ('pending', 'deleted'):
             data.update({'state': 'open'})
-        if suspended == '1' and self.state == 'open':
+        if suspended == '1' and self.state in ('open', 'deleted'):
             data.update({'state': 'pending'})
         return data
 

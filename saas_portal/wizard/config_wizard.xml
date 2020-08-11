@@ -45,6 +45,7 @@
                         <field name="client_id"/>
                         <field name="partner_id" class="oe_inline"/>
                         <field name="expiration" />
+                        <field name="target_server" />
                      </group>
                      <footer>
                         <button name="apply" string="Duplicate" type="object" class="oe_highlight"/>

@@ -1,13 +1,19 @@
+import requests
 import functools
+import uuid
 import datetime
 import werkzeug.utils
+from werkzeug.wrappers import BaseResponse
 import simplejson
+import tempfile
+from subprocess import Popen, PIPE, DEVNULL
 
 from odoo import api, SUPERUSER_ID
 from odoo import http
-from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
+from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT, exec_pg_command_pipe, exec_pg_environ
 from odoo.tools.translate import _
 from odoo.http import request
+from odoo.service.db import closing, db_connect, restore_db, dump_db
 from odoo.addons.auth_oauth.controllers.main import fragment_to_query_string
 
 import logging
@@ -319,3 +325,84 @@ class SaasServer(http.Controller):
         client = client[0]
         result = client.backup_database()
         return simplejson.dumps(result)
+
+    dump_database_tokens = {}
+
+    @http.route(['/saas_server/dump_database_prepare'], type='http', website=True, auth='public')
+    @fragment_to_query_string
+    @webservice
+    def dump_database_prepare(self, **post):
+        client_id = post['client_id']
+        access_token = post['access_token']
+        saas_oauth_provider = request.env.ref('saas_server.saas_oauth_provider').sudo()
+
+        user_data = request.env['res.users'].sudo()._auth_oauth_rpc(saas_oauth_provider.validation_endpoint, access_token, local_host=saas_oauth_provider.local_host, local_port=saas_oauth_provider.local_port)
+        if user_data.get("error"):
+            raise Exception(user_data['error'])
+
+        client = request.env['saas_server.client'].sudo().search([('client_id', '=', client_id)], limit=1)
+        if not client:
+            raise Exception('Client not found')
+
+        db_name = client.name
+        dump_database_token = str(uuid.uuid4())
+        self.dump_database_tokens[dump_database_token] = db_name
+
+        return dump_database_token
+
+    @http.route(['/saas_server/dump_database'], type='http', website=True, auth='public')
+    @webservice
+    def dump_database(self, dump_database_token):
+        db_name = self.dump_database_tokens.pop(dump_database_token)
+
+        _logger.info('DUMP DB: %s', (db_name,))
+
+        def iterator():
+            with tempfile.TemporaryDirectory() as tmp_dir:
+                filename = tmp_dir + "/backup.zip"
+                with open(filename, "wb") as f:
+                    dump_db(db_name, f)
+
+                with open(filename, "rb") as f:
+                    f.seek(0)
+                    while 1:
+                        data = f.read(16*1024)
+                        if not data:
+                            break
+                        yield data
+
+        return BaseResponse(iterator(), 200, [('Content-Type', 'application/octet-stream')])
+
+    @http.route(['/saas_server/restore_database'], type='http', website=True, auth='public')
+    @fragment_to_query_string
+    @webservice
+    def restore_database(self, **post):
+        state = simplejson.loads(post.get('state'))
+
+        origin_uri = state['origin_uri']
+        access_token = post['access_token']
+        saas_oauth_provider = request.env.ref('saas_server.saas_oauth_provider').sudo()
+
+        user_data = request.env['res.users'].sudo()._auth_oauth_rpc(saas_oauth_provider.validation_endpoint, access_token, local_host=saas_oauth_provider.local_host, local_port=saas_oauth_provider.local_port)
+        if user_data.get("error"):
+            raise Exception(user_data['error'])
+
+        res = requests.get(origin_uri, stream=True)
+        res.raise_for_status()
+
+        db_name = "restored_" + datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            filename = tmp_dir + "/" + db_name + ".zip"
+            _logger.info("started downloaded database dump")
+            with open(filename, "wb") as f:
+                for chunk in res.iter_content(16*1024):
+                    f.write(chunk)
+
+            _logger.info("finished downloaded database dump")
+
+            _logger.info("started restoring ...")
+            restore_db(db_name, filename)
+            _logger.info("finished restoring ...")
+
+        return db_name

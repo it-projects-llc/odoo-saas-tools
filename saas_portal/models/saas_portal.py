@@ -810,7 +810,7 @@ class SaasPortalClient(models.Model):
                 raise Forbidden
 
     @api.multi
-    def duplicate_database(self, dbname=None, partner_id=None, expiration=None):
+    def duplicate_database(self, dbname=None, partner_id=None, expiration=None, target_server=None):
         self.ensure_one()
         p_client = self.env['saas_portal.client']
         p_server = self.env['saas_portal.server']
@@ -818,9 +818,41 @@ class SaasPortalClient(models.Model):
         owner_user = self.env['res.users'].search(
             [('partner_id', '=', partner_id)], limit=1) or self.env.user
 
-        server = self.server_id
-        if not server:
-            server = p_server.get_saas_server()
+        if target_server and self.server_id != target_server:
+            # TODO: заранее продублировать там базу, если сервер отличается от базы клиенского
+            req, req_kwargs = self.server_id._request_server(
+                path='/saas_server/dump_database_prepare',
+                client_id=self.client_id,
+            )
+            origin_res = requests.Session().send(req, **req_kwargs)
+            if not origin_res.ok:
+                raise Warning(_('Reason: %s \n Message: %s') %
+                              (origin_res.reason, origin_res.content))
+
+            req, req_kwargs = target_server._request_server(
+                path='/saas_server/restore_database',
+                state={
+                    "origin_uri": '{scheme}://{host}:{port}/saas_server/dump_database?dump_database_token={database_token}'.format(
+                        scheme=self.server_id.local_request_scheme or self.server_id.request_scheme,
+                        host=self.server_id.local_host or self.server_id.host,
+                        port=self.server_id.request_port or 80,
+                        database_token=origin_res.text,
+                    )
+                }
+            )
+
+            target_res = requests.Session().send(req, **req_kwargs)
+            if not target_res.ok:
+                raise Warning(_('Reason: %s \n Message: %s') %
+                              (target_res.reason, target_res.content))
+
+            server = target_server
+            db_template = target_res.text
+        else:
+            server = self.server_id
+            if not server:
+                server = p_server.get_saas_server()
+            db_template = self.name
 
         server.action_sync_server()
 
@@ -851,7 +883,7 @@ class SaasPortalClient(models.Model):
             'r': client.public_url + 'web',
             'owner_user': owner_user_data,
             'public_url': client.public_url,
-            'db_template': self.name,
+            'db_template': db_template,
             'disable_mail_server': True,
         }
 

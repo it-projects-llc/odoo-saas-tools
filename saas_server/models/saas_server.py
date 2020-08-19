@@ -285,7 +285,7 @@ class SaasServerClient(models.Model):
 
     @api.multi
     def upgrade_database(self, **kwargs):
-        for record in self:
+        for record in self.filtered(lambda record: record.state != "deleted"):
             with record.registry().cursor() as cr:
                 env = api.Environment(cr, SUPERUSER_ID, record._context)
                 return record._upgrade_database(env, **kwargs)

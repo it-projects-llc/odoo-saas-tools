@@ -1,7 +1,7 @@
 import os
 
 from odoo import models, fields, api, tools
-from odoo.addons.base.module.module import Module as A
+from odoo.addons.base.models.ir_module import Module
 from odoo.modules import get_module_resource
 
 
@@ -25,7 +25,7 @@ class ModuleDemo(models.Model):
 
     @staticmethod
     def get_values_from_terp(terp):
-        res = A.get_values_from_terp(terp)
+        res = Module.get_values_from_terp(terp)
         res.update({
             'demo_title': terp.get('demo_title', False),
             'demo_summary': terp.get('demo_summary', False),

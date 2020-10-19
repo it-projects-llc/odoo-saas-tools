@@ -268,11 +268,16 @@ class SaasServer(http.Controller):
         _logger.info('sync_server post: %s', post)
 
         state = simplejson.loads(post.get('state'))
+        print("state          ", state)
         updating_client_ID = state.get('updating_client_ID')
+        print ("updating_client_ID        ", updating_client_ID)
         access_token = post['access_token']
+        print ("access_token         ", access_token)
         saas_oauth_provider = request.env.ref('saas_server.saas_oauth_provider').sudo()
+        print ("saas_oauth_provider        ", saas_oauth_provider)
 
         user_data = request.env['res.users'].sudo()._auth_oauth_rpc(saas_oauth_provider.validation_endpoint, access_token, local_host=saas_oauth_provider.local_host, local_port=saas_oauth_provider.local_port)
+        print ("user_data       ", user_data)
         if user_data.get("error"):
             raise Exception(user_data['error'])
 
@@ -292,6 +297,8 @@ class SaasServer(http.Controller):
                 'db_storage': client.db_storage,
                 'total_storage_limit': client.total_storage_limit,
             })
+            print ("res        ",  res)
+            print ("simplejson.dumps(res)   ",simplejson.dumps(res))
         return simplejson.dumps(res)
 
     def _get_message(self, dbuuid):

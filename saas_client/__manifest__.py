@@ -16,7 +16,7 @@
     ],
     'data': [
         'views/saas_client.xml',
-        'views/res_config.xml',
+        # 'views/res_config.xml',
         'security/rules.xml',
         'security/groups.xml',
         'data/ir_cron.xml',

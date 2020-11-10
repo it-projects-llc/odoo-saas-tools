@@ -23,6 +23,8 @@ class res_users(models.Model):
     _inherit = 'res.users'
 
     def _auth_oauth_rpc(self, endpoint, access_token, local_host=None, local_port=None):
+        local_host = local_host or self.env.context.get('local_host')
+        local_port = local_port or self.env.context.get('local_port')
         params = werkzeug.url_encode({'access_token': access_token})
         host = None
         try:
@@ -39,7 +41,6 @@ class res_users(models.Model):
         else:
             url = endpoint + '?' + params
         req = urllib.request.Request(url, headers={'host': host})
-        print(('url', url))
 
         with urllib.request.urlopen(req) as response:
             html = response.read()
@@ -47,14 +48,6 @@ class res_users(models.Model):
 
     @api.model
     def _auth_oauth_validate(self, provider, access_token):
-        """ return the validation data corresponding to the access token """
         p = self.env['auth.oauth.provider'].browse(provider)
-        validation = self._auth_oauth_rpc(
-            p.validation_endpoint, access_token, local_host=p.local_host, local_port=p.local_port)
-        if validation.get("error"):
-            raise Exception(validation['error'])
-        if p.data_endpoint:
-            data = self._auth_oauth_rpc(
-                p.data_endpoint, access_token, local_host=p.local_host, local_port=p.local_port)
-            validation.update(data)
-        return validation
+        self = self.with_context(local_host=p.local_host, local_port=p.local_port)
+        return super(res_users, self)._auth_oauth_validate(provider, access_token)

@@ -25,6 +25,13 @@
           </div>
           <div class="col-xs-12 col-md-6 o_setting_box">
             <div>
+              <label for="sftp_port"/>
+              <div class="text-muted">The port where the SFTP connection should be made with. This is the port on the external server.</div>
+              <field name="sftp_port" placeholder="22"/>
+            </div>
+          </div>
+          <div class="col-xs-12 col-md-6 o_setting_box">
+            <div>
               <label for="sftp_password"/>
               <div class="text-muted">The password from the user where the SFTP connection should be made with. This is the password from the user on the external server.</div>
               <field name="sftp_password" password="True"/>

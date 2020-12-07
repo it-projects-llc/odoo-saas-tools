@@ -24,6 +24,10 @@ class SaasPortalConfigWizard(models.TransientModel):
         string='Username on SFTP Server',
         help='''The username where the SFTP connection should be made with.
         This is the user on the external server.''')
+    sftp_port = fields.Integer(
+        string='Port on SFTP Server', default="22",
+        help='''The port where the SFTP connection should be made with.
+        This is the port on the external server.''')
     sftp_password = fields.Char(
         string='Password User SFTP Server',
         help='''The password from the user where the SFTP connection should be
@@ -51,6 +55,7 @@ class SaasPortalConfigWizard(models.TransientModel):
         ICPSudo = self.env['ir.config_parameter'].sudo()
         ICPSudo.set_param("saas_server.sftp_server", self.sftp_server)
         ICPSudo.set_param("saas_server.sftp_username", self.sftp_username)
+        ICPSudo.set_param("saas_server.sftp_port", self.sftp_port)
         ICPSudo.set_param("saas_server.sftp_password", self.sftp_password)
         ICPSudo.set_param("saas_server.sftp_path", self.sftp_path)
         ICPSudo.set_param("saas_server.rsa_key_path", self.rsa_key_path)
@@ -64,6 +69,7 @@ class SaasPortalConfigWizard(models.TransientModel):
         res.update(
             sftp_server=ICPSudo.get_param('saas_server.sftp_server'),
             sftp_username=ICPSudo.get_param('saas_server.sftp_username'),
+            sftp_port=int(ICPSudo.get_param('saas_server.sftp_port')),
             sftp_password=ICPSudo.get_param('saas_server.sftp_password'),
             sftp_path=ICPSudo.get_param('saas_server.sftp_path'),
             rsa_key_path=ICPSudo.get_param('saas_server.rsa_key_path'),
@@ -76,6 +82,7 @@ class SaasPortalConfigWizard(models.TransientModel):
         params = {
             "host": self.sftp_server,
             "username": self.sftp_username,
+            "port": int(self.sftp_port),
         }
 
         try:

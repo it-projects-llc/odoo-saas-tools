@@ -22,6 +22,7 @@ class SaasServerClient(models.Model):
         server = ICPSudo.get_param('saas_server.sftp_server', None)
         username = ICPSudo.get_param('saas_server.sftp_username', None)
         password = ICPSudo.get_param('saas_server.sftp_password', None)
+        port = int(ICPSudo.get_param('saas_server.sftp_port', 22))
         path = ICPSudo.get_param('saas_server.sftp_path', None)
         rsa_key_path = ICPSudo.get_param('saas_server.rsa_key_path', None)
         rsa_key_passphrase=ICPSudo.get_param('saas_server.rsa_key_passphrase')
@@ -30,6 +31,7 @@ class SaasServerClient(models.Model):
         params = {
             "host": server,
             "username": username,
+            "port": port,
         }
         if rsa_key_path:
             params["private_key"] = self.rsa_key_path

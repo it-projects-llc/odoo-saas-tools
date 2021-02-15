@@ -1,7 +1,7 @@
 {
     'name': 'SaaS Portal Tagging',
     'summary': "Ability to tag client databases",
-    'version': '11.0.1.0.0',
+    'version': '12.0.1.0.0',
     'author': 'Salton Massally <salton.massally@gmail.com>, Nicolas JEUDY',
     'license': 'GPL-3',
     'category': 'SaaS',

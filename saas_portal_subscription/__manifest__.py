@@ -1,6 +1,6 @@
 {
     'name': 'SaaS Portal Subscription',
-    'version': '11.0.1.0.0',
+    'version': '12.0.1.0.0',
     'author': 'PlanetaTIC, Ivan Yelizariev, Nicolas JEUDY',
     'license': 'LGPL-3',
     'category': 'SaaS',

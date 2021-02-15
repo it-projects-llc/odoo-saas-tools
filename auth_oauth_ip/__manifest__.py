@@ -3,7 +3,7 @@
     "summary": """Allows to check access_token by requests in local network""",
     "category": "Extra Tools",
     "images": [],
-    "version": "11.0.1.0.0",
+    "version": "12.0.1.0.0",
     "author": "IT-Projects LLC, Ivan Yelizariev, Nicolas JEUDY",
     "support": "apps@it-projects.info",
     "website": "https://it-projects.info",

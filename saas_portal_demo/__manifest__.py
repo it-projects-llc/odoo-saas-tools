@@ -3,7 +3,7 @@
     "summary": """All you need to create demos for your applications in odoo apps store""",
     "category": "SaaS",
     "images": [],
-    "version": "11.0.1.0.0",
+    "version": "12.0.1.0.0",
 
     "author": "IT-Projects LLC, Cesar Lage, Ivan Yelizariev, Nicolas JEUDY",
     "website": "https://it-projects.info",

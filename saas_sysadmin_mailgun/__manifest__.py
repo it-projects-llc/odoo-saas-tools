@@ -3,7 +3,7 @@
     "summary": """This module configurates new databases for clients such as their users can send and receive mails""",
     "category": "SaaS",
     "images": [],
-    "version": "11.0.1.0.0",
+    "version": "12.0.1.0.0",
 
     "author": "IT-Projects LLC, Ildar Nasyrov, Nicolas JEUDY",
     "support": "apps@it-projects.info",

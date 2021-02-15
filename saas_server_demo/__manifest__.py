@@ -3,7 +3,7 @@
     "summary": """new parameters in __openerp__.py for demonstrative modules, control repositories for demonstration""",
     "category": "SaaS",
     "images": [],
-    "version": "11.0.1.0.0",
+    "version": "12.0.1.0.0",
 
     "author": "IT-Projects LLC, Ildar Nasyrov, Nicolas JEUDY",
     "website": "https://it-projects.info",

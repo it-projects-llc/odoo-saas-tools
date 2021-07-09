@@ -43,9 +43,9 @@
                 <t t-foreach="instances" t-as="instance">
                     <tr>
                         <td>
-                            <a t-attf-href="{{instance._request_url('/saas_server/edit_database')[0]}}"><t t-esc="instance.name"/></a>
+                            <a t-attf-href="{{instance._request_url('/saas_server/edit_database')}}"><t t-esc="instance.name"/></a>
                         </td>
-                        <td><span t-field="instances.expiration_datetime"/></td>
+                        <td><span t-field="instance.expiration_datetime"/></td>
                     </tr>
                 </t>
             </table>

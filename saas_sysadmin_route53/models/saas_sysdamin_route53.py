@@ -33,7 +33,7 @@ class SaasPortalClient(models.Model):
     def create(self, vals):
         client = super(SaasPortalClient, self).create(vals)
         if client.server_id.aws_hosted_zone_id:
-            client.server_id._update_zone(client.name, value=client.server_id.name, type='cname')
+            client.server_id._update_zone(client.name, value=client.server_id.ip_address, type='a')
         return client
 
     @api.multi
@@ -42,8 +42,8 @@ class SaasPortalClient(models.Model):
             if 'server_id' in vals:
                 server = self.env['saas_portal.server'].browse(vals['server_id'])
                 if client.server_id.aws_hosted_zone_id and server.id != client.server_id.id:
-                    client.server_id._update_zone(client.name, value=client.server_id.name,
-                                                  type='cname', action='update')
+                    client.server_id._update_zone(client.name, value=client.server_id.ip_address,
+                                                  type='a', action='update')
         super(SaasPortalClient, self).write(vals)
         return True
 
@@ -51,5 +51,5 @@ class SaasPortalClient(models.Model):
     def unlink(self):
         for client in self:
             if client.server_id.aws_hosted_zone_id:
-                client.server_id._update_zone(client.name, type='cname', action='delete')
+                client.server_id._update_zone(client.name, type='a', action='delete')
         return super(SaasPortalClient, self).unlink()

@@ -1,7 +1,7 @@
 Web server
 ==========
 
-All requests to domains you are use must be redirected to localhost:8069 with preserving value for header HOST. Check possible configurations below.
+All requests to domains you are using must be redirected to localhost:8069 with preserving value for header HOST. Check possible configurations below.
 
 
 Nginx
